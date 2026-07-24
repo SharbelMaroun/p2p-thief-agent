@@ -1,5 +1,9 @@
 # PLAN — Architecture & Technical Design
 
+> **QUARANTINE — PRE-AUDIT DRAFT.** Unsupported values, schemas, filenames,
+> dependencies, protocol details, and role-confused architecture below must not guide
+> implementation. Use only `CONFIRMED` ledger entries.
+
 - **Document version:** 2.11
 - **Changelog:** v2.11 — compliance audit: result artifact carries all four repo links (rule 49); handshake terms explicitly lock the scent model (rule 23). v2.10 — review pass: Acknowledge step (state machine + sequence diagrams), `world` config section, threading & concurrency model, coding/testing standards, `data/` directory.
 - **Status:** DRAFT — approve before development

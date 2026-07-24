@@ -1,5 +1,8 @@
 # PRD — Scent Trails & Belief Map (Perception)
 
+> **QUARANTINE — PRE-AUDIT DRAFT.** Dimensions, coefficients, formulas, schemas, and
+> behavior below are unverified. Do not implement from this file.
+
 - **Version:** 1.01 · **Status:** DRAFT · *(v1.01 — compliance audit: scent-model pre-game crypto-lock made explicit, rule 23)*
 - **Modules:** `domain/smell.py`, `domain/belief.py` · **Phase 4** · **Tasks:** T229-267 · **Requirements:** FR-5, FR-6, FR-7
 

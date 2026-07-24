@@ -1,5 +1,8 @@
 # PRD — P2P Networking & FastMCP
 
+> **QUARANTINE — PRE-AUDIT DRAFT.** Tool names, messages, ports, timeouts, sequencing,
+> and validation below are unverified. Do not implement from this file.
+
 - **Version:** 1.01 · **Status:** DRAFT · *(v1.01 — compliance audit: NET-7 explicitly covers the scent-model crypto-lock, rule 23)*
 - **Modules:** `infra/mcp_server.py`, `infra/mcp_client.py`, `domain/protocol.py`, `peer/handshake.py` · **Phase 2, 5** · **Tasks:** T131-175, T305-342 · **Requirements:** FR-13, FR-14, FR-15
 

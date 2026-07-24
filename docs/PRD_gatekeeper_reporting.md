@@ -1,5 +1,8 @@
 # PRD — API Gatekeeper & Automated Reporting
 
+> **QUARANTINE — PRE-AUDIT DRAFT.** Artifact schemas, limits, Gmail behavior, address,
+> and filenames below are unverified. Do not implement from this file.
+
 - **Version:** 1.01 · **Status:** DRAFT · *(v1.01 — compliance audit: result JSON carries all four repo links, rule 49)*
 - **Modules:** `shared/gatekeeper.py`, `shared/rate_limiter.py`, `infra/email_sender.py`, `report/*` · **Phase 7** · **Tasks:** T408-459 · **Requirements:** FR-18, FR-19, FR-20
 

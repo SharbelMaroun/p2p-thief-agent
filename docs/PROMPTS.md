@@ -1,5 +1,8 @@
 # PROMPTS — Prompt Engineering Log ("Prompt Book")
 
+> **KEEP WITH WARNING.** This is provenance, not authoritative evidence. Prompts and
+> their outputs cannot confirm a requirement.
+
 - **Document version:** 1.00 · **Status:** LIVING DOCUMENT — update with every significant AI-assisted step (guidelines §8.3)
 - **Purpose:** record all significant prompts used to build the project: context/goal, the prompt, output received, refinements made, and best practices derived.
 

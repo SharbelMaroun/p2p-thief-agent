@@ -1,5 +1,8 @@
 # PRD — Commit-Reveal Cryptographic Integrity
 
+> **QUARANTINE — PRE-AUDIT DRAFT.** Payloads, fields, canonicalization, sequence, and
+> sanctions below are unverified. Do not implement from this file.
+
 - **Version:** 1.00 · **Status:** DRAFT
 - **Module:** `domain/crypto.py`, `peer/sealing.py` · **Phase 6** · **Tasks:** T343-378 · **Requirements:** FR-8, FR-9, FR-10
 
