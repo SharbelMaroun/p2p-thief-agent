@@ -1,36 +1,40 @@
 # Repository Audit
 
-Audit date: 2026-07-24. “Verified” means verified for present repository purpose, not
-that embedded project claims are authoritative.
+Audit updated: 2026-07-24.
 
-| Path | Current purpose | Classification | Verified statements | Unsupported statements | Required action | Blocking evidence needed |
-|---|---|---|---|---|---|---|
-| `.env-example` | Placeholders | REVISE | No literal secret found | Provider/model names and need | Keep inactive; revise later | Official integrations/design |
-| `.gitignore` | Ignore local/secrets | KEEP WITH WARNING | Ignores `.env` and common secrets | Exact artifact paths | Keep; re-audit later | Original guidelines |
-| `.vscode/settings.json` | Editor settings | REMOVE LATER | Editor-only | Tool assumptions | Do not treat as requirement | Tooling policy |
-| `LICENSE` | MIT text | KEEP WITH WARNING | Standard license text | Applicability to future/course material | Keep | Ownership decision |
-| `README.md` | Entry point | REVISE | Companion URLs/audit status | Old runtime, section-count, install, config claims | Replaced safely | Official report/package rules |
-| `config/README.md` | Configuration quarantine notice | KEEP | Correctly records audit state | None; it does not define schema or values | Keep until configs are verified/replaced | Confirmed config requirements |
-| `config/police/game.json` | Cop shared-config draft | REMOVE LATER | Valid JSON | All schema/values; wrong role | Retain only; never consume | Schema/removal approval |
-| `config/police/game.toml` | Cop local-config draft | REMOVE LATER | Companion URLs | Ports/timeouts/models/email/modes | Retain only; never consume | Requirements/removal approval |
-| `config/police/rate_limits.json` | Cop limit draft | REMOVE LATER | Valid JSON | Version/all limits | Retain only; never consume | Requirements/removal approval |
-| `config/thief/game.json` | Thief shared-config draft | QUARANTINE | Valid JSON | Schema/version/all values | Do not overwrite/use | Appendix F/templates |
-| `config/thief/game.toml` | Thief private-config draft | QUARANTINE | Companion URLs | Version/ports/timeouts/models/email/fields | Do not use | Official rules/team choices |
-| `config/thief/rate_limits.json` | Thief limit draft | QUARANTINE | Valid JSON | Version/quotas/queue/retry | Do not use | Official/provider constraints |
-| `docs/PLAN.md` | Architecture plan | QUARANTINE | Useful topic inventory | Modules/messages/schemas/values/dependencies/tests | Banner; rewrite later | Confirmed ledger |
-| `docs/PRD.md` | Product draft | QUARANTINE | Candidate inventory | Numeric/protocol/reporting/tooling claims | Banner; rebuild later | Official sources |
-| `docs/PRD_commit_reveal.md` | Crypto draft | QUARANTINE | Candidate questions | Payload/hash/sequence/sanctions | Banner; do not implement | Protocol/templates |
-| `docs/PRD_gatekeeper_reporting.md` | Reporting draft | QUARANTINE | Candidate area | Artifacts/Gmail/limits/address | Banner; do not implement | Templates/book |
-| `docs/PRD_p2p_mcp.md` | Network draft | QUARANTINE | Candidate area | Tools/messages/timeouts/rules | Banner; do not implement | Official protocol |
-| `docs/PRD_scent_belief.md` | Perception draft | QUARANTINE | Thief-relevant topic | Dimensions/formulas/schemas | Banner; do not implement | Appendix F/book |
-| `docs/PRD_strategy.md` | Strategy draft | KEEP WITH WARNING | Thief evasion/belief focus | Interfaces/weights/exact behaviors | Banner; ideation only | Role rules/team design |
-| `docs/PROMPTS.md` | Prompt history | KEEP WITH WARNING | Planning provenance | Outputs are not evidence | Retain only as provenance | Prompt-log requirement |
-| `docs/TODO.md` | Work breakdown | QUARANTINE | Candidate inventory | Counts/phases/files/requirements/values | Banner; do not start | Verified ledger/plan |
-| `Material/LECTURER_REPO_OVERVIEW.md` | Simulator summary | KEEP WITH WARNING | Intended URL/path | Missing upstream commit; stale test result | Navigation only | Pinned checkout |
-| `Material/PROJECT_CONTEXT(1).md` | Planning context | KEEP WITH WARNING | Warns against assumptions | Unverified examples/designs | Navigation only | Official sources |
-| `Material/SUBMISSION_CHECKLIST(1).md` | Planning checklist | KEEP WITH WARNING | Useful coverage list | Checkmarks/claims are not evidence | Treat claims unverified | Official sources |
-| `Material/software_submission_guidelines-V3_Summary.md` | Summary | KEEP WITH WARNING | Names intended source | All mandates until original checked | Navigation only | Original v3.0 |
-| `Material/reference/police_thief_p2p.pdf` | Intended book | KEEP WITH WARNING | File exists | Version/content not directly verified here | Preserve/verify | Provenance/reader |
-| `Material/reference/police_thief_p2p_unverified_translation.md` | Translation | QUARANTINE | Explicitly unverified | All translated content | Navigation only | Original PDF |
+## Remediation summary
 
-The ten audit control documents created by this task are classified `KEEP`.
+| Area | Current state | Status |
+|---|---|---|
+| Active runtime configuration | None | `CONFIRMED` |
+| Thief configuration drafts | `config/drafts/thief/` with `.unverified` names | `CONFIRMED` |
+| Cop configuration drafts | `archive/pre-audit/opposite-role-config/cop/` | `CONFIRMED` |
+| `_audit_status` fields | Absent from all JSON files | `CONFIRMED` |
+| README | Corrected for verified-requirements phase and canonical links | `CONFIRMED` |
+| Shared structural baseline | `SR-001`–`SR-006` and `PS-001`–`PS-009` confirmed | `CONFIRMED` |
+| Runtime schemas, values, messages, tools, and reporting details | Not resolved | `UNKNOWN` |
+| Implementation/package/test files | Not added by this remediation | `CONFIRMED` |
+
+## Current-file classification
+
+| Path/group | Current purpose | Classification | Required action |
+|---|---|---|---|
+| `README.md` | Verified-requirements entry point | KEEP | Maintain only ledger-backed claims |
+| `LICENSE` | Repository license | KEEP WITH WARNING | Apply only to team-authored material where legally valid; review final licensing |
+| `.env-example` and `.gitignore` | Secret-handling scaffolding | KEEP WITH WARNING | Revisit names when integrations are verified |
+| `.vscode/settings.json` | Editor-local settings | REMOVE LATER | Do not treat as course configuration |
+| `config/README.md` | Configuration quarantine policy | KEEP | Update only after official config evidence |
+| `config/drafts/thief/*` | Preserved Thief drafts | QUARANTINE | Never load; replace only from verified sources |
+| `archive/pre-audit/opposite-role-config/*` | Preserved Cop/opposite-role material | KEEP WITH WARNING | Never use in Thief implementation |
+| `docs/REQUIREMENTS_LEDGER.md` | Full confirmed/role ledger | KEEP | Synchronize shared IDs with Cop |
+| `docs/SHARED_REQUIREMENT_BASELINE.md` | Shared confirmed baseline | KEEP | Keep free of gameplay/simulator details |
+| `docs/UNKNOWN_REQUIREMENTS.md` | Blocking unknowns | KEEP | Resolve only with direct evidence |
+| `docs/SPECIFICATION_CONFLICTS.md` | Conflicts/discrepancies | KEEP | Do not silently select a side |
+| `docs/VERIFICATION_POLICY.md` and `docs/SOURCE_OF_TRUTH.md` | Evidence controls | KEEP | Apply before implementation |
+| `docs/PLAN.md`, `docs/PRD*.md`, `docs/TODO.md` | Verified-phase planning stubs | KEEP | Expand only from confirmed ledger entries |
+| `docs/PROMPT_LOG.md` | Canonical prompt-engineering log | KEEP WITH WARNING | Provenance is not requirement evidence |
+| `docs/SIMULATOR_BASELINE.md` | Earlier local inspection record | KEEP WITH WARNING | Await centralized verified export |
+| `Material/*` | Local references/navigation aids | KEEP WITH WARNING / QUARANTINE | Do not stage or treat translations/summaries as binding |
+
+No teammate material was permanently deleted. Historical opposite-role configuration is
+archived, and superseded design drafts are preserved under `archive/pre-audit/`.

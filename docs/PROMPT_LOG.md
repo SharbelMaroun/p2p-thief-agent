@@ -1,4 +1,4 @@
-# PROMPTS — Prompt Engineering Log ("Prompt Book")
+# Prompt Engineering Log
 
 > **KEEP WITH WARNING.** This is provenance, not authoritative evidence. Prompts and
 > their outputs cannot confirm a requirement.
