@@ -1,12 +1,13 @@
-# Specification Conflicts
+# Specification Conflicts and Unresolved Discrepancies
 
-| ID | Claim A | Claim B | Status | Impact | Resolution evidence |
-|---|---|---|---|---|---|
-| C-001 | Current config/simulator example use one game | Legacy PRD/PLAN claim six | `CONFLICT` | Series/config/scoring | Appendix F exact row |
-| C-002 | Current config uses one version value | Translation/example shows another | `CONFLICT` | Config compatibility | Original guidelines/schema |
-| C-003 | Simulator config uses draft reporting | Legacy PRD says Gmail send | `CONFLICT` | Reporting/OAuth | Official book/newer Moodle |
-| C-004 | Repo contains Cop config and both-role plans | Task requires Thief-only runtime | `CONFLICT` | Boundary | Audit task controls now; official rule still needed |
-| C-005 | Simulator ports/timeouts are defaults | Legacy docs present them as requirements | `CONFLICT` | Network/config | Appendix F/official instruction |
-| C-006 | Old README says six mandatory sections | Direct support is unavailable | `CONFLICT` | Report | Official submission sources |
-| C-007 | Legacy docs specify artifact filenames/fields | Moodle templates are absent | `CONFLICT` | Reporting | Original templates |
-| C-008 | Simulator described as book-linked v3.0.0 | Local directory lacks independent Git provenance | `CONFLICT` | Baseline | Clean upstream pinned checkout |
+| ID | Issue | Status | Impact | Resolution evidence |
+|---|---|---|---|---|
+| C-001 | Historical draft `num_games = 1` conflicts with an unverified NotebookLM claim of 6. | `CONFLICT` | Series/config/scoring | Direct Appendix F row |
+| C-002 | README described as five content components plus a cross-link conflicts with “six mandatory sections.” | `CONFLICT` | Academic report | Exact Chapter 9.4.2 and Appendix C text |
+| C-003 | Simulator tool names appear as `submit_audit`, `exchange_audit`, or another name. | `UNKNOWN` | MCP contract | Centralized verified simulator reverse-engineering export |
+| C-004 | Final-project Gmail address spelling is unresolved. | `UNKNOWN` | Reporting | Official Appendix F/table or newer announcement |
+| C-005 | Previous references pointed to Appendix G for GitHub submission requirements; book v3.0.0 uses Appendix C. | `CONFIRMED` | Documentation citations | Corrected to Appendix C |
+| C-006 | Whether all four reporting artifacts must be byte-identical is unresolved. | `UNKNOWN` | Reporting/contracts | Official JSON templates and direct book text |
+| C-007 | Whether a stateless common package is allowed is unresolved; shared live state is separately prohibited by `SR-004`. | `UNKNOWN` | Shared architecture | Official rule or lecturer clarification |
+
+No unresolved entry is resolved by selecting an example or simulator default.
