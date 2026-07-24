@@ -1,5 +1,8 @@
 # TODO — Full Work Breakdown Structure (600+ tasks)
 
+> **QUARANTINE — DO NOT START PHASE 1.** Counts, phases, filenames, requirements, and
+> acceptance values below predate verification. Rebuild only from confirmed evidence.
+
 - **Document version:** 2.11
 - **Changelog:** v2.11 — compliance audit vs. all 3 Material sources: T416 corrected (4 repo links, rule 49); addendum B T633–T635 added (4-link result artifact, UI documentation, scent-model lock test). v2.10 — review pass: statuses updated; addendum A T621–T632 (Acknowledge step, NL-only hint validation, 6-sub-game series, league integrity).
 - **Status:** DRAFT — approve before development (guidelines §2.5)

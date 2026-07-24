@@ -1,5 +1,8 @@
 # PRD — Strategy & Decision Module
 
+> **KEEP WITH WARNING — PRE-AUDIT IDEATION.** Thief evasion and Cop-belief topics are
+> relevant, but interfaces, weights, behaviors, and requirement labels are unverified.
+
 - **Version:** 1.00 · **Status:** DRAFT
 - **Modules:** `strategy/brains.py`, `strategy/__init__.py` (factory) · **Phase 3–4** · **Tasks:** T176-228 · **Requirements:** FR-11, FR-12
 

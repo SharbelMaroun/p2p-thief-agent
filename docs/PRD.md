@@ -1,5 +1,8 @@
 # PRD — Distributed Cops-and-Robbers over a P2P Network
 
+> **QUARANTINE — PRE-AUDIT DRAFT.** “Binding,” “mandatory,” “fixed,” and numerical
+> labels below are unverified. Use only `CONFIRMED` ledger entries.
+
 - **Document version:** 2.11
 - **Changelog:** v2.11 — compliance audit vs. all 3 Material sources: result JSON carries **all four repo links** (rule 49), scent-model pre-game crypto-lock made explicit (rule 23), UI-documentation task added (guidelines §10), task counts reconciled. v2.10 — review pass: Acknowledge protocol step, barrier-capture + honest capture answer, NL-only hint rule, 6-sub-game series + league integrity.
 - **Status:** DRAFT — awaiting team approval before development (guidelines §2.5)
