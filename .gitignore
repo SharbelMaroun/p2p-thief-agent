@@ -1,0 +1,27 @@
+# Secrets — NEVER commit (rulebook App.A rule 39-40, guidelines §7.4)
+.env
+credentials.json
+token.json
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Runtime artifacts (official game artifacts are copied to results/, which is tracked)
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

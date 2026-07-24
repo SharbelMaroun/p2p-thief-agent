@@ -1,0 +1,32 @@
+# PRIVATE per-peer configuration (never negotiated, never signed).
+# The shared game.json OVERRIDES any matching game condition here.
+version = "1.00"
+
+[game]
+group_name = "<Your-Team-Name>"
+group_id = "<team-id>"
+sub_game_number = 1
+members = ["<member-id-1>", "<member-id-2>"]
+
+[game.repos]
+cop = "https://github.com/SharbelMaroun/p2p-cop-agent"
+thief = "https://github.com/SharbelMaroun/p2p-thief-agent"
+
+[network]
+my_port = 8801
+opponent_url = "http://127.0.0.1:8802/mcp"
+turn_timeout_seconds = 180
+
+# [strategy]
+# thief_class = "<pkg>.strategy:ThiefBrain"   # package.module:Class — unset = default heuristic
+
+[trash_talk]
+provider = "template"   # template (0 tokens, default) | ollama | claude_api | claude_cli
+
+[llm]
+model = "claude-haiku-4-5-20251001"
+step_deadline_seconds = 30
+
+[email]
+recipient = "rimesegal+uoh26finalgame@gmail.com"
+mode = "draft"   # draft while testing; switch to send for official league games
