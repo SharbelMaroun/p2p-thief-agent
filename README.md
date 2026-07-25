@@ -1,74 +1,85 @@
 # P2P Thief Agent
 
-Thief-side repository for the “Distributed Cops-and-Robbers over a Peer-to-Peer
-Network” final project.
+Independently installable Thief-side package for the “Distributed Cops-and-Robbers over
+a Peer-to-Peer Network” university project.
 
-> Companion Cop repository: <https://github.com/SharbelMaroun/p2p-cop-agent>
+Companion Cop repository:
+<https://github.com/SharbelMaroun/p2p-cop-agent>
 
-## Requirements status
+## Milestone status
 
-This repository is in the verified-requirements phase. Structural and professional
-requirements with direct support are recorded as `CONFIRMED`; unresolved gameplay,
-protocol, configuration, and reporting details remain `UNKNOWN`. There is no runtime
-implementation or approved runtime configuration yet.
+Version `1.00` is an M0–M1 documentation and package scaffold. The inspected baseline
+(`119fa911d5b1a5aecdaa9531d0912e5c6f9ab32f`) contained no Python package, tests,
+`pyproject.toml`, or lockfile. This milestone adds those engineering foundations but
+deliberately implements no game engine, peer runtime, LLM, Gmail, GUI, or replay
+behavior.
 
-- [Requirements ledger](docs/REQUIREMENTS_LEDGER.md)
-- [Shared structural baseline](docs/SHARED_REQUIREMENT_BASELINE.md)
-- [Unknown requirements](docs/UNKNOWN_REQUIREMENTS.md)
-- [Specification conflicts](docs/SPECIFICATION_CONFLICTS.md)
-- [Verification policy](docs/VERIFICATION_POLICY.md)
-- [Repository audit](docs/REPOSITORY_AUDIT.md)
-- [Configuration status](config/README.md)
+The Cop agent owns the proposed parity-controlled contract bundle for this gate. No
+accepted Cop proposal is currently available, so the shared contract is
+**pending—not frozen**. The Thief repository will consume accepted files byte-for-byte;
+it will not invent a competing MCP contract.
 
-No installation or run commands are published until the package and runtime contracts
-are verified.
+## Install and inspect
 
-## Confirmed structural requirements
+Python 3.10 or newer and
+[uv](https://docs.astral.sh/uv/) are required.
 
-- The final project uses separate Cop and Thief repositories, each linking to the other
-  and accessible to the lecturer.
-- Cop and Thief run as separate processes with separate configuration environments,
-  local state, and no access to the opponent’s private truth.
-- Each peer acts as both a FastMCP server and client; exact tool names remain `UNKNOWN`.
-- Each repository includes a root README, configuration directory, PRDs, PLAN, TODO,
-  and code in its completed form.
-- Required documentation includes `README.md`, `docs/PRD.md`, `docs/PLAN.md`,
-  `docs/TODO.md`, and dedicated PRDs for important mechanisms.
-- Professional requirements confirm `uv`, committed `pyproject.toml` and `uv.lock`,
-  code/test file-size limits, TDD and coverage, Ruff, configuration/secrets controls,
-  an SDK/service boundary, a centralized external-API gatekeeper, and
-  `docs/PROMPT_LOG.md`.
+```text
+uv sync --frozen
+uv run p2p-thief --help
+```
 
-These statements summarize `SR-001` through `SR-006` and `PS-001` through `PS-009`.
-Appendix F gameplay values and statuses are directly confirmed as `AF-013` through
-`AF-022`; supplied JSON artifact structures are confirmed as `JS-001` through `JS-003`.
-Exact MCP messages, remaining cryptographic procedures, and unverified simulator details
-remain `UNKNOWN`.
+The command exposes scaffold metadata and help only. It does not start a peer or a
+game.
 
-## Thief scope
+## Quality gates
 
-This repository represents only the Thief peer at runtime. Thief concerns include
-evasion, belief about the Cop, Cop-scent observation, survival, route selection,
-Thief-local strategy, and Thief-local verbal behavior. Confirmed Appendix F values do
-not by themselves settle formulas, event ordering, schemas, or protocol messages.
+```text
+uv run ruff check .
+uv run pytest --cov --cov-branch --cov-fail-under=85
+uv run python scripts/check_file_lengths.py
+uv run python scripts/check_secrets.py
+uv run python scripts/check_shared_contracts.py
+```
 
-The Thief implementation must not import the Cop repository’s private runtime code,
-depend on its filesystem, or share live mutable state with it. Whether independently
-duplicated stateless packages are permitted remains `UNKNOWN`.
+Shared-hash verification requires the future accepted Cop manifest. Until then the
+contract check exits nonzero with a pending blocker; it never reports a false pass.
 
-## Configuration
+## Confirmed boundaries
 
-There is no approved runtime configuration. Historical Thief drafts are quarantined
-under `config/drafts/thief/`; no implementation may load them. See
-[config/README.md](config/README.md).
+- Cop and Thief are separate processes and repositories with no shared memory, database,
+  runtime filesystem, or private truth (`SR-001`, `SR-004`, `THIEF-001`).
+- Legal moves are north, south, east, west, and stay; diagonals are illegal
+  (`AF-015`).
+- Barrier placement is disclosed; a barrier on the Thief’s current cell and a trapped
+  Thief are captures (`AE-015`, `AE-046`).
+- SHA-256 commit-reveal, secret nonces until reveal, explicit state machines,
+  illegal-transition rejection, deadlines, watchdogs, and public tunneling are required
+  (`AE-004`, `AE-006`, `AE-010`, `AE-017`).
+- Live GUI information is local truth only (`AE-008`).
+- Appendix F values are recorded as `AF-013`–`AF-022`; official artifact-template key
+  sets are recorded as `JS-001`–`JS-003`.
+- Deterministic movement is the project default. Appendix E rule 25 is a
+  recommendation, not an automatic mandatory sanction (`AE-025`).
 
-## License
+See the [requirements ledger](docs/REQUIREMENTS_LEDGER.md), [verified parameter
+baseline](docs/PARAMETERS_BASELINE.md), [JSON artifact evidence](docs/JSON_ARTIFACT_SCHEMAS.md),
+[unknowns](docs/UNKNOWN_REQUIREMENTS.md), [conflicts](docs/SPECIFICATION_CONFLICTS.md),
+[repository audit](docs/REPOSITORY_AUDIT.md), and
+[M1 verification record](docs/M1_VERIFICATION.md).
 
-The current [MIT license](LICENSE) applies only to team-authored material where legally
-valid. Lecturer-provided documents and code are not automatically relicensed. The final
-licensing decision remains subject to review.
+## Architecture boundary
 
-Documentation completeness in this requirements-remediation phase does not mean the
-project is submission-complete. Runtime implementation, tests, formal schema validators,
-match evidence, repository access, release tagging, and current Moodle requirements
-remain separate submission gates.
+All future business behavior must be reachable through the public SDK. CLI, GUI, MCP
+transport, and external integrations may adapt inputs and outputs but may not contain or
+duplicate business logic. The present package contains only metadata, the SDK entry
+point, and empty layer boundaries.
+
+Historical configurations remain quarantined under `config/drafts/`; runtime code must
+not load them. Local private TOML and real `.env` files are ignored.
+
+## License and provenance
+
+The [MIT license](LICENSE) covers team-authored material where legally valid.
+Lecturer-provided documents and simulator code are not automatically relicensed. No
+lecturer simulator runtime code is included in this scaffold.

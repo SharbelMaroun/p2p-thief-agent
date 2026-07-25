@@ -5,10 +5,11 @@ source, version, exact page/table/section or file/symbol, and a short faithful
 paraphrase. Numerical values and modes require direct Appendix F evidence. Mandatory
 rules require direct Appendix E evidence unless a higher-priority source controls.
 
-Machine-readable Moodle templates are required before accepting exact JSON schemas,
-fields, ownership, signatures, or filenames. Simulator observations require its
-upstream URL and full upstream commit hash, and remain illustrative unless official
-sources confirm them.
+Machine-readable official templates can confirm fields that are present, ownership,
+identifiers, signatures, and filenames. Populated examples do not by themselves prove
+requiredness, optionality, types, enums, or validation constraints. Simulator
+observations require its upstream URL and full upstream commit hash and remain
+illustrative unless a higher source confirms them.
 
 NotebookLM answers, translations, summaries, checklists, team plans, repository prose,
 current configuration, and unconfirmed simulator behavior are insufficient alone.
@@ -17,8 +18,10 @@ Conflicts must be recorded without silently selecting a value. Before implementa
 
 1. update the source inventory and ledger;
 2. resolve affected conflicts and unknowns;
-3. obtain teammate agreement for independently duplicated stateless contracts;
-4. update configuration only from verified schemas and values;
+3. obtain an accepted cross-team ADR for parity-controlled contracts;
+4. copy accepted contract files byte-for-byte without a runtime repository dependency;
 5. add tests traceable to confirmed requirements.
 
-Newer Moodle or lecturer instructions must be checked again before implementation.
+An unresolved item blocks only its dependent subsystem. It does not blanket-block
+documentation, package scaffolding, or unrelated domain work. Newer Moodle or lecturer
+instructions must be checked again before the affected release gate.

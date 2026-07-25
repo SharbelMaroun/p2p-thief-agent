@@ -1,7 +1,7 @@
 # Shared Requirement Baseline
 
-This file contains only shared confirmed structural and professional requirements. It
-contains no gameplay values or simulator-specific names.
+This file contains shared confirmed structural and professional requirements. It is a
+Thief-side evidence baseline; it is not claimed byte-identical with the Cop repository.
 
 | ID | Requirement | Status | Direct source location |
 |---|---|---|---|
@@ -11,6 +11,10 @@ contains no gameplay values or simulator-specific names.
 | SR-004 | Cop and Thief use separate processes and configuration environments, share no live mutable state, and cannot access the opponent’s private truth. | `CONFIRMED` | Official project book v3.0.0, Chapter 2.4.2 |
 | SR-005 | Each peer acts as both a FastMCP server and FastMCP client. | `CONFIRMED` | Official project book v3.0.0, peer architecture description |
 | SR-006 | Each repository contains a root README, configuration directory, PRD documents, PLAN, TODO, and code. | `CONFIRMED` | Official project book v3.0.0, Chapter 9.4 and Appendix C |
+| SR-007 | The submission revision uses the documented annotated tag `v1.0-submission`, subject to a later dated Moodle override. | `CONFIRMED` | Official project book v3.0.0, Appendix C checklist and Appendix E rule 41 |
+| SR-008 | The README academic report contains six listed components, with the companion-repository link as the sixth. | `CONFIRMED` | Official project book v3.0.0, Chapter 9.4.2 and Appendix E rule 42 |
+| SR-009 | Runtime coordination uses a single gateway, explicit state machine, illegal-transition rejection, deadlines, and a watchdog. | `CONFIRMED` | Official project book v3.0.0, Appendix E rules 3–7 |
+| SR-010 | The completed project provides a local-truth live GUI and a replay/verifier. | `CONFIRMED` | Official project book v3.0.0, Appendix E rules 8, 9, and 20 |
 | PS-001 | Required documentation is `README.md`, `docs/PRD.md`, `docs/PLAN.md`, `docs/TODO.md`, and dedicated mechanism PRDs. | `CONFIRMED` | Professional Software Submission Guidelines v3.0, pages 7–9 |
 | PS-002 | Use `uv`; keep dependencies in `pyproject.toml`; commit `uv.lock`. | `CONFIRMED` | Professional Software Submission Guidelines v3.0, pages 19–20 |
 | PS-003 | Code and test files are limited to 150 code lines, excluding blanks/comments. | `CONFIRMED` | Professional Software Submission Guidelines v3.0, page 10 |
@@ -20,3 +24,4 @@ contains no gameplay values or simulator-specific names.
 | PS-007 | User interfaces and integrations delegate business logic through an SDK/service boundary. | `CONFIRMED` | Professional Software Submission Guidelines v3.0, page 11 |
 | PS-008 | External API calls use a centralized gatekeeper with limiting, FIFO queueing, backpressure, retries, and monitoring. | `CONFIRMED` | Professional Software Submission Guidelines v3.0, pages 13–14 |
 | PS-009 | Maintain `docs/PROMPT_LOG.md`. | `CONFIRMED` | Professional Software Submission Guidelines v3.0, page 19 |
+| PS-010 | Code and configuration versions start at `1.00`; the code version has one source at `src/<pkg>/shared/version.py`. | `CONFIRMED` | Professional Software Submission Guidelines v3.0, page 19 |
