@@ -12,7 +12,9 @@ Audit updated: 2026-07-24.
 | `_audit_status` fields | Absent from all JSON files | `CONFIRMED` |
 | README | Corrected for verified-requirements phase and canonical links | `CONFIRMED` |
 | Shared structural baseline | `SR-001`–`SR-006` and `PS-001`–`PS-009` confirmed | `CONFIRMED` |
-| Runtime schemas, values, messages, tools, and reporting details | Not resolved | `UNKNOWN` |
+| Appendix F values, statuses, filenames, provider modes, and official addresses | Directly verified from the original PDF | `CONFIRMED` |
+| Supplied JSON artifact structures and key sets | Directly inspected from four templates | `CONFIRMED` |
+| Formal JSON Schema validation rules, exact MCP messages/tools, and unverified simulator details | Not resolved | `UNKNOWN` |
 | Implementation/package/test files | Not added by this remediation | `CONFIRMED` |
 
 ## Current-file classification
@@ -21,7 +23,7 @@ Audit updated: 2026-07-24.
 |---|---|---|---|
 | `README.md` | Verified-requirements entry point | KEEP | Maintain only ledger-backed claims |
 | `LICENSE` | Repository license | KEEP WITH WARNING | Apply only to team-authored material where legally valid; review final licensing |
-| `.env-example` and `.gitignore` | Secret-handling scaffolding | KEEP WITH WARNING | Revisit names when integrations are verified |
+| `.env-example` and `.gitignore` | Secret-handling scaffolding | KEEP | `.env-example` exists with placeholders only; keep secrets ignored |
 | `.vscode/settings.json` | Editor-local settings | REMOVE LATER | Do not treat as course configuration |
 | `config/README.md` | Configuration quarantine policy | KEEP | Update only after official config evidence |
 | `config/drafts/thief/*` | Preserved Thief drafts | QUARANTINE | Never load; replace only from verified sources |
@@ -38,3 +40,8 @@ Audit updated: 2026-07-24.
 
 No teammate material was permanently deleted. Historical opposite-role configuration is
 archived, and superseded design drafts are preserved under `archive/pre-audit/`.
+
+Documentation completeness for this evidence-review phase does not mean submission
+completeness. Implementation, tests, formal schema validators, match evidence, repository
+access, release tagging, and current Moodle instructions remain separate submission
+gates.

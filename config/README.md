@@ -6,9 +6,11 @@ All files under `config/drafts/` are unverified historical drafts. No implementa
 may load them. Their exact fields, filenames, versions, values, and schemas remain
 `UNKNOWN`.
 
-Before any active configuration is created, the official Appendix F values and official
-JSON templates must be obtained and verified directly. No replacement schema is defined
-by this repository audit.
+Appendix F values and statuses are directly verified in
+`docs/REQUIREMENTS_LEDGER.md`. The supplied official JSON artifact templates are
+recorded in `docs/JSON_ARTIFACT_SCHEMAS.md`. Exact MCP messages and remaining
+cryptographic procedures must still be verified before active runtime configuration is
+approved.
 
 Opposite-role Cop drafts are preserved outside the active configuration tree under
 `archive/pre-audit/opposite-role-config/`.
