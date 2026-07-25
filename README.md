@@ -40,14 +40,16 @@ are verified.
   `docs/PROMPT_LOG.md`.
 
 These statements summarize `SR-001` through `SR-006` and `PS-001` through `PS-009`.
-They do not confirm gameplay values or runtime schemas.
+Appendix F gameplay values and statuses are directly confirmed as `AF-013` through
+`AF-022`. Official JSON schemas, exact MCP messages, and unverified simulator details
+remain `UNKNOWN`.
 
 ## Thief scope
 
-This repository represents only the Thief peer at runtime. Candidate Thief concerns
-include evasion, belief about the Cop, Cop-scent observation, survival, route selection,
-Thief-local strategy, and Thief-local verbal behavior. Exact mechanics remain subject
-to direct Appendix E and Appendix F verification.
+This repository represents only the Thief peer at runtime. Thief concerns include
+evasion, belief about the Cop, Cop-scent observation, survival, route selection,
+Thief-local strategy, and Thief-local verbal behavior. Confirmed Appendix F values do
+not by themselves settle formulas, event ordering, schemas, or protocol messages.
 
 The Thief implementation must not import the Cop repository’s private runtime code,
 depend on its filesystem, or share live mutable state with it. Whether independently
@@ -64,3 +66,8 @@ under `config/drafts/thief/`; no implementation may load them. See
 The current [MIT license](LICENSE) applies only to team-authored material where legally
 valid. Lecturer-provided documents and code are not automatically relicensed. The final
 licensing decision remains subject to review.
+
+Documentation completeness in this requirements-remediation phase does not mean the
+project is submission-complete. Runtime implementation, tests, official JSON schemas,
+match evidence, repository access, release tagging, and current Moodle requirements
+remain separate submission gates.
