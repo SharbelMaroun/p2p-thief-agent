@@ -1,15 +1,22 @@
-# Simulator Baseline
+# Lecturer Simulator Baseline
 
-Status: `UNKNOWN` pending centralized analysis.
+Status: pinned reference inspected through a verified planning export.
 
-The planning repository is responsible for reverse-engineering the lecturer simulator.
-No verified simulator-analysis export was available during this remediation. This
-repository does not infer tool names, schemas, messages, values, or requirements from
-the simulator.
+| Field | Value |
+|---|---|
+| Upstream | `https://github.com/rmisegal/Game-P2P-Cop-Chase.git` |
+| Exact commit | `960499fd5e8777b4929625f5d8fdcf2ab4677b54` |
+| Release subject | `Release v3.0.0 — align code and guidelines-book versions to 3.0.0` |
+| Verified export | planning workspace `exports/simulator-shared/`, inspected 2026-07-24 |
 
-When a verified central export is available, record its upstream URL, full commit hash,
-inspection date, exact files/symbols, commands/results, and the distinction between
-officially confirmed requirements and illustrative behavior.
+The simulator is a learning and interoperability reference, not a submission skeleton.
+Its implementation cannot override the book. In particular:
 
-The previous local inspection record is preserved under
-`archive/pre-audit/documentation/SIMULATOR_BASELINE.md`.
+- do not copy its one-game demo/default into the official six-sub-game series;
+- do not copy its subtractive/immediate scent decay; Chapter 4.3 is multiplicative;
+- do not present `negotiate`, `receive_turn`, `submit_audit`, or `receive_control` as
+  mandatory book names;
+- do not copy substantial source without an accepted license/provenance decision.
+
+This M1 source tree was written as a clean behavior-free scaffold and contains no
+lecturer simulator runtime code. ADR-0008 remains pending for any later reuse.

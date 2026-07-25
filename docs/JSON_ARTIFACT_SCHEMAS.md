@@ -1,16 +1,25 @@
 # Official JSON Artifact Templates
 
-Status: directly inspected from the supplied `Json-examples/` directory.
+Status: directly inspected key-presence evidence from the supplied `Json-examples/`
+directory.
 
 Source directory supplied for this audit: external
 `SimulatorEXM-Repo/Json-examples/` (the templates are not copied into this repository).
 
-The four JSON files parse successfully. They establish the artifact structure and key
-sets below. Their populated values are examples from a generated one-sub-game match;
-they do not override Appendix F. In particular, the example's `num_games: 1` and
-`num_sub_games: 1` do not replace Appendix F Table 18's fixed six-sub-game series.
-Fields not present in Appendix F, including `pheromone_min_center_intensity`, are schema
-fields or example values only unless separately confirmed by a binding source.
+The four JSON files parse successfully. They prove that the listed keys are present in
+the inspected examples. They do not by themselves prove requiredness, optionality,
+types, enums, bounds, additional-property behavior, or every nested shape (`U-019`).
+Their populated one-sub-game values do not override Appendix F's fixed six-sub-game
+series. Fields absent from Appendix F, including
+`pheromone_min_center_intensity`, remain template/example fields without a confirmed
+gameplay value.
+
+Observed SHA-256 values:
+
+- declaration: `f0f54ada41b831fc666d18ba0605f656ec4ac21160a85653553bda8e574543e4`
+- agreed config: `4e7778d88bf53aa2d4dad0ad09c64764149d3ed0e521e578e77a3ab75773cba1`
+- game log: `00e783628585e85d9f7716faf337917090d5e4a5530d4bd10c239647002e71c2`
+- final result: `397bf9f00cf5aa4dfc609b6add10336d267056f8c2ef333e4b32a03a85d8d204`
 
 ## `1-pre-game-declaration.json`
 
@@ -82,3 +91,7 @@ Mutual agreement: `sha256`, `confirmed`.
 These templates confirm JSON artifact structure, not exact MCP wire messages or
 simulator behavior. Exact MCP tool calls/messages and any behavior inferred only from a
 generated match remain `UNKNOWN`.
+
+Every inspected template carries `schema_version: 1.1`; the book's Appendix B example
+uses `1.2`. This unresolved discrepancy is `C-008`/ADR-0003 and must not be silently
+normalized.

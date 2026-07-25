@@ -72,3 +72,22 @@
 3. **Mechanical verifiability** — sequential IDs, one item per line, grep-checkable counts and section lists.
 4. **Reference ≠ spec** — log every reference-code deviation and let the book win (ADRs).
 5. **Audit passes are prompts too** — schedule an explicit "find what's missing" pass after any large generation; it found 4 real gaps here.
+
+## P-008 — M0–M1 reconciliation and scaffold
+
+- **Date:** 2026-07-25 · **Tool:** OpenAI Codex implementation agent
+- **Goal:** reconcile main with useful Sharbel planning, preserve stronger Appendix
+  E/F and JSON-template evidence, and create a behavior-free uv package scaffold.
+- **Prompt (essence):** inspect all branches and five predicted conflicts; port only
+  source-backed material; consume the Cop-owned contract without inventing it; add
+  SDK-first tests and professional quality gates; stop before runtime behavior.
+- **Output:** five-conflict reconciliation, direct source hashes, narrowed unknowns,
+  ten ADR placeholders, provider-neutral secrets policy, `p2p_thief_agent` scaffold,
+  tests, lockfile, and quality scripts. The Cop contract stayed pending because no
+  proposal appeared.
+- **Refinement:** used the official guideline PDF for the exact Ruff/version policy,
+  observed the SDK test fail before implementation, and rejected branch claims that
+  weakened verified values or overstated LLM movement guidance.
+- **Lesson:** parallel agents can audit branches, sources, and external dependencies,
+  but shared protocol bytes must wait for the designated proposal and an actual hash
+  comparison.
