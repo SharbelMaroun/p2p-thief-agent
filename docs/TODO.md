@@ -10,7 +10,7 @@
 - [x] Extract Appendix E rule 25 and Appendix F Tables 13–21 from the original PDF.
 - [x] Confirm both official email addresses from Appendix F Table 20.
 - [x] Confirm the Thief `.env-example` already exists with placeholders only; no creation TODO remains.
-- [ ] Obtain official JSON templates.
+- [x] Inspect the four supplied official JSON templates and record their schema key sets.
 - [ ] Obtain newer Moodle instructions and announcements.
 - [ ] Import centralized verified simulator-analysis exports.
 - [ ] Resolve exact README content mapping and submission tag naming.

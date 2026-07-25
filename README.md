@@ -41,7 +41,8 @@ are verified.
 
 These statements summarize `SR-001` through `SR-006` and `PS-001` through `PS-009`.
 Appendix F gameplay values and statuses are directly confirmed as `AF-013` through
-`AF-022`. Official JSON schemas, exact MCP messages, and unverified simulator details
+`AF-022`; supplied JSON artifact structures are confirmed as `JS-001` through `JS-003`.
+Exact MCP messages, remaining cryptographic procedures, and unverified simulator details
 remain `UNKNOWN`.
 
 ## Thief scope
@@ -68,6 +69,6 @@ valid. Lecturer-provided documents and code are not automatically relicensed. Th
 licensing decision remains subject to review.
 
 Documentation completeness in this requirements-remediation phase does not mean the
-project is submission-complete. Runtime implementation, tests, official JSON schemas,
+project is submission-complete. Runtime implementation, tests, formal schema validators,
 match evidence, repository access, release tagging, and current Moodle requirements
 remain separate submission gates.

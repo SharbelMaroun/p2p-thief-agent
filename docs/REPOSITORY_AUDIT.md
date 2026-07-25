@@ -13,7 +13,8 @@ Audit updated: 2026-07-24.
 | README | Corrected for verified-requirements phase and canonical links | `CONFIRMED` |
 | Shared structural baseline | `SR-001`–`SR-006` and `PS-001`–`PS-009` confirmed | `CONFIRMED` |
 | Appendix F values, statuses, filenames, provider modes, and official addresses | Directly verified from the original PDF | `CONFIRMED` |
-| Official JSON schemas, exact MCP messages/tools, and unverified simulator details | Not resolved | `UNKNOWN` |
+| Supplied JSON artifact structures and key sets | Directly inspected from four templates | `CONFIRMED` |
+| Formal JSON Schema validation rules, exact MCP messages/tools, and unverified simulator details | Not resolved | `UNKNOWN` |
 | Implementation/package/test files | Not added by this remediation | `CONFIRMED` |
 
 ## Current-file classification
@@ -41,6 +42,6 @@ No teammate material was permanently deleted. Historical opposite-role configura
 archived, and superseded design drafts are preserved under `archive/pre-audit/`.
 
 Documentation completeness for this evidence-review phase does not mean submission
-completeness. Implementation, tests, official JSON templates, match evidence, repository
+completeness. Implementation, tests, formal schema validators, match evidence, repository
 access, release tagging, and current Moodle instructions remain separate submission
 gates.

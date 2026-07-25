@@ -4,7 +4,7 @@ The following items remain `UNKNOWN` and block only their affected implementatio
 
 | ID | Unknown | Blocks | Evidence needed |
 |---|---|---|---|
-| U-002 | Exact JSON schemas, field ownership, signing, and byte-equality rules | Configuration/reporting | Official JSON templates and book text |
+| U-002 | Exact cryptographic canonicalization, signature computation, and byte-equality procedure beyond the confirmed JSON fields | Configuration/reporting | Direct binding protocol text |
 | U-003 | Exact MCP tool names and message fields | Networking | Official protocol evidence or centralized verified simulator export |
 | U-004 | Exact Step-0 sequence | Handshake | Direct official section |
 | U-005 | Exact commit payload and nonce reveal time | Cryptography | Direct official protocol text/templates |
@@ -24,6 +24,7 @@ No simulator-analysis export was found in the central planning repository during
 remediation. This repository will not duplicate that reverse-engineering work.
 
 Appendix F values, statuses, artifact filename patterns, provider modes, and both
-official email addresses are directly confirmed in `AF-013` through `AF-022` and are
-intentionally absent above. Official JSON schemas, exact MCP messages, and unverified
-simulator behavior remain `UNKNOWN`.
+official email addresses are directly confirmed in `AF-013` through `AF-022`. The
+supplied JSON artifact structures are confirmed in `JS-001` through `JS-003`. Exact MCP
+messages and unverified simulator behavior remain `UNKNOWN`; template example values
+are not promoted over Appendix F.
