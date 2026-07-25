@@ -50,5 +50,7 @@ JSON-template evidence. `119fa91` preserves the `849c16e` tree byte-for-byte.
 | Shared contract | `PENDING COP PROPOSAL`; no parity-controlled file copied |
 | Simulator reuse | No runtime code copied |
 
+Exact local check results are recorded in [M1_VERIFICATION.md](M1_VERIFICATION.md).
+
 Documentation/scaffold completeness is not contract freeze, runtime completion, or
 submission readiness.

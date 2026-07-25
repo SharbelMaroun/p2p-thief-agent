@@ -33,6 +33,7 @@ or provenance material and cannot override current direct evidence.
 
 ## Verdict
 
-The repository is complete for the M1 scaffold gate once all listed local quality
-checks pass. It is not contract-frozen, runtime-complete, submission-ready, or evidence
-complete.
+All local scaffold checks pass; exact results are in
+[M1_VERIFICATION.md](M1_VERIFICATION.md). The combined M1 gate remains pending the Cop
+contract proposal and parity hashes. The repository is not contract-frozen,
+runtime-complete, submission-ready, or evidence complete.
