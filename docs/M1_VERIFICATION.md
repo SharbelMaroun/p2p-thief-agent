@@ -31,7 +31,7 @@ minimal SDK implementation, the test passed.
 | `uv run python scripts/check_secrets.py` | Exit 0; 90 text files checked, zero findings |
 | `uv run p2p-thief --help` | Exit 0; scaffold help only |
 | `uv run p2p-thief --version` | Exit 0; `p2p-thief 1.00` |
-| Official JSON parse/hash check | Exit 0; 4/4 parsed and hashes match `SOURCE_INVENTORY.md` |
+| Generated-example JSON parse/hash check | Exit 0; 4/4 parsed and hashes match `SOURCE_INVENTORY.md`; official provenance not established |
 | Markdown relative-link check | Exit 0; 39 documents, zero broken targets |
 | Simulator runtime provenance scan | Exit 0; zero named simulator runtime matches in `src/tests/scripts` |
 | `git diff --check` | Exit 0; no whitespace errors |
@@ -45,14 +45,14 @@ the module-execution wrapper is uncovered, leaving 92.86% global coverage.
 uv run python scripts/check_shared_contracts.py
 ```
 
-Actual result: exit 1 with `PENDING`; no Cop-owned proposal or accepted parity manifest
-exists, so shared-hash verification was not run. Repeated read-only checks found the Cop
-branch `agent/cop-m0-m1-contract-scaffold` unchanged at
-`72c05a18ba7a9a7fe14dad2ecb85034c64fa310a`.
+Actual result: exit 1 with `PENDING`; no accepted parity manifest exists, so
+shared-hash verification was not run. A Cop candidate exists at exact commit
+`84339c210c8e3293d972bccec5912abf519d502c`, but it is unfrozen and
+coordinator-rejected pending revision. Zero candidate files were integrated.
 
-No shared contract version, controlled-file list, or contract-file hash is claimed.
-Official source-template hashes are evidence inputs only and are not presented as
-cross-repository parity.
+No contract version, controlled-file list, manifest hash, or file hash is accepted for
+handoff. Generated-example hashes are observations only and are not presented as
+official provenance or cross-repository parity.
 
 ## Scope confirmation
 

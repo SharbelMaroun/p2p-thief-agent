@@ -19,9 +19,11 @@ Thief agent must:
 This produces independent file copies, not a cross-repository package, mount, import, or
 shared runtime filesystem. It does not make Cop authoritative during play.
 
-Until a proposal is available and accepted, the contract status is `PENDING`. No Thief
-MCP tools, message envelope, schema, crypto payload, fixture, active shared
-configuration, or manifest format may be invented. Byte identity may be claimed only
-for files whose hashes were actually compared.
+Candidate `84339c210c8e3293d972bccec5912abf519d502c` is available but was
+coordinator-rejected pending revision. Until a revised candidate is accepted and a
+complete handoff is supplied, the contract status is `PENDING`. No Thief MCP tools,
+message envelope, schema, crypto payload, fixture, active shared configuration, or
+manifest format may be invented. Byte identity may be claimed only for files whose
+hashes were actually compared.
 
 Companion: <https://github.com/SharbelMaroun/p2p-cop-agent>.

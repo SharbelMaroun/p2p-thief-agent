@@ -14,10 +14,12 @@ Version `1.00` is an M0–M1 documentation and package scaffold. The inspected b
 deliberately implements no game engine, peer runtime, LLM, Gmail, GUI, or replay
 behavior.
 
-The Cop agent owns the proposed parity-controlled contract bundle for this gate. No
-accepted Cop proposal is currently available, so the shared contract is
-**pending—not frozen**. The Thief repository will consume accepted files byte-for-byte;
-it will not invent a competing MCP contract.
+The Cop agent owns parity-controlled shared files. A Cop candidate exists at exact
+commit `84339c210c8e3293d972bccec5912abf519d502c`, but it is unfrozen and was rejected
+by the coordinator pending revision. Zero accepted parity-controlled files have been
+integrated here, so the shared contract remains **pending—not frozen**. The Thief
+repository will consume only a coordinator-accepted handoff byte-for-byte; it will not
+repair or invent a competing contract.
 
 ## Install and inspect
 
@@ -57,15 +59,17 @@ contract check exits nonzero with a pending blocker; it never reports a false pa
   illegal-transition rejection, deadlines, watchdogs, and public tunneling are required
   (`AE-004`, `AE-006`, `AE-010`, `AE-017`).
 - Live GUI information is local truth only (`AE-008`).
-- Appendix F values are recorded as `AF-013`–`AF-022`; official artifact-template key
-  sets are recorded as `JS-001`–`JS-003`.
+- Appendix F values are recorded as `AF-013`–`AF-022`; artifact-example key-set
+  observations are recorded as `JS-001`–`JS-003`, with provenance still unresolved.
 - Deterministic movement is the project default. Appendix E rule 25 is a
   recommendation, not an automatic mandatory sanction (`AE-025`).
 
 See the [requirements ledger](docs/REQUIREMENTS_LEDGER.md), [verified parameter
 baseline](docs/PARAMETERS_BASELINE.md), [JSON artifact evidence](docs/JSON_ARTIFACT_SCHEMAS.md),
 [unknowns](docs/UNKNOWN_REQUIREMENTS.md), [conflicts](docs/SPECIFICATION_CONFLICTS.md),
-[repository audit](docs/REPOSITORY_AUDIT.md), and
+[repository audit](docs/REPOSITORY_AUDIT.md), [independent contract
+review](docs/CONTRACT_REVIEW.md), [contract handoff
+checklist](docs/CONTRACT_HANDOFF_CHECKLIST.md), and
 [M1 verification record](docs/M1_VERIFICATION.md).
 
 ## Architecture boundary

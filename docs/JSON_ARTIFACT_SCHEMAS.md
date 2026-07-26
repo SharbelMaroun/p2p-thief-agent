@@ -1,16 +1,17 @@
-# Official JSON Artifact Templates
+# JSON Artifact Example Observations
 
-Status: directly inspected key-presence evidence from the supplied `Json-examples/`
-directory.
+Status: exact bytes and key presence inspected; official provenance unresolved.
 
 Source directory supplied for this audit: external
 `SimulatorEXM-Repo/Json-examples/` (the templates are not copied into this repository).
 
-The four JSON files parse successfully. They prove that the listed keys are present in
-the inspected examples. They do not by themselves prove requiredness, optionality,
-types, enums, bounds, additional-property behavior, or every nested shape (`U-019`).
-Their populated one-sub-game values do not override Appendix F's fixed six-sub-game
-series. Fields absent from Appendix F, including
+The coordinator found the four files byte-identical to locally generated simulator
+logs. No original Moodle/lecturer handoff authenticates them as official templates.
+They therefore prove only that the listed keys occur in the inspected bytes. They do
+not prove requiredness, optionality, types, enums, bounds, additional-property
+behavior, every nested shape, or binding provenance (`U-019`). Their populated
+one-sub-game values do not override Appendix F's fixed six-sub-game series. Fields
+absent from Appendix F, including
 `pheromone_min_center_intensity`, remain template/example fields without a confirmed
 gameplay value.
 
@@ -88,9 +89,10 @@ Mutual agreement: `sha256`, `confirmed`.
 
 ## Remaining boundary
 
-These templates confirm JSON artifact structure, not exact MCP wire messages or
-simulator behavior. Exact MCP tool calls/messages and any behavior inferred only from a
-generated match remain `UNKNOWN`.
+These examples record an observed JSON artifact structure, not an authenticated
+official schema, exact MCP wire messages, or mandatory simulator behavior. Exact MCP
+tool calls/messages and any behavior inferred only from a generated match remain
+`UNKNOWN`.
 
 Every inspected template carries `schema_version: 1.1`; the book's Appendix B example
 uses `1.2`. This unresolved discrepancy is `C-008`/ADR-0003 and must not be silently
