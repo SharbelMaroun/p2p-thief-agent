@@ -1,11 +1,13 @@
 # Plan
 
-Status: M0 documentation reconciliation; M1 contract-and-scaffold parity gate pending.
+Status: M0 complete; M1 public-contract gate blocked pending a revised,
+coordinator-accepted Cop handoff. M2–M9 are blocked.
 
-At baseline `119fa911d5b1a5aecdaa9531d0912e5c6f9ab32f`, implementation had not
-begun: there were no Python files, tests, `pyproject.toml`, or `uv.lock`.
+The Thief M0–M1 scaffold is based on remote main
+`e1cc4992cd1c9a7705edf13fc976f85482ce601b`. It has package, SDK, CLI, test, and
+quality boundaries but no gameplay or peer runtime.
 
-## Layer plan
+## Architecture boundary
 
 ```text
 CLI / future GUI / future MCP adapters
@@ -14,63 +16,79 @@ CLI / future GUI / future MCP adapters
                  |
 domain + orchestration + services + strategy
                  |
- future protocol/config/external adapters
+ protocol / config / external adapters
 ```
 
-The M1 source tree establishes these boundaries without runtime behavior. Every future
-external entry point delegates through the SDK (`PS-007`); Cop and Thief remain
-independently installable with no runtime filesystem dependency (`SR-004`,
-`THIEF-001`).
+Every external entry point delegates through the SDK (`PS-007`). Cop and Thief remain
+independently installable and share no runtime filesystem, mutable state, or private
+truth (`SR-004`, `THIEF-001`).
 
-## Gated milestones
+## Common gated milestones
 
-| Gate | Scope | Entry condition | Exit evidence |
+| Gate | Common phase | Thief-owned outcome | Current status |
 |---|---|---|---|
-| M0 | Evidence and branch reconciliation | Verified `origin/main` and branch topology | Five-conflict table, preserved `AF`/`JS` evidence |
-| M1 | First implementation gate: package scaffold plus contract parity | M0 complete; Cop proposal may proceed in parallel | Frozen uv install, SDK/CLI tests and quality gates **and** accepted bytes copied verbatim with matching hashes |
-| M2 | Thief domain foundation | Entire M1 gate passed | Immutable coordinates/actions/grid, legal movement and capture rules with unit tests |
-| M3 | Local Thief state and strategy | M2 passed | Local history, known barriers, deterministic survival policy with tests |
-| M4+ | Protocol and integrations | Relevant ADRs accepted and unknowns closed | Separate gated FastMCP, crypto, scent, GUI/replay, LLM and reporting increments |
+| M0 | Evidence and source reconciliation | Correct source hierarchy, traceable Appendix E/F evidence, explicit unknowns/conflicts, reconciled repository history | `DONE` |
+| M1 | Public contract, match configuration, parity and freeze | Independently review a coordinator-accepted handoff, copy accepted controlled bytes exactly, verify the manifest and per-file hashes, and prove neutral match-config conformance | `BLOCKED` |
+| M2 | Core domain rules | Coordinates, actions, grid, legal movement, barrier and capture semantics behind the SDK | `BLOCKED ON M1` |
+| M3 | Local state, scoring and deterministic baseline | Immutable local history, disclosed-barrier state, scoring, and deterministic legal baseline | `BLOCKED ON M1` |
+| M4 | Protocol, canonicalization and commit-reveal | Accepted public messages, exact canonical bytes, state transitions, commitment verification, and audit outcomes | `BLOCKED ON M1` |
+| M5 | FastMCP runtime and resilience | Symmetric server/client peer, gateway, idempotency, deadlines, watchdog, recovery, and tunnel path | `BLOCKED ON M1` |
+| M6 | Scent, belief and private strategy | Confirmed scent physics, public observations, Thief-local belief, and private strategy | `BLOCKED ON M1` |
+| M7 | Series orchestration, artifacts, gatekeeper and reporting | Six-sub-game flow, official artifacts, external-call gatekeeper, and agreed JSON reporting | `BLOCKED ON M1` |
+| M8 | GUI, replay, interoperability and security hardening | Local-truth UI, replay/verifier, neutral-opponent E2E, tamper tests, and security review | `BLOCKED ON M1` |
+| M9 | League evidence, submission and release | League evidence, academic README, final clean gates, access checks, and annotated release | `BLOCKED ON M1` |
 
-An unknown blocks only the affected gate. Package and documentation work is not
-blanket-blocked by unresolved runtime protocol fields.
+Only Thief-owned work is decomposed in [TODO.md](TODO.md). The Cop repository remains
+the sole author of parity-controlled shared files.
 
-## Contract consumption
+## M1 gate
 
-The Cop agent is the proposal owner for parity-controlled files during this milestone.
-The Thief agent reviews sources and fields, copies accepted files byte-for-byte, and
-verifies the Cop manifest. This workflow does not make Cop authoritative at runtime.
-If the proposal is absent or unsupported, M1 stays partially complete and `PENDING`; no replacement
-schema, tool list, fixture, or config is invented.
+Cop candidate `84339c210c8e3293d972bccec5912abf519d502c` exists, but it is
+`0.1.0-proposed`, unfrozen, and coordinator-rejected. The independent findings are in
+[CONTRACT_REVIEW.md](CONTRACT_REVIEW.md). It must not be copied.
 
-## Architectural decisions
+Contract consumption starts only after every input in
+[CONTRACT_HANDOFF_CHECKLIST.md](CONTRACT_HANDOFF_CHECKLIST.md) is supplied:
 
-Decision placeholders are indexed in [adr/README.md](adr/README.md):
+- accepted Cop commit;
+- accepted contract version;
+- accepted manifest exact-byte SHA-256;
+- accepted controlled-path list;
+- accepted per-file hashes;
+- explicit coordinator acceptance verdict.
 
-1. MCP contract.
-2. Message envelope and idempotency.
-3. Schema-version discrepancy.
-4. Shared JSON and private TOML.
-5. Scent model.
-6. Commit-reveal canonicalization.
-7. LLM movement policy.
-8. Simulator reuse and license.
-9. GUI truth model.
-10. Gmail reporting.
+After receipt, Thief verifies the handoff before copying, copies every controlled path
+byte-for-byte from the accepted commit, makes no shared-file edits, and proves
+bidirectional match-configuration conformance with a neutral compliant opponent. Any
+shared defect returns to Cop for a revised candidate.
 
-No placeholder is an accepted runtime decision. Each requires cited evidence, a
-decision owner, tests, and compatible Cop/Thief treatment where applicable.
+M1 exits only when 100% of controlled bytes and the manifest self-hash match, both
+repositories independently pass their contract checks, and the coordinator accepts
+the resulting cross-repository evidence.
+
+## Decision gates
+
+The ten placeholders under [adr/](adr/README.md) do not authorize runtime behavior.
+Shared-impact decisions require direct evidence, compatible Cop/Thief treatment, and
+coordinator acceptance. In particular, schema versions, participant/match binding,
+canonicalization, `config_sha256` scope, extension policy, and neutral-opponent
+failure semantics must be settled before M2.
 
 ## Verification sequence
 
-1. Lock dependencies with uv.
-2. Sync from the committed lock in a clean environment.
-3. Run Ruff with zero findings.
-4. Run all tests with branch coverage at least 85%.
-5. Enforce source/test file-size limits.
-6. Scan tracked project material for secret patterns.
-7. Validate accepted contract fixtures and hashes when the Cop proposal exists.
-8. Confirm source contains no lecturer-simulator runtime code.
+1. `uv sync --frozen`
+2. `uv run ruff check .`
+3. `uv run pytest --cov --cov-branch --cov-fail-under=85`
+4. `uv run python scripts/check_file_lengths.py`
+5. `uv run python scripts/check_secrets.py`
+6. CLI help and version smoke tests
+7. Current contract-status check: exit 1 with `PENDING`
+8. `git diff --check`
 
-The task ledger, ownership, priorities, traceability, and Definitions of Done are in
-[TODO.md](TODO.md).
+CI runs the same currently applicable sequence. The contract-status step must remain
+fail-closed until the accepted handoff is integrated and verified.
+
+The protected checker still prints historical “no proposal” wording. In current
+coordination terms, its `PENDING` result means no accepted handoff is integrated. CI
+therefore verifies the nonzero exit and `PENDING` marker without changing the
+Cop-owned candidate path.

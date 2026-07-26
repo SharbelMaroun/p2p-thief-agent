@@ -38,6 +38,6 @@ def test_secret_scan_flags_fake_token_but_allows_dummy(
 
 
 def test_contract_check_fails_closed(capsys: pytest.CaptureFixture[str]) -> None:
-    """No unavailable Cop proposal can be reported as a passing parity check."""
+    """An unaccepted contract handoff cannot be reported as passing parity."""
     assert check_shared_contracts.main() == 1
     assert "PENDING" in capsys.readouterr().out

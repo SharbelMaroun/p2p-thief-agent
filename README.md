@@ -67,7 +67,9 @@ contract check exits nonzero with a pending blocker; it never reports a false pa
 See the [requirements ledger](docs/REQUIREMENTS_LEDGER.md), [verified parameter
 baseline](docs/PARAMETERS_BASELINE.md), [JSON artifact evidence](docs/JSON_ARTIFACT_SCHEMAS.md),
 [unknowns](docs/UNKNOWN_REQUIREMENTS.md), [conflicts](docs/SPECIFICATION_CONFLICTS.md),
-[repository audit](docs/REPOSITORY_AUDIT.md), and
+[repository audit](docs/REPOSITORY_AUDIT.md), [independent contract
+review](docs/CONTRACT_REVIEW.md), [contract handoff
+checklist](docs/CONTRACT_HANDOFF_CHECKLIST.md), and
 [M1 verification record](docs/M1_VERIFICATION.md).
 
 ## Architecture boundary

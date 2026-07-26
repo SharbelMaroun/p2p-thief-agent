@@ -11,6 +11,7 @@ contract or runtime evidence is unavailable.
 | `docs/PRD.md` | Yes | M1 requirements and acceptance criteria | Expand only with confirmed or accepted behavior |
 | `docs/PLAN.md` | Yes | Gated architecture plan and ADR index | Accept contract ADRs before protocol work |
 | `docs/TODO.md` | Yes | Active owned/prioritized task ledger | Update status as gates pass |
+| Contract review and handoff checklist | Yes | Current candidate independently rejected; consumption inputs fail closed | Complete only from a coordinator-accepted handoff |
 | Mechanism PRDs | Yes | Confirmed boundaries plus open details | Close each mechanism's named unknowns |
 | `docs/PROMPT_LOG.md` | Yes | Living provenance log | Append significant AI-assisted work |
 | `pyproject.toml` / `uv.lock` | Yes | Independently installable M1 scaffold | Keep uv lock and metadata current |

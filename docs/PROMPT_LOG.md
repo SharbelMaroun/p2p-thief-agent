@@ -83,11 +83,27 @@
   SDK-first tests and professional quality gates; stop before runtime behavior.
 - **Output:** five-conflict reconciliation, direct source hashes, narrowed unknowns,
   ten ADR placeholders, provider-neutral secrets policy, `p2p_thief_agent` scaffold,
-  tests, lockfile, and quality scripts. The Cop contract stayed pending because no
-  proposal appeared.
+  tests, lockfile, and quality scripts. At that review time the Cop proposal had not
+  yet appeared; this statement was superseded by P-009.
 - **Refinement:** used the official guideline PDF for the exact Ruff/version policy,
   observed the SDK test fail before implementation, and rejected branch claims that
   weakened verified values or overstated LLM movement guidance.
 - **Lesson:** parallel agents can audit branches, sources, and external dependencies,
   but shared protocol bytes must wait for the designated proposal and an actual hash
   comparison.
+
+## P-009 — Independent contract-readiness review
+
+- **Date:** 2026-07-26 · **Tool:** OpenAI Codex implementation/review agent
+- **Goal:** review immutable Cop candidate `84339c2` without integration, correct stale
+  Thief status/source claims, add CI, and make the M1 handoff fail closed.
+- **Prompt (essence):** obey the coordinator audit; preserve `Material/`; inspect Cop
+  through Git only; do not copy shared files or begin gameplay; make four atomic
+  commits; align M0–M9 and require exact acceptance metadata/hashes.
+- **Output:** corrected source/provenance status, path-by-path candidate NO-GO review,
+  GitHub Actions quality gates, M0–M9 Thief ledger, and exact-byte handoff checklist.
+- **Refinement:** separated Cop-local manifest integrity from cross-repository parity
+  and treated generated JSON examples as unauthenticated observations.
+- **Lesson:** a proposal's existence is not acceptance; consumers need a pinned commit,
+  version, manifest self-hash, exact path list, per-file hashes, and explicit
+  coordinator verdict before trusting or copying bytes.
