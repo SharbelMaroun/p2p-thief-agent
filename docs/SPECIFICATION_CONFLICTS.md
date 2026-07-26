@@ -13,6 +13,8 @@
 | C-009 | Book multiplicative scent decay versus simulator subtractive/immediate decay | `RESOLVED` | Book formula controls; simulator behavior must not be copied | Chapter 4.3, PDF p.43; pinned simulator export; ADR-0005 |
 | C-010 | Branch claims LLM movement is categorically forbidden | `RESOLVED` | Deterministic movement is policy/default; rule 25 is a recommendation without automatic sanction | Appendix E rule 25; `AE-025`; ADR-0007 |
 | C-011 | Documents claim Cop/Thief files are already byte-identical | `RESOLVED` | Make no parity claim until actual manifest comparison passes | Contract policy; `U-020` |
+| C-012 | Generated template prose says roles switch, while the book confirms six sub-games but does not define an alternating schedule | `OPEN` | Do not enforce alternation or choose the starting role without binding evidence or joint acceptance | `AF-018`; `U-021`; local generated examples |
+| C-013 | Appendix B links sorted-key canonical JSON to `config_sha256`, while Chapter 5 gives compact UTF-8 bytes only for a core commitment example | `OPEN` | Keep the confirmed primitives, but do not invent hash scope, self-field exclusion, or full JSON canonicalization rules | `CR-001`; `U-002`; ADR-0006 |
 
 No open conflict is resolved by selecting a simulator default, populated example, or
 unaccepted proposal.

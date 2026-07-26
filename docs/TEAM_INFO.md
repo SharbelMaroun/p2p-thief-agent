@@ -8,7 +8,7 @@
 | Automated JSON-report address | `CONFIRMED` | `rmisegal+uoh26finalgame@gmail.com` (`AF-020`) |
 | Team/group identifier | `UNKNOWN` | Await verified team input (`U-016`) |
 | Member names/identifiers | `UNKNOWN` | Await verified team input (`U-016`) |
-| Eight-character team code | `UNKNOWN` | Await verified team input (`U-016`) |
+| Eight-character team code | `UNKNOWN` | Required to be unique, exactly eight characters, and contain no spaces; await the actual verified value (`SR-011`, `U-016`) |
 
 Do not infer identity fields from Git authors, examples, translations, or archived
 configuration.

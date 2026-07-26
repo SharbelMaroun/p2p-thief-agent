@@ -14,12 +14,16 @@ Status: quantitative/reporting requirements confirmed; integration details pendi
   `rmisegal+uoh26finalgame@gmail.com` (`AF-020`).
 - Official filenames are recorded in `AF-021`, and observed template keys are recorded
   in `JS-001..003`.
+- The four artifacts carry one common `game_uid`, and their filenames derive from
+  `game_id` (`AR-001`).
 
 ## Still open
 
 Gmail draft-versus-send behavior, OAuth setup details, retries for each call category,
 signature/canonicalization procedures, and template requiredness/types/enums remain
-open (`U-002`, `U-009`, `U-019`, ADR-0010). A populated template is not a formal schema.
+open (`U-002`, `U-009`, `U-019`, ADR-0010). The book requires separately submitted,
+mutually agreed JSON reports, but does not explicitly establish byte identity for the
+two independently delivered result files. A populated template is not a formal schema.
 
 ## Future acceptance criteria and tests
 
