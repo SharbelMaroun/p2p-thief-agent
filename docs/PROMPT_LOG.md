@@ -127,3 +127,23 @@
 - **Lesson:** examples can confirm field presence, but only authoritative prose can
   establish requiredness and semantics; byte-level cryptographic rules need explicit
   scope and shared test vectors.
+
+## P-011 — Proposed pre-game gate resolution audit
+
+- **Date:** 2026-07-27 · **Tool:** OpenAI Codex implementation/review agent
+- **Goal:** determine whether supplied simulator mechanics, schema labels, commits,
+  and hashes satisfy the coordinator's M1 gate.
+- **Prompt (essence):** treat `REQUIRED_TERMS`, `validate_agreement`, odd/even
+  `role_for()`, canonical JSON settings, schema labels, and supplied fixed hashes as a
+  proposed technical resolution before gameplay.
+- **Output:** exact template-value verification, current simulator-tag verification,
+  revised Cop-candidate review, a separation of match artifacts from repository
+  parity evidence, and a corrected provisional-copy → parity/conformance → final-freeze
+  handoff sequence.
+- **Refinement:** verified that `7cf3fc9` is historical simulator tag `v1.11`, that the
+  two supplied hashes are absent from the files, and that simulator
+  `validate_agreement` checks missing terms but does not itself perform signature
+  exchange or cross-repository parity.
+- **Lesson:** runtime preflight, match cryptography, and repository supply-chain
+  integrity are three different gates; one hash or one validation function cannot
+  substitute for the others.

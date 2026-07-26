@@ -14,12 +14,13 @@ Version `1.00` is an M0–M1 documentation and package scaffold. The inspected b
 deliberately implements no game engine, peer runtime, LLM, Gmail, GUI, or replay
 behavior.
 
-The Cop agent owns parity-controlled shared files. A Cop candidate exists at exact
-commit `84339c210c8e3293d972bccec5912abf519d502c`, but it is unfrozen and was rejected
-by the coordinator pending revision. Zero accepted parity-controlled files have been
-integrated here, so the shared contract remains **pending—not frozen**. The Thief
-repository will consume only a coordinator-accepted handoff byte-for-byte; it will not
-repair or invent a competing contract.
+The Cop agent owns parity-controlled shared files. Original candidate `84339c2` and
+coordinator-reviewed revision `b586af9` were not authorized for Thief copying. A later
+local-only Cop head `665bd30` remains proposed, unfrozen, and unreviewed. Zero
+parity-controlled files have been integrated here, so the shared contract remains
+**pending—not frozen**. The Thief repository will consume only an explicitly
+provisionally authorized handoff byte-for-byte, prove parity/conformance, and then
+wait for final coordinator freeze; it will not repair or invent a competing contract.
 
 ## Install and inspect
 
@@ -67,6 +68,7 @@ contract check exits nonzero with a pending blocker; it never reports a false pa
 See the [requirements ledger](docs/REQUIREMENTS_LEDGER.md), [verified parameter
 baseline](docs/PARAMETERS_BASELINE.md), [JSON artifact evidence](docs/JSON_ARTIFACT_SCHEMAS.md),
 [book/template reconciliation](docs/BOOK_TEMPLATE_RECONCILIATION.md),
+[proposed gate-resolution review](docs/GATE_RESOLUTION_REVIEW.md),
 [unknowns](docs/UNKNOWN_REQUIREMENTS.md), [conflicts](docs/SPECIFICATION_CONFLICTS.md),
 [repository audit](docs/REPOSITORY_AUDIT.md), [independent contract
 review](docs/CONTRACT_REVIEW.md), [contract handoff

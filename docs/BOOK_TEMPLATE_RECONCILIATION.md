@@ -64,3 +64,8 @@ authorize gameplay implementation or modification of Cop-owned shared contract f
 M2 remains blocked until an accepted cross-repository contract handoff resolves
 `U-020`, including the open schedule, canonicalization, schema-version, and formal
 artifact-schema decisions.
+
+Later supplied assertions about simulator `REQUIRED_TERMS`, odd/even `role_for()`,
+schema labels, and fixed hash values are audited in
+[GATE_RESOLUTION_REVIEW.md](GATE_RESOLUTION_REVIEW.md). They do not authenticate the
+four files or replace the coordinator parity handoff.

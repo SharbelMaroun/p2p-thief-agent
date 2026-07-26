@@ -1,6 +1,51 @@
 # Independent Cop Contract Review
 
-Review date: 2026-07-26
+Initial review date: 2026-07-26
+
+Latest review update: 2026-07-27
+
+## Revised-candidate update
+
+The original path-by-path review below remains the historical review of immutable Cop
+candidate `84339c210c8e3293d972bccec5912abf519d502c`.
+
+The Thief independently inspected immutable revised candidate
+`b586af9e55dcc40789a1d7ab683edb97c8cfabc6` and compared it with
+`COORDINATOR_M1_CANDIDATE_REVIEW.md`. The revised candidate fixed several original
+defects:
+
+- it represents `agreed_between`, match identity, and selected match values;
+- it distinguishes local integrity from optional cross-root comparison;
+- it adds neutral match validation and negative mutation tests;
+- it corrects source priority and generated-artifact provenance;
+- its 17-file local manifest and quality gates passed coordinator review.
+
+It remained ineligible for Thief copying because:
+
+- parity-controlled `config/game.json` and `config/rate_limits.json` embed one
+  permanent neutral match instance, so new opponents would mutate frozen bytes;
+- controlled checker messages and private-configuration prose are Cop-specific rather
+  than role-neutral;
+- it does not prove two different valid opponent/match identities can be supplied
+  without changing controlled stable-contract files;
+- the coordinator explicitly recorded `ACCEPTED_FOR_THIEF_COPY: NO`,
+  `CONTRACT_FREEZE: NO-GO`, and `M2_GAMEPLAY: NO-GO`.
+
+Later local Cop commits through
+`665bd30a75866e872f899eb337664266e26129ed` attempt further canonicalization and
+artifact decisions. That head was local-only, `0.1.0-proposed`, unfrozen, explicitly
+`NO-GO`, and not coordinator-accepted at inspection time. Its exact proposed values
+must not be copied or relabeled as accepted. The supplied technical assertions and
+exact hashes are classified separately in
+[GATE_RESOLUTION_REVIEW.md](GATE_RESOLUTION_REVIEW.md).
+
+The corrected handoff sequence is provisional copy authorization, exact-byte
+parity/conformance testing, external-decision closure, and only then final freeze.
+Requiring final freeze before any provisional copy would create a circular gate.
+
+**CURRENT CONTRACT INTEGRATION: NO-GO**
+
+**CURRENT M2 GAMEPLAY: NO-GO**
 
 ## Scope and method
 

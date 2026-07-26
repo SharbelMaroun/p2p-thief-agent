@@ -17,7 +17,7 @@ An unknown blocks only its named subsystem.
 | U-016 | Team/group/member identifiers and eight-character team code | Identity/reporting | Verified team input |
 | U-017 | Newer Moodle instructions and lecturer announcements | Potential final-release areas | Obtain dated official posts |
 | U-019 | Official template required/optional fields, types, enums, bounds, and additional-property rules | Artifact validation | Formal schemas or dated authoritative clarification |
-| U-020 | Exact accepted parity-file list, contract version, manifest shape, and hashes | Contract gate | Source-backed Cop proposal and Thief review |
+| U-020 | Exact provisionally authorized parity-file list, candidate version, manifest shape/hash, per-file hashes, and later final-freeze revision | Contract gate | Coordinator-named immutable Cop handoff, Thief parity/conformance evidence, then separate final freeze |
 | U-021 | Exact six-sub-game role assignment, including whether Cop and Thief must alternate every sub-game and which team starts in which role | League scheduling | Binding book passage, dated lecturer clarification, or accepted shared schedule |
 
 ## Closed in this reconciliation

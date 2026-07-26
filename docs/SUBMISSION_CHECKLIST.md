@@ -32,6 +32,8 @@ Unchecked boxes are future release evidence, not proof of an unknown requirement
       confirmed book requirement (`U-021`).
 - [ ] Legal-move, barrier disclosure/capture, trapped capture, scoring, scent,
       commit-reveal, timeout, and watchdog tests pass.
+- [ ] Step-0 records the actual played Git commit and required host/model/team/sub-game
+      declaration; the same commit is present in the final artifact (`CR-002`).
 - [ ] Live GUI shows local truth only; replay verifies captured transcript.
 
 ## Official artifacts and reporting
