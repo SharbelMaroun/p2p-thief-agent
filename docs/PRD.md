@@ -9,8 +9,8 @@ The current milestone creates documentation, package boundaries, tests, and qual
 gates. It does not implement gameplay, networking, cryptography, LLM access, Gmail,
 GUI, or replay.
 
-The official book v3.0.0, official JSON templates, and professional submission
-guidelines control requirements in the order recorded by
+The official book v3.0.0, authenticated official JSON templates when available, and
+professional submission guidelines control requirements in the order recorded by
 [SOURCE_OF_TRUTH.md](SOURCE_OF_TRUTH.md). Simulator behavior is reference evidence only.
 
 ## M1 goals
@@ -22,7 +22,7 @@ guidelines control requirements in the order recorded by
 | M1-PRD-003 | Runnable scaffold | `p2p-thief --help` exits successfully without starting runtime behavior | `tests/integration/test_cli.py` |
 | M1-PRD-004 | Enforced quality policy | Ruff has zero findings; branch coverage is at least 85%; size and secret checks pass | Quality commands in README |
 | M1-PRD-005 | Contract consumer, not author | Accepted Cop files are copied byte-for-byte and hashes match, or the gate remains explicitly pending | `scripts/check_shared_contracts.py` |
-| M1-PRD-006 | Evidence-preserving docs | Appendix E/F and JSON-template evidence remains traceable and the five branch conflicts are recorded | Repository audit review |
+| M1-PRD-006 | Evidence-preserving docs | Appendix E/F evidence and generated-example JSON observations remain traceable without overstated provenance | Repository audit review |
 
 ## Future product requirements
 
@@ -48,6 +48,7 @@ test normal, boundary, and failure paths (`PS-004`).
 
 ## Release gate
 
-M2 begins only after the Cop proposal is available, its sources and fields are reviewed,
-accepted parity-controlled bytes are present in both repositories, and the manifest
-hash check passes. Until then the contract status is `PENDING`.
+M2 begins only after the coordinator accepts a revised Cop proposal and supplies the
+complete handoff, accepted parity-controlled bytes are present in both repositories,
+and the manifest and per-file hash checks pass. Until then the contract status is
+`PENDING`.

@@ -5,8 +5,9 @@ Status: Pending
 ## Evidence
 
 Official project book v3.0.0 Appendix B, including section B.2, distinguishes shared
-JSON from local private TOML. Official course templates establish artifact key sets,
-but the active shared filename and private TOML schema remain unknown (`U-013`).
+JSON from local private TOML. Unauthenticated generated examples provide observed
+artifact key sets only; the active shared filename and private TOML schema remain
+unknown (`U-013`).
 
 ## Decision needed
 

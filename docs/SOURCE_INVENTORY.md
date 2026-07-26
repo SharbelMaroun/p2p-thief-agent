@@ -1,20 +1,21 @@
 # Source Inventory
 
-Inventory updated: 2026-07-25.
+Inventory updated: 2026-07-26.
 
 | Source | Verified provenance | Use/status |
 |---|---|---|
-| Official project book v3.0.0 | Local inspection copy `Material/reference/police_thief_p2p.pdf`; 160 PDF pages; SHA-256 `7c9e1d7527582c3aef9afd71709981cea50ea60b8fabefe85efccab0a5fdd02e` | Highest authority; Appendix E rules and Appendix F Tables 13–21 directly reviewed |
-| Official JSON templates | Local source workspace `SimulatorEXM-Repo/Json-examples/`; hashes listed below | Key presence and example structure confirmed; formal constraints are not inferred |
-| Lecturer simulator | `https://github.com/rmisegal/Game-P2P-Cop-Chase.git` at `960499fd5e8777b4929625f5d8fdcf2ab4677b54` | Learning/interoperability reference only; no runtime source copied |
-| Verified simulator export | Local planning export `exports/simulator-shared/`, inspection dated 2026-07-24 | Records exact simulator paths/behavior and book conflicts; not a shared contract |
-| Professional Software Submission Guidelines v3.0 | Local official PDF; 39 pages; SHA-256 `3f02df37767c745efc47646140c2e6ac7cae3b9c87c92073daf4eef74be09ebb` | Direct pages 15–20 control tests, coverage, Ruff, secrets, versioning, and uv |
-| Dated current Moodle/lecturer clarification | Not available | `UNKNOWN`; obtain before affected final-release decisions |
-| Cop M1 contract proposal | Not available after repeated inspection of `agent/cop-m0-m1-contract-scaffold` at `72c05a18ba7a9a7fe14dad2ecb85034c64fa310a` | Contract gate `PENDING`; historical drafts rejected |
-| Current repository documents | Present | Lower-priority planning/control evidence |
-| Archives, translations, summaries, prompt outputs | Present | Navigation/provenance only; never independently binding |
+| Official project book v3.0.0 | Local inspection copy `Material/reference/police_thief_p2p.pdf`; 160 PDF pages; SHA-256 `7c9e1d7527582c3aef9afd71709981cea50ea60b8fabefe85efccab0a5fdd02e` | Highest authority |
+| Appendix F | Directly reviewed in the book | Controlling parameters, values, and fixed/minimum/negotiated statuses |
+| Appendix E | Directly reviewed in the book | Controlling mandatory rules |
+| Authenticated official JSON templates | No authenticated source is available | `UNKNOWN`; the four local files below are generated-example observations only |
+| Current Moodle/dated lecturer material | Not available | `UNKNOWN`; required for affected decisions and final review |
+| Professional Software Submission Guidelines v3.0 | Coordinator inspected a 39-page external candidate; SHA-256 `3f02df37767c745efc47646140c2e6ac7cae3b9c87c92073daf4eef74be09ebb` | Applied submission guidance; authoritative course use still needs confirmation |
+| Lecturer simulator | `https://github.com/rmisegal/Game-P2P-Cop-Chase.git` at `960499fd5e8777b4929625f5d8fdcf2ab4677b54` | Lower-priority learning/interoperability reference; no runtime source copied |
+| Lecture and assignment material | No final-project-specific handoff verified locally | Lower than the simulator under the coordinator source order |
+| Team notes, repository documents, translations, summaries, and AI output | Present | Navigation/provenance only; never independently binding |
+| Cop M1 contract candidate | Immutable commit `84339c210c8e3293d972bccec5912abf519d502c`; contract `0.1.0-proposed` | Exists but is unfrozen and coordinator-rejected; zero files accepted or integrated |
 
-## Official template hashes
+## Unauthenticated generated-example hashes
 
 | Template | SHA-256 |
 |---|---|

@@ -5,7 +5,7 @@ Status: Pending
 ## Evidence
 
 Official project book v3.0.0 Appendix B shows `schema_version` 1.2, while all four
-inspected official course artifact templates use 1.1 (`JS-001`; see
+inspected unauthenticated generated examples use 1.1 (`JS-001`; see
 [JSON_ARTIFACT_SCHEMAS.md](../JSON_ARTIFACT_SCHEMAS.md)).
 
 ## Decision needed

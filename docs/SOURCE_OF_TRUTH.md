@@ -1,24 +1,26 @@
 # Source of Truth
 
-Status date: 2026-07-25.
+Status date: 2026-07-26.
 
 Requirements are evaluated in this order:
 
-1. Official assignment book `police_thief_p2p.pdf`, version 3.0.0, including
-   Appendices E and F.
-2. Official course JSON templates.
-3. Lecturer simulator at exact commit
+1. Official Final Project Book `police_thief_p2p.pdf`, version 3.0.0.
+2. Appendix F mandatory parameters and statuses.
+3. Appendix E mandatory rules.
+4. Authenticated official JSON templates.
+5. Current Moodle instructions and dated lecturer announcements.
+6. Professional Software Submission Guidelines v3.0.
+7. Lecturer simulator at exact commit
    `960499fd5e8777b4929625f5d8fdcf2ab4677b54`.
-4. Dated lecturer or Moodle clarification.
-5. Professional Software Submission Guidelines v3.0.
-6. A cross-team ADR accepted by both peers.
-7. Current repository documents.
-8. Archived documents, NotebookLM text, translations, summaries, team notes, and AI
-   plans.
+8. Lecture and assignment material.
+9. Team notes, translations, repository prose, and previous AI reports.
 
 The higher-ranked direct source controls. Appendix F is the book's controlling
-quantitative table. Simulator behavior is an interoperability and learning reference,
-not a submission skeleton, and cannot override the book.
+quantitative table. The four locally observed JSON files are not authenticated
+official templates: the coordinator found them byte-identical to generated simulator
+logs, so their provenance remains `UNKNOWN`. Simulator behavior is an interoperability
+and learning reference, not a submission skeleton, and cannot override the sources
+above it.
 
 Every evaluated claim uses exactly one status:
 

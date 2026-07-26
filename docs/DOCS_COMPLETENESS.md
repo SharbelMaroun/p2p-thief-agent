@@ -15,7 +15,7 @@ contract or runtime evidence is unavailable.
 | `docs/PROMPT_LOG.md` | Yes | Living provenance log | Append significant AI-assisted work |
 | `pyproject.toml` / `uv.lock` | Yes | Independently installable M1 scaffold | Keep uv lock and metadata current |
 | `src/` / `tests/` / `scripts/` | Yes | SDK/CLI metadata and quality gates only | Add behavior through TDD after contract gate |
-| Shared contract bundle | No | Fail-closed checker reports `PENDING COP PROPOSAL` | Review sources, copy accepted bytes, replace pending gate, pass parity hashes |
+| Shared contract bundle | No | Candidate `84339c2` exists but is unfrozen, coordinator-rejected, and not integrated; checker remains `PENDING` | Receive a revised coordinator-accepted handoff, copy exact bytes, and pass parity hashes |
 | Active shared/private runtime config | No | Intentionally absent | ADR-0004 plus accepted contract |
 | Runtime, GUI, replay, Gmail evidence | No | Out of M1 scope | Later gated milestones |
 
@@ -34,6 +34,6 @@ or provenance material and cannot override current direct evidence.
 ## Verdict
 
 All local scaffold checks pass; exact results are in
-[M1_VERIFICATION.md](M1_VERIFICATION.md). The combined M1 gate remains pending the Cop
-contract proposal and parity hashes. The repository is not contract-frozen,
+[M1_VERIFICATION.md](M1_VERIFICATION.md). The combined M1 gate remains pending a
+coordinator-accepted Cop handoff and parity hashes. The repository is not contract-frozen,
 runtime-complete, submission-ready, or evidence complete.

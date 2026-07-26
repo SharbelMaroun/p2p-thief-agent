@@ -4,9 +4,9 @@ Status: Pending
 
 ## Evidence
 
-Official project book v3.0.0 requires SHA-256 commit-reveal, and the official artifact
-templates confirm integrity fields (`JS-003`). Appendix E rule 18 keeps nonces secret
-until the end-game reveal. Exact canonical bytes, committed payload, nonce
+Official project book v3.0.0 requires SHA-256 commit-reveal, and unauthenticated
+generated examples contain observed integrity fields (`JS-003`). Appendix E rule 18
+keeps nonces secret until the end-game reveal. Exact canonical bytes, committed payload, nonce
 encoding/length, and wire sequencing remain unknown (`U-002` and `U-005`).
 
 ## Decision needed

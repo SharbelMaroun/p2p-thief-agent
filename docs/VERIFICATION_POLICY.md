@@ -5,9 +5,11 @@ source, version, exact page/table/section or file/symbol, and a short faithful
 paraphrase. Numerical values and modes require direct Appendix F evidence. Mandatory
 rules require direct Appendix E evidence unless a higher-priority source controls.
 
-Machine-readable official templates can confirm fields that are present, ownership,
-identifiers, signatures, and filenames. Populated examples do not by themselves prove
-requiredness, optionality, types, enums, or validation constraints. Simulator
+Authenticated machine-readable official templates can confirm fields that are
+present, ownership, identifiers, signatures, and filenames. Unauthenticated populated
+examples prove only observations about their exact bytes; they do not prove
+requiredness, optionality, types, enums, validation constraints, or official
+provenance. Simulator
 observations require its upstream URL and full upstream commit hash and remain
 illustrative unless a higher source confirms them.
 
