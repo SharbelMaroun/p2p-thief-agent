@@ -28,10 +28,19 @@ def test_placement_off_board_rejected() -> None:
         validate_barrier_placement(BOARD, Coordinate(0, 0), Coordinate(-1, 0))
 
 
-def test_placement_on_police_cell_rejected() -> None:
-    """A barrier on the Police's own cell is illegal."""
-    with pytest.raises(DomainError):
-        validate_barrier_placement(BOARD, POLICE, POLICE)
+def test_own_cell_placement_valid_via_pure_api() -> None:
+    """The Police may place a barrier on their current cell (book Ch.3.4)."""
+    assert validate_barrier_placement(BOARD, POLICE, POLICE) == POLICE
+
+
+def test_own_cell_placement_valid_via_barrier_field() -> None:
+    """Own-cell placement succeeds through BarrierField.place and stays immutable."""
+    field = BarrierField(quota=3)
+    extended = field.place(BOARD, POLICE, POLICE)
+
+    assert extended.blocks(POLICE)
+    assert not field.blocks(POLICE)
+    assert len(field.cells) == 0
 
 
 @pytest.mark.parametrize("cell", [Coordinate(4, 4), Coordinate(3, 5), Coordinate(1, 3)])

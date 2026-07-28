@@ -1,9 +1,13 @@
 """Public barrier declarations and their official placement rules (`AE-015`).
 
 The Thief validates disclosed barrier placements with the same official rules the
-Police must follow. Validation is pure and takes the Police's auditable position
-explicitly; it holds no Cop-private truth. A placed barrier permanently blocks
-movement for both players. Barrier-on-Thief capture is evaluated in `capture`.
+Police must follow. Per the project book Chapter 3.4 (PDF p.37 / printed p.21), the
+Police may give up movement to place a barrier either on the Police's current cell or
+on one orthogonally adjacent cell. Validation is pure and takes the Police's auditable
+position explicitly; it holds no Cop-private truth. A placed barrier permanently
+blocks movement for both players. This pure API validates a disclosed placement only;
+the barrier-replaces-movement turn rule is enforced later by the turn state machine.
+Barrier-on-Thief capture is evaluated in `capture`.
 """
 
 from __future__ import annotations
@@ -59,10 +63,10 @@ def validate_barrier_placement(
         placed = frozenset(existing)
     board.validate_position(cell)
     board.validate_position(police_position)
-    if cell == police_position:
-        raise DomainError("barrier cannot be placed on the Police's own cell")
-    if not is_orthogonal_step(police_position, cell):
-        raise DomainError("barrier must be one orthogonal step from the Police position")
+    if cell != police_position and not is_orthogonal_step(police_position, cell):
+        raise DomainError(
+            "barrier must be on the Police's own cell or one orthogonal step away"
+        )
     if cell in placed:
         raise DomainError(f"barrier already declared at {cell.to_list()}")
     if len(placed) >= quota:
