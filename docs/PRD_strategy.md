@@ -1,6 +1,8 @@
 # PRD — Thief Strategy
 
-Status: deterministic baseline policy selected for planning; algorithm details pending.
+Status: deterministic baseline policy **implemented** as a contract-independent module
+on branch `agent/thief-baseline-strategy`. Belief, scent, look-ahead beyond two ply,
+and any verbal layer remain out of scope and blocked.
 
 Evasion, legal route selection, survival, Thief-local belief use, and Thief-local verbal
 behavior are in scope. Appendix E rule 25 recommends algorithmic movement and LLM use
@@ -29,3 +31,42 @@ before any protocol use.
 
 Weights, look-ahead, belief heuristic, verbal policy, and optional future learning are
 team design choices. No strategy implementation is included in M1.
+
+## Implemented baseline
+
+`p2p_thief_agent.strategy` exposes `choose_action` and `rank_actions` through the SDK.
+Both are pure: they take board, position, plausible Police cells, and disclosed
+barriers explicitly, and they read no Cop-private truth.
+
+Because scent physics and belief are M6 and blocked, the policy cannot infer a Police
+position. It accepts an explicit iterable of **plausible** Police cells and reasons
+about the worst case among them. An empty iterable is a vacuous criterion, not an
+assertion that every cell is safe.
+
+Candidates are ranked by strict criterion priority, never by a weighted sum, so no
+numeric weight needs calibration data the project does not have:
+
+1. discard dead-end targets — a target whose every remaining exit leads back to the
+   cell just vacated;
+2. maximize the Manhattan distance to the nearest plausible Police cell;
+3. maximize one-step mobility at the target, excluding `STAY`;
+4. maximize two-ply onward reach, then minimize corner/edge contact;
+5. break remaining ties by the fixed `Action` order `N, S, E, W, STAY`.
+
+Consequences of this ordering that are deliberate, not accidental: fleeing outranks
+corner avoidance, so the policy will move towards an edge to increase distance; and
+because `STAY` is always legal from an on-board cell, a legal action always exists, so
+`choose_action` never raises for an on-board position. An off-board position is
+rejected by the domain rather than silently repaired.
+
+`rank_actions` ranks dead ends last as a block rather than dropping them, so a caller
+facing nothing but dead ends still receives a complete legal ordering. That block
+ordering is the deterministic fallback.
+
+### Boundary
+
+The baseline is a contract-independent exception authorized on 2026-07-28. It is not
+M3-004: formal M3 remains `BLOCKED`, and this module adds no local state, no history,
+no scoring, and no turn state machine. Manhattan distance and the criterion order are
+implementation choices, not official rules, and no shared-contract byte depends on
+them.
