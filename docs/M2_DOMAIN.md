@@ -9,7 +9,7 @@ Status: **CONTRACT-INDEPENDENT M2 DOMAIN COMPLETE**
 The Thief core domain is implemented independently behind the public SDK using only
 Appendix E/F `CONFIRMED` rules. It authors no shared-contract byte, imports no Cop
 module, and reads no Cop-private truth. FastMCP, commit-reveal, protocol runtime, and
-shared-contract runtime remain deferred until Cop `0.2.0-proposed`.
+live peer runtime remain separate `PENDING` milestones that consume no peer bundle.
 
 ## Modules
 
@@ -20,6 +20,10 @@ shared-contract runtime remain deferred until Cop `0.2.0-proposed`.
 | `domain/movement.py` | M2-03 | One-orthogonal-step-or-STAY movement per origin convention; off-board and barriered targets reject; deterministic legal-action and cardinal-move enumeration |
 | `domain/barriers.py` | M2-04 | Pure disclosed-barrier placement validation and immutable `BarrierField`; on-board, on the Police's current cell or one orthogonally adjacent cell, unique, within quota |
 | `domain/capture.py` | M2-05 | `evaluate_capture` over the three capture causes, applying an implementation-chosen tie-break when several hold at once |
+
+All public domain entry points reject off-board player positions consistently, and
+plain iterable barrier inputs receive the same quota validation as `BarrierField`
+(`M2-006`).
 
 ## Decisions and interpretations
 

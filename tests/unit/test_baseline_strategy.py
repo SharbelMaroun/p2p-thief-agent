@@ -124,6 +124,13 @@ def test_off_board_position_is_rejected_rather_than_repaired():
         choose_action(BOARD, Coordinate(9, 9), [Coordinate(0, 0)])
 
 
+def test_rank_actions_rejects_any_off_board_police_position():
+    police = [Coordinate(0, 0), Coordinate(9, 9)]
+
+    with pytest.raises(DomainError):
+        rank_actions(BOARD, CENTRE, police)
+
+
 def test_policy_works_on_a_board_with_a_nonzero_axis_start_index():
     board = Board(size=5, axis_start_index=1)
     here = Coordinate(3, 3)

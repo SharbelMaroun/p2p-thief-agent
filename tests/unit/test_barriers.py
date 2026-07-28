@@ -93,6 +93,25 @@ def test_barrier_field_rejects_negative_quota() -> None:
         BarrierField(quota=-1)
 
 
+@pytest.mark.parametrize("bad", [True, 1.0, "5"])
+def test_raw_iterable_rejects_non_integer_quota(bad: object) -> None:
+    """Raw barrier iterables apply the same quota validation as BarrierField."""
+    with pytest.raises(DomainError):
+        validate_barrier_placement(
+            BOARD,
+            POLICE,
+            Coordinate(2, 3),
+            (),
+            quota=bad,  # type: ignore[arg-type]
+        )
+
+
+def test_raw_iterable_rejects_negative_quota() -> None:
+    """Raw barrier iterables reject negative quotas before placement checks."""
+    with pytest.raises(DomainError):
+        validate_barrier_placement(BOARD, POLICE, Coordinate(2, 3), (), quota=-1)
+
+
 def test_barrier_permanently_blocks_movement() -> None:
     """A placed barrier blocks the Thief's move into that cell."""
     from p2p_thief_agent.domain.coordinates import Action

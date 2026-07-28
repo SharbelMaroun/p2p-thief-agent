@@ -5,7 +5,7 @@ types and functions and the deterministic baseline strategy are re-exported here
 adapters never import internal modules directly or duplicate business logic.
 """
 
-from p2p_thief_agent import domain, strategy
+from p2p_thief_agent import domain, protocol, strategy
 from p2p_thief_agent.domain import (
     DEFAULT_BARRIER_QUOTA,
     Action,
@@ -23,6 +23,29 @@ from p2p_thief_agent.domain import (
     legal_actions,
     resolve_move,
     validate_barrier_placement,
+)
+from p2p_thief_agent.protocol import (
+    PROFILE,
+    VERSION,
+    CanonicalizationError,
+    ConformanceError,
+    ConformanceSession,
+    NegotiatedOffer,
+    NegotiationState,
+    accept_offer,
+    agreed_configuration_sha256,
+    audit_sha256,
+    build_offer,
+    canonical_sha256,
+    canonicalize,
+    commitment_sha256,
+    loads,
+    new_nonce,
+    open_remote_session,
+    rejection,
+    source_sha256,
+    validate_offer,
+    verify_commitment,
 )
 from p2p_thief_agent.sdk.api import ThiefSdk
 from p2p_thief_agent.strategy import (
@@ -45,9 +68,23 @@ __all__ = [
     "Coordinate",
     "DomainError",
     "OriginCorner",
+    "PROFILE",
     "ThiefSdk",
+    "VERSION",
+    "CanonicalizationError",
+    "ConformanceError",
+    "ConformanceSession",
+    "NegotiationState",
+    "NegotiatedOffer",
+    "accept_offer",
+    "agreed_configuration_sha256",
+    "audit_sha256",
+    "build_offer",
     "cardinal_moves",
+    "canonical_sha256",
+    "canonicalize",
     "choose_action",
+    "commitment_sha256",
     "domain",
     "edge_contacts",
     "evaluate_capture",
@@ -56,12 +93,20 @@ __all__ = [
     "is_orthogonal_step",
     "is_trapped",
     "legal_actions",
+    "loads",
     "manhattan_distance",
     "min_threat_distance",
     "mobility",
+    "new_nonce",
+    "open_remote_session",
     "onward_reach",
     "rank_actions",
+    "rejection",
     "resolve_move",
+    "protocol",
+    "source_sha256",
     "strategy",
+    "validate_offer",
     "validate_barrier_placement",
+    "verify_commitment",
 ]

@@ -55,6 +55,7 @@ def legal_actions(
     barriers: Iterable[Coordinate] = (),
 ) -> list[Action]:
     """Enumerate legal actions in fixed Action order (deterministic)."""
+    board.validate_position(position)
     blocked = frozenset(barriers)
     legal: list[Action] = []
     for action in Action:

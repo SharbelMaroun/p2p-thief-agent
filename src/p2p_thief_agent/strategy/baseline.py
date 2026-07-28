@@ -99,7 +99,7 @@ def rank_actions(
     """
     board.validate_position(position)
     blocked = frozenset(barriers)
-    threats = tuple(police_positions)
+    threats = tuple(board.validate_position(threat) for threat in police_positions)
     legal = legal_actions(board, position, blocked)
     targets = {action: resolve_move(board, position, action, blocked) for action in legal}
     return sorted(

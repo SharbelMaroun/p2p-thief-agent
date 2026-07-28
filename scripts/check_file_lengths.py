@@ -26,10 +26,17 @@ def python_files(directory: Path) -> list[Path]:
     return sorted(directory.rglob("*.py")) if directory.exists() else []
 
 
+def javascript_files(directory: Path) -> list[Path]:
+    """Return JavaScript files below an existing directory in stable order."""
+    return sorted(directory.rglob("*.js")) if directory.exists() else []
+
+
 def main() -> int:
     """Report any file that exceeds its controlling limit."""
     source_files = python_files(PROJECT_ROOT / "src") + python_files(PROJECT_ROOT / "scripts")
-    test_files = python_files(PROJECT_ROOT / "tests")
+    test_files = python_files(PROJECT_ROOT / "tests") + javascript_files(
+        PROJECT_ROOT / "tests" / "neutral_stub"
+    )
     violations: list[str] = []
 
     for path in source_files:

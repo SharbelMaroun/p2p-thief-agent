@@ -1,5 +1,7 @@
 """Tests for capture conditions and precedence (M2-05)."""
 
+import pytest
+
 from p2p_thief_agent.domain.barriers import BarrierField
 from p2p_thief_agent.domain.board import Board
 from p2p_thief_agent.domain.capture import (
@@ -8,7 +10,7 @@ from p2p_thief_agent.domain.capture import (
     is_captured,
     is_trapped,
 )
-from p2p_thief_agent.domain.coordinates import Coordinate
+from p2p_thief_agent.domain.coordinates import Coordinate, DomainError
 
 BOARD = Board(size=7)
 
@@ -94,3 +96,24 @@ def test_capture_accepts_plain_iterable_barriers() -> None:
     assert evaluate_capture(BOARD, thief, Coordinate(0, 0), [thief]) is (
         CaptureReason.BARRIER_ON_THIEF
     )
+
+
+def test_is_trapped_rejects_off_board_thief() -> None:
+    """An off-board Thief cannot be reported as trapped."""
+    with pytest.raises(DomainError):
+        is_trapped(BOARD, Coordinate(9, 9))
+
+
+@pytest.mark.parametrize(
+    ("thief", "police"),
+    [
+        (Coordinate(9, 9), Coordinate(0, 0)),
+        (Coordinate(0, 0), Coordinate(9, 9)),
+    ],
+)
+def test_evaluate_capture_rejects_off_board_players(
+    thief: Coordinate, police: Coordinate
+) -> None:
+    """Capture evaluation requires both player positions to be on-board."""
+    with pytest.raises(DomainError):
+        evaluate_capture(BOARD, thief, police)

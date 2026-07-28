@@ -2,7 +2,7 @@
 
 Status: deterministic baseline policy **implemented** as a contract-independent module
 on branch `agent/thief-baseline-strategy`. Belief, scent, look-ahead beyond two ply,
-and any verbal layer remain out of scope and blocked.
+and any verbal layer remain `PENDING` in their later milestones.
 
 Evasion, legal route selection, survival, Thief-local belief use, and Thief-local verbal
 behavior are in scope. Appendix E rule 25 recommends algorithmic movement and LLM use
@@ -41,7 +41,7 @@ team design choices. No strategy implementation is included in M1.
 Both are pure: they take board, position, plausible Police cells, and disclosed
 barriers explicitly, and they read no Cop-private truth.
 
-Because scent physics and belief are M6 and blocked, the policy cannot infer a Police
+Because scent physics and belief are `PENDING` in M6, the policy cannot infer a Police
 position. It accepts an explicit iterable of **plausible** Police cells and reasons
 about the worst case among them. An empty iterable is a vacuous criterion, not an
 assertion that every cell is safe.
@@ -69,7 +69,7 @@ ordering is the deterministic fallback.
 ### Boundary
 
 The baseline is a contract-independent exception authorized on 2026-07-28. It is not
-M3-004: formal M3 remains `BLOCKED`, and this module adds no local state, no history,
+M3-004: formal M3 integration remains `PENDING`, and this module adds no local state, no history,
 no scoring, and no turn state machine. Manhattan distance and the criterion order are
 implementation choices, not official rules, and no shared-contract byte depends on
 them.

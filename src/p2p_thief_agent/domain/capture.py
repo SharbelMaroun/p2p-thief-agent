@@ -38,6 +38,7 @@ def is_trapped(
     barriers: BarrierField | Iterable[Coordinate] = (),
 ) -> bool:
     """Return whether every cardinal neighbor is off-board or barriered."""
+    board.validate_position(thief)
     field = _as_field(barriers)
     for neighbor in board.orthogonal_neighbors(thief):
         if board.contains(neighbor) and not field.blocks(neighbor):
@@ -52,6 +53,8 @@ def evaluate_capture(
     barriers: BarrierField | Iterable[Coordinate] = (),
 ) -> CaptureReason | None:
     """Return the highest-precedence capture reason, or None if uncaptured."""
+    board.validate_position(thief)
+    board.validate_position(police)
     field = _as_field(barriers)
     if thief == police:
         return CaptureReason.SAME_CELL

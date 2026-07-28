@@ -8,6 +8,10 @@ Companion Cop repository:
 
 ## Milestone status
 
+M0 and M2 are `DONE`. M1 is `IN PROGRESS` at the Thief-authored conformance
+profile. M3–M9 are `PENDING` and proceed sequentially; unresolved choices are raised
+explicitly rather than classified as blockers.
+
 Version `1.00` began as an M0–M1 documentation and package scaffold. The inspected
 baseline (`119fa911d5b1a5aecdaa9531d0912e5c6f9ab32f`) contained no Python package,
 tests, `pyproject.toml`, or lockfile; that milestone added those engineering
@@ -20,20 +24,14 @@ E/F `CONFIRMED` rules, takes every board and position input explicitly, and depe
 no shared-contract byte, MCP endpoint, or Cop-owned file. See
 [M2_DOMAIN.md](docs/M2_DOMAIN.md).
 
-The repository still deliberately implements no peer runtime, protocol or commit-reveal
-runtime, LLM, Gmail, GUI, or replay behavior.
+The repository still deliberately implements no live peer runtime, commit-reveal state
+machine, LLM, Gmail, GUI, or replay behavior.
 
-The Cop agent owns parity-controlled shared files. Original candidate `84339c2`,
-revision `b586af9`, and the latest revision `e0df5ba` (Cop main `be705f9`) were all
-rejected for Thief copying. On 2026-07-28 the coordinator audited `e0df5ba` and issued
-`ACCEPTED_FOR_PROVISIONAL_PARITY: NO`: its 18 file hashes and manifest are
-integrity-correct, but the contract is semantically rejected across seven issues (see
-[COORDINATOR_VERDICT_2026-07-28.md](docs/COORDINATOR_VERDICT_2026-07-28.md)). A newer
-Cop bundle `0.2.0-proposed` (`0c20bf0`, 32 controlled files) has since been reviewed
-read-only here: every declared hash and vector reproduces exactly, but four of the seven
-blockers remain unresolved and no coordinator verdict exists for it, so it is likewise
-not copyable. Zero
-parity-controlled files have been integrated here.
+Earlier Cop-bundle reviews are retained as historical audit evidence only. No
+peer-owned file was integrated, and those bundles are not inputs to the current
+Thief-authored conformance workflow. The dated findings remain in
+[COORDINATOR_VERDICT_2026-07-28.md](docs/COORDINATOR_VERDICT_2026-07-28.md) and
+[CONTRACT_REVIEW.md](docs/CONTRACT_REVIEW.md).
 
 On 2026-07-28 the copy model was **superseded**. Under `THIEF-002` this repository has
 no access to the companion Cop repository and must play unknown classmate opponents, so
@@ -66,8 +64,9 @@ uv run python scripts/check_secrets.py
 uv run python scripts/check_shared_contracts.py
 ```
 
-Shared-hash verification requires the future accepted Cop manifest. Until then the
-contract check exits nonzero with a pending blocker; it never reports a false pass.
+The conformance checker remains fail-closed at `PENDING` until an exact accepted
+profile revision is recorded. This is honest incomplete evidence, not a blocker on
+profile or conformance work.
 
 ## Confirmed boundaries
 
@@ -105,8 +104,9 @@ checklist](docs/CONTRACT_HANDOFF_CHECKLIST.md), and
 
 All future business behavior must be reachable through the public SDK. CLI, GUI, MCP
 transport, and external integrations may adapt inputs and outputs but may not contain or
-duplicate business logic. The present package contains only metadata, the SDK entry
-point, and empty layer boundaries.
+duplicate business logic. The present package exposes the implemented M2 domain and
+deterministic baseline through the SDK; protocol, orchestration, service, and UI
+packages remain explicit boundaries for their later milestones.
 
 Historical configurations remain quarantined under `config/drafts/`; runtime code must
 not load them. Local private TOML and real `.env` files are ignored.
