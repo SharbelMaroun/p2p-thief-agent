@@ -11,14 +11,14 @@ An unknown blocks only its named subsystem.
 | U-006 | Exact peer ports and local endpoint configuration | Networking | Accepted private-config design; official values if any |
 | U-009 | Gmail draft-versus-send mode and exact OAuth/credential workflow | Reporting | Appendix A, dated clarification, or accepted ADR-0010 |
 | U-010 | Whether a shared executable stateless package is permitted | Packaging | Lecturer clarification; M1 uses independent byte copies only |
-| U-013 | Complete private TOML keys, types, secret-loading method, and compatibility rules | Configuration | ADR-0004 and source-backed Cop proposal; `config/game.toml`, its private role, major categories, and JSON precedence are confirmed in `AB-001` |
+| U-013 | Complete private TOML keys, types, secret-loading method, and compatibility rules | Configuration | ADR-0004 and source-backed Cop proposal; `config/game.toml`, its private role, major categories, and JSON precedence are confirmed in `AB-001`; `opponent_url` is a confirmed key (course material 2026-07-28); full schema and secret-loading method remain open |
 | U-014 | Non-quantitative event ordering: moves/barriers/capture, scent emission/decay/observation, and scoring edge cases | Domain/protocol | Direct book sections plus accepted shared rules |
 | U-015 | Scope permitted for simulator code reuse under its license/provenance | Provenance | License/lecturer review and ADR-0008 |
 | U-016 | Team/group/member identifiers and eight-character team code | Identity/reporting | Verified team input |
 | U-017 | Newer Moodle instructions and lecturer announcements | Potential final-release areas | Obtain dated official posts |
 | U-019 | Official template required/optional fields, types, enums, bounds, and additional-property rules | Artifact validation | Formal schemas or dated authoritative clarification |
 | U-020 | Exact provisionally authorized parity-file list, candidate version, manifest shape/hash, per-file hashes, and later final-freeze revision | Contract gate | Coordinator-named immutable Cop handoff, Thief parity/conformance evidence, then separate final freeze |
-| U-021 | Exact six-sub-game role assignment, including whether Cop and Thief must alternate every sub-game and which team starts in which role | League scheduling | Binding book passage, dated lecturer clarification, or accepted shared schedule |
+| ~~U-021~~ | ~~Exact six-sub-game role assignment~~ | ~~League scheduling~~ | **CLOSED 2026-07-28** — see below |
 
 ## Closed in this reconciliation
 
@@ -30,3 +30,12 @@ confirmed in `SR-011..013`. The shared/private configuration boundary, mandatory
 confirmed in `AB-001..002`, `AR-001`, and `CR-001`. JSON template key presence is
 confirmed in `JS-001..003`. Final reports are JSON attachments without a free-text
 report body (`AE-032`). Exact constraints beyond that evidence remain open above.
+
+**U-021 — CLOSED 2026-07-28:** Role alternation confirmed from course material
+(source level 8, lecture/assignment material; commas in source suggest direct
+document extraction). Natural role on odd sub-games (1, 3, 5); opposite role on even
+sub-games (2, 4, 6). Natural role is the group's configured repository role from
+private `game.toml`. Scores are aggregated per group across the full series. This
+corroborates the Cop candidate `e0df5ba` LEAGUE_CONTRACT.md wording and the
+owner-supplied lecturer direction dated 2026-07-27. Record as `CONFIRMED` in the
+requirements ledger.
