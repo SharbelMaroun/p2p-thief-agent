@@ -15,6 +15,21 @@ absent from Appendix F, including
 `pheromone_min_center_intensity`, remain template/example fields without a confirmed
 gameplay value.
 
+## Book-confirmed baseline
+
+The book independently confirms four artifact families: declaration, agreed
+per-sub-game configuration, per-sub-game log, and final result. It also confirms that
+the four artifacts for a match carry one common `game_uid` and that their filenames
+derive from `game_id` (`AR-001`). Appendix F fixes the filename patterns in `AF-021`.
+Those facts do not authenticate the exact local example bytes or make every observed
+field mandatory.
+
+Appendix B confirms `agreed_between` as a mandatory field in shared
+`config/game.json`, represented as a list of the two participating group identifiers
+(`AB-002`). It does not specify deterministic list order. The book does not establish
+that `game_uid` must use UUID syntax, that `game_id` must follow the example naming
+pattern, or that the observed `links` dictionary is mandatory in every artifact.
+
 Observed SHA-256 values:
 
 - declaration: `f0f54ada41b831fc666d18ba0605f656ec4ac21160a85653553bda8e574543e4`

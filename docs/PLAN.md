@@ -1,7 +1,8 @@
 # Plan
 
-Status: M0 complete; M1 public-contract gate blocked pending a revised,
-coordinator-accepted Cop handoff. M2–M9 are blocked.
+Status: M0 complete; M1 public-contract gate blocked pending coordinator
+authorization for provisional parity testing. Final freeze follows successful
+cross-repository parity/conformance. M2–M9 are blocked.
 
 The Thief M0–M1 scaffold is based on remote main
 `e1cc4992cd1c9a7705edf13fc976f85482ce601b`. It has package, SDK, CLI, test, and
@@ -28,7 +29,7 @@ truth (`SR-004`, `THIEF-001`).
 | Gate | Common phase | Thief-owned outcome | Current status |
 |---|---|---|---|
 | M0 | Evidence and source reconciliation | Correct source hierarchy, traceable Appendix E/F evidence, explicit unknowns/conflicts, reconciled repository history | `DONE` |
-| M1 | Public contract, match configuration, parity and freeze | Independently review a coordinator-accepted handoff, copy accepted controlled bytes exactly, verify the manifest and per-file hashes, and prove neutral match-config conformance | `BLOCKED` |
+| M1 | Public contract, match configuration, parity and freeze | Independently review a provisionally authorized handoff, copy controlled bytes exactly, verify the manifest and per-file hashes, prove neutral match-config conformance, and obtain final freeze | `BLOCKED` |
 | M2 | Core domain rules | Coordinates, actions, grid, legal movement, barrier and capture semantics behind the SDK | `BLOCKED ON M1` |
 | M3 | Local state, scoring and deterministic baseline | Immutable local history, disclosed-barrier state, scoring, and deterministic legal baseline | `BLOCKED ON M1` |
 | M4 | Protocol, canonicalization and commit-reveal | Accepted public messages, exact canonical bytes, state transitions, commitment verification, and audit outcomes | `BLOCKED ON M1` |
@@ -43,28 +44,32 @@ the sole author of parity-controlled shared files.
 
 ## M1 gate
 
-Cop candidate `84339c210c8e3293d972bccec5912abf519d502c` exists, but it is
-`0.1.0-proposed`, unfrozen, and coordinator-rejected. The independent findings are in
-[CONTRACT_REVIEW.md](CONTRACT_REVIEW.md). It must not be copied.
+The original Cop candidate `84339c2` and coordinator-reviewed revised candidate
+`b586af9` must not be copied. The coordinator explicitly rejected `b586af9` for
+Thief consumption while authorizing Cop portability remediation and Thief review.
+Subsequent Cop work through `e0df5ba530fd7c433d41a98c5976ca7e08cdfa53` is now
+remotely available on Cop main (`be705f9`, 2026-07-28) with status
+`UNFROZEN — NO-GO UNTIL PARITY` and no coordinator authorization. Independent
+findings are in [CONTRACT_REVIEW.md](CONTRACT_REVIEW.md) and
+[GATE_RESOLUTION_REVIEW.md](GATE_RESOLUTION_REVIEW.md).
 
 Contract consumption starts only after every input in
 [CONTRACT_HANDOFF_CHECKLIST.md](CONTRACT_HANDOFF_CHECKLIST.md) is supplied:
 
-- accepted Cop commit;
-- accepted contract version;
-- accepted manifest exact-byte SHA-256;
-- accepted controlled-path list;
-- accepted per-file hashes;
-- explicit coordinator acceptance verdict.
+- provisionally authorized Cop commit and candidate version;
+- provisionally accepted manifest exact-byte SHA-256;
+- provisionally accepted controlled-path list and per-file hashes;
+- explicit coordinator authorization for parity/conformance testing.
 
 After receipt, Thief verifies the handoff before copying, copies every controlled path
-byte-for-byte from the accepted commit, makes no shared-file edits, and proves
+byte-for-byte from the provisionally authorized commit, makes no shared-file edits, and proves
 bidirectional match-configuration conformance with a neutral compliant opponent. Any
 shared defect returns to Cop for a revised candidate.
 
 M1 exits only when 100% of controlled bytes and the manifest self-hash match, both
 repositories independently pass their contract checks, and the coordinator accepts
-the resulting cross-repository evidence.
+the resulting cross-repository evidence and issues the separate final contract-freeze
+and M2 gameplay verdicts. Provisional copy authorization alone never opens M2.
 
 ## Decision gates
 
@@ -86,9 +91,10 @@ failure semantics must be settled before M2.
 8. `git diff --check`
 
 CI runs the same currently applicable sequence. The contract-status step must remain
-fail-closed until the accepted handoff is integrated and verified.
+fail-closed until a provisionally authorized handoff is integrated and verified.
 
 The protected checker still prints historical “no proposal” wording. In current
-coordination terms, its `PENDING` result means no accepted handoff is integrated. CI
+coordination terms, its `PENDING` result means no provisionally authorized handoff is
+integrated. CI
 therefore verifies the nonzero exit and `PENDING` marker without changing the
 Cop-owned candidate path.

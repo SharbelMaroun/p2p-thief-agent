@@ -1,6 +1,132 @@
 # Independent Cop Contract Review
 
-Review date: 2026-07-26
+Initial review date: 2026-07-26
+
+Latest review update: 2026-07-28
+
+## Revised-candidate update
+
+The original path-by-path review below remains the historical review of immutable Cop
+candidate `84339c210c8e3293d972bccec5912abf519d502c`.
+
+The Thief independently inspected immutable revised candidate
+`b586af9e55dcc40789a1d7ab683edb97c8cfabc6` and compared it with
+`COORDINATOR_M1_CANDIDATE_REVIEW.md`. The revised candidate fixed several original
+defects:
+
+- it represents `agreed_between`, match identity, and selected match values;
+- it distinguishes local integrity from optional cross-root comparison;
+- it adds neutral match validation and negative mutation tests;
+- it corrects source priority and generated-artifact provenance;
+- its 17-file local manifest and quality gates passed coordinator review.
+
+It remained ineligible for Thief copying because:
+
+- parity-controlled `config/game.json` and `config/rate_limits.json` embed one
+  permanent neutral match instance, so new opponents would mutate frozen bytes;
+- controlled checker messages and private-configuration prose are Cop-specific rather
+  than role-neutral;
+- it does not prove two different valid opponent/match identities can be supplied
+  without changing controlled stable-contract files;
+- the coordinator explicitly recorded `ACCEPTED_FOR_THIEF_COPY: NO`,
+  `CONTRACT_FREEZE: NO-GO`, and `M2_GAMEPLAY: NO-GO`.
+
+`665bd30a75866e872f899eb337664266e26129ed` was previously described as local-only.
+It has since been pushed to the remote `agent/cop-m1-contract-revision` branch and
+merged to Cop main via PR #8. Two further commits followed it on that branch:
+`459cd73` (moved `config/rate_limits.json` and its schema to the local tier, reducing
+the controlled set from 20 to 18 paths) and `e0df5ba530fd7c433d41a98c5976ca7e08cdfa53`
+(documented the candidate as technically ready for external coordinator review, with
+status `UNFROZEN — NO-GO UNTIL PARITY`). The Cop main HEAD is now
+`be705f9dc9e14b9fc8a53ffe1658493ad977f1fc` (2026-07-28 merge). Those commits and
+their exact proposed values must not be copied or relabeled as accepted; no coordinator
+verdict supplies `ACCEPTED_FOR_PROVISIONAL_PARITY: YES` for any of them. The
+proposed inventory for `e0df5ba` is recorded in
+[GATE_RESOLUTION_REVIEW.md](GATE_RESOLUTION_REVIEW.md).
+
+The corrected handoff sequence is provisional copy authorization, exact-byte
+parity/conformance testing, external-decision closure, and only then final freeze.
+Requiring final freeze before any provisional copy would create a circular gate.
+
+**CURRENT CONTRACT INTEGRATION: NO-GO**
+
+**CURRENT M2 GAMEPLAY: NO-GO**
+
+## Candidate e0df5ba review (2026-07-28)
+
+Read-only inspection of `e0df5ba530fd7c433d41a98c5976ca7e08cdfa53` (Cop main
+`be705f9`, merged via PR #8). Every file was read using
+`git show e0df5ba:<path>`. No file was copied or modified.
+
+### Verdict
+
+The candidate makes substantial progress over `b586af9`: `config/rate_limits.json`
+is correctly moved to the local tier, `agreed_between` is present and required in
+the schema, the checker now supports genuine cross-root comparison via
+`--compare-root`, and all Appendix F values are implemented with correct
+fixed/minimum/negotiated semantics. However, one P0 remains: `config/game.json`
+contains match-specific participant identifiers that must change per actual match,
+which means controlled bytes cannot stay frozen across different real-participant
+match instances. Stage B requirement — "Two different valid participant/match pairs
+work without changing any controlled stable-contract byte" — cannot be verified from
+this design.
+
+**CONTRACT INTEGRATION: NO-GO**
+
+**M2 GAMEPLAY: NO-GO**
+
+### Path-by-path review
+
+| Candidate path | Severity | Independent review |
+|---|---|---|
+| `.gitattributes` | P1 | Deterministic LF rules for all 18 controlled paths. Content is correct and internally consistent. Making `.gitattributes` a cross-repository parity-controlled file is a project policy choice, not a book requirement. |
+| `config/game.json` | P0 | All Appendix F values are present with correct fixed/minimum/negotiated semantics. `agreed_between` correctly requires two participant identifiers. **P0: The file contains `"neutral-group-alpha"` and `"neutral-group-beta"` as placeholder participant IDs. Because the file is listed as a parity-controlled stable file (exact bytes identical between repos), any actual match with real group IDs would require mutating those controlled bytes. The candidate demonstrates schema correctness using a neutral fixture but does not define the mechanism by which two different real-participant match instances produce byte-identical `config/game.json` without editing the controlled source. Stage B checklist item "two different valid participant/match pairs work without changing any controlled stable-contract byte" is not satisfiable under the current design.** |
+| `docs/contracts/ARTIFACT_CONTRACT.md` | P1 | Correctly defines four artifact families, common identity (`game_id`, `game_uid`, `links`), the config lock, and declaration requirements. Role alternation (odd-game natural, even-game opposite) is documented as owner-supplied lecturer direction dated 2026-07-27, not directly book-confirmed. UUID protocol (UUIDv4 vs. SHA-256-derived) remains open for M7. |
+| `docs/contracts/CONTRACT_VERSION` | PASS | Reads `0.1.0-proposed`. Accurately reflects the unfrozen candidate state. |
+| `docs/contracts/LEAGUE_CONTRACT.md` | P1 | Clear separation of fixed, minimum, and negotiated values, each with a direct Appendix F locator. Role alternation cited as owner-supplied direction rather than direct book text. |
+| `docs/contracts/MATCH_CONFIGURATION.md` | P1 | Canonical hash algorithm (sorted keys, compact separators, unescaped Unicode, UTF-8) is clearly defined and aligned with `CR-001`. `config_sha256` scope is correctly separated from source bytes. Does not define the mechanism for producing an identical `config/game.json` with non-placeholder participant IDs across two independent repositories. |
+| `docs/contracts/PRIVATE_CONFIGURATION.md` | PASS | Correctly enumerates all private-tier concerns. `config/rate_limits.json` correctly classified as local. No parity claim for private data. |
+| `docs/contracts/SHARED_RULES.md` | P1 | All mandatory rules carry direct book citations. Schema and extension decisions correctly marked as proposals. Role alternation and `game.version` root placement are PROPOSED without direct book authority. |
+| `docs/schemas/artifact-keyset-fixture.schema.json` | P1 | Correctly labeled `LOCAL_OBSERVATION_NEEDS_MANUAL_REVIEW`. Validates fixture metadata structure only, not official artifact content. Provenance of the four source files remains unverified. |
+| `docs/schemas/config-hash-vector.schema.json` | PASS | Defines the hash-vector structure cleanly. Consistent with `CR-001`. Provides a deterministic schema for the canonical-hash test vector. |
+| `docs/schemas/game-config.schema.json` | P1 | Material improvement: `agreed_between` is now present and required; all Appendix F values use correct `const`/`minimum` constraints. `schema_version: "1.2"` `const` rejects 1.1/1.3 without an accepted compatibility policy. `axis_start_index` has no bounds preventing negative values. `additionalProperties: false` at the root is a project proposal. |
+| `scripts/check_shared_contracts.py` | P1 | `--compare-root` flag enables genuine cross-root exact-byte comparison, directly resolving the original P1 about Cop-local-only integrity. **P1: Docstring says "Cop-authored contract bundle"; success message says "Cop-local contract integrity OK". When copied to Thief, the `--write` flag would write a manifest derived from the Thief root, producing incorrect results. Thief usage must be restricted to the verify/compare paths only; the write path is not role-neutral.** |
+| `scripts/shared_contract_integrity.py` | P1 | `compare_repository_roots` enables genuine cross-root byte comparison — a significant improvement. `write_manifest` is a Cop-only operation: it builds the manifest from the local root and would produce incorrect output from the Thief root. `controlled_paths` hardcodes Cop paths and would return empty or wrong results from a fresh Thief root before copying. The write/build paths are not role-neutral. |
+| `tests/fixtures/contracts/agreed_config.keyset.json` | P1 | Correctly labeled `NEEDS_MANUAL_REVIEW`. Records observed key sets including `agreed_between`, `config_sha256`, `game_uid`, and `sub_game_number`. All values redacted; only key presence is claimed. Provenance remains unverified (simulator-generated). |
+| `tests/fixtures/contracts/declaration.keyset.json` | P1 | Correctly labeled `NEEDS_MANUAL_REVIEW`. Records observed key sets including `signature`. Required/optional status of `signature` and its generation mechanism remain unknown. Provenance unverified. |
+| `tests/fixtures/contracts/final_result.keyset.json` | P1 | Correctly labeled `NEEDS_MANUAL_REVIEW`. Records `mutual_agreement.sha256` and `confirmed` observations. Sub-game roles use a wildcard key pattern consistent with the proposed alternation model. Provenance unverified. |
+| `tests/fixtures/contracts/game-config-sha256.vector.json` | PASS | Canonical hash vector for the neutral `config/game.json` fixture: 965 UTF-8 bytes, SHA-256 `adac9efe...`, sorted-compact-unescaped-Unicode-UTF-8 algorithm. Independently verifiable deterministic test vector. |
+| `tests/fixtures/contracts/game_log.keyset.json` | P1 | Correctly labeled `NEEDS_MANUAL_REVIEW`. Records commit-reveal structure (payload/nonce/commit) and Step-0 system-spec keys. Provenance unverified. |
+
+### Improvements over b586af9
+
+| b586af9 finding | e0df5ba resolution |
+|---|---|
+| `config/rate_limits.json` embeds a neutral match instance as a parity-controlled file | Resolved: `rate_limits.json` and its schema moved to the local tier and excluded from parity |
+| Checker proves only Cop-local integrity | Resolved: `--compare-root` adds genuine cross-root exact-byte comparison |
+| `agreed_between` absent from schema; closed schema rejects it | Resolved: `agreed_between` is now present and required |
+| Checker messages say "Shared-contract parity OK" without cross-root comparison | Resolved: messages now distinguish local-verify from cross-root compare |
+| `config/game.json` and `config/rate_limits.json` embed one permanent neutral match instance so new opponents would mutate frozen bytes | Partially resolved: `rate_limits.json` removed; `config/game.json` still embeds placeholder participant IDs (P0 remains for the config file) |
+| Cop-local integrity labeled as parity | Resolved: cross-root comparison function added |
+
+### Required revision outcomes
+
+1. **Resolve the stable-contract mutation gate.** Define whether `config/game.json`
+   is (a) a stable template (participant IDs appear only in emitted artifacts, not in
+   the source constitution) or (b) a per-match file regenerated by mutual agreement.
+   If (b), specify the negotiation mechanism and clarify that the parity manifest is
+   also per-match.
+2. **Prove two different real-participant match identities** produce byte-identical
+   `config/game.json` values without editing any currently parity-controlled stable
+   file.
+3. **Clarify Thief checker usage boundaries.** Specify which paths of
+   `check_shared_contracts.py` and `shared_contract_integrity.py` are valid from a
+   Thief root, and mark or remove the Cop-only `--write` / `write_manifest` path.
+4. **Confirm role alternation** through a direct book citation or explicit
+   coordinator acceptance of the owner-supplied direction.
+5. **Resolve schema version compatibility.** Define an accepted policy for
+   `schema_version: "1.1"`, `"1.2"`, and `"1.3"`, or provide a compatibility
+   normalization rule.
 
 ## Scope and method
 

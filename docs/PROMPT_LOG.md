@@ -107,3 +107,43 @@
 - **Lesson:** a proposal's existence is not acceptance; consumers need a pinned commit,
   version, manifest self-hash, exact path list, per-file hashes, and explicit
   coordinator verdict before trusting or copying bytes.
+
+## P-010 — Book and JSON-template evidence reconciliation
+
+- **Date:** 2026-07-27 · **Tool:** OpenAI Codex implementation/review agent
+- **Goal:** verify the supplied Moodle, reporting, configuration, identity,
+  canonicalization, scheduling, and schema claims against project book v3.0.0 and the
+  four local JSON examples.
+- **Prompt (essence):** treat the book and supplied templates as new evidence; identify
+  which assertions are binding, partial, or unsupported; update project controls
+  without editing Cop-owned shared contract files or beginning gameplay.
+- **Output:** source-page verification, a claim-by-claim reconciliation, confirmed
+  Moodle/PDF and README evidence requirements, a narrowed shared/private config
+  boundary, common artifact-identity requirements, and explicit open conflicts for
+  role scheduling, schema compatibility, result-byte identity, and hash scope.
+- **Refinement:** separated sorted compact UTF-8 serialization in the Chapter 5 commit
+  example from the still-undefined full `config_sha256` algorithm; did not infer OAuth
+  credential storage, UUID grammar, or mandatory `links` fields from generated data.
+- **Lesson:** examples can confirm field presence, but only authoritative prose can
+  establish requiredness and semantics; byte-level cryptographic rules need explicit
+  scope and shared test vectors.
+
+## P-011 — Proposed pre-game gate resolution audit
+
+- **Date:** 2026-07-27 · **Tool:** OpenAI Codex implementation/review agent
+- **Goal:** determine whether supplied simulator mechanics, schema labels, commits,
+  and hashes satisfy the coordinator's M1 gate.
+- **Prompt (essence):** treat `REQUIRED_TERMS`, `validate_agreement`, odd/even
+  `role_for()`, canonical JSON settings, schema labels, and supplied fixed hashes as a
+  proposed technical resolution before gameplay.
+- **Output:** exact template-value verification, current simulator-tag verification,
+  revised Cop-candidate review, a separation of match artifacts from repository
+  parity evidence, and a corrected provisional-copy → parity/conformance → final-freeze
+  handoff sequence.
+- **Refinement:** verified that `7cf3fc9` is historical simulator tag `v1.11`, that the
+  two supplied hashes are absent from the files, and that simulator
+  `validate_agreement` checks missing terms but does not itself perform signature
+  exchange or cross-repository parity.
+- **Lesson:** runtime preflight, match cryptography, and repository supply-chain
+  integrity are three different gates; one hash or one validation function cannot
+  substitute for the others.

@@ -13,17 +13,20 @@ Thief agent must:
 
 1. inspect the proposal commit and its cited sources;
 2. reject or question unsupported fields;
-3. copy accepted parity-controlled files byte-for-byte;
-4. verify every copied file against the accepted SHA-256 manifest.
+3. copy provisionally authorized parity-controlled files byte-for-byte;
+4. verify every copied file against the provisional SHA-256 manifest;
+5. prove parity/conformance before requesting final coordinator freeze.
 
 This produces independent file copies, not a cross-repository package, mount, import, or
 shared runtime filesystem. It does not make Cop authoritative during play.
 
-Candidate `84339c210c8e3293d972bccec5912abf519d502c` is available but was
-coordinator-rejected pending revision. Until a revised candidate is accepted and a
-complete handoff is supplied, the contract status is `PENDING`. No Thief MCP tools,
-message envelope, schema, crypto payload, fixture, active shared configuration, or
-manifest format may be invented. Byte identity may be claimed only for files whose
-hashes were actually compared.
+Original candidate `84339c2` and revised candidate `b586af9` were not authorized for
+Thief copying. Later observed local Cop head `665bd30` is proposed, unfrozen, and has
+no coordinator verdict. Until an immutable candidate receives explicit provisional
+parity authorization and a complete handoff, the contract status is `PENDING`. No
+Thief MCP tools, message envelope, schema, crypto payload, fixture, active shared
+configuration, or manifest format may be invented. Byte identity may be claimed only
+for files whose hashes were actually compared. Provisional parity is not final freeze
+or gameplay permission.
 
 Companion: <https://github.com/SharbelMaroun/p2p-cop-agent>.

@@ -47,7 +47,7 @@ generated-example JSON key observations. `119fa91` preserves the `849c16e` tree 
 | Package | Behavior-free `p2p_thief_agent` SDK/CLI scaffold |
 | Quality | uv lock, Ruff, branch coverage, length and secret gates |
 | Runtime config | None; historical drafts remain quarantined |
-| Shared contract | Candidate `84339c2` exists but is unfrozen and coordinator-rejected; zero accepted parity-controlled files copied |
+| Shared contract | Revised `b586af9` was coordinator-reviewed but not authorized for Thief copying; later local `665bd30` is proposed/unreviewed; zero parity-controlled files copied |
 | Simulator reuse | No runtime code copied |
 
 Exact local check results are recorded in [M1_VERIFICATION.md](M1_VERIFICATION.md).

@@ -17,10 +17,11 @@ not Thief implementation tasks.
 
 ## M1 — Public contract, match configuration, parity and freeze
 
-Current blocker: candidate
-`84339c210c8e3293d972bccec5912abf519d502c` exists, but it is unfrozen,
-coordinator-rejected, and has not supplied an accepted handoff. “Proposal missing” is
-not the blocker.
+Current blocker: revised candidate `b586af9` was coordinator-reviewed but explicitly
+not authorized for Thief copying. The latest candidate `e0df5ba` (Cop main
+`be705f9`, 2026-07-28) self-declares readiness for external coordinator review but
+has no coordinator authorization. “Proposal missing” is not the blocker; provisional
+parity authorization is.
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
@@ -29,11 +30,14 @@ not the blocker.
 | M1-003 | Correct stale source, proposal, and artifact-provenance claims | DONE | Updated source/status documentation |
 | M1-004 | Review Cop candidate `84339c2` read-only, path by path | DONE | `CONTRACT_REVIEW.md` with NO-GO verdict |
 | M1-005 | Keep the current contract checker fail-closed | DONE | Exit 1 with documented `PENDING` |
-| M1-006 | Receive every accepted handoff value and coordinator acceptance verdict | BLOCKED | Complete `CONTRACT_HANDOFF_CHECKLIST.md` |
-| M1-007 | Verify accepted manifest bytes, controlled paths, and every declared file hash before copying | BLOCKED | Pre-copy checklist and recorded hash table |
-| M1-008 | Copy all accepted controlled paths verbatim from the accepted Cop commit | BLOCKED | 100% exact-byte presence; no Thief-authored shared edits |
-| M1-009 | Add only the Thief adapter/tests required by the accepted neutral match-config contract | BLOCKED | Bidirectional neutral-opponent conformance and negative tests |
-| M1-010 | Prove cross-repository parity and obtain final coordinator freeze verdict | BLOCKED | Both checkers pass, manifest self-hash matches, acceptance recorded |
+| M1-006 | Review revised Cop candidate `b586af9` and coordinator portability findings | DONE | Updated `CONTRACT_REVIEW.md` and `GATE_RESOLUTION_REVIEW.md` |
+| M1-006b | Review Cop candidate `e0df5ba` read-only, path by path (18 controlled files) | DONE | `CONTRACT_REVIEW.md` with P0/P1 findings and NO-GO verdict |
+| M1-007 | Receive every provisionally authorized handoff value and coordinator verdict | BLOCKED | Complete Stage A of `CONTRACT_HANDOFF_CHECKLIST.md` |
+| M1-008 | Verify provisional manifest bytes, controlled paths, and every declared file hash before copying | BLOCKED | Pre-copy checklist and recorded hash table |
+| M1-009 | Copy all provisionally authorized controlled paths verbatim from the named Cop commit | BLOCKED | 100% exact-byte presence; no Thief-authored shared edits |
+| M1-010 | Add only the Thief adapter/tests required by the provisionally authorized neutral match-config contract | BLOCKED | Bidirectional neutral-opponent conformance and negative tests |
+| M1-011 | Prove cross-repository parity and two variable match identities | BLOCKED | Both checkers pass without controlled-byte mutation |
+| M1-012 | Obtain final coordinator contract-freeze and M2 verdicts | BLOCKED | Manifest self-hash, parity/conformance evidence, and explicit GO recorded |
 
 ## M2 — Core domain rules
 
