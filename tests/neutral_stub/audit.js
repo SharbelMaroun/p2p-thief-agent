@@ -23,7 +23,7 @@ function verifyRecords(records, turns, nextStep, context) {
     const turn = turns.get(step);
     lowerHex(record.turn_message_id, 32, "turn_message_id");
     lowerHex(record.commitment_sha256, 64, "commitment_sha256");
-    lowerHex(record.nonce, 64, "nonce");
+    lowerHex(record.nonce, 32, "nonce");
     const reveal = payload(record.payload, context);
     if (nonces.has(record.nonce)) fail("COMMITMENT_MISMATCH", "audit reuses nonce");
     nonces.add(record.nonce);

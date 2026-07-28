@@ -1,9 +1,18 @@
-"""Option-B move commitments over RFC 8785 payload bytes."""
+"""Book move commitments (Chapter 5.3): nonce inside the sorted, compact JSON payload.
+
+The commitment hashes ``json.dumps(payload, sort_keys=True, separators=(",", ":"))``
+with the book's default ``ensure_ascii=True`` (non-ASCII escaped), UTF-8 encoded, then
+SHA-256. The nonce is a member of that payload and there is no delimiter. This matches a
+book-literal opponent byte-for-byte. The separate config-hash domains keep using the
+RFC 8785 JCS canonicalizer; see ``ADR-0006`` and
+``COORDINATOR_RULING_COMMIT_REVEAL_2026-07-28.md``.
+"""
 
 from __future__ import annotations
 
 import hashlib
 import hmac
+import json
 import secrets
 from collections.abc import Mapping
 from typing import Any
@@ -35,8 +44,8 @@ _PAYLOAD_KEYS = (
 
 
 def new_nonce() -> str:
-    """Return 32 CSPRNG bytes as 64 lowercase hexadecimal characters."""
-    return secrets.token_hex(32)
+    """Return 16 CSPRNG bytes as 32 lowercase hex characters (book ``token_hex(16)``)."""
+    return secrets.token_hex(16)
 
 
 def _position(value: object, label: str) -> list[int]:
@@ -91,12 +100,17 @@ def payload_respects_board(payload: Mapping[str, Any], board_size: int) -> bool:
     return barrier is None or all(cell < board_size for cell in barrier["position"])
 
 
+def _book_canonical_bytes(committed: Mapping[str, Any]) -> bytes:
+    """Serialize exactly as book Chapter 5.3: sorted keys, compact, escaped, UTF-8."""
+    return json.dumps(dict(committed), sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
 def commitment_sha256(payload: object, nonce: object) -> str:
-    """Hash JCS(payload), a literal pipe, and the 64 nonce ASCII characters."""
+    """Hash the book payload with the nonce inside it and no delimiter (Ch.5.3)."""
     validated = validate_payload(payload)
-    nonce_text = require_lower_hex(nonce, 64, "nonce")
-    material = canonicalize(dict(validated)) + b"|" + nonce_text.encode("ascii")
-    return hashlib.sha256(material).hexdigest()
+    nonce_text = require_lower_hex(nonce, 32, "nonce")
+    committed = {**dict(validated), "nonce": nonce_text}
+    return hashlib.sha256(_book_canonical_bytes(committed)).hexdigest()
 
 
 def verify_commitment(payload: object, nonce: object, expected: object) -> bool:

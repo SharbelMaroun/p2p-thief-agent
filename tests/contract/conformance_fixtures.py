@@ -6,8 +6,8 @@ from p2p_thief_agent.protocol.commitment import commitment_sha256
 from p2p_thief_agent.protocol.session import ConformanceSession
 
 NOW_MS = 150
-NONCE_1 = "00" * 32
-NONCE_2 = "11" * 32
+NONCE_1 = "00" * 16
+NONCE_2 = "11" * 16
 
 
 def make_session(*, optional_control: bool = False) -> ConformanceSession:

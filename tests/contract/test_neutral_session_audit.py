@@ -72,7 +72,7 @@ def test_tampered_or_reused_reveal_is_commitment_mismatch(mutation: str) -> None
     if mutation == "payload":
         records[0]["payload"]["move"] = "S"
     elif mutation == "nonce":
-        records[0]["nonce"] = "f" * 64
+        records[0]["nonce"] = "f" * 32
     elif mutation == "commitment":
         records[0]["commitment_sha256"] = "f" * 64
     elif mutation == "turn_id":
@@ -102,7 +102,7 @@ def test_failed_audit_is_not_cached_and_success_closes_streams() -> None:
     turn, payload, nonce = make_turn()
     valid = make_audit([audit_record(turn, payload, nonce)])
     invalid = deepcopy(valid)
-    invalid["body"]["records"][0]["nonce"] = "f" * 64
+    invalid["body"]["records"][0]["nonce"] = "f" * 32
     later_turn = make_turn(2, nonce=NONCE_2)[0]
     later_audit = make_audit([], message_id="e" * 32)
     response = node_session([

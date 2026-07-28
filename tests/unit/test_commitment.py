@@ -13,7 +13,7 @@ from p2p_thief_agent.protocol.commitment import (
 )
 from p2p_thief_agent.protocol.profile import ConformanceError
 
-NONCE = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+NONCE = "000102030405060708090a0b0c0d0e0f"
 
 
 def payload() -> dict[str, object]:
@@ -35,8 +35,8 @@ def payload() -> dict[str, object]:
 
 
 def test_known_commitment_vector_and_verification() -> None:
-    """The complete payload and nonce produce one frozen SHA-256 value."""
-    expected = "5e959502118846bd080922d25e55bbfb7eaf483ac2e5bceb43589afcd940d193"
+    """The book construction (nonce inside payload, no delimiter) has a frozen value."""
+    expected = "3bbe9cc43316a15eb3a707fc1a7648113a9ff981d6e1c88ee36809d7b57d171b"
 
     assert commitment_sha256(payload(), NONCE) == expected
     assert verify_commitment(payload(), NONCE, expected)
@@ -49,15 +49,15 @@ def test_changed_payload_or_nonce_does_not_verify() -> None:
     changed["move"] = "S"
 
     assert not verify_commitment(changed, NONCE, expected)
-    assert not verify_commitment(payload(), "f" * 64, expected)
+    assert not verify_commitment(payload(), "f" * 32, expected)
 
 
-def test_nonce_is_32_random_bytes_in_lower_hex() -> None:
-    """Generated nonces satisfy the exact profile and are fresh."""
+def test_nonce_is_16_random_bytes_in_lower_hex() -> None:
+    """Generated nonces are the book's token_hex(16): 32 lowercase hex and fresh."""
     first = new_nonce()
     second = new_nonce()
 
-    assert re.fullmatch(r"[0-9a-f]{64}", first)
+    assert re.fullmatch(r"[0-9a-f]{32}", first)
     assert first != second
 
 
@@ -91,7 +91,7 @@ def test_payload_rejects_unknown_field_and_bad_nonce() -> None:
 
     with pytest.raises(ConformanceError, match="unknown field"):
         validate_payload(value)
-    with pytest.raises(ConformanceError, match="64 lowercase"):
+    with pytest.raises(ConformanceError, match="32 lowercase"):
         commitment_sha256(payload(), "not-a-nonce")
 
 

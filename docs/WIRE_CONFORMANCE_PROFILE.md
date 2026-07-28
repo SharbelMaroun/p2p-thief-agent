@@ -348,9 +348,9 @@ replace a locked value.
 
 ### 5.2 Committed payload, nonce, and commitment
 
-**Authority: BOOK-CONFIRMED for SHA-256 commit-reveal, delayed nonce reveal, and the
-sorted compact UTF-8 core (`AE-017`, `CR-001`); OPTION-B PROJECT CHOICE for the exact
-payload, RFC 8785 completion, nonce profile, and construction.**
+**Authority: BOOK-CONFIRMED construction (`AE-017`, `CR-001`, and book Ch.5.3, printed
+p.37), ruled by the coordinator on 2026-07-28; the exact committed field set remains
+`UNKNOWN` (`U-005`). See `COORDINATOR_RULING_COMMIT_REVEAL_2026-07-28.md`.**
 
 The private committed payload is closed and has exactly:
 
@@ -377,22 +377,27 @@ scalar values. `hint` and `barrier` MUST equal the public turn fields. All ident
 role, step, coordinate, and movement values MUST be valid under the accepted
 negotiation and game configuration.
 
-The nonce MUST be 32 independently generated cryptographically secure random bytes,
-encoded as exactly 64 lowercase hexadecimal characters. It MUST be unique per committed
-record and remain secret until `final_audit`.
+The nonce MUST be 16 independently generated cryptographically secure random bytes,
+encoded as exactly 32 lowercase hexadecimal characters (the book's `token_hex(16)`). It
+MUST be unique per committed record and remain secret until `final_audit`.
+
+The commitment follows book Chapter 5.3 exactly: the nonce is a member **inside** the
+hashed JSON payload, there is **no delimiter**, and serialization is the book's
+`json.dumps(sort_keys=True, separators=(",", ":"))` with default `ensure_ascii=True`
+(non-ASCII escaped as `\uXXXX`), UTF-8 encoded, then SHA-256.
 
 ```text
-commitment_sha256 =
-  lowerhex(SHA256(
-    JCS(payload) ||
-    ASCII("|") ||
-    ASCII(nonce)
-  ))
+committed  = payload with the string "nonce" member added
+serialized = json.dumps(committed, sort_keys=True, separators=(",", ":"))  # ensure_ascii=True
+commitment_sha256 = lowerhex(SHA256(serialized.encode("utf-8")))
 ```
 
-The payload's fixed `domain` provides move-commitment domain separation. The nonce is
-outside the JSON payload. No newline, NUL, length prefix, hex decoding of the nonce, or
-Unicode normalization is performed.
+This is byte-identical to a book-literal opponent. The commit domain therefore uses the
+book's escaped serialization, distinct from the RFC 8785 JCS canonicalizer (raw UTF-8)
+used for the separate `config_sha256` and source-byte domains. No delimiter, length
+prefix, or hex decoding of the nonce is performed. The `domain` field and the exact
+committed field set are a Thief choice and remain `UNKNOWN` (`U-005`) for
+cross-classmate interoperability until an authenticated lecturer answer settles them.
 
 ## 6. Final audit
 
@@ -411,7 +416,7 @@ digest, and acknowledgement.**
       "turn_message_id": "32-lowercase-hex",
       "commitment_sha256": "64-lowercase-hex",
       "payload": {},
-      "nonce": "64-lowercase-hex"
+      "nonce": "32-lowercase-hex"
     }
   ]
 }

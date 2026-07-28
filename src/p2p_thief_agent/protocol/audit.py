@@ -40,7 +40,7 @@ def verify_audit_records(
         step = require_safe_int(record["step"], "audit record step", 1)
         require_lower_hex(record["turn_message_id"], 32, "turn_message_id")
         require_lower_hex(record["commitment_sha256"], 64, "commitment_sha256")
-        nonce = require_lower_hex(record["nonce"], 64, "nonce")
+        nonce = require_lower_hex(record["nonce"], 32, "nonce")
         payload = validate_payload(record["payload"])
         validated.append((record, step, nonce, payload))
     expected_steps = list(range(1, next_step))

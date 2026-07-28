@@ -53,7 +53,7 @@ def test_tampered_reveal_is_commitment_mismatch(mutation: str) -> None:
     if mutation == "payload":
         records[0]["payload"]["move"] = "S"
     elif mutation == "nonce":
-        records[0]["nonce"] = "f" * 64
+        records[0]["nonce"] = "f" * 32
     elif mutation == "commitment":
         records[0]["commitment_sha256"] = "f" * 64
     else:
@@ -99,7 +99,7 @@ def test_audit_failure_is_cached_and_changed_retry_conflicts() -> None:
     """A first technical rejection is terminal and reserves its message ID."""
     session, records = locked_two_turns()
     invalid = make_audit(deepcopy(records))
-    invalid["body"]["records"][0]["nonce"] = "f" * 64
+    invalid["body"]["records"][0]["nonce"] = "f" * 32
     with pytest.raises(ConformanceError):
         session.submit_audit(invalid, now_ms=NOW_MS)
 

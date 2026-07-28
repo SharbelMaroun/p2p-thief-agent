@@ -31,7 +31,7 @@ def test_plain_sha256_and_source_domains() -> None:
     assert game["sha256"] != rates["sha256"]
 
 
-def test_move_commitment_uses_nonce_ascii_not_decoded_bytes() -> None:
+def test_move_commitment_matches_book_construction() -> None:
     payload = make_payload()
     response = node_result({
         "op": "commitment_hash",
@@ -41,7 +41,7 @@ def test_move_commitment_uses_nonce_ascii_not_decoded_bytes() -> None:
     })
 
     assert response["sha256"] == commitment_sha256(payload, NONCE_1)
-    assert response["sha256"] == "96f16c9ac25ca79f3cd514f925678c02cf1c093fcf8a3becee9aab3f057673bb"
+    assert response["sha256"] == "37eaeae9fef360d0b1a3421d1e57b915a7c74b0d8f7bcb1a4e53f942ccaa8b72"
 
 
 def test_named_cross_language_commitment_vector() -> None:
@@ -61,12 +61,12 @@ def test_named_cross_language_commitment_vector() -> None:
     }
     context = session_context()
     context["remote_group_id"] = "sharNamr"
-    nonce = "000102030405060708090a0b0c0d0e0f" "101112131415161718191a1b1c1d1e1f"
+    nonce = "000102030405060708090a0b0c0d0e0f"
     response = node_result({
         "op": "commitment_hash", "payload": payload, "nonce": nonce, "context": context
     })
 
-    assert response["sha256"] == "5e959502118846bd080922d25e55bbfb7eaf483ac2e5bceb43589afcd940d193"
+    assert response["sha256"] == "3bbe9cc43316a15eb3a707fc1a7648113a9ff981d6e1c88ee36809d7b57d171b"
 
 
 def test_final_audit_and_idempotency_domains() -> None:

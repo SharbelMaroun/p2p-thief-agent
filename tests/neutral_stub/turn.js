@@ -65,7 +65,7 @@ function payload(value, context) {
 
 function revealHash(value, nonce, context) {
   const result = payload(value, context);
-  lowerHex(nonce, 64, "nonce");
+  lowerHex(nonce, 32, "nonce");
   return commitmentHash(result, nonce);
 }
 
