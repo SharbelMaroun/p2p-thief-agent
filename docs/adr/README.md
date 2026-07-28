@@ -14,7 +14,7 @@ Shared-impact records require evidence under
 | [ADR-0003](0003-schema-version-discrepancy.md) | Schema-version discrepancy | Pending |
 | [ADR-0004](0004-shared-json-private-toml.md) | Shared JSON and private TOML | Pending |
 | [ADR-0005](0005-scent-model.md) | Scent model | Pending |
-| [ADR-0006](0006-commit-reveal-canonicalization.md) | Commit-reveal canonicalization | Pending |
+| [ADR-0006](0006-commit-reveal-canonicalization.md) | Commit-reveal canonicalization | Accepted (construction/flow, 2026-07-28); field set open |
 | [ADR-0007](0007-llm-movement-policy.md) | LLM movement policy | Proposed |
 | [ADR-0008](0008-simulator-reuse-and-license.md) | Simulator reuse and license | Pending |
 | [ADR-0009](0009-gui-truth-model.md) | GUI truth model | Proposed |
