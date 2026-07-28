@@ -18,7 +18,7 @@ An unknown blocks only its named subsystem.
 | U-017 | Newer Moodle instructions and lecturer announcements | Potential final-release areas | Obtain dated official posts |
 | U-019 | Official template required/optional fields, types, enums, bounds, and additional-property rules | Artifact validation | Formal schemas or dated authoritative clarification |
 | U-020 | Exact provisionally authorized parity-file list, candidate version, manifest shape/hash, per-file hashes, and later final-freeze revision | Contract gate | Coordinator-named immutable Cop handoff, Thief parity/conformance evidence, then separate final freeze |
-| ~~U-021~~ | ~~Exact six-sub-game role assignment~~ | ~~League scheduling~~ | **CLOSED 2026-07-28** — see below |
+| U-021 | Exact six-sub-game role assignment, including whether Cop and Thief must alternate every sub-game and which team starts in which role | League scheduling | **REOPENED 2026-07-28 by coordinator verdict.** Simulator confirms odd-natural/even-opposite alternation, but the book does not, and the recorded course/lecturer direction is not an authenticated Moodle announcement. Needs an authenticated lecturer answer before alternation may be treated as binding. See [COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md). |
 
 ## Closed in this reconciliation
 
@@ -31,11 +31,12 @@ confirmed in `AB-001..002`, `AR-001`, and `CR-001`. JSON template key presence i
 confirmed in `JS-001..003`. Final reports are JSON attachments without a free-text
 report body (`AE-032`). Exact constraints beyond that evidence remain open above.
 
-**U-021 — CLOSED 2026-07-28:** Role alternation confirmed from course material
-(source level 8, lecture/assignment material; commas in source suggest direct
-document extraction). Natural role on odd sub-games (1, 3, 5); opposite role on even
-sub-games (2, 4, 6). Natural role is the group's configured repository role from
-private `game.toml`. Scores are aggregated per group across the full series. This
-corroborates the Cop candidate `e0df5ba` LEAGUE_CONTRACT.md wording and the
-owner-supplied lecturer direction dated 2026-07-27. Record as `CONFIRMED` in the
-requirements ledger.
+**U-021 — briefly closed then REOPENED 2026-07-28:** Role alternation was
+provisionally recorded as `CONFIRMED` from course material on 2026-07-28. The same-day
+coordinator verdict (`ACCEPTED_FOR_PROVISIONAL_PARITY: NO`) explicitly rejected that
+promotion: odd-natural/even-opposite alternation is simulator-confirmed but **not**
+book-confirmed, and the recorded course/lecturer direction is not an authenticated
+Moodle announcement or original lecturer message. `U-021` is therefore reopened and
+`LS-001` is reverted to `UNKNOWN`. Alternation must not be treated as binding in
+normative contract documents until an authenticated lecturer answer is obtained. See
+[COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md).
