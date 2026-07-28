@@ -58,6 +58,20 @@ commit-reveal, and shared-contract runtime remain deferred until Cop `0.2.0-prop
 | M2-004 | Implement barrier-on-current-cell capture | DONE | `test_capture.py` barrier-on-Thief and precedence |
 | M2-005 | Implement trapped-Thief capture under the accepted STAY interpretation | DONE | `test_capture.py` trapped/STAY-no-rescue |
 
+## EXC — Contract-independent exceptions
+
+Work authorized outside the milestone sequence because it depends on no shared-contract
+byte, MCP endpoint, or Cop-owned file. An entry here **never** satisfies a milestone
+task; the corresponding milestone row keeps its own status.
+
+| ID | Thief-owned task | Status | Exit evidence |
+|---|---|---|---|
+| EXC-001 | Implement the deterministic Thief baseline policy on existing public domain APIs | DONE | `test_strategy_metrics.py`, `test_baseline_strategy.py`, `test_strategy_sdk.py`; `PRD_strategy.md`; branch `agent/thief-baseline-strategy` |
+
+`EXC-001` does **not** close `M3-004`. It adds no Thief-local state, no history, no
+scoring, and no turn state machine, so the M3 exit evidence is untouched and `M3-004`
+remains `BLOCKED`.
+
 ## M3 — Local state, scoring and deterministic baseline
 
 | ID | Thief-owned task | Status | Exit evidence |

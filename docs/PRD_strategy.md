@@ -9,9 +9,12 @@ behavior are in scope. Appendix E rule 25 recommends algorithmic movement and LL
 for text/behavioral-profile generation. It is a recommendation without an automatic
 mandatory sanction, not a categorical prohibition (`AE-025`).
 
-The project policy in ADR-0007 is therefore a deterministic movement baseline. Any
-future change requires both peers' accepted policy and still cannot bypass legal-action
-validation, deadlines, or the SDK. No model/provider is mandatory.
+ADR-0007 therefore **proposes** a deterministic movement baseline. Its status is
+`Proposed`, not accepted, so it is a recorded proposal rather than settled project
+policy; the implemented baseline below follows it as the working default without
+treating it as an accepted decision. Any future change requires both peers' accepted
+policy and still cannot bypass legal-action validation, deadlines, or the SDK. No
+model/provider is mandatory.
 
 ## Future inputs and output
 
