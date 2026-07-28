@@ -16,7 +16,8 @@ Status: mandatory mechanism confirmed; payload and canonicalization gate pending
 `U-002`, `U-004`, and `U-005` retain the exact canonical byte procedure, message
 sequence/acknowledgement fields, committed field set, identity binding, signature
 procedure, nonce encoding/length, and error envelope. ADR-0006 cannot be accepted until
-the Cop proposal cites controlling evidence or records a cross-team design decision.
+the Thief conformance profile or another explicitly recorded shared decision settles
+them.
 
 ## Future acceptance criteria and tests
 

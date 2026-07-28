@@ -1,9 +1,10 @@
 # Active Thief Task Ledger
 
-Statuses: `DONE`, `IN PROGRESS`, `PENDING`, or `BLOCKED`. Every M2–M9 item is blocked
-until the M1 accepted-contract handoff is complete. This ledger decomposes Thief-owned
-work only; Cop contract revision and coordinator acceptance are external prerequisites,
-not Thief implementation tasks.
+Statuses: `DONE`, `IN PROGRESS`, `PENDING`, and `SUPERSEDED`. `DONE` requires verified
+exit evidence. `IN PROGRESS` means actively being worked. `PENDING` means queued,
+awaiting review, or awaiting an explicit decision; it does not mean blocked. Work
+proceeds sequentially. When a required choice or acceptance is not recorded, ask the
+user rather than infer it.
 
 ## M0 — Evidence and source reconciliation
 
@@ -15,7 +16,7 @@ not Thief implementation tasks.
 | M0-004 | Correct the coordinator source hierarchy and artifact provenance | DONE | `SOURCE_OF_TRUTH.md`, `SOURCE_INVENTORY.md` |
 | M0-005 | Preserve explicit unknowns without inventing runtime fields | DONE | `UNKNOWN_REQUIREMENTS.md`, ADR placeholders |
 
-## M1 — Public contract, match configuration, parity and freeze
+## M1 — Interoperability conformance profile
 
 **The copy model was superseded on 2026-07-28.** Under `THIEF-002` this repository has
 no access to the companion Cop repository and must interoperate with an unknown
@@ -24,8 +25,8 @@ classmate opponent, so byte-parity with one peer is not evidence of interoperabi
 approach stays visible. `M1-004`, `M1-006`, and `M1-006b`/`M1-006c` remain `DONE`: they
 were reviews of external artifacts and no peer byte was ever integrated.
 
-Current blocker: no Thief-owned conformance profile exists yet. The work is `M1-013`
-through `M1-017`, then coordinator acceptance in `M1-012`.
+Current work starts at `M1-013`; later M1 tasks remain `PENDING` until their exit
+evidence is reached.
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
@@ -42,19 +43,19 @@ through `M1-017`, then coordinator acceptance in `M1-012`.
 | M1-009 | ~~Copy all provisionally authorized controlled paths verbatim from the named Cop commit~~ | SUPERSEDED | Copy model withdrawn 2026-07-28 under `THIEF-002` |
 | M1-010 | ~~Add only the Thief adapter/tests required by the provisionally authorized match-config contract~~ | SUPERSEDED | Reframed as `M1-016`/`M1-017` against a neutral stub |
 | M1-011 | ~~Prove cross-repository parity and two variable match identities~~ | SUPERSEDED | Byte parity with one peer is not evidence about an unknown opponent |
-| M1-013 | Author the Thief-owned wire conformance profile with labelled authority per item | BLOCKED | Stage A of `CONTRACT_HANDOFF_CHECKLIST.md`; every item book-confirmed, Option-B, or `UNKNOWN` |
-| M1-014 | Define canonicalization with reproducible vectors including escaping and separated hash domains | BLOCKED | Vectors covering nested objects, numbers, non-ASCII, quotes, backslashes, control characters, and non-BMP codepoints |
-| M1-015 | Build a neutral stub opponent sharing no source file with any peer repository | BLOCKED | Stub is independently authored and imports no peer module |
-| M1-016 | Prove bidirectional conformance and two participant identities against the stub | BLOCKED | Thief-proposes and Thief-accepts both pass without editing a profile file |
-| M1-017 | Prove fail-closed negative vectors before gameplay | BLOCKED | Participant, value, version, hash, ordering, replay, and private-leakage vectors all reject |
-| M1-012 | Obtain coordinator profile acceptance and the separate M2 gameplay verdict | BLOCKED | `CONFORMANCE_PROFILE: ACCEPTED` naming an exact revision, then `M2_GAMEPLAY: GO` |
+| M1-013 | Author the Thief-owned wire conformance profile with labelled authority per item | IN PROGRESS | Stage A of `CONTRACT_HANDOFF_CHECKLIST.md`; every item book-confirmed, Option-B, or `UNKNOWN` |
+| M1-014 | Define canonicalization with reproducible vectors including escaping and separated hash domains | PENDING | Vectors covering nested objects, numbers, non-ASCII, quotes, backslashes, control characters, and non-BMP codepoints |
+| M1-015 | Build a neutral stub opponent sharing no source file with any peer repository | PENDING | Stub is independently authored and imports no peer module |
+| M1-016 | Prove bidirectional conformance and two participant identities against the stub | PENDING | Thief-proposes and Thief-accepts both pass without editing a profile file |
+| M1-017 | Prove fail-closed negative vectors before gameplay | PENDING | Participant, value, version, hash, ordering, replay, and private-leakage vectors all reject |
+| M1-012 | Record profile acceptance and the separate M2 gameplay verdict | PENDING | `CONFORMANCE_PROFILE: ACCEPTED` naming an exact revision, then `M2_GAMEPLAY: GO` |
 
 ## M2 — Core domain rules
 
 Coordinator authorized contract-independent M2 domain implementation on 2026-07-28.
 This work uses only Appendix E/F `CONFIRMED` rules with explicit inputs; it does not
 depend on any shared-contract byte, MCP endpoint, or Cop-owned file. FastMCP,
-commit-reveal, and shared-contract runtime remain deferred until Cop `0.2.0-proposed`.
+commit-reveal, and live peer runtime remain separate later milestones.
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
@@ -63,6 +64,7 @@ commit-reveal, and shared-contract runtime remain deferred until Cop `0.2.0-prop
 | M2-003 | Implement disclosed-barrier domain rules | DONE | `test_barriers.py`, `test_movement.py` |
 | M2-004 | Implement barrier-on-current-cell capture | DONE | `test_capture.py` barrier-on-Thief and precedence |
 | M2-005 | Implement trapped-Thief capture under the accepted STAY interpretation | DONE | `test_capture.py` trapped/STAY-no-rescue |
+| M2-006 | Reject invalid off-board positions and malformed iterable barrier quotas consistently | DONE | Focused movement, capture, barrier, and strategy tests; full suite |
 
 ## EXC — Contract-independent exceptions
 
@@ -75,76 +77,75 @@ task; the corresponding milestone row keeps its own status.
 | EXC-001 | Implement the deterministic Thief baseline policy on existing public domain APIs | DONE | `test_strategy_metrics.py`, `test_baseline_strategy.py`, `test_strategy_sdk.py`; `PRD_strategy.md`; branch `agent/thief-baseline-strategy` |
 
 `EXC-001` does **not** close `M3-004`. It adds no Thief-local state, no history, no
-scoring, and no turn state machine, so the M3 exit evidence is untouched and `M3-004`
-remains `BLOCKED`.
+scoring, and no turn state machine, so the M3 integration evidence is still `PENDING`.
 
 ## M3 — Local state, scoring and deterministic baseline
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M3-001 | Model immutable Thief-local state and history snapshots | BLOCKED | Local-truth and immutability tests |
-| M3-002 | Track known disclosed barriers without Cop-private truth | BLOCKED | Provenance/boundary tests |
-| M3-003 | Implement accepted scoring and outcome calculation | BLOCKED | Capture, survival, tie, and technical-loss tests |
-| M3-004 | Implement a deterministic legal baseline policy | BLOCKED | Tie-break, fallback, trapped, and repeatability tests |
+| M3-001 | Model immutable Thief-local state and history snapshots | PENDING | Local-truth and immutability tests |
+| M3-002 | Track known disclosed barriers without Cop-private truth | PENDING | Provenance/boundary tests |
+| M3-003 | Implement accepted scoring and outcome calculation | PENDING | Capture, survival, tie, and technical-loss tests |
+| M3-004 | Integrate the completed deterministic legal baseline policy | PENDING | Tie-break, fallback, trapped, repeatability, and local-state integration tests |
 
 ## M4 — Protocol, canonicalization and commit-reveal
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M4-001 | Implement accepted public envelopes and message models | BLOCKED | Schema/version/identity failure tests |
-| M4-002 | Implement exact canonical bytes and shared test vectors | BLOCKED | Independent vector/hash tests |
-| M4-003 | Implement explicit protocol states and illegal-transition rejection | BLOCKED | Transition table tests |
-| M4-004 | Implement SHA-256 commit, acknowledgement, reveal, and nonce secrecy | BLOCKED | Normal/order/tamper tests |
-| M4-005 | Implement audit mismatch and technical-loss outcomes | BLOCKED | Replayable audit failure tests |
+| M4-001 | Implement accepted public envelopes and message models | PENDING | Schema/version/identity failure tests |
+| M4-002 | Implement exact canonical bytes and shared test vectors | PENDING | Independent vector/hash tests |
+| M4-003 | Implement explicit protocol states and illegal-transition rejection | PENDING | Transition table tests |
+| M4-004 | Implement SHA-256 commit, acknowledgement, reveal, and nonce secrecy | PENDING | Normal/order/tamper tests |
+| M4-005 | Implement audit mismatch and technical-loss outcomes | PENDING | Replayable audit failure tests |
 
 ## M5 — FastMCP runtime and resilience
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M5-001 | Route runtime coordination through one Thief gateway | BLOCKED | Architecture/boundary tests |
-| M5-002 | Run the Thief as both FastMCP server and client | BLOCKED | Separate-process integration tests |
-| M5-003 | Enforce accepted idempotency, acknowledgement, and duplicate handling | BLOCKED | Duplicate/reorder tests |
-| M5-004 | Implement deadlines, watchdog, controlled recovery, and backpressure | BLOCKED | Timeout/crash/recovery tests |
-| M5-005 | Validate localhost and public-tunnel paths against identical fixtures | BLOCKED | Connectivity and failure evidence |
+| M5-001 | Route runtime coordination through one Thief gateway | PENDING | Architecture/boundary tests |
+| M5-002 | Run the Thief as both FastMCP server and client | PENDING | Separate-process integration tests |
+| M5-003 | Enforce accepted idempotency, acknowledgement, and duplicate handling | PENDING | Duplicate/reorder tests |
+| M5-004 | Implement deadlines, watchdog, controlled recovery, and backpressure | PENDING | Timeout/crash/recovery tests |
+| M5-005 | Validate localhost and public-tunnel paths against identical fixtures | PENDING | Connectivity and failure evidence |
 
 ## M6 — Scent, belief and private strategy
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M6-001 | Implement confirmed multiplicative scent physics | BLOCKED | Emission/decay/clipping tests |
-| M6-002 | Consume accepted public scent observations in the accepted order | BLOCKED | Shape/order/boundary tests |
-| M6-003 | Maintain a Thief-local belief without objective Cop truth | BLOCKED | Privacy and update tests |
-| M6-004 | Add private strategy improvements behind legal validation | BLOCKED | Determinism/deadline/no-network tests |
+| M6-001 | Implement confirmed multiplicative scent physics | PENDING | Emission/decay/clipping tests |
+| M6-002 | Consume accepted public scent observations in the accepted order | PENDING | Shape/order/boundary tests |
+| M6-003 | Maintain a Thief-local belief without objective Cop truth | PENDING | Privacy and update tests |
+| M6-004 | Add private strategy improvements behind legal validation | PENDING | Determinism/deadline/no-network tests |
 
 ## M7 — Series orchestration, artifacts, gatekeeper and reporting
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M7-001 | Orchestrate the accepted six-sub-game series lifecycle | BLOCKED | Series state/scoring tests |
-| M7-002 | Build accepted declaration, config, log, and result artifacts | BLOCKED | Schema/link/hash tests |
-| M7-003 | Implement the centralized external-call gatekeeper | BLOCKED | FIFO/rate/retry/backpressure tests |
-| M7-004 | Implement accepted private verbal-provider modes | BLOCKED | Mocked provider/fallback tests |
-| M7-005 | Send the mutually agreed final JSON report through Gmail | BLOCKED | Mocked recipient/body/attachment/agreement tests |
+| M7-001 | Orchestrate the accepted six-sub-game series lifecycle | PENDING | Series state/scoring tests |
+| M7-002 | Build accepted declaration, config, log, and result artifacts | PENDING | Schema/link/hash tests |
+| M7-003 | Implement the centralized external-call gatekeeper | PENDING | FIFO/rate/retry/backpressure tests |
+| M7-004 | Implement accepted private verbal-provider modes | PENDING | Mocked provider/fallback tests |
+| M7-005 | Send the mutually agreed final JSON report through Gmail | PENDING | Mocked recipient/body/attachment/agreement tests |
 
 ## M8 — GUI, replay, interoperability and security hardening
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M8-001 | Build a live Thief local-truth GUI through the SDK | BLOCKED | View-model truth-boundary tests |
-| M8-002 | Build replay UI on the accepted verifier | BLOCKED | Valid/malformed/reordered/tampered replay tests |
-| M8-003 | Run bidirectional games against a neutral compliant-opponent harness | BLOCKED | Unknown-opponent E2E evidence |
-| M8-004 | Harden secrets, identity, input validation, and dependency boundaries | BLOCKED | Security/privacy review and tests |
-| M8-005 | Exercise crash, timeout, mismatch, and tamper recovery end to end | BLOCKED | Failure-injection evidence |
+| M8-001 | Build a live Thief local-truth GUI through the SDK | PENDING | View-model truth-boundary tests |
+| M8-002 | Build replay UI on the accepted verifier | PENDING | Valid/malformed/reordered/tampered replay tests |
+| M8-003 | Run bidirectional games against a neutral compliant-opponent harness | PENDING | Unknown-opponent E2E evidence |
+| M8-004 | Harden secrets, identity, input validation, and dependency boundaries | PENDING | Security/privacy review and tests |
+| M8-005 | Exercise crash, timeout, mismatch, and tamper recovery end to end | PENDING | Failure-injection evidence |
 
 ## M9 — League evidence, submission and release
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M9-001 | Capture required league/game artifacts and repository commit evidence | BLOCKED | Reviewed evidence bundle |
-| M9-002 | Complete all six academic README components | BLOCKED | README checklist |
-| M9-003 | Verify team identity, repository access, and current Moodle instructions | BLOCKED | Submission identity/access record |
-| M9-004 | Run all gates from a clean frozen environment and complete security/provenance review | BLOCKED | Final validation record |
-| M9-005 | Create the reviewed annotated `v1.0-submission` release tag | BLOCKED | Tag points to accepted submission commit |
+| M9-001 | Capture required league/game artifacts and repository commit evidence | PENDING | Reviewed evidence bundle |
+| M9-002 | Complete all six academic README components | PENDING | README checklist |
+| M9-003 | Verify team identity, repository access, and current Moodle instructions | PENDING | Submission identity/access record |
+| M9-004 | Run all gates from a clean frozen environment and complete security/provenance review | PENDING | Final validation record |
+| M9-005 | Create the reviewed annotated `v1.0-submission` release tag | PENDING | Tag points to accepted submission commit |
 
 The archived 635-task document remains historical coverage under
 `archive/pre-audit/documentation/TODO.md`; it is not the active plan.

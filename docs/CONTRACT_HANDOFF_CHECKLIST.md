@@ -1,6 +1,6 @@
 # Interoperability Conformance Checklist
 
-Status: **BLOCKED — NO ACCEPTED CONFORMANCE PROFILE**
+Status: **IN PROGRESS — STAGE A PROFILE DEFINITION**
 
 ## Why this document changed on 2026-07-28
 
@@ -29,7 +29,8 @@ Authority for every profile item must be one of:
 - **book-confirmed** — direct Appendix E/F or chapter evidence, cited exactly;
 - **Option-B project choice** — a documented academic-freedom selection where the book
   leaves a wire detail open, per `OPTION_B_INTEROP_DECISION.md`;
-- **`UNKNOWN`** — unresolved, and therefore not implementable yet.
+- **`UNKNOWN`** — unresolved; keep the dependent choice `PENDING` and ask for an
+  explicit decision before implementing it.
 
 An item with no authority label is not part of the profile.
 
@@ -85,12 +86,12 @@ verdict.
 
 | Required value | Current state |
 |---|---|
-| Thief conformance profile | MISSING |
-| Neutral stub opponent | MISSING |
-| Bidirectional conformance evidence | MISSING |
-| Escaping and cross-implementation vectors | MISSING |
-| `CONFORMANCE_PROFILE: ACCEPTED` | NOT ISSUED |
-| `M2_GAMEPLAY: GO` | NOT ISSUED |
+| Thief conformance profile | IN PROGRESS |
+| Neutral stub opponent | PENDING |
+| Bidirectional conformance evidence | PENDING |
+| Escaping and cross-implementation vectors | PENDING |
+| `CONFORMANCE_PROFILE: ACCEPTED` | PENDING |
+| `M2_GAMEPLAY: GO` | PENDING |
 
 ## Checker semantics
 

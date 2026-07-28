@@ -1,4 +1,5 @@
 # Contract tests
 
-Contract fixtures and parity tests remain pending the accepted Cop-owned proposal.
-No Thief-specific protocol fixture is created in M1.
+M1 conformance tests use a Thief-authored profile and a neutral stub that imports no
+project module and shares no source file with a peer. No Cop-owned fixture, manifest,
+or byte-parity check is part of this test boundary.

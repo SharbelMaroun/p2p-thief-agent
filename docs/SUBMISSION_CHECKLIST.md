@@ -1,6 +1,7 @@
 # Submission Checklist
 
-Unchecked boxes are future release evidence, not proof of an unknown requirement.
+Unchecked boxes are `PENDING` release evidence; they do not classify a phase as
+blocked or prove that runtime evidence already exists.
 
 ## Repository and release
 
@@ -26,7 +27,8 @@ Unchecked boxes are future release evidence, not proof of an unknown requirement
 ## Contract and game evidence
 
 - [ ] Accepted shared game config is byte-identical on both peers (`AE-011`).
-- [ ] Contract manifest hashes match both repositories.
+- [ ] The accepted conformance-profile revision, negotiated capabilities, and agreed
+      configuration hash are mutually recorded and verified.
 - [ ] Each official series contains six sub-games (`AF-018`).
 - [ ] Use only the jointly accepted role schedule; alternation is not yet a
       confirmed book requirement (`U-021`).
