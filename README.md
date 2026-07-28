@@ -8,18 +8,31 @@ Companion Cop repository:
 
 ## Milestone status
 
-Version `1.00` is an M0–M1 documentation and package scaffold. The inspected baseline
-(`119fa911d5b1a5aecdaa9531d0912e5c6f9ab32f`) contained no Python package, tests,
-`pyproject.toml`, or lockfile. This milestone adds those engineering foundations but
-deliberately implements no game engine, peer runtime, LLM, Gmail, GUI, or replay
-behavior.
+Version `1.00` began as an M0–M1 documentation and package scaffold. The inspected
+baseline (`119fa911d5b1a5aecdaa9531d0912e5c6f9ab32f`) contained no Python package,
+tests, `pyproject.toml`, or lockfile; that milestone added those engineering
+foundations.
+
+The M2 core domain — coordinates, board geometry, legal movement, barrier rules, and
+capture conditions — is now implemented behind the public SDK under the 2026-07-28
+coordinator authorization for contract-independent domain work. It uses only Appendix
+E/F `CONFIRMED` rules, takes every board and position input explicitly, and depends on
+no shared-contract byte, MCP endpoint, or Cop-owned file. See
+[M2_DOMAIN.md](docs/M2_DOMAIN.md).
+
+The repository still deliberately implements no peer runtime, protocol or commit-reveal
+runtime, LLM, Gmail, GUI, or replay behavior.
 
 The Cop agent owns parity-controlled shared files. Original candidate `84339c2`,
 revision `b586af9`, and the latest revision `e0df5ba` (Cop main `be705f9`) were all
 rejected for Thief copying. On 2026-07-28 the coordinator audited `e0df5ba` and issued
 `ACCEPTED_FOR_PROVISIONAL_PARITY: NO`: its 18 file hashes and manifest are
 integrity-correct, but the contract is semantically rejected across seven issues (see
-[COORDINATOR_VERDICT_2026-07-28.md](docs/COORDINATOR_VERDICT_2026-07-28.md)). Zero
+[COORDINATOR_VERDICT_2026-07-28.md](docs/COORDINATOR_VERDICT_2026-07-28.md)). A newer
+Cop bundle `0.2.0-proposed` (`0c20bf0`, 32 controlled files) has since been reviewed
+read-only here: every declared hash and vector reproduces exactly, but four of the seven
+blockers remain unresolved and no coordinator verdict exists for it, so it is likewise
+not copyable. Zero
 parity-controlled files have been integrated here, so the shared contract remains
 **pending—not frozen**. The Thief repository will consume only an explicitly
 provisionally authorized handoff byte-for-byte, prove parity/conformance, and then

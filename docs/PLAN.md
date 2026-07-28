@@ -2,7 +2,9 @@
 
 Status: M0 complete; M1 public-contract gate blocked pending coordinator
 authorization for provisional parity testing. Final freeze follows successful
-cross-repository parity/conformance. M2–M9 are blocked.
+cross-repository parity/conformance. M2 core domain is implemented under the
+2026-07-28 coordinator authorization for contract-independent domain work and awaits
+independent re-review; M3–M9 remain blocked.
 
 The Thief M0–M1 scaffold is based on remote main
 `e1cc4992cd1c9a7705edf13fc976f85482ce601b`. It has package, SDK, CLI, test, and
@@ -30,7 +32,7 @@ truth (`SR-004`, `THIEF-001`).
 |---|---|---|---|
 | M0 | Evidence and source reconciliation | Correct source hierarchy, traceable Appendix E/F evidence, explicit unknowns/conflicts, reconciled repository history | `DONE` |
 | M1 | Public contract, match configuration, parity and freeze | Independently review a provisionally authorized handoff, copy controlled bytes exactly, verify the manifest and per-file hashes, prove neutral match-config conformance, and obtain final freeze | `BLOCKED` |
-| M2 | Core domain rules | Coordinates, actions, grid, legal movement, barrier and capture semantics behind the SDK | `BLOCKED ON M1` |
+| M2 | Core domain rules | Coordinates, actions, grid, legal movement, barrier and capture semantics behind the SDK | `IMPLEMENTED` (contract-independent, authorized 2026-07-28; coordinator re-review pending, `MERGE_ALLOWED: NO`) |
 | M3 | Local state, scoring and deterministic baseline | Immutable local history, disclosed-barrier state, scoring, and deterministic legal baseline | `BLOCKED ON M1` |
 | M4 | Protocol, canonicalization and commit-reveal | Accepted public messages, exact canonical bytes, state transitions, commitment verification, and audit outcomes | `BLOCKED ON M1` |
 | M5 | FastMCP runtime and resilience | Symmetric server/client peer, gateway, idempotency, deadlines, watchdog, recovery, and tunnel path | `BLOCKED ON M1` |
@@ -49,7 +51,11 @@ The Cop candidates `84339c2`, `b586af9`, and `e0df5ba` must not be copied. On
 `ACCEPTED_FOR_PROVISIONAL_PARITY: NO`: hashes are integrity-correct but the contract
 is semantically rejected across seven issues, including mixed stable/per-match
 configuration, unsupported schema fields, `rate_limits.json` misclassification, and
-unauthenticated role alternation. Independent findings are in
+unauthenticated role alternation. A newer Cop bundle `0.2.0-proposed`
+(`0c20bf0`, 32 controlled files) has been reviewed read-only by the Thief: its bytes
+and vectors reproduce exactly, but four of the seven blockers remain unresolved and it
+carries no coordinator verdict, so it must not be copied either. Independent findings
+are in
 [CONTRACT_REVIEW.md](CONTRACT_REVIEW.md),
 [GATE_RESOLUTION_REVIEW.md](GATE_RESOLUTION_REVIEW.md), and the authoritative
 [COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md).
