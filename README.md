@@ -68,6 +68,11 @@ contract check exits nonzero with a pending blocker; it never reports a false pa
 
 - Cop and Thief are separate processes and repositories with no shared memory, database,
   runtime filesystem, or private truth (`SR-001`, `SR-004`, `THIEF-001`).
+- This repository is developed with no read and no write access to the companion Cop
+  repository, and must interoperate with an **unknown** opponent (`THIEF-002`). League
+  play is against classmates, so matching one companion repository is evidence about
+  that repository only. Interoperability is demonstrated against a neutral stub sharing
+  no files with either side.
 - Legal moves are north, south, east, west, and stay; diagonals are illegal
   (`AF-015`).
 - Barrier placement is disclosed; a barrier on the Thief’s current cell and a trapped
