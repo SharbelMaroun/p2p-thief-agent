@@ -18,9 +18,12 @@ not Thief implementation tasks.
 ## M1 — Public contract, match configuration, parity and freeze
 
 Current blocker: revised candidate `b586af9` was coordinator-reviewed but explicitly
-not authorized for Thief copying. The latest candidate `e0df5ba` (Cop main
-`be705f9`, 2026-07-28) self-declares readiness for external coordinator review but
-has no coordinator authorization. “Proposal missing” is not the blocker; provisional
+not authorized for Thief copying. Candidate `e0df5ba` (Cop main `be705f9`,
+2026-07-28) received the explicit coordinator verdict
+`ACCEPTED_FOR_PROVISIONAL_PARITY: NO`. A newer Cop bundle `0.2.0-proposed` exists at
+`0c20bf03d916d7bbd9c7d4cfef87bd18e45e485d` and has been reviewed read-only by the
+Thief (M1-006c); it is integrity-clean but still semantically NO-GO and carries no
+coordinator verdict of any kind. “Proposal missing” is not the blocker; provisional
 parity authorization is.
 
 | ID | Thief-owned task | Status | Exit evidence |
@@ -32,6 +35,7 @@ parity authorization is.
 | M1-005 | Keep the current contract checker fail-closed | DONE | Exit 1 with documented `PENDING` |
 | M1-006 | Review revised Cop candidate `b586af9` and coordinator portability findings | DONE | Updated `CONTRACT_REVIEW.md` and `GATE_RESOLUTION_REVIEW.md` |
 | M1-006b | Review Cop candidate `e0df5ba` read-only, path by path (18 controlled files) | DONE | `CONTRACT_REVIEW.md` with P0/P1 findings and NO-GO verdict |
+| M1-006c | Review Cop bundle `0.2.0-proposed` at `0c20bf0` read-only (32 controlled files) | DONE | `CONTRACT_REVIEW.md`: 32/32 hashes and 7/7 vectors independently reproduced; four of seven coordinator blockers unresolved plus two new P0 defects; NO-GO |
 | M1-007 | Receive every provisionally authorized handoff value and coordinator verdict | BLOCKED | Complete Stage A of `CONTRACT_HANDOFF_CHECKLIST.md` |
 | M1-008 | Verify provisional manifest bytes, controlled paths, and every declared file hash before copying | BLOCKED | Pre-copy checklist and recorded hash table |
 | M1-009 | Copy all provisionally authorized controlled paths verbatim from the named Cop commit | BLOCKED | 100% exact-byte presence; no Thief-authored shared edits |
