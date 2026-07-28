@@ -78,6 +78,12 @@ def test_barrier_field_rejects_non_integer_quota(bad: object) -> None:
         BarrierField(quota=bad)  # type: ignore[arg-type]
 
 
+def test_barrier_field_rejects_negative_quota() -> None:
+    """A negative quota is invalid."""
+    with pytest.raises(DomainError):
+        BarrierField(quota=-1)
+
+
 def test_barrier_permanently_blocks_movement() -> None:
     """A placed barrier blocks the Thief's move into that cell."""
     from p2p_thief_agent.domain.coordinates import Action

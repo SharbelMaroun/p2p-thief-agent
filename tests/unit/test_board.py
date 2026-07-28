@@ -61,6 +61,12 @@ def test_board_rejects_non_integer_size(bad: object) -> None:
         Board(size=bad)  # type: ignore[arg-type]
 
 
+def test_board_rejects_non_origin_corner() -> None:
+    """origin_corner must be an OriginCorner value."""
+    with pytest.raises(DomainError):
+        Board(size=7, origin_corner="top-left")  # type: ignore[arg-type]
+
+
 def test_orthogonal_neighbors_are_deterministic() -> None:
     """Neighbors are returned N,S,E,W in row/col form regardless of board edges."""
     board = Board(size=7)

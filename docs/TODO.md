@@ -48,11 +48,11 @@ commit-reveal, and shared-contract runtime remain deferred until Cop `0.2.0-prop
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M2-001 | Implement immutable coordinates, actions, and configured grid bounds | IN PROGRESS | Construction/boundary unit tests |
-| M2-002 | Implement N/S/E/W/STAY legal-action validation | IN PROGRESS | Normal, boundary, diagonal, off-grid, and blocked tests |
-| M2-003 | Implement disclosed-barrier domain rules | IN PROGRESS | Placement/disclosure and legal-move tests |
-| M2-004 | Implement barrier-on-current-cell capture | IN PROGRESS | Accepted-order capture test |
-| M2-005 | Implement trapped-Thief capture under the accepted STAY interpretation | IN PROGRESS | Accepted-order trapped/capture tests |
+| M2-001 | Implement immutable coordinates, actions, and configured grid bounds | DONE | `test_coordinates.py`, `test_board.py`; `M2_DOMAIN.md` |
+| M2-002 | Implement N/S/E/W/STAY legal-action validation | DONE | `test_movement.py` normal/boundary/diagonal/off-grid/blocked |
+| M2-003 | Implement disclosed-barrier domain rules | DONE | `test_barriers.py`, `test_movement.py` |
+| M2-004 | Implement barrier-on-current-cell capture | DONE | `test_capture.py` barrier-on-Thief and precedence |
+| M2-005 | Implement trapped-Thief capture under the accepted STAY interpretation | DONE | `test_capture.py` trapped/STAY-no-rescue |
 
 ## M3 — Local state, scoring and deterministic baseline
 
