@@ -70,6 +70,15 @@ def test_position_off_board_rejected() -> None:
         resolve_move(board, Coordinate(9, 9), Action.STAY)
 
 
+@pytest.mark.parametrize("enumerate_moves", [legal_actions, cardinal_moves])
+def test_move_enumeration_rejects_off_board_source(enumerate_moves) -> None:
+    """Legal-action helpers reject an invalid source instead of returning empty."""
+    board = Board(size=5)
+
+    with pytest.raises(DomainError):
+        enumerate_moves(board, Coordinate(9, 9))
+
+
 def test_legal_actions_are_deterministic_and_ordered() -> None:
     """Enumeration follows fixed Action order and includes STAY."""
     board = Board(size=7)

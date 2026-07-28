@@ -60,7 +60,8 @@ def validate_barrier_placement(
     if isinstance(existing, BarrierField):
         placed, quota = existing.cells, existing.quota
     else:
-        placed = frozenset(existing)
+        normalized = BarrierField(frozenset(existing), quota=quota)
+        placed, quota = normalized.cells, normalized.quota
     board.validate_position(cell)
     board.validate_position(police_position)
     if cell != police_position and not is_orthogonal_step(police_position, cell):
