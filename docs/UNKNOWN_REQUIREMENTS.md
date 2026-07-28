@@ -14,7 +14,7 @@ An unknown blocks only its named subsystem.
 | U-013 | Complete private TOML keys, types, secret-loading method, and compatibility rules | Configuration | ADR-0004 and source-backed Cop proposal; `config/game.toml`, its private role, major categories, and JSON precedence are confirmed in `AB-001`; `opponent_url` is a confirmed key (course material 2026-07-28); full schema and secret-loading method remain open |
 | U-014 | Non-quantitative event ordering: moves/barriers/capture, scent emission/decay/observation, and scoring edge cases | Domain/protocol | Direct book sections plus accepted shared rules |
 | U-015 | Scope permitted for simulator code reuse under its license/provenance | Provenance | License/lecturer review and ADR-0008 |
-| U-016 | Team/group/member identifiers and eight-character team code | Identity/reporting | Verified team input |
+| U-016 | Team/group/member identifiers and eight-character team code | Identity/reporting | **CLOSED 2026-07-28** by verified team input: group identifier `sharNamr`, members Amr safadi and Sharbel Maroun, team code `sharNamr` (exactly 8 characters, no spaces, satisfies `SR-011`). See [TEAM_INFO.md](TEAM_INFO.md) |
 | U-017 | Newer Moodle instructions and lecturer announcements | Potential final-release areas | Obtain dated official posts |
 | U-019 | Official template required/optional fields, types, enums, bounds, and additional-property rules | Artifact validation | Formal schemas or dated authoritative clarification |
 | U-020 | Exact provisionally authorized parity-file list, candidate version, manifest shape/hash, per-file hashes, and later final-freeze revision | Contract gate | Coordinator-named immutable Cop handoff, Thief parity/conformance evidence, then separate final freeze |

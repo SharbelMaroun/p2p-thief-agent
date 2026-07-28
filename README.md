@@ -8,22 +8,40 @@ Companion Cop repository:
 
 ## Milestone status
 
-Version `1.00` is an M0–M1 documentation and package scaffold. The inspected baseline
-(`119fa911d5b1a5aecdaa9531d0912e5c6f9ab32f`) contained no Python package, tests,
-`pyproject.toml`, or lockfile. This milestone adds those engineering foundations but
-deliberately implements no game engine, peer runtime, LLM, Gmail, GUI, or replay
-behavior.
+Version `1.00` began as an M0–M1 documentation and package scaffold. The inspected
+baseline (`119fa911d5b1a5aecdaa9531d0912e5c6f9ab32f`) contained no Python package,
+tests, `pyproject.toml`, or lockfile; that milestone added those engineering
+foundations.
+
+The M2 core domain — coordinates, board geometry, legal movement, barrier rules, and
+capture conditions — is now implemented behind the public SDK under the 2026-07-28
+coordinator authorization for contract-independent domain work. It uses only Appendix
+E/F `CONFIRMED` rules, takes every board and position input explicitly, and depends on
+no shared-contract byte, MCP endpoint, or Cop-owned file. See
+[M2_DOMAIN.md](docs/M2_DOMAIN.md).
+
+The repository still deliberately implements no peer runtime, protocol or commit-reveal
+runtime, LLM, Gmail, GUI, or replay behavior.
 
 The Cop agent owns parity-controlled shared files. Original candidate `84339c2`,
 revision `b586af9`, and the latest revision `e0df5ba` (Cop main `be705f9`) were all
 rejected for Thief copying. On 2026-07-28 the coordinator audited `e0df5ba` and issued
 `ACCEPTED_FOR_PROVISIONAL_PARITY: NO`: its 18 file hashes and manifest are
 integrity-correct, but the contract is semantically rejected across seven issues (see
-[COORDINATOR_VERDICT_2026-07-28.md](docs/COORDINATOR_VERDICT_2026-07-28.md)). Zero
-parity-controlled files have been integrated here, so the shared contract remains
-**pending—not frozen**. The Thief repository will consume only an explicitly
-provisionally authorized handoff byte-for-byte, prove parity/conformance, and then
-wait for final coordinator freeze; it will not repair or invent a competing contract.
+[COORDINATOR_VERDICT_2026-07-28.md](docs/COORDINATOR_VERDICT_2026-07-28.md)). A newer
+Cop bundle `0.2.0-proposed` (`0c20bf0`, 32 controlled files) has since been reviewed
+read-only here: every declared hash and vector reproduces exactly, but four of the seven
+blockers remain unresolved and no coordinator verdict exists for it, so it is likewise
+not copyable. Zero
+parity-controlled files have been integrated here.
+
+On 2026-07-28 the copy model was **superseded**. Under `THIEF-002` this repository has
+no access to the companion Cop repository and must play unknown classmate opponents, so
+byte-parity with one peer would prove nothing about interoperability. M1 is now a
+conformance gate: the Thief authors its own wire profile from book-confirmed rules and
+Option-B choices, and proves it bidirectionally against a neutral stub opponent sharing
+no source file with any peer. See
+[CONTRACT_HANDOFF_CHECKLIST.md](docs/CONTRACT_HANDOFF_CHECKLIST.md).
 
 ## Install and inspect
 
@@ -55,6 +73,11 @@ contract check exits nonzero with a pending blocker; it never reports a false pa
 
 - Cop and Thief are separate processes and repositories with no shared memory, database,
   runtime filesystem, or private truth (`SR-001`, `SR-004`, `THIEF-001`).
+- This repository is developed with no read and no write access to the companion Cop
+  repository, and must interoperate with an **unknown** opponent (`THIEF-002`). League
+  play is against classmates, so matching one companion repository is evidence about
+  that repository only. Interoperability is demonstrated against a neutral stub sharing
+  no files with either side.
 - Legal moves are north, south, east, west, and stay; diagonals are illegal
   (`AF-015`).
 - Barrier placement is disclosed; a barrier on the Thief’s current cell and a trapped

@@ -136,6 +136,157 @@ this design.
    `schema_version: "1.1"`, `"1.2"`, and `"1.3"`, or provide a compatibility
    normalization rule.
 
+## Candidate `0.2.0-proposed` review (2026-07-28)
+
+Read-only inspection of the Cop bundle `shared_contract/` at immutable commit
+`0c20bf03d916d7bbd9c7d4cfef87bd18e45e485d` (Cop branch
+`agent/cop-m2-own-cell-barrier-fix`, not merged to Cop main). Every file was read with
+`git cat-file blob <commit>:<path>` against the Cop object database. No file was
+copied, edited, reformatted, or integrated into this repository.
+
+This is Thief-side evidence prepared for the coordinator. It is not an authorization,
+it does not complete any Stage A value, and it changes no gate.
+
+### Independently reproduced integrity
+
+| Check | Result |
+|---|---|
+| Controlled files declared in `PARITY_MANIFEST.json` | 32 |
+| Files present under `shared_contract/` in the tree | 33 (manifest correctly excludes itself) |
+| Per-file SHA-256 recomputed from raw blobs | **32/32 match** |
+| Manifest exact-byte self-hash | `2b473b53…09642` **match** |
+| CRLF bytes in any controlled blob | none |
+| `vectors/move-commit.vectors.json` reproduced | **4/4** |
+| `vectors/config-sha256.vectors.json` reproduced | **3/3** |
+| `negotiation_terms.projection.json` `game_object` hash | `259a214a…24c15` **match** |
+
+Integrity was never the disputed question and it passes again. A clean manifest proves
+only that the declared bytes are the actual bytes; it proves nothing about semantics.
+
+### Verdict
+
+**CONTRACT INTEGRATION: NO-GO**
+
+**M2 GAMEPLAY: NO-GO**
+
+Of the seven coordinator blockers of 2026-07-28: one is resolved, one is partially
+resolved, one is substantially improved but incomplete, and four are unresolved. Two
+new P0 defects that were not present in `e0df5ba` were found.
+
+### Status against the seven coordinator blockers
+
+| # | Coordinator blocker | Status | Basis |
+|---|---|---|---|
+| 1 | Stable contract mixed with per-match identity/configuration | **RESOLVED** | The bundle contains no active match. `fixtures/match_config.example.json` is framed as a template, the per-match object is supplied at runtime, and `README.md` states that changing opponent IDs never edits a bundle file. No controlled file carries a runtime identity. |
+| 2 | Schema requires unsupported root fields | **NOT RESOLVED (P0)** | `schemas/match-config.schema.json` still lists `version` and `extensions` in `required` under `additionalProperties: false`. An opponent sending the exact Appendix B structure is still rejected. The required Appendix-B-exact conformance fixture does not exist in `fixtures/`. |
+| 3 | `rate_limits.json` classification | **PARTIALLY RESOLVED (P1)** | Gatekeeper values now sit inside the match object and are therefore covered by the `config_sha256` lock, satisfying "include its agreed values in the match lock". But the separate shared `rate_limits.json` that Appendix B describes is silently absent, with no stated mapping and no defined handling if an opponent sends one. `response_timeout_sec`/`watchdog_timeout_sec` are split into `network_and_league` while the other five Gatekeeper values sit in `rate_limiter_gatekeeper`; `AF-019` groups all seven together, and the split has no cited authority. |
+| 4 | Role alternation presented as binding | **NOT RESOLVED (P0)** | `SHARED_RULES.md` still contains a normative "Role alternation" section asserting odd-natural/even-opposite alternation as fact, with no `UNKNOWN` marking and no authority citation. The coordinator required its removal from normative contract documents. This directly contradicts Thief `LS-001` (`UNKNOWN`) and reopened `U-021`. |
+| 5 | Canonical hashing insufficiently established | **IMPROVED, INCOMPLETE (P1)** | Real progress: three hash domains are cleanly separated and 7/7 declared vectors reproduce exactly in an independent Thief-side implementation. Remaining gaps below. |
+| 6 | Unknown-opponent interoperability unproven from the book | **NOT RESOLVED — needs a coordinator ruling** | The bundle is honest that it is Option-B/`PROPOSED` pinned to the simulator, but that does not discharge "prove from the official book". The coordinator's specific required changes are unmet: schemas carry no stable `$id`, no capability/version negotiation exists, and `PROTOCOL_PROFILE.md` explicitly forbids `protocol_version`. See the open question below. |
+| 7 | Cross-field configuration validation incomplete | **NOT RESOLVED (P0)** | `$defs/coordinate` is still any two integers with no bounds. `axis_start_index` is still an unbounded integer accepting negatives — the identical defect flagged against `game-config.schema.json`. `axis_origin_corner` is a free string with `minLength: 1` and no enum, so any value validates. Nothing validates `thief_start`/`cop_start` against `grid_size`, the origin corner, or the start index; nothing prevents both agents starting on the same cell. No post-schema semantic-validation step is documented anywhere in the bundle. |
+
+### Remaining canonicalization gaps (blocker 5)
+
+- **No escaping vector.** The coordinator required vectors covering "Unicode, escaping,
+  nested objects and numbers". Nested objects, numbers (`2.5`, `0.1`) and non-ASCII
+  passthrough (Hebrew) are covered; **escaping is not**. No vector exercises a quote,
+  backslash, control character, solidus, or non-BMP/surrogate-pair codepoint.
+- **Reproduction is single-language.** The vectors reproduce exactly, but the profile is
+  specified as Python `json.dumps` keyword arguments and was reproduced here in Python.
+  That is not cross-language evidence. Float rendering is the concrete risk.
+- **`signature` is required but undefined.** `schemas/negotiate.schema.json` requires a
+  `signature` string, and `MATCH_CONFIGURATION.md` requires offers to match before play,
+  but no controlled file defines the signature algorithm, key handling, signed byte
+  range, or verification rule. `negotiate.valid.json` carries the literal placeholder
+  `"ed25519:example-signature-placeholder"`. `U-002` remains open on exactly this point.
+
+### New P0 and P1 defects found in this candidate
+
+**N-1 (P0) — `SHARED_RULES.md` states a barrier rule that contradicts both peers.**
+The rules table reads: "A barrier occupies one cell **exactly one orthogonal step from
+the placing peer**". That wording excludes the placing peer's own cell. Book §3.4 (PDF
+p.37 / printed p.21) permits placement on the peer's own current cell *or* one
+orthogonally adjacent cell. Thief M2 implements own-cell-or-one-step (`42bc571`), and
+the Cop's own code fix in this very commit does the same. Copying this bundle would
+import normative prose forbidding what both implementations do. The Cop's own handoff
+lists this as an open blocker, so it is known and simply not yet fixed.
+
+**N-2 (P0) — the per-sub-game `links` pattern is a placeholder used as a regex.**
+`schemas/per-subgame-config.schema.json` constrains `links.config` and `links.log` with
+`"pattern": "g<NN>"`. That regex matches the literal text `g<NN>` and nothing else.
+Verified against the pattern: `config_demo-series_g<NN>.json` is **accepted**, while the
+real filenames `config_demo-series_g01.json` and `config_demo-series_g1.json` are both
+**rejected**. `per_subgame_config.valid.json` passes only because it carries the
+unfilled placeholder. As written the schema accepts unfilled templates and rejects every
+real artifact, contradicting the confirmed `AF-021` filename patterns.
+
+**N-3 (P1) — the projection fixture contradicts the bundle's own `config_sha256` rule.**
+`MATCH_CONFIGURATION.md` states that `config_sha256` covers the "complete parsed
+per-match shared game object" and "must include the actual agreed `agreed_between`
+values". `fixtures/negotiation_terms.projection.json` computes
+`game_object_config_sha256` over an object missing seven of the eleven required roots,
+including `agreed_between`, `scoring`, `pheromones`, `rate_limiter_gatekeeper`,
+`version`, `world`, and `extensions`. The only worked example of the mapping
+demonstrates the rule being broken.
+
+**N-4 (P2) — scent formula authority.** `SHARED_RULES.md` cites "Book Ch.4; ADR-005" for
+`tau_ij(t+1) = max(0, (1-rho) * tau_ij(t) + delta_tau_ij)`. Thief `AF-016` records the
+three scent constants as `CONFIRMED` but explicitly notes "Formula and schema remain
+unknown". Either the Cop holds a citation the Thief ledger lacks, or the authority claim
+overstates. This must be reconciled before either peer implements M6.
+
+**N-5 (P2) — `verify.py` cannot represent a frozen bundle.** `build_manifest` hardcodes
+`"freeze_status": "proposed_unfrozen"`, and `verify()` fails if the stored manifest
+differs from the recomputed one. A future `CONTRACT_FREEZE: GO` therefore requires
+editing a controlled file, which changes its hash and the manifest self-hash. This is a
+forward-compatibility snag for the freeze step, not a defect today.
+
+**N-6 (P2) — `schema_version` compatibility still unresolved.** `const: "1.2"` continues
+to reject `1.1` and `1.3`, and the schema description admits compatibility "is
+unresolved". Carried over unchanged from the previous review.
+
+### Genuine improvements over `e0df5ba`
+
+| Earlier finding | Status in `0.2.0-proposed` |
+|---|---|
+| `config/game.json` embeds match-specific participant IDs in a parity-controlled file (Thief P0, coordinator blocker 1) | **Resolved.** No active match in the bundle; the example is a template in `fixtures/`. |
+| Checker is Cop-specific: Cop-only `--write`/`write_manifest`, hardcoded Cop paths, "Cop-local contract integrity OK" messaging (Thief required outcome 3) | **Resolved.** `verify.py` discovers files by `rglob` under the bundle root, never writes, has no role-specific paths or wording, and works identically from a Thief root. Manifest generation is moved out to an owner-only tool. |
+| Hash domains conflated | **Resolved.** Move-commit, `config_sha256`, and `config_file_sha256` are separately defined, separately vectored, and explicitly distinguished from the manifest self-hash. |
+| No protection against private-truth leakage in public messages | **Improved.** `turn-message.schema.json` adds a `not`/`anyOf` guard rejecting `position`, `move`, `nonce`, `intent`, and `verdict`. Note that `additionalProperties: true` still permits differently named leakage fields. |
+
+### Required revision outcomes
+
+1. Remove `version` and `extensions` from `required`, and add a fixture proving an exact
+   Appendix B object is accepted (blocker 2).
+2. Remove the normative role-alternation section from `SHARED_RULES.md` and mark it
+   `UNKNOWN` pending an authenticated lecturer answer (blocker 4).
+3. Correct the `SHARED_RULES.md` barrier sentence to own-cell-or-one-orthogonal-step so
+   the contract matches book §3.4 and both implementations (N-1).
+4. Replace the `g<NN>` placeholder pattern with a real expression such as
+   `^config_.+_g\d{2}\.json$`, and refixture with a filled filename (N-2).
+5. Add bounds and cross-field validation: bound `axis_start_index`, enumerate
+   `axis_origin_corner`, and validate both start coordinates against `grid_size`, the
+   origin corner, and the start index, with rejection tests (blocker 7).
+6. Add escaping vectors and at least one non-Python reproduction, or explicitly scope the
+   canonicalization profile as Python-defined (blocker 5).
+7. Define the `signature` algorithm and verification rule, or remove `signature` from
+   `required` until it is defined (N-3 companion).
+8. Correct the projection fixture so `config_sha256` is computed over a complete object
+   (N-3).
+9. Document the relationship between the nested Gatekeeper block and the Appendix B
+   `rate_limits.json`, including behaviour when an opponent sends the separate file
+   (blocker 3).
+
+### Open question for the coordinator
+
+Blocker 6 asks for interoperability proven from the official book, while the accepted
+Option-B decision deliberately selects a simulator-pinned profile for details the book
+leaves open. These pull in opposite directions and the Thief cannot resolve the tension
+on its own. The coordinator should state explicitly whether accepting Option B discharges
+blocker 6, or whether blocker 6 additionally requires stable schema `$id`s, a capability
+or version negotiation mechanism, and conformance evidence against a peer that shares
+none of these 32 files. Nothing in this repository may assume either answer.
+
 ## Scope and method
 
 This is a read-only Thief-side review of the immutable Cop candidate at

@@ -1,82 +1,111 @@
-# Contract Consumption Handoff Checklist
+# Interoperability Conformance Checklist
 
-Status: **BLOCKED — NO PROVISIONAL COPY AUTHORIZATION**
+Status: **BLOCKED — NO ACCEPTED CONFORMANCE PROFILE**
 
-This checklist is fail-closed and separates two coordinator decisions:
+## Why this document changed on 2026-07-28
 
-1. provisional authorization to copy an unfrozen candidate for parity and
-   conformance testing;
-2. final contract freeze after those tests and remaining external decisions pass.
+This file previously specified a **copy model**: receive Stage A values naming an
+immutable Cop commit, copy that repository's controlled bytes verbatim, and prove
+cross-repository byte parity. That model was superseded by team direction.
 
-This avoids the circular requirement that Thief parity exist before copying while
-also requiring final freeze before copying. No candidate has provisional copy
-authorization: original `84339c2`, revised `b586af9`, and the latest `e0df5ba`
-(Cop main `be705f9`) were all rejected. The `e0df5ba` rejection is the explicit dated
-coordinator verdict `ACCEPTED_FOR_PROVISIONAL_PARITY: NO` of 2026-07-28 — hashes are
-integrity-correct but the contract is semantically rejected across seven issues. See
-[COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md).
+The reason is not procedural, it is evidential. League play is against classmates for
+points, and `THIEF-002` now forbids any read or write access to the companion Cop
+repository. **Byte-parity with one companion repository is evidence about that
+repository and nothing else.** A classmate's agent has never seen those files, so
+copying them proves nothing about whether the two peers can actually play. Proving
+interoperability requires conformance to a stated profile, demonstrated against an
+opponent that shares no files with either side.
 
-## Stage A — required provisional handoff values
+The superseded copy model is retained in Git history. It must not be revived, and no
+Cop-owned file may be copied under it.
 
-| Required value | Current state | Provisional acceptance rule |
-|---|---|---|
-| `PROVISIONAL_COP_COMMIT` | MISSING | Full immutable, remotely available Cop commit SHA named by the coordinator |
-| `PROVISIONAL_CONTRACT_VERSION` | MISSING | Exact candidate version; it may remain explicitly proposed/unfrozen |
-| `PROVISIONAL_MANIFEST_SHA256` | MISSING | Coordinator-supplied 64-hex SHA-256 of the manifest's exact bytes |
-| `PROVISIONAL_CONTROLLED_PATHS` | MISSING | Complete ordered path list from that exact manifest |
-| Provisional per-file hashes | MISSING | One coordinator-supplied 64-hex SHA-256 for every controlled path |
-| Coordinator provisional verdict | EXPLICIT NO (2026-07-28) | Explicit `ACCEPTED_FOR_PROVISIONAL_PARITY: YES` for the same commit and metadata; the coordinator issued `NO` for `e0df5ba`/`be705f9` |
+## What replaces it
 
-If any value is missing, ambiguous, internally inconsistent, or attached to a different
-commit, stop. Do not copy or generate shared files.
+The Thief authors its **own** wire profile from the sources it is allowed to use, and
+proves that profile against a neutral stub. Nothing is copied from any peer.
 
-## Pre-copy verification
+Authority for every profile item must be one of:
 
-- [ ] Record all six provisional handoff inputs without abbreviating hashes.
-- [ ] Read the candidate only from `PROVISIONAL_COP_COMMIT`, never from the Cop working tree.
-- [ ] Verify the coordinator verdict names the same commit and contract version.
-- [ ] Hash the manifest's exact bytes and compare with `PROVISIONAL_MANIFEST_SHA256`.
-- [ ] Confirm the manifest contract version equals `PROVISIONAL_CONTRACT_VERSION`.
-- [ ] Confirm the manifest path list exactly equals `PROVISIONAL_CONTROLLED_PATHS`.
-- [ ] Confirm there is exactly one provisional per-file hash for every controlled path.
-- [ ] Independently review source claims and confirm no simulator-only behavior is mandatory.
-- [ ] Confirm stable league, negotiated per-match, and private peer boundaries are explicit.
-- [ ] Confirm runtime match instances can vary without editing stable controlled files.
-- [ ] Confirm every controlled script and policy is role-neutral in copied operation.
+- **book-confirmed** — direct Appendix E/F or chapter evidence, cited exactly;
+- **Option-B project choice** — a documented academic-freedom selection where the book
+  leaves a wire detail open, per `OPTION_B_INTEROP_DECISION.md`;
+- **`UNKNOWN`** — unresolved, and therefore not implementable yet.
 
-## Exact-byte consumption
+An item with no authority label is not part of the profile.
 
-- [ ] Copy every provisionally accepted controlled path directly from
-      `PROVISIONAL_COP_COMMIT`.
-- [ ] Do not edit, reformat, rename, regenerate, or partially select a controlled file.
-- [ ] Do not add a Thief-authored shared field or competing schema.
-- [ ] Recompute every copied file's SHA-256 and compare it with the provisional
-      per-file hash.
-- [ ] Recompute the manifest self-hash separately.
-- [ ] Confirm the controlled path set has no missing or unexpected entries.
-- [ ] Confirm Thief has no runtime import, mount, or filesystem dependency on Cop.
+## Stage A — profile definition
 
-## Stage B — parity and conformance evidence
+- [ ] Author a Thief-owned conformance profile listing every tool name, argument name,
+      message shape, and acknowledgement form.
+- [ ] Label every item book-confirmed, Option-B project choice, or `UNKNOWN`.
+- [ ] Define canonicalization exactly, with reproducible vectors covering nested
+      objects, numbers, non-ASCII text, **and escaping** (quotes, backslashes, control
+      characters, non-BMP codepoints).
+- [ ] Define the commitment construction and nonce profile, keeping the nonce outside
+      the payload.
+- [ ] Separate the hash domains: move commitment, agreed-configuration hash, and
+      configuration source-byte hash are three different values.
+- [ ] State the version and capability negotiation mechanism, or record its absence as
+      an explicit `UNKNOWN` with the interoperability risk named.
+- [ ] Define behaviour on encountering an unknown field, an unknown version, and a
+      missing optional tool.
+- [ ] Author the profile in this repository. Do not copy, transcribe, or reconstruct any
+      peer's controlled file (`THIEF-002`).
 
-- [ ] Thief accepts a neutral compliant opponent's byte-identical match configuration.
-- [ ] Thief creates a match configuration the neutral opponent accepts.
-- [ ] Two different valid participant/match pairs work without changing any controlled
-      stable-contract byte.
-- [ ] Participant mutation, negotiated-value mutation, unsupported version, hash mismatch,
-      ordering violation, and shared/private leakage fail before gameplay.
-- [ ] Thief quality and contract gates pass.
-- [ ] Cop quality and contract gates pass independently.
-- [ ] Cross-repository per-file hashes and manifest self-hash match.
+## Stage B — conformance evidence against an unknown opponent
 
-## Stage C — final freeze
+- [ ] Build a neutral stub opponent that shares no source file with this repository or
+      any peer repository.
+- [ ] The Thief accepts a conforming offer from the stub.
+- [ ] The Thief produces an offer the stub accepts.
+- [ ] Both directions pass: Thief-proposes and Thief-accepts.
+- [ ] Two different valid participant/match identities work without editing any profile
+      file.
+- [ ] Negative vectors fail closed before gameplay: participant mismatch, negotiated-value
+      mismatch, unsupported version, hash mismatch, ordering violation, replayed message,
+      and private-field leakage.
+- [ ] A message that reveals true position, move, intent/verdict, or a nonce before the
+      audit is rejected.
+- [ ] Canonicalization vectors are reproduced by an implementation that does not share
+      this repository's serializer configuration.
+- [ ] All standard quality gates pass.
 
-- [ ] Authenticated-source and formal-schema blockers required by the coordinator are
-      resolved or explicitly accepted as project-level interoperability decisions.
-- [ ] Coordinator reviews the parity/conformance evidence.
-- [ ] Coordinator supplies the final accepted contract version and exact freeze
-      revision.
-- [ ] Coordinator issues `CONTRACT_FREEZE: GO`.
-- [ ] Coordinator separately issues `M2_GAMEPLAY: GO`.
+## Stage C — acceptance
 
-Provisional copy permission authorizes only M1 parity/conformance work. Only after
-every Stage A–C box is satisfied may M1 be marked complete or gameplay begin.
+- [ ] The coordinator reviews the profile and the Stage B evidence.
+- [ ] Remaining `UNKNOWN` items are either resolved or explicitly accepted as scoped
+      risks, each named.
+- [ ] The coordinator issues `CONFORMANCE_PROFILE: ACCEPTED` naming the exact revision.
+- [ ] The coordinator separately issues `M2_GAMEPLAY: GO`.
+
+Profile acceptance authorizes protocol implementation only. Gameplay remains a separate
+verdict.
+
+## Current state
+
+| Required value | Current state |
+|---|---|
+| Thief conformance profile | MISSING |
+| Neutral stub opponent | MISSING |
+| Bidirectional conformance evidence | MISSING |
+| Escaping and cross-implementation vectors | MISSING |
+| `CONFORMANCE_PROFILE: ACCEPTED` | NOT ISSUED |
+| `M2_GAMEPLAY: GO` | NOT ISSUED |
+
+## Checker semantics
+
+`scripts/check_shared_contracts.py` remains **fail-closed** at `PENDING` with exit 1 and
+must never be edited to report a pass before Stage C completes. Its message still uses
+the historical copy-model wording about a missing proposal or parity manifest. Under the
+conformance model, read that `PENDING` as: **no accepted conformance profile exists.**
+The exit code and the fail-closed guarantee are unchanged.
+
+## What is explicitly no longer required
+
+- Receiving an immutable peer commit SHA, manifest hash, controlled-path list, or
+  per-file hashes.
+- Copying any peer file byte-for-byte.
+- Proving cross-repository byte parity.
+
+None of these ever proved interoperability with an unknown opponent, which is the only
+interoperability the league actually tests.

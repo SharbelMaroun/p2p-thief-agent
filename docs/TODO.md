@@ -17,11 +17,15 @@ not Thief implementation tasks.
 
 ## M1 — Public contract, match configuration, parity and freeze
 
-Current blocker: revised candidate `b586af9` was coordinator-reviewed but explicitly
-not authorized for Thief copying. The latest candidate `e0df5ba` (Cop main
-`be705f9`, 2026-07-28) self-declares readiness for external coordinator review but
-has no coordinator authorization. “Proposal missing” is not the blocker; provisional
-parity authorization is.
+**The copy model was superseded on 2026-07-28.** Under `THIEF-002` this repository has
+no access to the companion Cop repository and must interoperate with an unknown
+classmate opponent, so byte-parity with one peer is not evidence of interoperability.
+`M1-007` … `M1-011` are retained as `SUPERSEDED` rather than deleted, so the change of
+approach stays visible. `M1-004`, `M1-006`, and `M1-006b`/`M1-006c` remain `DONE`: they
+were reviews of external artifacts and no peer byte was ever integrated.
+
+Current blocker: no Thief-owned conformance profile exists yet. The work is `M1-013`
+through `M1-017`, then coordinator acceptance in `M1-012`.
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
@@ -32,12 +36,18 @@ parity authorization is.
 | M1-005 | Keep the current contract checker fail-closed | DONE | Exit 1 with documented `PENDING` |
 | M1-006 | Review revised Cop candidate `b586af9` and coordinator portability findings | DONE | Updated `CONTRACT_REVIEW.md` and `GATE_RESOLUTION_REVIEW.md` |
 | M1-006b | Review Cop candidate `e0df5ba` read-only, path by path (18 controlled files) | DONE | `CONTRACT_REVIEW.md` with P0/P1 findings and NO-GO verdict |
-| M1-007 | Receive every provisionally authorized handoff value and coordinator verdict | BLOCKED | Complete Stage A of `CONTRACT_HANDOFF_CHECKLIST.md` |
-| M1-008 | Verify provisional manifest bytes, controlled paths, and every declared file hash before copying | BLOCKED | Pre-copy checklist and recorded hash table |
-| M1-009 | Copy all provisionally authorized controlled paths verbatim from the named Cop commit | BLOCKED | 100% exact-byte presence; no Thief-authored shared edits |
-| M1-010 | Add only the Thief adapter/tests required by the provisionally authorized neutral match-config contract | BLOCKED | Bidirectional neutral-opponent conformance and negative tests |
-| M1-011 | Prove cross-repository parity and two variable match identities | BLOCKED | Both checkers pass without controlled-byte mutation |
-| M1-012 | Obtain final coordinator contract-freeze and M2 verdicts | BLOCKED | Manifest self-hash, parity/conformance evidence, and explicit GO recorded |
+| M1-006c | Review Cop bundle `0.2.0-proposed` at `0c20bf0` read-only (32 controlled files) | DONE | `CONTRACT_REVIEW.md`: 32/32 hashes and 7/7 vectors independently reproduced; four of seven coordinator blockers unresolved plus two new P0 defects; NO-GO |
+| M1-007 | ~~Receive every provisionally authorized handoff value and coordinator verdict~~ | SUPERSEDED | Copy model withdrawn 2026-07-28 under `THIEF-002` |
+| M1-008 | ~~Verify provisional manifest bytes, controlled paths, and declared file hashes before copying~~ | SUPERSEDED | Copy model withdrawn 2026-07-28 under `THIEF-002` |
+| M1-009 | ~~Copy all provisionally authorized controlled paths verbatim from the named Cop commit~~ | SUPERSEDED | Copy model withdrawn 2026-07-28 under `THIEF-002` |
+| M1-010 | ~~Add only the Thief adapter/tests required by the provisionally authorized match-config contract~~ | SUPERSEDED | Reframed as `M1-016`/`M1-017` against a neutral stub |
+| M1-011 | ~~Prove cross-repository parity and two variable match identities~~ | SUPERSEDED | Byte parity with one peer is not evidence about an unknown opponent |
+| M1-013 | Author the Thief-owned wire conformance profile with labelled authority per item | BLOCKED | Stage A of `CONTRACT_HANDOFF_CHECKLIST.md`; every item book-confirmed, Option-B, or `UNKNOWN` |
+| M1-014 | Define canonicalization with reproducible vectors including escaping and separated hash domains | BLOCKED | Vectors covering nested objects, numbers, non-ASCII, quotes, backslashes, control characters, and non-BMP codepoints |
+| M1-015 | Build a neutral stub opponent sharing no source file with any peer repository | BLOCKED | Stub is independently authored and imports no peer module |
+| M1-016 | Prove bidirectional conformance and two participant identities against the stub | BLOCKED | Thief-proposes and Thief-accepts both pass without editing a profile file |
+| M1-017 | Prove fail-closed negative vectors before gameplay | BLOCKED | Participant, value, version, hash, ordering, replay, and private-leakage vectors all reject |
+| M1-012 | Obtain coordinator profile acceptance and the separate M2 gameplay verdict | BLOCKED | `CONFORMANCE_PROFILE: ACCEPTED` naming an exact revision, then `M2_GAMEPLAY: GO` |
 
 ## M2 — Core domain rules
 
@@ -53,6 +63,20 @@ commit-reveal, and shared-contract runtime remain deferred until Cop `0.2.0-prop
 | M2-003 | Implement disclosed-barrier domain rules | DONE | `test_barriers.py`, `test_movement.py` |
 | M2-004 | Implement barrier-on-current-cell capture | DONE | `test_capture.py` barrier-on-Thief and precedence |
 | M2-005 | Implement trapped-Thief capture under the accepted STAY interpretation | DONE | `test_capture.py` trapped/STAY-no-rescue |
+
+## EXC — Contract-independent exceptions
+
+Work authorized outside the milestone sequence because it depends on no shared-contract
+byte, MCP endpoint, or Cop-owned file. An entry here **never** satisfies a milestone
+task; the corresponding milestone row keeps its own status.
+
+| ID | Thief-owned task | Status | Exit evidence |
+|---|---|---|---|
+| EXC-001 | Implement the deterministic Thief baseline policy on existing public domain APIs | DONE | `test_strategy_metrics.py`, `test_baseline_strategy.py`, `test_strategy_sdk.py`; `PRD_strategy.md`; branch `agent/thief-baseline-strategy` |
+
+`EXC-001` does **not** close `M3-004`. It adds no Thief-local state, no history, no
+scoring, and no turn state machine, so the M3 exit evidence is untouched and `M3-004`
+remains `BLOCKED`.
 
 ## M3 — Local state, scoring and deterministic baseline
 

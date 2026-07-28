@@ -147,3 +147,137 @@
 - **Lesson:** runtime preflight, match cryptography, and repository supply-chain
   integrity are three different gates; one hash or one validation function cannot
   substitute for the others.
+
+---
+
+> **Provenance note for P-012 … P-018.** These entries were reconstructed on
+> 2026-07-28 from commits, diffs, and the documents they produced, because the log had
+> fallen 17 commits behind. They are **not transcribed from the original sessions**:
+> the "Prompt (essence)" lines record the evident task, not verbatim wording, except
+> for P-017 and P-018 which were written in the session that performed them. Model
+> attribution is taken from the `Co-Authored-By` commit trailers, not from memory.
+
+## P-012 — Read-only review of Cop candidate `e0df5ba`
+
+- **Date:** 2026-07-28 · **Tool:** Claude Sonnet 4.6 (agentic CLI)
+- **Goal:** decide whether the newest remotely available Cop candidate could be copied.
+- **Prompt (essence):** review the candidate path by path from Git objects only, without
+  copying or modifying any Cop-owned file.
+- **Output:** `CONTRACT_REVIEW.md` path-by-path table over 18 controlled files, crediting
+  the genuine fixes (`rate_limits.json` moved local, `agreed_between` required,
+  `--compare-root` added) while raising a P0: `config/game.json` embeds match-specific
+  participant IDs, so controlled bytes cannot stay frozen across real matches.
+- **Refinement:** every file was read as `<commit>:<path>` so the mutable Cop working
+  tree could not contaminate the review.
+- **Lesson:** review an immutable commit, never a working tree; and credit real progress
+  explicitly, so a NO-GO verdict stays about the remaining defect rather than reading as
+  blanket rejection.
+
+## P-013 — Coordinator NO verdict and the role-alternation reversal
+
+- **Date:** 2026-07-28 · **Tool:** Claude Sonnet 4.6 (agentic CLI)
+- **Goal:** absorb the coordinator's `ACCEPTED_FOR_PROVISIONAL_PARITY: NO` and correct an
+  overclaim the Thief had made one commit earlier.
+- **Prompt (essence):** record the verdict authoritatively and propagate it across every
+  gate document.
+- **Output:** `COORDINATOR_VERDICT_2026-07-28.md` plus propagation through `PLAN.md`,
+  `TODO.md`, `CONTRACT_HANDOFF_CHECKLIST.md`, `CONTRACT_REVIEW.md`, and
+  `GATE_RESOLUTION_REVIEW.md`.
+- **Refinement:** commit `cc78798` had just promoted six-sub-game role alternation to
+  `CONFIRMED` from course material; commit `422643c` reverted it. `LS-001` returned to
+  `UNKNOWN` and `U-021` was reopened, because the source was not an authenticated Moodle
+  announcement or original lecturer message.
+- **Lesson:** the sharpest failure mode is promoting a plausible claim to `CONFIRMED`
+  from an unauthenticated source. Simulator behaviour plus convincing course text is
+  still not lecturer confirmation, and a same-day reversal is cheaper than a contract
+  built on the overclaim.
+
+## P-014 — Option B decision and opening contract-independent M2
+
+- **Date:** 2026-07-28 · **Tool:** Claude Sonnet 4.6 (agentic CLI)
+- **Goal:** find work that could legitimately proceed while the contract gate stayed shut.
+- **Prompt (essence):** record the Option B interoperability decision and open the domain
+  work that depends on no shared-contract byte.
+- **Output:** `OPTION_B_INTEROP_DECISION.md` pinned to simulator commit
+  `960499fd…4677b54`, recording future endpoints and the commit-reveal shape as a
+  decision only, with runtime explicitly deferred.
+- **Refinement:** the M2 carve-out was justified against a specific test — it uses only
+  Appendix E/F `CONFIRMED` rules and takes every board, barrier, and position input
+  explicitly — rather than by general impatience.
+- **Lesson:** a blocked gate does not block everything. Separating "depends on the
+  contract" from "depends only on confirmed rules" converted a full stop into real
+  progress, provided the boundary is stated and testable.
+
+## P-015 — M2 core domain by TDD
+
+- **Date:** 2026-07-28 · **Tool:** Claude Sonnet 4.6 (agentic CLI)
+- **Goal:** implement coordinates, board, movement, barriers, and capture behind the SDK.
+- **Prompt (essence):** build the domain in small red-green-refactor steps, one module per
+  commit, gates green before each.
+- **Output:** five commits producing `domain/` with immutable `Coordinate`/`Action`,
+  origin-aware `Board`, barrier-aware movement, placement validation with the
+  `DEFAULT_BARRIER_QUOTA = 14` minimum, and `evaluate_capture`; 92 tests at 99.25% branch
+  coverage, re-exported through `p2p_thief_agent.sdk` per `PS-007`.
+- **Refinement:** direction labels resolve per origin corner while orthogonal adjacency
+  stays origin-independent, so barrier and trapping logic could not silently inherit a
+  top-left assumption.
+- **Lesson:** where a rule is confirmed but a convention is negotiated, make the
+  convention an explicit input and keep the confirmed geometry independent of it.
+
+## P-016 — Own-cell barrier correction
+
+- **Date:** 2026-07-28 · **Tool:** Claude Sonnet 4.6 (agentic CLI)
+- **Goal:** fix a barrier rule implemented more narrowly than the book allows.
+- **Prompt (essence):** book Chapter 3.4 permits the Police to place a barrier on their
+  own current cell or one orthogonally adjacent cell; correct the validator.
+- **Output:** `validate_barrier_placement` accepts `target == police_position` or exactly
+  one orthogonal step; the own-cell-rejection test was replaced by positive tests through
+  both public APIs, keeping negative coverage for diagonal, multi-cell, off-board,
+  duplicate, and quota-exhausted placement. `M2_DOMAIN.md` also recorded that barrier
+  placement replaces movement, and downgraded capture-reason precedence to an explicitly
+  implementation-chosen tie-break.
+- **Refinement:** the same pass separated a confirmed rule (barrier replaces movement)
+  from an invented one (capture precedence), instead of leaving both implicit.
+- **Lesson:** when correcting a rule, re-audit the neighbouring claims written at the same
+  time; an over-narrow reading rarely travels alone.
+
+## P-017 — Review of Cop `0.2.0-proposed` and status reconciliation
+
+- **Date:** 2026-07-28 · **Tool:** Claude Opus 5 (Claude Code)
+- **Goal:** determine whether the newest 32-file Cop bundle resolves the seven coordinator
+  blockers.
+- **Prompt (essence):** "lets move forward with the project but dont make any assumption
+  when ever you are uncertain ask me" — answered by asking which task to take and whether
+  read-only access to the Cop repository was authorized, before touching anything.
+- **Output:** integrity independently reproduced (32/32 file hashes, manifest self-hash,
+  7/7 canonicalization vectors) but a NO-GO verdict: four of seven blockers unresolved,
+  plus two new P0 defects — `SHARED_RULES.md` states a barrier rule contradicting both
+  implementations, and the per-sub-game `links` pattern `g<NN>` is a placeholder used as a
+  regex that rejects every real filename.
+- **Refinement:** the vectors were re-derived in an independent implementation rather than
+  read; that is what exposed the escaping gap and the Python-only canonicalization
+  profile. The `g<NN>` defect was confirmed by running the pattern, not by reading it.
+- **Lesson:** a clean manifest proves only that the declared bytes are the actual bytes.
+  Executing a claimed rule finds defects that reading it does not.
+
+## P-018 — Deterministic baseline strategy
+
+- **Date:** 2026-07-28 · **Tool:** Claude Opus 5 (Claude Code)
+- **Goal:** implement the contract-independent Thief policy permitted as a narrow
+  exception.
+- **Prompt (essence):** "lets move forward with the project and with the implementation
+  but dont make any assumption when ever you are uncertain ask me", plus a mid-task
+  instruction to commit as work landed rather than only at the end.
+- **Output:** `strategy/metrics.py` and `strategy/baseline.py` behind the SDK, ranking
+  candidates by strict criterion priority — discard dead ends, maximize threat distance,
+  maximize mobility, maximize two-ply reach then minimize corner contact, fixed action
+  order — across three commits; 139 tests at 99.36% branch coverage.
+- **Refinement:** four design questions were put to the human first (branch base, threat
+  input model, lexicographic versus weighted scoring, task scope). The first definition of
+  "immediately trapping" proved nearly vacuous — the cell just vacated is always a legal
+  way back — and was replaced by "every exit leads back to the origin". Two failing tests
+  were found to encode wrong expectations and were corrected against the specified
+  priority order rather than bending the policy.
+- **Lesson:** lexicographic ranking beat a weighted sum precisely because no calibration
+  data exists to justify weights. And when a test fails, decide whether the code or the
+  expectation is wrong before changing either — here the policy was right twice.
