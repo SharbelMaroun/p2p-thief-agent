@@ -44,14 +44,15 @@ the sole author of parity-controlled shared files.
 
 ## M1 gate
 
-The original Cop candidate `84339c2` and coordinator-reviewed revised candidate
-`b586af9` must not be copied. The coordinator explicitly rejected `b586af9` for
-Thief consumption while authorizing Cop portability remediation and Thief review.
-Subsequent Cop work through `e0df5ba530fd7c433d41a98c5976ca7e08cdfa53` is now
-remotely available on Cop main (`be705f9`, 2026-07-28) with status
-`UNFROZEN — NO-GO UNTIL PARITY` and no coordinator authorization. Independent
-findings are in [CONTRACT_REVIEW.md](CONTRACT_REVIEW.md) and
-[GATE_RESOLUTION_REVIEW.md](GATE_RESOLUTION_REVIEW.md).
+The Cop candidates `84339c2`, `b586af9`, and `e0df5ba` must not be copied. On
+2026-07-28 the coordinator audited `e0df5ba` (Cop main `be705f9`) and issued
+`ACCEPTED_FOR_PROVISIONAL_PARITY: NO`: hashes are integrity-correct but the contract
+is semantically rejected across seven issues, including mixed stable/per-match
+configuration, unsupported schema fields, `rate_limits.json` misclassification, and
+unauthenticated role alternation. Independent findings are in
+[CONTRACT_REVIEW.md](CONTRACT_REVIEW.md),
+[GATE_RESOLUTION_REVIEW.md](GATE_RESOLUTION_REVIEW.md), and the authoritative
+[COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md).
 
 Contract consumption starts only after every input in
 [CONTRACT_HANDOFF_CHECKLIST.md](CONTRACT_HANDOFF_CHECKLIST.md) is supplied:

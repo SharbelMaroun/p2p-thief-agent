@@ -14,13 +14,13 @@ Version `1.00` is an M0–M1 documentation and package scaffold. The inspected b
 deliberately implements no game engine, peer runtime, LLM, Gmail, GUI, or replay
 behavior.
 
-The Cop agent owns parity-controlled shared files. Original candidate `84339c2` and
-coordinator-reviewed revision `b586af9` were not authorized for Thief copying. A
-subsequent Cop revision through `e0df5ba530fd7c433d41a98c5976ca7e08cdfa53` is now
-remotely available (Cop main `be705f9`, 2026-07-28) and self-declares readiness for
-external coordinator review with status `UNFROZEN — NO-GO UNTIL PARITY`. No
-coordinator has supplied `ACCEPTED_FOR_PROVISIONAL_PARITY: YES` for any candidate.
-Zero parity-controlled files have been integrated here, so the shared contract remains
+The Cop agent owns parity-controlled shared files. Original candidate `84339c2`,
+revision `b586af9`, and the latest revision `e0df5ba` (Cop main `be705f9`) were all
+rejected for Thief copying. On 2026-07-28 the coordinator audited `e0df5ba` and issued
+`ACCEPTED_FOR_PROVISIONAL_PARITY: NO`: its 18 file hashes and manifest are
+integrity-correct, but the contract is semantically rejected across seven issues (see
+[COORDINATOR_VERDICT_2026-07-28.md](docs/COORDINATOR_VERDICT_2026-07-28.md)). Zero
+parity-controlled files have been integrated here, so the shared contract remains
 **pending—not frozen**. The Thief repository will consume only an explicitly
 provisionally authorized handoff byte-for-byte, prove parity/conformance, and then
 wait for final coordinator freeze; it will not repair or invent a competing contract.
