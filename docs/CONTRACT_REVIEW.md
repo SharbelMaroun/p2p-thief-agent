@@ -75,6 +75,14 @@ this design.
 
 **M2 GAMEPLAY: NO-GO**
 
+> **Coordinator confirmation (2026-07-28):** the coordinator independently audited
+> Cop main `be705f9` and issued `ACCEPTED_FOR_PROVISIONAL_PARITY: NO`, confirming the
+> Thief's P0 on `config/game.json` (mixed stable/per-match configuration) and adding
+> further semantic blockers, including that `rate_limits.json` should be treated as
+> shared (reversing the Cop's local reclassification) and that role alternation must be
+> marked `UNKNOWN`. Full record:
+> [COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md).
+
 ### Path-by-path review
 
 | Candidate path | Severity | Independent review |

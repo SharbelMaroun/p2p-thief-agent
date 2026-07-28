@@ -9,9 +9,12 @@ This checklist is fail-closed and separates two coordinator decisions:
 2. final contract freeze after those tests and remaining external decisions pass.
 
 This avoids the circular requirement that Thief parity exist before copying while
-also requiring final freeze before copying. Neither original candidate `84339c2`,
-coordinator-reviewed revised candidate `b586af9`, nor later observed local Cop head
-`665bd30` has provisional copy authorization.
+also requiring final freeze before copying. No candidate has provisional copy
+authorization: original `84339c2`, revised `b586af9`, and the latest `e0df5ba`
+(Cop main `be705f9`) were all rejected. The `e0df5ba` rejection is the explicit dated
+coordinator verdict `ACCEPTED_FOR_PROVISIONAL_PARITY: NO` of 2026-07-28 — hashes are
+integrity-correct but the contract is semantically rejected across seven issues. See
+[COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md).
 
 ## Stage A — required provisional handoff values
 
@@ -22,7 +25,7 @@ coordinator-reviewed revised candidate `b586af9`, nor later observed local Cop h
 | `PROVISIONAL_MANIFEST_SHA256` | MISSING | Coordinator-supplied 64-hex SHA-256 of the manifest's exact bytes |
 | `PROVISIONAL_CONTROLLED_PATHS` | MISSING | Complete ordered path list from that exact manifest |
 | Provisional per-file hashes | MISSING | One coordinator-supplied 64-hex SHA-256 for every controlled path |
-| Coordinator provisional verdict | NO | Explicit `ACCEPTED_FOR_PROVISIONAL_PARITY: YES` for the same commit and metadata |
+| Coordinator provisional verdict | EXPLICIT NO (2026-07-28) | Explicit `ACCEPTED_FOR_PROVISIONAL_PARITY: YES` for the same commit and metadata; the coordinator issued `NO` for `e0df5ba`/`be705f9` |
 
 If any value is missing, ambiguous, internally inconsistent, or attached to a different
 commit, stop. Do not copy or generate shared files.

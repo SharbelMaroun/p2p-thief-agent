@@ -11,14 +11,14 @@ An unknown blocks only its named subsystem.
 | U-006 | Exact peer ports and local endpoint configuration | Networking | Accepted private-config design; official values if any |
 | U-009 | Gmail draft-versus-send mode and exact OAuth/credential workflow | Reporting | Appendix A, dated clarification, or accepted ADR-0010 |
 | U-010 | Whether a shared executable stateless package is permitted | Packaging | Lecturer clarification; M1 uses independent byte copies only |
-| U-013 | Complete private TOML keys, types, secret-loading method, and compatibility rules | Configuration | ADR-0004 and source-backed Cop proposal; `config/game.toml`, its private role, major categories, and JSON precedence are confirmed in `AB-001` |
+| U-013 | Complete private TOML keys, types, secret-loading method, and compatibility rules | Configuration | ADR-0004 and source-backed Cop proposal; `config/game.toml`, its private role, major categories, and JSON precedence are confirmed in `AB-001`; `opponent_url` is a confirmed key (course material 2026-07-28); full schema and secret-loading method remain open |
 | U-014 | Non-quantitative event ordering: moves/barriers/capture, scent emission/decay/observation, and scoring edge cases | Domain/protocol | Direct book sections plus accepted shared rules |
 | U-015 | Scope permitted for simulator code reuse under its license/provenance | Provenance | License/lecturer review and ADR-0008 |
 | U-016 | Team/group/member identifiers and eight-character team code | Identity/reporting | Verified team input |
 | U-017 | Newer Moodle instructions and lecturer announcements | Potential final-release areas | Obtain dated official posts |
 | U-019 | Official template required/optional fields, types, enums, bounds, and additional-property rules | Artifact validation | Formal schemas or dated authoritative clarification |
 | U-020 | Exact provisionally authorized parity-file list, candidate version, manifest shape/hash, per-file hashes, and later final-freeze revision | Contract gate | Coordinator-named immutable Cop handoff, Thief parity/conformance evidence, then separate final freeze |
-| U-021 | Exact six-sub-game role assignment, including whether Cop and Thief must alternate every sub-game and which team starts in which role | League scheduling | Binding book passage, dated lecturer clarification, or accepted shared schedule |
+| U-021 | Exact six-sub-game role assignment, including whether Cop and Thief must alternate every sub-game and which team starts in which role | League scheduling | **REOPENED 2026-07-28 by coordinator verdict.** Simulator confirms odd-natural/even-opposite alternation, but the book does not, and the recorded course/lecturer direction is not an authenticated Moodle announcement. Needs an authenticated lecturer answer before alternation may be treated as binding. See [COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md). |
 
 ## Closed in this reconciliation
 
@@ -30,3 +30,13 @@ confirmed in `SR-011..013`. The shared/private configuration boundary, mandatory
 confirmed in `AB-001..002`, `AR-001`, and `CR-001`. JSON template key presence is
 confirmed in `JS-001..003`. Final reports are JSON attachments without a free-text
 report body (`AE-032`). Exact constraints beyond that evidence remain open above.
+
+**U-021 — briefly closed then REOPENED 2026-07-28:** Role alternation was
+provisionally recorded as `CONFIRMED` from course material on 2026-07-28. The same-day
+coordinator verdict (`ACCEPTED_FOR_PROVISIONAL_PARITY: NO`) explicitly rejected that
+promotion: odd-natural/even-opposite alternation is simulator-confirmed but **not**
+book-confirmed, and the recorded course/lecturer direction is not an authenticated
+Moodle announcement or original lecturer message. `U-021` is therefore reopened and
+`LS-001` is reverted to `UNKNOWN`. Alternation must not be treated as binding in
+normative contract documents until an authenticated lecturer answer is obtained. See
+[COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md).

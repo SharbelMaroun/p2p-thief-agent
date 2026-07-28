@@ -15,6 +15,16 @@ absent from the inspected JSON files.
 
 No Cop-owned shared file was copied or modified during this review.
 
+> **Superseding coordinator verdict (2026-07-28):** the coordinator has since audited
+> Cop main `be705f9` (candidate `e0df5ba`) and issued
+> `ACCEPTED_FOR_PROVISIONAL_PARITY: NO`. The 18 file hashes and manifest are
+> integrity-correct; rejection is semantic across seven issues (mixed
+> stable/per-match config, unsupported schema fields, `rate_limits.json`
+> misclassification, unauthenticated role alternation, under-defined canonicalization,
+> unproven unknown-opponent interoperability, and incomplete cross-field validation).
+> The authoritative record is
+> [COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md).
+
 ## Exact-value verification
 
 | Supplied value or claim | Verified result |

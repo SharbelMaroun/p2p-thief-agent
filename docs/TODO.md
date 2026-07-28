@@ -41,13 +41,18 @@ parity authorization is.
 
 ## M2 — Core domain rules
 
+Coordinator authorized contract-independent M2 domain implementation on 2026-07-28.
+This work uses only Appendix E/F `CONFIRMED` rules with explicit inputs; it does not
+depend on any shared-contract byte, MCP endpoint, or Cop-owned file. FastMCP,
+commit-reveal, and shared-contract runtime remain deferred until Cop `0.2.0-proposed`.
+
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M2-001 | Implement immutable coordinates, actions, and configured grid bounds | BLOCKED | Construction/boundary unit tests |
-| M2-002 | Implement N/S/E/W/STAY legal-action validation | BLOCKED | Normal, boundary, diagonal, off-grid, and blocked tests |
-| M2-003 | Implement disclosed-barrier domain rules | BLOCKED | Placement/disclosure and legal-move tests |
-| M2-004 | Implement barrier-on-current-cell capture | BLOCKED | Accepted-order capture test |
-| M2-005 | Implement trapped-Thief capture under the accepted STAY interpretation | BLOCKED | Accepted-order trapped/capture tests |
+| M2-001 | Implement immutable coordinates, actions, and configured grid bounds | DONE | `test_coordinates.py`, `test_board.py`; `M2_DOMAIN.md` |
+| M2-002 | Implement N/S/E/W/STAY legal-action validation | DONE | `test_movement.py` normal/boundary/diagonal/off-grid/blocked |
+| M2-003 | Implement disclosed-barrier domain rules | DONE | `test_barriers.py`, `test_movement.py` |
+| M2-004 | Implement barrier-on-current-cell capture | DONE | `test_capture.py` barrier-on-Thief and precedence |
+| M2-005 | Implement trapped-Thief capture under the accepted STAY interpretation | DONE | `test_capture.py` trapped/STAY-no-rescue |
 
 ## M3 — Local state, scoring and deterministic baseline
 
