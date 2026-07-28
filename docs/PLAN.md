@@ -47,9 +47,10 @@ the sole author of parity-controlled shared files.
 The original Cop candidate `84339c2` and coordinator-reviewed revised candidate
 `b586af9` must not be copied. The coordinator explicitly rejected `b586af9` for
 Thief consumption while authorizing Cop portability remediation and Thief review.
-A later local-only Cop head `665bd30` remains `0.1.0-proposed`, unfrozen, `NO-GO`,
-and has no coordinator authorization. Independent findings are in
-[CONTRACT_REVIEW.md](CONTRACT_REVIEW.md) and
+Subsequent Cop work through `e0df5ba530fd7c433d41a98c5976ca7e08cdfa53` is now
+remotely available on Cop main (`be705f9`, 2026-07-28) with status
+`UNFROZEN — NO-GO UNTIL PARITY` and no coordinator authorization. Independent
+findings are in [CONTRACT_REVIEW.md](CONTRACT_REVIEW.md) and
 [GATE_RESOLUTION_REVIEW.md](GATE_RESOLUTION_REVIEW.md).
 
 Contract consumption starts only after every input in

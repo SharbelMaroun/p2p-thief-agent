@@ -1,6 +1,6 @@
 # Proposed Cryptographic and Configuration Gate Resolution Review
 
-Review date: 2026-07-27
+Review date: 2026-07-27; updated: 2026-07-28
 
 ## Verdict
 
@@ -66,15 +66,51 @@ Coordinator review of immutable Cop candidate
 - gameplay: no-go;
 - portability remediation: authorized.
 
-A later local-only Cop head was observed at
-`665bd30a75866e872f899eb337664266e26129ed`. Its own handoff labels the bundle
-`0.1.0-proposed`, `UNFROZEN`, and `NO-GO`. It records 20 controlled paths, manifest
-exact-byte SHA-256
-`ed09244a6b05a4832b8f4d85bc5881ae9eaea139023cd0e946b2bf994b32ad2d`,
-and proposed config vector
+`665bd30a75866e872f899eb337664266e26129ed` was previously described as a local-only
+head. It has since been pushed to the `agent/cop-m1-contract-revision` remote branch
+and is now remotely available. Two further commits followed it: `459cd73` (reduced
+the controlled set from 20 to 18 paths by moving `config/rate_limits.json` and
+`docs/schemas/rate-limits.schema.json` to the local tier) and `e0df5ba` (updated
+documentation to mark the candidate ready for external review). The branch was
+subsequently merged to Cop main at
+`be705f9dc9e14b9fc8a53ffe1658493ad977f1fc` via PR #8 (2026-07-28).
+
+The latest remotely available Cop candidate is
+`e0df5ba530fd7c433d41a98c5976ca7e08cdfa53`. Its handoff document labels the bundle
+`0.1.0-proposed`, `UNFROZEN`, and `NO-GO UNTIL PARITY`, and states explicitly "This
+handoff is for coordinator review." It records 18 controlled paths, a proposed
+manifest exact-byte SHA-256 of
+`473982dc01594b1c7abee8fc7f20cf665a6b245e53114ed4a2732c115a35d86a`, and a proposed
+canonical config vector of
 `adac9efe6d51b9487c400a04c2e185af9fb3622e1a7d74f18d400425656d82db`.
-Those are candidate evidence, not accepted handoff values. The commit was ahead of
-its remote branch and had no coordinator acceptance verdict at review time.
+
+The candidate self-reports the following proposed controlled paths and SHA-256 values:
+
+| Proposed controlled path | Proposed SHA-256 |
+|---|---|
+| `.gitattributes` | `f9eaec26456d492ccc58aec75ce3a8e6e7680fb158b23da3977bcfa02b22c1ba` |
+| `config/game.json` | `70758af55f178a049a438b81eb5f9acd389c568214cb3006358c66f8d10abd06` |
+| `docs/contracts/ARTIFACT_CONTRACT.md` | `33d218b9d071ae40b7cd90f802c75a170cb30e9fd0c43eb61c2622140f034337` |
+| `docs/contracts/CONTRACT_VERSION` | `9e061d4d08ca911d12915da01033a8a9f03cd0329a6ba33bbb953d6bba9edbda` |
+| `docs/contracts/LEAGUE_CONTRACT.md` | `fac906032ac8a7138b177d2512940d84692ebec23f5377b8c0ccc0bb53b9af78` |
+| `docs/contracts/MATCH_CONFIGURATION.md` | `e476ebafeed0d66522a7d96535d43dfc7f598413b0b1553d6d5e8c973afd2f23` |
+| `docs/contracts/PRIVATE_CONFIGURATION.md` | `16b13bc8e8dd3cf17234a27e36623970153961d322b4895d3be9241931eeb745` |
+| `docs/contracts/SHARED_RULES.md` | `ce080c2edc9b9965f0b2601144a425d22a25623f305af1a16a7c9aa39733a643` |
+| `docs/schemas/artifact-keyset-fixture.schema.json` | `8e56b199fb6339a1d085422face33fac8313efd8b7d0d142774607b2febd7a3f` |
+| `docs/schemas/config-hash-vector.schema.json` | `6477d028ac010cd5ae288f6d469ba8ca89055fe7681f8937fbcedc52f3878d86` |
+| `docs/schemas/game-config.schema.json` | `fda84cf295788fda09e93e0e56d8876ae549ff7f1e99391d03552e86f04860d9` |
+| `scripts/check_shared_contracts.py` | `b29bd3c978baf7b1b988e7a37c644cdc3b3e5fb548e852e0238fa95bac855b39` |
+| `scripts/shared_contract_integrity.py` | `3f9dc0eb48a8ca9c5de83a287ffffb88bcc27aec7aeb6e64fe59140e6591b78b` |
+| `tests/fixtures/contracts/agreed_config.keyset.json` | `a82c0f98a9eccb35d13dffb5287f1c74f65918008de4c178c3565540cb1ec1bf` |
+| `tests/fixtures/contracts/declaration.keyset.json` | `fa80c357f5b9b1266ca8b22f9a588d7644735ef948ff26744e0e1b4e0232eeb4` |
+| `tests/fixtures/contracts/final_result.keyset.json` | `032da7375bb220a298858d89d214a8504946cfa783e815940474bd354deec479` |
+| `tests/fixtures/contracts/game-config-sha256.vector.json` | `116f790324b0bdfd28cc38926c2667ae6c9feabaea7b4e2e74662e5fc8dbea54` |
+| `tests/fixtures/contracts/game_log.keyset.json` | `d084554908c831f7924b8ce943470443f3ee82ef829e8f0b2b44dc0017c3639b` |
+
+These are proposed candidate values self-reported by the Cop. They are not accepted
+handoff values. No coordinator verdict supplies `ACCEPTED_FOR_PROVISIONAL_PARITY: YES`
+tied to these values. All Stage A items in `CONTRACT_HANDOFF_CHECKLIST.md` remain
+MISSING. The Thief has not copied and must not copy any shared file.
 
 ## What is required next
 

@@ -2,7 +2,7 @@
 
 Initial review date: 2026-07-26
 
-Latest review update: 2026-07-27
+Latest review update: 2026-07-28
 
 ## Revised-candidate update
 
@@ -31,12 +31,17 @@ It remained ineligible for Thief copying because:
 - the coordinator explicitly recorded `ACCEPTED_FOR_THIEF_COPY: NO`,
   `CONTRACT_FREEZE: NO-GO`, and `M2_GAMEPLAY: NO-GO`.
 
-Later local Cop commits through
-`665bd30a75866e872f899eb337664266e26129ed` attempt further canonicalization and
-artifact decisions. That head was local-only, `0.1.0-proposed`, unfrozen, explicitly
-`NO-GO`, and not coordinator-accepted at inspection time. Its exact proposed values
-must not be copied or relabeled as accepted. The supplied technical assertions and
-exact hashes are classified separately in
+`665bd30a75866e872f899eb337664266e26129ed` was previously described as local-only.
+It has since been pushed to the remote `agent/cop-m1-contract-revision` branch and
+merged to Cop main via PR #8. Two further commits followed it on that branch:
+`459cd73` (moved `config/rate_limits.json` and its schema to the local tier, reducing
+the controlled set from 20 to 18 paths) and `e0df5ba530fd7c433d41a98c5976ca7e08cdfa53`
+(documented the candidate as technically ready for external coordinator review, with
+status `UNFROZEN — NO-GO UNTIL PARITY`). The Cop main HEAD is now
+`be705f9dc9e14b9fc8a53ffe1658493ad977f1fc` (2026-07-28 merge). Those commits and
+their exact proposed values must not be copied or relabeled as accepted; no coordinator
+verdict supplies `ACCEPTED_FOR_PROVISIONAL_PARITY: YES` for any of them. The
+proposed inventory for `e0df5ba` is recorded in
 [GATE_RESOLUTION_REVIEW.md](GATE_RESOLUTION_REVIEW.md).
 
 The corrected handoff sequence is provisional copy authorization, exact-byte
