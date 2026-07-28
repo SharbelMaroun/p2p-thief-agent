@@ -31,7 +31,7 @@ truth (`SR-004`, `THIEF-001`).
 | Gate | Common phase | Thief-owned outcome | Current status |
 |---|---|---|---|
 | M0 | Evidence and source reconciliation | Correct source hierarchy, traceable Appendix E/F evidence, explicit unknowns/conflicts, reconciled repository history | `DONE` |
-| M1 | Public contract, match configuration, parity and freeze | Independently review a provisionally authorized handoff, copy controlled bytes exactly, verify the manifest and per-file hashes, prove neutral match-config conformance, and obtain final freeze | `BLOCKED` |
+| M1 | Interoperability conformance profile | Author a Thief-owned wire profile from book-confirmed rules and Option-B choices, prove it bidirectionally against a neutral stub opponent, and obtain profile acceptance | `BLOCKED` |
 | M2 | Core domain rules | Coordinates, actions, grid, legal movement, barrier and capture semantics behind the SDK | `IMPLEMENTED` (contract-independent, authorized 2026-07-28; coordinator re-review pending, `MERGE_ALLOWED: NO`) |
 | M3 | Local state, scoring and deterministic baseline | Immutable local history, disclosed-barrier state, scoring, and deterministic legal baseline | `BLOCKED ON M1` |
 | M4 | Protocol, canonicalization and commit-reveal | Accepted public messages, exact canonical bytes, state transitions, commitment verification, and audit outcomes | `BLOCKED ON M1` |
@@ -41,8 +41,8 @@ truth (`SR-004`, `THIEF-001`).
 | M8 | GUI, replay, interoperability and security hardening | Local-truth UI, replay/verifier, neutral-opponent E2E, tamper tests, and security review | `BLOCKED ON M1` |
 | M9 | League evidence, submission and release | League evidence, academic README, final clean gates, access checks, and annotated release | `BLOCKED ON M1` |
 
-Only Thief-owned work is decomposed in [TODO.md](TODO.md). The Cop repository remains
-the sole author of parity-controlled shared files.
+Only Thief-owned work is decomposed in [TODO.md](TODO.md). Under `THIEF-002` this
+repository authors its own wire profile and consumes no peer-owned file.
 
 ## M1 gate
 
@@ -60,23 +60,35 @@ are in
 [GATE_RESOLUTION_REVIEW.md](GATE_RESOLUTION_REVIEW.md), and the authoritative
 [COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md).
 
-Contract consumption starts only after every input in
-[CONTRACT_HANDOFF_CHECKLIST.md](CONTRACT_HANDOFF_CHECKLIST.md) is supplied:
+### The copy model was superseded on 2026-07-28
 
-- provisionally authorized Cop commit and candidate version;
-- provisionally accepted manifest exact-byte SHA-256;
-- provisionally accepted controlled-path list and per-file hashes;
-- explicit coordinator authorization for parity/conformance testing.
+M1 no longer consumes a peer's bundle. Team direction (`THIEF-002`) forbids read and
+write access to the companion Cop repository and makes league play against classmates
+the target, so byte-parity with one companion repository is evidence about that
+repository and nothing else. A classmate's agent has never seen those files.
 
-After receipt, Thief verifies the handoff before copying, copies every controlled path
-byte-for-byte from the provisionally authorized commit, makes no shared-file edits, and proves
-bidirectional match-configuration conformance with a neutral compliant opponent. Any
-shared defect returns to Cop for a revised candidate.
+M1 is now an **interoperability conformance gate**, specified in
+[CONTRACT_HANDOFF_CHECKLIST.md](CONTRACT_HANDOFF_CHECKLIST.md):
 
-M1 exits only when 100% of controlled bytes and the manifest self-hash match, both
-repositories independently pass their contract checks, and the coordinator accepts
-the resulting cross-repository evidence and issues the separate final contract-freeze
-and M2 gameplay verdicts. Provisional copy authorization alone never opens M2.
+- **Stage A** — the Thief authors its own wire profile, labelling every item
+  book-confirmed, an Option-B project choice, or `UNKNOWN`, including exact
+  canonicalization with escaping vectors and separated hash domains.
+- **Stage B** — that profile is proved bidirectionally against a neutral stub opponent
+  sharing no source file with any peer, with two participant identities and fail-closed
+  negative vectors.
+- **Stage C** — the coordinator accepts the profile, then separately issues
+  `M2_GAMEPLAY: GO`.
+
+No peer commit SHA, manifest hash, controlled-path list, or per-file hash is required
+any more, and no peer file may be copied. The reviews above remain valid as reviews of
+an external artifact; they are not a route to consuming one.
+
+M1 exits only when Stage A, Stage B, and Stage C are all satisfied. Profile acceptance
+authorizes protocol implementation only and never opens gameplay on its own.
+
+The contract checker stays fail-closed at `PENDING` with exit 1 throughout. Its message
+retains historical copy-model wording; under this model it means no accepted conformance
+profile exists.
 
 ## Decision gates
 

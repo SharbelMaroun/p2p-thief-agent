@@ -33,10 +33,15 @@ Cop bundle `0.2.0-proposed` (`0c20bf0`, 32 controlled files) has since been revi
 read-only here: every declared hash and vector reproduces exactly, but four of the seven
 blockers remain unresolved and no coordinator verdict exists for it, so it is likewise
 not copyable. Zero
-parity-controlled files have been integrated here, so the shared contract remains
-**pending—not frozen**. The Thief repository will consume only an explicitly
-provisionally authorized handoff byte-for-byte, prove parity/conformance, and then
-wait for final coordinator freeze; it will not repair or invent a competing contract.
+parity-controlled files have been integrated here.
+
+On 2026-07-28 the copy model was **superseded**. Under `THIEF-002` this repository has
+no access to the companion Cop repository and must play unknown classmate opponents, so
+byte-parity with one peer would prove nothing about interoperability. M1 is now a
+conformance gate: the Thief authors its own wire profile from book-confirmed rules and
+Option-B choices, and proves it bidirectionally against a neutral stub opponent sharing
+no source file with any peer. See
+[CONTRACT_HANDOFF_CHECKLIST.md](docs/CONTRACT_HANDOFF_CHECKLIST.md).
 
 ## Install and inspect
 

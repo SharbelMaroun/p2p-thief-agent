@@ -22,7 +22,7 @@ contract or runtime evidence is unavailable.
 | `docs/TEAM_INFO.md` | Yes | Identity confirmed 2026-07-28; `U-016` closed | Nothing outstanding |
 | `pyproject.toml` / `uv.lock` | Yes | Independently installable M1 scaffold | Keep uv lock and metadata current |
 | `src/` / `tests/` / `scripts/` | Yes | M2 core domain and the contract-independent baseline strategy behind the SDK; 139 tests at 99.36% branch coverage | Add protocol, runtime, and transport behavior through TDD after the contract gate |
-| Shared contract bundle | No | Four Cop candidates reviewed and none copyable: `84339c2`, `b586af9`, `e0df5ba` (explicit coordinator `NO`, 2026-07-28), and `0.2.0-proposed` at `0c20bf0` — integrity-clean but four of seven blockers unresolved plus two new P0 defects. Checker remains `PENDING` | Receive a provisionally authorized handoff, copy exact bytes, prove parity/conformance, then obtain final freeze |
+| Thief conformance profile | No | Copy model superseded 2026-07-28 under `THIEF-002`; four Cop candidates were reviewed and none was ever copied. Checker remains `PENDING` | Author the profile (`M1-013`/`M1-014`), prove it against a neutral stub (`M1-015`–`M1-017`), then obtain profile acceptance |
 | Active shared/private runtime config | No | Intentionally absent | ADR-0004 plus accepted contract |
 | Runtime, GUI, replay, Gmail evidence | No | Out of M1 scope | Later gated milestones |
 
