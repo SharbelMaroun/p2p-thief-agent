@@ -33,7 +33,8 @@ public tools and their sole arguments are exactly:
 | Tool | Sole argument | Required |
 |---|---|---|
 | `negotiate` | `offer` | yes |
-| `receive_turn` | `message` | yes |
+| `receive_move` | `message` | yes |
+| `receive_reveal` | `message` | yes |
 | `submit_audit` | `audit` | yes |
 | `receive_control` | `message` | no; capability-negotiated |
 
@@ -99,7 +100,8 @@ has depth 1; each nested object or array adds 1. Limits are:
 | Tool argument | Maximum JCS bytes | Maximum container depth |
 |---|---:|---:|
 | `negotiate.offer` | 65,536 | 64 |
-| `receive_turn.message` | 16,384 | 64 |
+| `receive_move.message` | 16,384 | 64 |
+| `receive_reveal.message` | 16,384 | 64 |
 | `submit_audit.audit` | 8,388,608 | 64 |
 | `receive_control.message` | 16,384 | 64 |
 
@@ -129,7 +131,7 @@ post-negotiation envelope. `offer` has exactly these members:
   "game_id": "actual-game-id",
   "game_uid": "actual-game-uid",
   "sub_game_number": 1,
-  "required_capabilities": ["negotiate", "receive_turn", "submit_audit"],
+  "required_capabilities": ["negotiate", "receive_move", "submit_audit"],
   "optional_capabilities": ["receive_control"],
   "step_zero": {},
   "configuration": {}
@@ -255,7 +257,7 @@ Success returns this closed direct object:
     {"group_id": "proposer-group-id", "role": "thief"},
     {"group_id": "responder-group-id", "role": "police"}
   ],
-  "accepted_capabilities": ["negotiate", "receive_turn", "submit_audit", "receive_control"],
+  "accepted_capabilities": ["negotiate", "receive_move", "submit_audit", "receive_control"],
   "game_source_sha256": "64-lowercase-hex",
   "rate_limits_source_sha256": "64-lowercase-hex",
   "agreed_configuration_sha256": "64-lowercase-hex"
@@ -303,7 +305,7 @@ ambiguous mapping is `IDENTITY_MISMATCH`.
 hints, and public barrier disclosure (`AE-017`, `AE-021`, `AE-022`); OPTION-B PROJECT
 CHOICE for the exact fields and acknowledgement.**
 
-`receive_turn(message)` requires `type: "turn_commit"` and this exact `body`:
+`receive_move(message)` requires `type: "turn_commit"` and this exact `body`:
 
 ```json
 {
@@ -348,9 +350,9 @@ replace a locked value.
 
 ### 5.2 Committed payload, nonce, and commitment
 
-**Authority: BOOK-CONFIRMED for SHA-256 commit-reveal, delayed nonce reveal, and the
-sorted compact UTF-8 core (`AE-017`, `CR-001`); OPTION-B PROJECT CHOICE for the exact
-payload, RFC 8785 completion, nonce profile, and construction.**
+**Authority: BOOK-CONFIRMED construction (`AE-017`, `CR-001`, and book Ch.5.3, printed
+p.37), ruled by the coordinator on 2026-07-28; the exact committed field set remains
+`UNKNOWN` (`U-005`). See `COORDINATOR_RULING_COMMIT_REVEAL_2026-07-28.md`.**
 
 The private committed payload is closed and has exactly:
 
@@ -377,22 +379,81 @@ scalar values. `hint` and `barrier` MUST equal the public turn fields. All ident
 role, step, coordinate, and movement values MUST be valid under the accepted
 negotiation and game configuration.
 
-The nonce MUST be 32 independently generated cryptographically secure random bytes,
-encoded as exactly 64 lowercase hexadecimal characters. It MUST be unique per committed
-record and remain secret until `final_audit`.
+The nonce MUST be 16 independently generated cryptographically secure random bytes,
+encoded as exactly 32 lowercase hexadecimal characters (the book's `token_hex(16)`). It
+MUST be unique per committed record and remain secret until `final_audit`.
+
+The commitment follows book Chapter 5.3 exactly: the nonce is a member **inside** the
+hashed JSON payload, there is **no delimiter**, and serialization is the book's
+`json.dumps(sort_keys=True, separators=(",", ":"))` with default `ensure_ascii=True`
+(non-ASCII escaped as `\uXXXX`), UTF-8 encoded, then SHA-256.
 
 ```text
-commitment_sha256 =
-  lowerhex(SHA256(
-    JCS(payload) ||
-    ASCII("|") ||
-    ASCII(nonce)
-  ))
+committed  = payload with the string "nonce" member added
+serialized = json.dumps(committed, sort_keys=True, separators=(",", ":"))  # ensure_ascii=True
+commitment_sha256 = lowerhex(SHA256(serialized.encode("utf-8")))
 ```
 
-The payload's fixed `domain` provides move-commitment domain separation. The nonce is
-outside the JSON payload. No newline, NUL, length prefix, hex decoding of the nonce, or
-Unicode normalization is performed.
+This is byte-identical to a book-literal opponent. The commit domain therefore uses the
+book's escaped serialization, distinct from the RFC 8785 JCS canonicalizer (raw UTF-8)
+used for the separate `config_sha256` and source-byte domains. No delimiter, length
+prefix, or hex decoding of the nonce is performed. The `domain` field and the exact
+committed field set are a Thief choice and remain `UNKNOWN` (`U-005`) for
+cross-classmate interoperability until an authenticated lecturer answer settles them.
+
+### 5.3 Live move reveal (book Step 3)
+
+**Authority: BOOK-CONFIRMED that Step 3 discloses the move and hint while the nonce
+stays hidden until the final audit (book Ch.5.3, Figure 6, printed p.36); OPTION-B
+PROJECT CHOICE for the exact envelope, ordering, and acknowledgement, ruled by the
+coordinator on 2026-07-29.**
+
+The book's four-step flow is Commit → Acknowledge → **Reveal (move + hint, nonce
+hidden)** → Final Reveal (all nonces, end of game). Steps 1–2 are the `turn_commit`
+message and its `locked` acknowledgement (section 5.1); Step 4 is `final_audit`
+(section 6). Step 3 is a distinct message: `receive_reveal(message)` requires
+`type: "move_reveal"` and this exact closed `body`:
+
+```json
+{
+  "step": 1,
+  "move": "N",
+  "hint": "public natural-language hint"
+}
+```
+
+`move` is exactly one of `N`, `S`, `E`, `W`, or `STAY` — the movement token that was
+hidden at commit. `hint` MUST equal the locked turn's public hint (restated, not newly
+introduced; this profile keeps the hint public at commit). The nonce, pre-move
+position, intent, committed payload, and verdict remain forbidden in this message; only
+`body.move` is exempted from the private-field scan of section 8.
+
+A reveal is accepted only for a step already locked by `turn_commit`, in strictly
+ascending order, once per step, and never after the audit stream closes. A step revealed
+out of order or before its commit is `OUT_OF_ORDER`; a re-revealed step is
+`REPLAYED_MESSAGE`; a restated hint that does not match the locked turn is
+`COMMITMENT_MISMATCH`. Success returns exactly these eight members:
+
+```json
+{
+  "profile": "p2p-thief-option-b",
+  "version": "1.0",
+  "status": "revealed",
+  "acknowledges": "reveal-message-id",
+  "game_uid": "negotiated-game-uid",
+  "sub_game_number": 1,
+  "step": 1,
+  "move": "N"
+}
+```
+
+The reveal itself is **not** verified against the commitment — the nonce is still
+hidden, so a move revealed here that contradicts the commitment cannot be proven yet.
+That contradiction is caught at the final audit: the audited payload MUST reproduce the
+commitment (section 6) and its `move` MUST equal the move disclosed at Step 3, else
+`COMMITMENT_MISMATCH` and the technical-loss state. Step-3 reveals are optional in this
+profile; when a step was revealed, the audit enforces the match, exactly realizing the
+book's "what happens if an agent reveals an inconsistent move" guarantee.
 
 ## 6. Final audit
 
@@ -411,7 +472,7 @@ digest, and acknowledgement.**
       "turn_message_id": "32-lowercase-hex",
       "commitment_sha256": "64-lowercase-hex",
       "payload": {},
-      "nonce": "64-lowercase-hex"
+      "nonce": "32-lowercase-hex"
     }
   ]
 }
@@ -505,17 +566,19 @@ without assuming control support.
 OPTION-B PROJECT CHOICE for deterministic wire enforcement.**
 
 Before `final_audit`, a sender MUST NOT disclose or encode its true runtime position,
-move, intent, verdict, committed payload, or nonce in any field, alias, extension, or
+intent, verdict, committed payload, or nonce in any field, alias, extension, or
 free-text value. The only coordinate exception is
-`receive_turn.message.body.barrier.position`. Negotiated static starting coordinates
-inside the canonical configuration sources are public configuration, not runtime
-truth.
+`receive_move.message.body.barrier.position`. The move is disclosed at exactly one
+authorized location — `receive_reveal.message.body.move` at book Step 3 (section 5.3) —
+and stays forbidden everywhere else until audit; the nonce is never disclosed before
+`final_audit`. Negotiated static starting coordinates inside the canonical
+configuration sources are public configuration, not runtime truth.
 
 The pre-audit structural scanner runs before generic unknown-field rejection. A member
 named exactly `payload`, `move`, `position`, `intent`, `verdict`, or `nonce` at any
-pre-audit location returns `PRIVATE_FIELD_LEAK`, except for the barrier-position and
-static-configuration exceptions above. Closed schemas reject aliases and all other
-extensions. A receiver that otherwise detects semantic disclosure in a hint or reason
+pre-audit location returns `PRIVATE_FIELD_LEAK`, except for the barrier-position, the
+Step-3 `body.move`, and static-configuration exceptions above. Closed schemas reject
+aliases and all other extensions. A receiver that otherwise detects semantic disclosure in a hint or reason
 MUST also return `PRIVATE_FIELD_LEAK`; free text is not permission to bypass secrecy.
 
 `verdict` is not a v1.0 commitment or audit-payload member. Its final reporting

@@ -13,7 +13,7 @@ def test_expiry_boundary_is_inclusive() -> None:
     session = make_session()
     message, _, _ = make_turn()
 
-    acknowledgement = session.receive_turn(message, now_ms=message["expires_at_ms"])
+    acknowledgement = session.receive_move(message, now_ms=message["expires_at_ms"])
 
     assert acknowledgement["status"] == "locked"
 
@@ -24,7 +24,7 @@ def test_turn_canonical_byte_limit_precedes_hint_limit() -> None:
     message["body"]["hint"] = "😀" * 4096
 
     with pytest.raises(ConformanceError) as captured:
-        session.receive_turn(message, now_ms=150)
+        session.receive_move(message, now_ms=150)
 
     assert captured.value.code == "MALFORMED"
 
@@ -38,7 +38,7 @@ def test_turn_depth_limit_is_enforced_before_schema() -> None:
     message["body"] = nested
 
     with pytest.raises(ConformanceError) as captured:
-        session.receive_turn(message, now_ms=150)
+        session.receive_move(message, now_ms=150)
 
     assert captured.value.code == "MALFORMED"
 
@@ -49,7 +49,7 @@ def test_lone_surrogate_is_rejected_at_i_json_boundary() -> None:
     message["body"]["hint"] = "\ud800"
 
     with pytest.raises(ConformanceError) as captured:
-        session.receive_turn(message, now_ms=150)
+        session.receive_move(message, now_ms=150)
 
     assert captured.value.code == "MALFORMED"
 

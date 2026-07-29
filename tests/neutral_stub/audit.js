@@ -9,7 +9,7 @@ const RECORD_KEYS = [
   "step", "turn_message_id", "commitment_sha256", "payload", "nonce",
 ];
 
-function verifyRecords(records, turns, nextStep, context) {
+function verifyRecords(records, turns, nextStep, context, reveals) {
   if (!Array.isArray(records) || records.length !== turns.size) {
     fail("OUT_OF_ORDER", "audit must cover every locked turn");
   }
@@ -23,7 +23,7 @@ function verifyRecords(records, turns, nextStep, context) {
     const turn = turns.get(step);
     lowerHex(record.turn_message_id, 32, "turn_message_id");
     lowerHex(record.commitment_sha256, 64, "commitment_sha256");
-    lowerHex(record.nonce, 64, "nonce");
+    lowerHex(record.nonce, 32, "nonce");
     const reveal = payload(record.payload, context);
     if (nonces.has(record.nonce)) fail("COMMITMENT_MISMATCH", "audit reuses nonce");
     nonces.add(record.nonce);
@@ -36,6 +36,9 @@ function verifyRecords(records, turns, nextStep, context) {
         !sameValue(reveal.barrier, turn.barrier) ||
         revealHash(reveal, record.nonce, context) !== turn.commitment_sha256) {
       fail("COMMITMENT_MISMATCH", "audit record does not match locked turn");
+    }
+    if (reveals.has(step) && reveal.move !== reveals.get(step)) {
+      fail("COMMITMENT_MISMATCH", "audit move contradicts the live reveal");
     }
   }
   return auditHash(context, records);

@@ -3,6 +3,7 @@
 const { createHash } = require("node:crypto");
 const { fail } = require("./errors");
 const { canonicalize } = require("./jcs");
+const { bookCanonical } = require("./book_json");
 const { strictParseBytes } = require("./strict_json");
 
 function sha256(bytes) {
@@ -49,10 +50,8 @@ function valueHash(value) {
 }
 
 function commitmentHash(payload, nonce) {
-  return sha256(Buffer.concat([
-    Buffer.from(canonicalize(payload), "utf8"),
-    Buffer.from(`|${nonce}`, "ascii"),
-  ]));
+  const committed = { ...payload, nonce };
+  return sha256(Buffer.from(bookCanonical(committed), "utf8"));
 }
 
 function auditHash(context, records) {

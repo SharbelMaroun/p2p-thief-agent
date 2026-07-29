@@ -56,6 +56,7 @@ class AuditSessionMixin:
                 sender_group_id=self.remote_group_id,  # type: ignore[attr-defined]
                 next_step=self.next_step,  # type: ignore[attr-defined]
                 turns=self._turns,  # type: ignore[attr-defined]
+                reveals=self._reveals,  # type: ignore[attr-defined]
                 records=records,
                 board_size=self.board_size,  # type: ignore[attr-defined]
             )

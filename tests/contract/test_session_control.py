@@ -46,7 +46,7 @@ def test_abort_closes_stream_and_new_abort_is_replay() -> None:
     assert acknowledgement["control"] == "abort"
     assert session.receive_control(deepcopy(abort), now_ms=NOW_MS) == acknowledgement
     with pytest.raises(ConformanceError) as turn_error:
-        session.receive_turn(make_turn()[0], now_ms=NOW_MS)
+        session.receive_move(make_turn()[0], now_ms=NOW_MS)
     with pytest.raises(ConformanceError) as replay_error:
         session.receive_control(
             make_control("abort", message_id="d" * 32),
@@ -60,12 +60,12 @@ def test_abort_closes_stream_and_new_abort_is_replay() -> None:
 def test_verified_audit_closes_turn_and_audit_streams() -> None:
     session = make_session()
     turn, payload, nonce = make_turn()
-    session.receive_turn(turn, now_ms=NOW_MS)
+    session.receive_move(turn, now_ms=NOW_MS)
     audit = make_audit([audit_record(turn, payload, nonce)])
     session.submit_audit(audit, now_ms=NOW_MS)
 
     with pytest.raises(ConformanceError) as turn_error:
-        session.receive_turn(make_turn(2, nonce=NONCE_1)[0], now_ms=NOW_MS)
+        session.receive_move(make_turn(2, nonce=NONCE_1)[0], now_ms=NOW_MS)
     with pytest.raises(ConformanceError) as audit_error:
         session.submit_audit(
             make_audit([], message_id="e" * 32),

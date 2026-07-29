@@ -23,8 +23,8 @@ def locked_two_turns():
     first, first_payload, _ = make_turn()
     second_payload = make_payload(2, move="E", hint="Broadway")
     second, _, _ = make_turn(2, nonce=NONCE_2, payload=second_payload)
-    session.receive_turn(first, now_ms=NOW_MS)
-    session.receive_turn(second, now_ms=NOW_MS)
+    session.receive_move(first, now_ms=NOW_MS)
+    session.receive_move(second, now_ms=NOW_MS)
     records = [
         audit_record(first, first_payload, NONCE_1),
         audit_record(second, second_payload, NONCE_2),
@@ -53,7 +53,7 @@ def test_tampered_reveal_is_commitment_mismatch(mutation: str) -> None:
     if mutation == "payload":
         records[0]["payload"]["move"] = "S"
     elif mutation == "nonce":
-        records[0]["nonce"] = "f" * 64
+        records[0]["nonce"] = "f" * 32
     elif mutation == "commitment":
         records[0]["commitment_sha256"] = "f" * 64
     else:
@@ -99,7 +99,7 @@ def test_audit_failure_is_cached_and_changed_retry_conflicts() -> None:
     """A first technical rejection is terminal and reserves its message ID."""
     session, records = locked_two_turns()
     invalid = make_audit(deepcopy(records))
-    invalid["body"]["records"][0]["nonce"] = "f" * 64
+    invalid["body"]["records"][0]["nonce"] = "f" * 32
     with pytest.raises(ConformanceError):
         session.submit_audit(invalid, now_ms=NOW_MS)
 

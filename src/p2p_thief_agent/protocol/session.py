@@ -13,13 +13,16 @@ from p2p_thief_agent.protocol.profile import (
 )
 from p2p_thief_agent.protocol.session_audit import AuditSessionMixin
 from p2p_thief_agent.protocol.session_control import ControlSessionMixin
+from p2p_thief_agent.protocol.session_reveal import RevealSessionMixin
 from p2p_thief_agent.protocol.session_support import SeenResults, WireBinding
 from p2p_thief_agent.protocol.session_turn import TurnSessionMixin
 
 
 @dataclass(slots=True)
-class ConformanceSession(TurnSessionMixin, AuditSessionMixin, ControlSessionMixin):
-    """Negotiated local context with idempotent turn/audit validation."""
+class ConformanceSession(
+    TurnSessionMixin, RevealSessionMixin, AuditSessionMixin, ControlSessionMixin
+):
+    """Negotiated local context with idempotent turn/reveal/audit validation."""
 
     game_id: str
     game_uid: str
@@ -32,10 +35,12 @@ class ConformanceSession(TurnSessionMixin, AuditSessionMixin, ControlSessionMixi
     board_size: int = 7
     optional_control: bool = False
     next_step: int = field(default=1, init=False)
+    next_reveal_step: int = field(default=1, init=False)
     technical_loss: bool = field(default=False, init=False)
     score: int | None = field(default=None, init=False)
     _seen: SeenResults = field(default_factory=dict, init=False)
     _turns: dict[int, dict[str, Any]] = field(default_factory=dict, init=False)
+    _reveals: dict[int, str] = field(default_factory=dict, init=False)
     _closed: str | None = field(default=None, init=False)
 
     def __post_init__(self) -> None:

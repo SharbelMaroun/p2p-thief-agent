@@ -19,23 +19,36 @@ revision is recorded.
 The future FastMCP surface will expose:
 
 - `negotiate`
-- `receive_turn`
+- `receive_move` — the book's named turn tool (§2.3.2), superseding the earlier
+  Option-B `receive_move` name per the 2026-07-28 coordinator ruling
 - `submit_audit`
 - `receive_control` (optional)
 
 `submit_audit` is the **server** tool. `exchange_audit` is only a **client-side**
 method and is never exposed as a server tool.
 
-## Commit-reveal shape (recorded, not implemented)
+## Commit-reveal shape — SUPERSEDED BY BOOK on 2026-07-28
 
-- True `move`, `position`, `intent`, and `nonce` are revealed only in the final audit.
-- The commitment is computed over canonical JSON, a literal `"|"` separator, and the
-  nonce.
+> The Option-B commit-reveal construction and no-live-reveal flow below were **reversed**
+> by the coordinator on 2026-07-28 in favour of the book construction and the book's
+> four-step flow. See
+> [COORDINATOR_RULING_COMMIT_REVEAL_2026-07-28.md](COORDINATOR_RULING_COMMIT_REVEAL_2026-07-28.md)
+> and `ADR-0006`.
 
-The complete canonicalization profile (Unicode escaping, number rendering,
-cross-language vectors) is still governed by `U-002`/`ADR-0006` and the coordinator's
-2026-07-28 verdict; this decision fixes only the composition shape, not the full
-byte-level specification.
+Book-ruled construction now in force:
+
+- The nonce is a field **inside** the hashed JSON payload; there is **no delimiter**.
+- Serialization is the book's `json.dumps(sort_keys=True, separators=(",", ":"))` with
+  default `ensure_ascii=True` (non-ASCII escaped), UTF-8 encoded, then SHA-256.
+- The turn flow is the book's four steps: Commit → Acknowledge → live Reveal
+  (Move + Hint, nonce hidden) → Final Reveal (all nonces at end of game).
+
+Superseded Option-B shape (retained for history, not implemented): true `move`,
+`position`, `intent`, and `nonce` revealed only in the final audit, with the commitment
+computed over canonical JSON, a literal `"|"` separator, and an external nonce.
+
+The exact committed field set and names remain an `UNKNOWN` (`U-005`); this ruling fixes
+the construction and flow, not the full field roster.
 
 ## Authorization boundary
 

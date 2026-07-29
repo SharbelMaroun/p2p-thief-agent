@@ -24,11 +24,11 @@ def test_turn_retry_conflict_replay_and_order_are_independent() -> None:
     replay = make_turn(message_id="e" * 32)[0]
     future = make_turn(3)[0]
     response = node_session([
-        action("receive_turn", first),
-        action("receive_turn", deepcopy(first)),
-        action("receive_turn", changed),
-        action("receive_turn", replay),
-        action("receive_turn", future),
+        action("receive_move", first),
+        action("receive_move", deepcopy(first)),
+        action("receive_move", changed),
+        action("receive_move", replay),
+        action("receive_move", future),
     ])
 
     assert response["results"][0] == response["results"][1]
@@ -44,7 +44,7 @@ def test_every_early_private_field_rejects_before_lock(field: str) -> None:
     """The independent recursive scanner rejects each reserved reveal name."""
     message = make_turn()[0]
     message["body"][field] = "secret"
-    response = node_session([action("receive_turn", message)])
+    response = node_session([action("receive_move", message)])
 
     assert code(response["results"][0]) == "PRIVATE_FIELD_LEAK"
     assert response["state"]["next_step"] == 1
@@ -54,7 +54,7 @@ def test_public_barrier_position_is_the_only_position_exception() -> None:
     """The disclosed barrier coordinate passes strict privacy scanning."""
     message = make_turn()[0]
     message["body"]["barrier"] = {"position": [3, 4]}
-    response = node_session([action("receive_turn", message)])
+    response = node_session([action("receive_move", message)])
 
     assert response["results"][0]["status"] == "locked"
 
@@ -62,7 +62,7 @@ def test_public_barrier_position_is_the_only_position_exception() -> None:
 def test_public_barrier_coordinate_must_fit_negotiated_board() -> None:
     message = make_turn()[0]
     message["body"]["barrier"] = {"position": [7, 0]}
-    response = node_session([action("receive_turn", message)])
+    response = node_session([action("receive_move", message)])
 
     assert code(response["results"][0]) == "MALFORMED"
 
@@ -82,7 +82,7 @@ def test_envelope_version_identity_expiry_and_negative_zero(
     """Common-envelope primitives fail closed in the independent parser."""
     message = make_turn()[0]
     message[field] = bad
-    response = node_session([action("receive_turn", message)])
+    response = node_session([action("receive_move", message)])
 
     assert code(response["results"][0]) == expected
 
@@ -98,6 +98,6 @@ def test_turn_resource_limits_precede_schema(limit: str) -> None:
             nested = [nested]
         message["body"]["extension"] = nested
 
-    response = node_session([action("receive_turn", message)])
+    response = node_session([action("receive_move", message)])
 
     assert code(response["results"][0]) == "MALFORMED"

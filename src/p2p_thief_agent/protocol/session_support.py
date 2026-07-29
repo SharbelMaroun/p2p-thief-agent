@@ -64,11 +64,12 @@ def validate_envelope(
     maximum_bytes: int,
     scan_private: bool,
     binding: WireBinding,
+    allow_private_paths: tuple[tuple[str, ...], ...] = (),
 ) -> dict[str, Any]:
     """Validate the common envelope through identity, expiry, and message type."""
     require_limits(value, maximum_bytes)
     if scan_private:
-        reject_private_fields(value)
+        reject_private_fields(value, allow=allow_private_paths)
     message = dict(require_closed(value, _ENVELOPE_KEYS, "message"))
     if message["profile"] != PROFILE:
         reject("UNSUPPORTED_PROFILE", "message profile does not match")

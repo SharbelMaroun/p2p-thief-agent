@@ -42,7 +42,7 @@ cross-team verdict.
 
 | ADR | Topic | Blocking dependency |
 |---|---|---|
-| ADR-0001 | MCP contract | `U-003`. Option B proposes `negotiate` / `receive_turn` / `submit_audit` / optional `receive_control`, but coordinator blocker 6 — interoperability unproven from the book — is open, and the Thief has explicitly referred that tension back to the coordinator. |
+| ADR-0001 | MCP contract | `U-003`. Option B proposes `negotiate` / `receive_move` / `submit_audit` / optional `receive_control`, but coordinator blocker 6 — interoperability unproven from the book — is open, and the Thief has explicitly referred that tension back to the coordinator. |
 | ADR-0002 | Message envelope and idempotency | `U-003`. Option B's `PROTOCOL_PROFILE.md` goes further and *forbids* `protocol_version`, `message_id`, `idempotency_key`, and `sequence`, which is a stronger claim than this ADR contemplates and is itself unaccepted. |
 | ADR-0003 | Schema-version discrepancy | Needs authoritative clarification. Unchanged in substance: the Cop `0.2.0-proposed` schema still pins `const: "1.2"` while its own description admits compatibility with 1.1 and 1.3 is unresolved. |
 | ADR-0006 | Commit-reveal canonicalization | `U-002`, and identical to coordinator blocker 5. More evidence exists than when drafted — the `0.2.0-proposed` vectors reproduce exactly — but the review found no escaping vector, single-language reproduction only, and a `signature` field that is required with no algorithm defined anywhere. |

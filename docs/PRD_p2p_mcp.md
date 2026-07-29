@@ -18,7 +18,7 @@ Status: structural and reliability boundaries confirmed; wire contract pending.
 
 Exact MCP tool names, envelopes, fields, idempotency keys, ordering, acknowledgements,
 ports, maximum sizes, and recovery messages remain in `U-003`/`U-006` and ADR-0001/0002.
-Simulator names such as `negotiate`, `receive_turn`, `submit_audit`, and
+Simulator names such as `negotiate`, `receive_move`, `submit_audit`, and
 `receive_control` are candidate interoperability choices, not book-mandated names.
 
 ## Future acceptance criteria and tests

@@ -6,8 +6,8 @@ from p2p_thief_agent.protocol.commitment import commitment_sha256
 from p2p_thief_agent.protocol.session import ConformanceSession
 
 NOW_MS = 150
-NONCE_1 = "00" * 32
-NONCE_2 = "11" * 32
+NONCE_1 = "00" * 16
+NONCE_2 = "11" * 16
 
 
 def make_session(*, optional_control: bool = False) -> ConformanceSession:
@@ -73,6 +73,29 @@ def make_turn(
         },
     }
     return message, reveal, nonce
+
+
+def make_reveal(
+    step: int = 1,
+    *,
+    move: str = "N",
+    hint: str = "Central Park",
+    message_id: str | None = None,
+) -> dict:
+    """Return a Step-3 live move-reveal envelope (nonce stays hidden)."""
+    return {
+        "profile": "p2p-thief-option-b",
+        "version": "1.0",
+        "message_id": message_id or f"{step:031x}a",
+        "sent_at_ms": 100,
+        "expires_at_ms": 200,
+        "game_uid": "match-01-sub-1",
+        "sub_game_number": 1,
+        "sender_group_id": "groupThief",
+        "recipient_group_id": "groupPolice",
+        "type": "move_reveal",
+        "body": {"step": step, "move": move, "hint": hint},
+    }
 
 
 def audit_record(message: dict, payload: dict, nonce: str) -> dict:
