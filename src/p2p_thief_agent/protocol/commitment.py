@@ -1,11 +1,20 @@
-"""Book move commitments (Chapter 5.3): nonce inside the sorted, compact JSON payload.
+"""Simulator-conformant move commitments.
 
-The commitment hashes ``json.dumps(payload, sort_keys=True, separators=(",", ":"))``
-with the book's default ``ensure_ascii=True`` (non-ASCII escaped), UTF-8 encoded, then
-SHA-256. The nonce is a member of that payload and there is no delimiter. This matches a
-book-literal opponent byte-for-byte. The separate config-hash domains keep using the
-RFC 8785 JCS canonicalizer; see ``ADR-0006`` and
-``COORDINATOR_RULING_COMMIT_REVEAL_2026-07-28.md``.
+Per the lecturer's authoritative answer (2026-07-29), the reference simulator
+``Game-P2P-Cop-Chase`` defines the wire commitment as::
+
+    commitment = SHA256(canonical_json(payload) + "|" + nonce)
+
+where ``canonical_json`` is ``json.dumps(payload, sort_keys=True, ensure_ascii=False,
+separators=(",", ":"))`` UTF-8 encoded, the nonce is 32 lowercase hex characters
+(``secrets.token_hex(16)``) placed **outside** the payload after a single ``"|"``
+delimiter, and no other delimiter, length prefix, or nonce hex-decoding is applied.
+
+This supersedes the 2026-07-28 book-literal ruling for the *hash bytes only*: the book
+still governs the commit-reveal concept and the game rules, but the opponent follows the
+simulator, so the commitment must match it byte-for-byte to verify at audit. The exact
+committed field roster is best-effort from the written spec and still needs verification
+against the simulator source (``U-005``).
 """
 
 from __future__ import annotations
@@ -100,17 +109,17 @@ def payload_respects_board(payload: Mapping[str, Any], board_size: int) -> bool:
     return barrier is None or all(cell < board_size for cell in barrier["position"])
 
 
-def _book_canonical_bytes(committed: Mapping[str, Any]) -> bytes:
-    """Serialize exactly as book Chapter 5.3: sorted keys, compact, escaped, UTF-8."""
-    return json.dumps(dict(committed), sort_keys=True, separators=(",", ":")).encode("utf-8")
+def _canonical_json(payload: Mapping[str, Any]) -> str:
+    """Serialize as the simulator's canonical JSON: sorted, compact, ensure_ascii=False."""
+    return json.dumps(dict(payload), sort_keys=True, ensure_ascii=False, separators=(",", ":"))
 
 
 def commitment_sha256(payload: object, nonce: object) -> str:
-    """Hash the book payload with the nonce inside it and no delimiter (Ch.5.3)."""
+    """Hash ``SHA256(canonical_json(payload) + "|" + nonce)`` (simulator construction)."""
     validated = validate_payload(payload)
     nonce_text = require_lower_hex(nonce, 32, "nonce")
-    committed = {**dict(validated), "nonce": nonce_text}
-    return hashlib.sha256(_book_canonical_bytes(committed)).hexdigest()
+    serialized = _canonical_json(validated) + "|" + nonce_text
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
 def verify_commitment(payload: object, nonce: object, expected: object) -> bool:

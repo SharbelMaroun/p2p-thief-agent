@@ -35,8 +35,8 @@ def payload() -> dict[str, object]:
 
 
 def test_known_commitment_vector_and_verification() -> None:
-    """The book construction (nonce inside payload, no delimiter) has a frozen value."""
-    expected = "3bbe9cc43316a15eb3a707fc1a7648113a9ff981d6e1c88ee36809d7b57d171b"
+    """The simulator construction (canonical_json + "|" + nonce) has a frozen value."""
+    expected = "349470332e9917b65f0ebe6dd23b63fadb18371ef5f790f50aed981a2a73cc3d"
 
     assert commitment_sha256(payload(), NONCE) == expected
     assert verify_commitment(payload(), NONCE, expected)

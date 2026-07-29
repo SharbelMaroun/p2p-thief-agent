@@ -397,23 +397,22 @@ The nonce MUST be 16 independently generated cryptographically secure random byt
 encoded as exactly 32 lowercase hexadecimal characters (the book's `token_hex(16)`). It
 MUST be unique per committed record and remain secret until `final_audit`.
 
-The commitment follows book Chapter 5.3 exactly: the nonce is a member **inside** the
-hashed JSON payload, there is **no delimiter**, and serialization is the book's
-`json.dumps(sort_keys=True, separators=(",", ":"))` with default `ensure_ascii=True`
-(non-ASCII escaped as `\uXXXX`), UTF-8 encoded, then SHA-256.
+The commitment follows the **reference simulator** (`Game-P2P-Cop-Chase`) per the
+lecturer's 2026-07-29 answer, which supersedes the 2026-07-28 book-literal ruling for the
+hash bytes: the nonce is placed **outside** the payload after a single `|` delimiter, and
+serialization is `json.dumps(sort_keys=True, ensure_ascii=False, separators=(",", ":"))`
+(non-ASCII emitted raw, only `"`, `\`, and control characters escaped), UTF-8 encoded,
+then SHA-256.
 
 ```text
-committed  = payload with the string "nonce" member added
-serialized = json.dumps(committed, sort_keys=True, separators=(",", ":"))  # ensure_ascii=True
-commitment_sha256 = lowerhex(SHA256(serialized.encode("utf-8")))
+serialized = json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+commitment_sha256 = lowerhex(SHA256((serialized + "|" + nonce).encode("utf-8")))
 ```
 
-This is byte-identical to a book-literal opponent. The commit domain therefore uses the
-book's escaped serialization, distinct from the RFC 8785 JCS canonicalizer (raw UTF-8)
-used for the separate `config_sha256` and source-byte domains. No delimiter, length
-prefix, or hex decoding of the nonce is performed. The `domain` field and the exact
-committed field set are a Thief choice and remain `UNKNOWN` (`U-005`) for
-cross-classmate interoperability until an authenticated lecturer answer settles them.
+This matches a simulator-conformant opponent so commitments verify at the final audit. No
+length prefix or hex decoding of the nonce is performed. The exact committed field roster
+is best-effort from the lecturer's written spec and still requires verification against
+the simulator source (`U-005`).
 
 ### 5.3 Live move reveal (book Step 3)
 

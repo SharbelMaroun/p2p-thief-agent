@@ -31,7 +31,7 @@ def test_plain_sha256_and_source_domains() -> None:
     assert game["sha256"] != rates["sha256"]
 
 
-def test_move_commitment_matches_book_construction() -> None:
+def test_move_commitment_matches_simulator_construction() -> None:
     payload = make_payload()
     response = node_result({
         "op": "commitment_hash",
@@ -41,7 +41,7 @@ def test_move_commitment_matches_book_construction() -> None:
     })
 
     assert response["sha256"] == commitment_sha256(payload, NONCE_1)
-    assert response["sha256"] == "37eaeae9fef360d0b1a3421d1e57b915a7c74b0d8f7bcb1a4e53f942ccaa8b72"
+    assert response["sha256"] == "a26b45ff8012b59e29aa56cefe2de84e6cbde99dca5c92a9b4b5ffb3567d309c"
 
 
 def test_named_cross_language_commitment_vector() -> None:
@@ -66,7 +66,7 @@ def test_named_cross_language_commitment_vector() -> None:
         "op": "commitment_hash", "payload": payload, "nonce": nonce, "context": context
     })
 
-    assert response["sha256"] == "3bbe9cc43316a15eb3a707fc1a7648113a9ff981d6e1c88ee36809d7b57d171b"
+    assert response["sha256"] == "349470332e9917b65f0ebe6dd23b63fadb18371ef5f790f50aed981a2a73cc3d"
 
 
 def test_final_audit_and_idempotency_domains() -> None:
