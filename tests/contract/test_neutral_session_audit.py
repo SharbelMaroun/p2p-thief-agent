@@ -32,8 +32,8 @@ def run(records: list[dict]) -> dict:
     """Lock two turns and submit the supplied records."""
     turns, _ = scenario()
     return node_session([
-        action("receive_turn", turns[0]),
-        action("receive_turn", turns[1]),
+        action("receive_move", turns[0]),
+        action("receive_move", turns[1]),
         action("submit_audit", make_audit(records)),
     ])
 
@@ -47,8 +47,8 @@ def test_complete_audit_hash_and_retry_match_python() -> None:
     turns, records = scenario()
     audit = make_audit(records)
     response = node_session([
-        action("receive_turn", turns[0]),
-        action("receive_turn", turns[1]),
+        action("receive_move", turns[0]),
+        action("receive_move", turns[1]),
         action("submit_audit", audit),
         action("submit_audit", deepcopy(audit)),
     ])
@@ -106,10 +106,10 @@ def test_failed_audit_is_not_cached_and_success_closes_streams() -> None:
     later_turn = make_turn(2, nonce=NONCE_2)[0]
     later_audit = make_audit([], message_id="e" * 32)
     response = node_session([
-        action("receive_turn", turn),
+        action("receive_move", turn),
         action("submit_audit", invalid),
         action("submit_audit", valid),
-        action("receive_turn", later_turn),
+        action("receive_move", later_turn),
         action("submit_audit", later_audit),
     ])
 

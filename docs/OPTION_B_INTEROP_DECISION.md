@@ -20,7 +20,7 @@ The future FastMCP surface will expose:
 
 - `negotiate`
 - `receive_move` — the book's named turn tool (§2.3.2), superseding the earlier
-  Option-B `receive_turn` name per the 2026-07-28 coordinator ruling
+  Option-B `receive_move` name per the 2026-07-28 coordinator ruling
 - `submit_audit`
 - `receive_control` (optional)
 

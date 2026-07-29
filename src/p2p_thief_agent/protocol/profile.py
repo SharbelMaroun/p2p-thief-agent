@@ -16,7 +16,7 @@ from p2p_thief_agent.protocol.canonical import (
 
 PROFILE = "p2p-thief-option-b"
 VERSION = "1.0"
-REQUIRED_CAPABILITIES = ("negotiate", "receive_turn", "submit_audit")
+REQUIRED_CAPABILITIES = ("negotiate", "receive_move", "submit_audit")
 OPTIONAL_CAPABILITIES = ("receive_control",)
 MAX_SAFE_INTEGER = 2**53 - 1
 

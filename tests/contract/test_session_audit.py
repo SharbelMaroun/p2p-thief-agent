@@ -23,8 +23,8 @@ def locked_two_turns():
     first, first_payload, _ = make_turn()
     second_payload = make_payload(2, move="E", hint="Broadway")
     second, _, _ = make_turn(2, nonce=NONCE_2, payload=second_payload)
-    session.receive_turn(first, now_ms=NOW_MS)
-    session.receive_turn(second, now_ms=NOW_MS)
+    session.receive_move(first, now_ms=NOW_MS)
+    session.receive_move(second, now_ms=NOW_MS)
     records = [
         audit_record(first, first_payload, NONCE_1),
         audit_record(second, second_payload, NONCE_2),

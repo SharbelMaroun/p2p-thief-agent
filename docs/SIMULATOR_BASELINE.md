@@ -14,7 +14,7 @@ Its implementation cannot override the book. In particular:
 
 - do not copy its one-game demo/default into the official six-sub-game series;
 - do not copy its subtractive/immediate scent decay; Chapter 4.3 is multiplicative;
-- do not present `negotiate`, `receive_turn`, `submit_audit`, or `receive_control` as
+- do not present `negotiate`, `receive_move`, `submit_audit`, or `receive_control` as
   mandatory book names;
 - do not copy substantial source without an accepted license/provenance decision.
 

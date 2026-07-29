@@ -6,7 +6,7 @@ const { record } = require("./hashes");
 
 const PROFILE = "p2p-thief-option-b";
 const VERSION = "1.0";
-const REQUIRED_CAPABILITIES = ["negotiate", "receive_turn", "submit_audit"];
+const REQUIRED_CAPABILITIES = ["negotiate", "receive_move", "submit_audit"];
 const PRIVATE_FIELDS = new Set(["payload", "nonce", "position", "move", "intent", "verdict"]);
 const ENVELOPE_KEYS = [
   "profile", "version", "message_id", "sent_at_ms", "expires_at_ms", "game_uid",

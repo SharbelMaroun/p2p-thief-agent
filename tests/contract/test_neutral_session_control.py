@@ -33,7 +33,7 @@ def test_heartbeat_retry_abort_and_closed_state() -> None:
         action("receive_control", heartbeat),
         action("receive_control", deepcopy(heartbeat)),
         action("receive_control", abort),
-        action("receive_turn", make_turn()[0]),
+        action("receive_move", make_turn()[0]),
         action("receive_control", repeated_abort),
     ])
 

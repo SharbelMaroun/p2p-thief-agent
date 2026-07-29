@@ -101,7 +101,7 @@ class Session {
     try {
       action = closed(value, ACTION_KEYS, "action");
       safeInt(action.now_ms, "action.now_ms");
-      if (action.tool === "receive_turn") return this.turn(action.message, action.now_ms);
+      if (action.tool === "receive_move") return this.turn(action.message, action.now_ms);
       if (action.tool === "submit_audit") return this.audit(action.message, action.now_ms);
       if (action.tool === "receive_control") return this.control(action.message, action.now_ms);
       fail("MALFORMED", "unknown session tool");

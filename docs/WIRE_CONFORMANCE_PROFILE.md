@@ -33,7 +33,7 @@ public tools and their sole arguments are exactly:
 | Tool | Sole argument | Required |
 |---|---|---|
 | `negotiate` | `offer` | yes |
-| `receive_turn` | `message` | yes |
+| `receive_move` | `message` | yes |
 | `submit_audit` | `audit` | yes |
 | `receive_control` | `message` | no; capability-negotiated |
 
@@ -99,7 +99,7 @@ has depth 1; each nested object or array adds 1. Limits are:
 | Tool argument | Maximum JCS bytes | Maximum container depth |
 |---|---:|---:|
 | `negotiate.offer` | 65,536 | 64 |
-| `receive_turn.message` | 16,384 | 64 |
+| `receive_move.message` | 16,384 | 64 |
 | `submit_audit.audit` | 8,388,608 | 64 |
 | `receive_control.message` | 16,384 | 64 |
 
@@ -129,7 +129,7 @@ post-negotiation envelope. `offer` has exactly these members:
   "game_id": "actual-game-id",
   "game_uid": "actual-game-uid",
   "sub_game_number": 1,
-  "required_capabilities": ["negotiate", "receive_turn", "submit_audit"],
+  "required_capabilities": ["negotiate", "receive_move", "submit_audit"],
   "optional_capabilities": ["receive_control"],
   "step_zero": {},
   "configuration": {}
@@ -255,7 +255,7 @@ Success returns this closed direct object:
     {"group_id": "proposer-group-id", "role": "thief"},
     {"group_id": "responder-group-id", "role": "police"}
   ],
-  "accepted_capabilities": ["negotiate", "receive_turn", "submit_audit", "receive_control"],
+  "accepted_capabilities": ["negotiate", "receive_move", "submit_audit", "receive_control"],
   "game_source_sha256": "64-lowercase-hex",
   "rate_limits_source_sha256": "64-lowercase-hex",
   "agreed_configuration_sha256": "64-lowercase-hex"
@@ -303,7 +303,7 @@ ambiguous mapping is `IDENTITY_MISMATCH`.
 hints, and public barrier disclosure (`AE-017`, `AE-021`, `AE-022`); OPTION-B PROJECT
 CHOICE for the exact fields and acknowledgement.**
 
-`receive_turn(message)` requires `type: "turn_commit"` and this exact `body`:
+`receive_move(message)` requires `type: "turn_commit"` and this exact `body`:
 
 ```json
 {
@@ -512,7 +512,7 @@ OPTION-B PROJECT CHOICE for deterministic wire enforcement.**
 Before `final_audit`, a sender MUST NOT disclose or encode its true runtime position,
 move, intent, verdict, committed payload, or nonce in any field, alias, extension, or
 free-text value. The only coordinate exception is
-`receive_turn.message.body.barrier.position`. Negotiated static starting coordinates
+`receive_move.message.body.barrier.position`. Negotiated static starting coordinates
 inside the canonical configuration sources are public configuration, not runtime
 truth.
 

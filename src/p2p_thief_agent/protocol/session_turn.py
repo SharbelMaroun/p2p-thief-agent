@@ -18,7 +18,7 @@ from p2p_thief_agent.protocol.session_support import (
 class TurnSessionMixin:
     """Provide fail-closed, idempotent turn commitment handling."""
 
-    def receive_turn(self, value: object, *, now_ms: int) -> dict[str, JSONValue]:
+    def receive_move(self, value: object, *, now_ms: int) -> dict[str, JSONValue]:
         """Validate and durably lock one commitment-only turn message."""
         message = validate_envelope(
             value,
