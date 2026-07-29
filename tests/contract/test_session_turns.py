@@ -5,7 +5,13 @@ from copy import deepcopy
 import pytest
 
 from p2p_thief_agent.protocol.profile import ConformanceError
-from tests.contract.conformance_fixtures import NOW_MS, make_session, make_turn
+from tests.contract.conformance_fixtures import (
+    NONCE_2,
+    NOW_MS,
+    make_reveal,
+    make_session,
+    make_turn,
+)
 
 
 def test_turn_is_locked_and_exact_retry_returns_cached_ack() -> None:
@@ -52,6 +58,23 @@ def test_new_id_replay_and_future_step_fail_without_mutation() -> None:
     assert replayed.value.code == "REPLAYED_MESSAGE"
     assert ordered.value.code == "OUT_OF_ORDER"
     assert session.next_step == 2
+
+
+def test_next_commitment_waits_for_matching_live_reveal() -> None:
+    """A new step cannot lock while the previous step awaits Step 3."""
+    session = make_session()
+    first, _, _ = make_turn()
+    blocked, _, _ = make_turn(2, nonce=NONCE_2)
+    session.receive_move(first, now_ms=NOW_MS)
+
+    with pytest.raises(ConformanceError) as captured:
+        session.receive_move(blocked, now_ms=NOW_MS)
+    assert captured.value.code == "OUT_OF_ORDER"
+    assert session.next_step == 2
+
+    session.receive_reveal(make_reveal(), now_ms=NOW_MS)
+    replacement, _, _ = make_turn(2, nonce=NONCE_2, message_id="d" * 32)
+    assert session.receive_move(replacement, now_ms=NOW_MS)["step"] == 2
 
 
 @pytest.mark.parametrize("field", ["payload", "nonce", "position", "move", "intent", "verdict"])

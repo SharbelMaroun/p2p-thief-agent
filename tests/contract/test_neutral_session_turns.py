@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import pytest
 
-from tests.contract.conformance_fixtures import make_turn
+from tests.contract.conformance_fixtures import NONCE_2, make_reveal, make_turn
 from tests.contract.neutral_helpers import action, node_session
 
 
@@ -37,6 +37,23 @@ def test_turn_retry_conflict_replay_and_order_are_independent() -> None:
         "IDEMPOTENCY_CONFLICT", "REPLAYED_MESSAGE", "OUT_OF_ORDER"
     ]
     assert response["state"] == {"next_step": 2, "closed": None}
+
+
+def test_next_commitment_waits_for_matching_live_reveal() -> None:
+    """The neutral state machine opens step 2 only after revealing step 1."""
+    first = make_turn()[0]
+    second = make_turn(2, nonce=NONCE_2)[0]
+    response = node_session([
+        action("receive_move", first),
+        action("receive_move", second),
+        action("receive_reveal", make_reveal()),
+        action("receive_move", second),
+    ])
+
+    assert code(response["results"][1]) == "OUT_OF_ORDER"
+    assert response["results"][2]["status"] == "revealed"
+    assert response["results"][3]["status"] == "locked"
+    assert response["state"]["next_step"] == 3
 
 
 @pytest.mark.parametrize("field", ["payload", "nonce", "position", "move", "intent", "verdict"])

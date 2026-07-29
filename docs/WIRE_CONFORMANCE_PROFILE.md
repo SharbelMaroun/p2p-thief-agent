@@ -357,7 +357,10 @@ commitment_sha256, hint, barrier)` and returns:
 ```
 
 This acknowledgement has exactly the eight shown members. A later message cannot
-replace a locked value.
+replace a locked value. Each new lock enters a live-reveal-pending phase. Until the
+matching Step-3 reveal is accepted, the next new turn commitment and `final_audit` are
+`OUT_OF_ORDER`; exact cached retries and negotiated control traffic retain their normal
+behavior.
 
 ### 5.2 Committed payload, nonce, and commitment
 
@@ -439,10 +442,13 @@ introduced; this profile keeps the hint public at commit). The nonce, pre-move
 position, intent, committed payload, and verdict remain forbidden in this message; only
 `body.move` is exempted from the private-field scan of section 8.
 
-A reveal is accepted only for a step already locked by `turn_commit`, in strictly
-ascending order, once per step, and never after the audit stream closes. A step revealed
-out of order or before its commit is `OUT_OF_ORDER`; a re-revealed step is
-`REPLAYED_MESSAGE`; a restated hint that does not match the locked turn is
+A reveal is accepted only for the currently pending step already locked by
+`turn_commit`, in strictly ascending order, and never after the audit stream closes. A
+step revealed out of order or before its commit is `OUT_OF_ORDER`; a restated hint that
+does not match the locked turn is `COMMITMENT_MISMATCH`. An exact message retry returns
+its cached acknowledgement. While the stream remains open, a new message ID repeating
+the same accepted `step`, `move`, and `hint` is also acknowledged without mutating
+state; a different move or hint for that step is a deterministic
 `COMMITMENT_MISMATCH`. Success returns exactly these eight members:
 
 ```json
@@ -461,9 +467,9 @@ out of order or before its commit is `OUT_OF_ORDER`; a re-revealed step is
 The reveal itself is **not** verified against the commitment — the nonce is still
 hidden, so a move revealed here that contradicts the commitment cannot be proven yet.
 That contradiction is caught at the final audit: the audited payload MUST reproduce the
-commitment (section 6) and its `move` MUST equal the move disclosed at Step 3, else
-`COMMITMENT_MISMATCH` and the technical-loss state. Step-3 reveals are optional in this
-profile; when a step was revealed, the audit enforces the match, exactly realizing the
+commitment (section 6) and its `move` and `hint` MUST equal the values accepted at Step
+3, else `COMMITMENT_MISMATCH` and the technical-loss state. Every locked turn requires
+this live reveal before another commitment or the final audit, exactly realizing the
 book's "what happens if an agent reveals an inconsistent move" guarantee.
 
 ## 6. Final audit
@@ -489,11 +495,16 @@ digest, and acknowledgement.**
 }
 ```
 
+`final_audit` is legal only when every locked turn has completed its required live
+reveal. An audit received while any turn is reveal-pending is `OUT_OF_ORDER` and does
+not create a technical loss.
+
 Each record has exactly the five shown members. `payload` is the exact committed
 payload from section 5.2. Records MUST be strictly ascending by `step`, contain no
 duplicate step or `turn_message_id`, and cover every locked turn for the sender exactly
 once. `turn_message_id`, public fields, and commitment MUST match the lock. The
-receiver MUST recompute the commitment for every record before accepting any of them.
+receiver MUST recompute the commitment for every record and verify that the payload's
+`move` and `hint` equal the corresponding live reveal before accepting any of them.
 
 Any well-formed but changed identity, role, step, position, move, intent, hint, barrier,
 nonce, or commitment is `COMMITMENT_MISMATCH`; malformed or unknown fields retain the
@@ -622,19 +633,22 @@ after it closes. Inputs rejected before a safe key can be established are not ca
 entries and are deterministically revalidated on retry.
 
 A new message ID that repeats an already consumed `negotiation_id`, sender/step lock,
-sender final audit, abort, or audited `turn_message_id` is `REPLAYED_MESSAGE`.
-Out-of-sequence steps, pre-negotiation traffic, incomplete/mismatched mirrored
-negotiation, audit coverage errors, post-audit turns, and post-abort traffic are
-`OUT_OF_ORDER`. Exact idempotent retries are the sole exception.
+sender final audit, abort, or audited `turn_message_id` is `REPLAYED_MESSAGE`. The
+same-step live-reveal retry has the explicit identical-acknowledgement/conflict rule in
+section 5.3. Out-of-sequence steps, a new commitment or audit while a live reveal is
+pending, pre-negotiation traffic, incomplete/mismatched mirrored negotiation, audit
+coverage errors, post-audit turns, and post-abort traffic are `OUT_OF_ORDER`. Exact
+cached retries remain valid in every state.
 
 The wire state is:
 
 ```text
 BOOTSTRAP -> two mirrored accepted offers -> READY
-READY -> first locked turn -> ACTIVE
+READY|ACTIVE -> new locked turn -> REVEAL_PENDING
+REVEAL_PENDING -> matching live reveal -> ACTIVE
 READY|ACTIVE -> verified final audit -> AUDITED
 READY|ACTIVE -> commitment-mismatched final audit -> TECHNICAL_LOSS
-READY|ACTIVE -> accepted abort -> ABORTED
+READY|ACTIVE|REVEAL_PENDING -> accepted abort -> ABORTED
 ```
 
 `TECHNICAL_LOSS` is terminal and fixes the sender's score at zero. Heartbeat is
@@ -679,7 +693,7 @@ exactly:
 | `EXPIRED` | request deadline has passed |
 | `PRIVATE_FIELD_LEAK` | runtime private truth or nonce appears before audit |
 | `OPTIONAL_TOOL_UNAVAILABLE` | unnegotiated or absent optional control tool |
-| `COMMITMENT_MISMATCH` | audit record does not reproduce its locked commitment |
+| `COMMITMENT_MISMATCH` | live reveals conflict, or an audit record does not reproduce its lock and live reveal |
 | `INTERNAL_ERROR` | unexpected receiver failure without private diagnostic leakage |
 
 Validation is fail-closed. Limits and strict parsing precede application validation,

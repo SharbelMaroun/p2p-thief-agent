@@ -11,6 +11,7 @@ from tests.contract.conformance_fixtures import (
     audit_record,
     make_audit,
     make_payload,
+    make_reveal,
     make_turn,
 )
 from tests.contract.neutral_helpers import action, node_session
@@ -33,7 +34,9 @@ def run(records: list[dict]) -> dict:
     turns, _ = scenario()
     return node_session([
         action("receive_move", turns[0]),
+        action("receive_reveal", make_reveal()),
         action("receive_move", turns[1]),
+        action("receive_reveal", make_reveal(2, move="E", hint="Broadway")),
         action("submit_audit", make_audit(records)),
     ])
 
@@ -48,11 +51,13 @@ def test_complete_audit_hash_and_retry_match_python() -> None:
     audit = make_audit(records)
     response = node_session([
         action("receive_move", turns[0]),
+        action("receive_reveal", make_reveal()),
         action("receive_move", turns[1]),
+        action("receive_reveal", make_reveal(2, move="E", hint="Broadway")),
         action("submit_audit", audit),
         action("submit_audit", deepcopy(audit)),
     ])
-    first, second = response["results"][2:]
+    first, second = response["results"][4:]
 
     assert first == second
     assert first["status"] == "verified"
@@ -107,13 +112,14 @@ def test_failed_audit_is_not_cached_and_success_closes_streams() -> None:
     later_audit = make_audit([], message_id="e" * 32)
     response = node_session([
         action("receive_move", turn),
+        action("receive_reveal", make_reveal()),
         action("submit_audit", invalid),
         action("submit_audit", valid),
         action("receive_move", later_turn),
         action("submit_audit", later_audit),
     ])
 
-    assert response["results"][1]["error"]["code"] == "COMMITMENT_MISMATCH"
-    assert response["results"][2]["status"] == "verified"
-    assert response["results"][3]["error"]["code"] == "OUT_OF_ORDER"
-    assert response["results"][4]["error"]["code"] == "REPLAYED_MESSAGE"
+    assert response["results"][2]["error"]["code"] == "COMMITMENT_MISMATCH"
+    assert response["results"][3]["status"] == "verified"
+    assert response["results"][4]["error"]["code"] == "OUT_OF_ORDER"
+    assert response["results"][5]["error"]["code"] == "REPLAYED_MESSAGE"

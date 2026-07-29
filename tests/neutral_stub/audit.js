@@ -13,9 +13,15 @@ function verifyRecords(records, turns, nextStep, context, reveals) {
   if (!Array.isArray(records) || records.length !== turns.size) {
     fail("OUT_OF_ORDER", "audit must cover every locked turn");
   }
+  if (reveals.size !== turns.size) {
+    fail("OUT_OF_ORDER", "every locked turn must have a live reveal");
+  }
   const steps = records.map((record) => record && record.step);
   const expected = Array.from({ length: nextStep - 1 }, (_, index) => index + 1);
   if (!sameValue(steps, expected)) fail("OUT_OF_ORDER", "audit steps are not complete");
+  if (!sameValue([...reveals.keys()], expected)) {
+    fail("OUT_OF_ORDER", "live reveal steps are not complete");
+  }
   const nonces = new Set();
   for (const value of records) {
     const record = closed(value, RECORD_KEYS, "audit record");
@@ -37,8 +43,9 @@ function verifyRecords(records, turns, nextStep, context, reveals) {
         revealHash(reveal, record.nonce, context) !== turn.commitment_sha256) {
       fail("COMMITMENT_MISMATCH", "audit record does not match locked turn");
     }
-    if (reveals.has(step) && reveal.move !== reveals.get(step)) {
-      fail("COMMITMENT_MISMATCH", "audit move contradicts the live reveal");
+    const liveReveal = reveals.get(step);
+    if (!liveReveal || reveal.move !== liveReveal.move || reveal.hint !== liveReveal.hint) {
+      fail("COMMITMENT_MISMATCH", "audit payload contradicts the live reveal");
     }
   }
   return auditHash(context, records);

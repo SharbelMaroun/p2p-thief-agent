@@ -40,7 +40,7 @@ class ConformanceSession(
     score: int | None = field(default=None, init=False)
     _seen: SeenResults = field(default_factory=dict, init=False)
     _turns: dict[int, dict[str, Any]] = field(default_factory=dict, init=False)
-    _reveals: dict[int, str] = field(default_factory=dict, init=False)
+    _reveals: dict[int, dict[str, str]] = field(default_factory=dict, init=False)
     _closed: str | None = field(default=None, init=False)
 
     def __post_init__(self) -> None:

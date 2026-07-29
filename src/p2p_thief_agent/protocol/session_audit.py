@@ -44,6 +44,8 @@ class AuditSessionMixin:
                 reject("REPLAYED_MESSAGE", "final audit was already accepted")
             if self._closed is not None:  # type: ignore[attr-defined]
                 reject("OUT_OF_ORDER", "audit stream is already closed")
+            if self.next_reveal_step != self.next_step:  # type: ignore[attr-defined]
+                reject("OUT_OF_ORDER", "every locked turn must be live-revealed first")
             if len(records) != len(self._turns):  # type: ignore[attr-defined]
                 reject(
                     "OUT_OF_ORDER",
