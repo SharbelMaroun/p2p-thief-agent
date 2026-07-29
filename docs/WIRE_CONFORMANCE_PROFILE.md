@@ -131,7 +131,12 @@ post-negotiation envelope. `offer` has exactly these members:
   "game_id": "actual-game-id",
   "game_uid": "actual-game-uid",
   "sub_game_number": 1,
-  "required_capabilities": ["negotiate", "receive_move", "submit_audit"],
+  "required_capabilities": [
+    "negotiate",
+    "receive_move",
+    "receive_reveal",
+    "submit_audit"
+  ],
   "optional_capabilities": ["receive_control"],
   "step_zero": {},
   "configuration": {}
@@ -139,7 +144,7 @@ post-negotiation envelope. `offer` has exactly these members:
 ```
 
 `supported_versions` MUST equal `["1.0"]`. `required_capabilities` MUST equal the shown
-three-element array in that order. `optional_capabilities` MUST be either `[]` or
+four-element array in that order. `optional_capabilities` MUST be either `[]` or
 `["receive_control"]`; duplicates are forbidden.
 
 `step_zero` is closed and has exactly:
@@ -257,7 +262,13 @@ Success returns this closed direct object:
     {"group_id": "proposer-group-id", "role": "thief"},
     {"group_id": "responder-group-id", "role": "police"}
   ],
-  "accepted_capabilities": ["negotiate", "receive_move", "submit_audit", "receive_control"],
+  "accepted_capabilities": [
+    "negotiate",
+    "receive_move",
+    "receive_reveal",
+    "submit_audit",
+    "receive_control"
+  ],
   "game_source_sha256": "64-lowercase-hex",
   "rate_limits_source_sha256": "64-lowercase-hex",
   "agreed_configuration_sha256": "64-lowercase-hex"
@@ -265,7 +276,7 @@ Success returns this closed direct object:
 ```
 
 `participants` is in proposer-then-responder order and each item has exactly
-`group_id` and `role`. `accepted_capabilities` is the required three-element sequence
+`group_id` and `role`. `accepted_capabilities` is the required four-element sequence
 followed by the sorted optional intersection; omit `receive_control` when it was not
 offered or is not supported. Every identity and hash MUST echo a verified offer.
 
