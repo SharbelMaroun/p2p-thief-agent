@@ -8,6 +8,7 @@ const {
 } = require("./schema");
 
 const TURN_KEYS = ["step", "role", "commitment_sha256", "hint", "barrier"];
+const REVEAL_KEYS = ["step", "move", "hint"];
 const PAYLOAD_KEYS = [
   "domain", "game_id", "game_uid", "sub_game_number", "step", "sender_group_id",
   "role", "position", "move", "intent", "hint", "barrier",
@@ -29,6 +30,16 @@ function turnBody(value, context) {
   if (body.role !== context.remote_role) {
     fail("IDENTITY_MISMATCH", "turn role does not match sender");
   }
+  return body;
+}
+
+function revealBody(value) {
+  const body = closed(value, REVEAL_KEYS, "body");
+  safeInt(body.step, "body.step", 1);
+  if (!["N", "S", "E", "W", "STAY"].includes(body.move)) {
+    fail("MALFORMED", "body.move is not a fixed movement token");
+  }
+  text(body.hint, "body.hint", 4096);
   return body;
 }
 
@@ -73,4 +84,4 @@ function sameValue(first, second) {
   return canonicalize(first) === canonicalize(second);
 }
 
-module.exports = { payload, revealHash, sameValue, turnBody };
+module.exports = { payload, revealBody, revealHash, sameValue, turnBody };

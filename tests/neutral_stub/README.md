@@ -8,8 +8,8 @@ Send exactly one JSON command on standard input; one JSON result is written to s
 output. Hash operations are `canonicalize`, `sha256`, `config_hash`, `source_hash`,
 `commitment_hash`, `audit_hash`, and `idempotency_hash`. Negotiation operations are
 `make_offer`, `validate_offer`, `accept_offer`, and stateful `negotiate_sequence`.
-Stateful `session` executes ordered `receive_move`, `submit_audit`, and
-`receive_control` actions in one isolated process.
+Stateful `session` executes ordered `receive_move`, `receive_reveal`, `submit_audit`,
+and `receive_control` actions in one isolated process.
 
 Failed top-level commands return `{"ok":false,"rejection":{...}}`; the nested rejection
 is the profile's exact `status`/`acknowledges`/`error` object. Stateful scenario results

@@ -30,6 +30,7 @@ def verify_audit_records(
     sender_group_id: str,
     next_step: int,
     turns: Mapping[int, Mapping[str, Any]],
+    reveals: Mapping[int, str],
     records: list[JSONValue],
     board_size: int,
 ) -> str:
@@ -67,6 +68,8 @@ def verify_audit_records(
             or not verify_commitment(payload, nonce, turn["commitment_sha256"])
         ):
             reject("COMMITMENT_MISMATCH", "audit record does not match locked turn")
+        if step in reveals and payload["move"] != reveals[step]:
+            reject("COMMITMENT_MISMATCH", "audit move contradicts the live reveal")
     return audit_sha256(
         game_id=game_id,
         game_uid=game_uid,

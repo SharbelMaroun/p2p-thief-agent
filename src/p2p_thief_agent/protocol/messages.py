@@ -13,21 +13,28 @@ from p2p_thief_agent.protocol.profile import (
 )
 
 _TURN_KEYS = ("step", "role", "commitment_sha256", "hint", "barrier")
+_REVEAL_KEYS = ("step", "move", "hint")
+_MOVE_TOKENS = {"N", "S", "E", "W", "STAY"}
 _PRIVATE_FIELDS = {"payload", "nonce", "position", "move", "intent", "verdict"}
 
 
-def reject_private_fields(value: object, path: tuple[str, ...] = ()) -> None:
+def reject_private_fields(
+    value: object,
+    path: tuple[str, ...] = (),
+    *,
+    allow: tuple[tuple[str, ...], ...] = (),
+) -> None:
     """Reject reserved private member names before ordinary schema validation."""
     if isinstance(value, dict):
         for key, child in value.items():
             child_path = (*path, key)
-            is_public_barrier = child_path == ("body", "barrier", "position")
-            if key in _PRIVATE_FIELDS and not is_public_barrier:
+            allowed = child_path == ("body", "barrier", "position") or child_path in allow
+            if key in _PRIVATE_FIELDS and not allowed:
                 reject("PRIVATE_FIELD_LEAK", f"private field {'.'.join(child_path)}")
-            reject_private_fields(child, child_path)
+            reject_private_fields(child, child_path, allow=allow)
     elif isinstance(value, list):
         for child in value:
-            reject_private_fields(child, path)
+            reject_private_fields(child, path, allow=allow)
 
 
 def _public_barrier(value: object, board_size: int) -> None:
@@ -53,4 +60,15 @@ def validate_turn_body(value: object, *, expected_role: str, board_size: int) ->
     if not isinstance(body["hint"], str) or len(body["hint"]) > 4096:
         reject("MALFORMED", "body.hint must be text of at most 4096 characters")
     _public_barrier(body["barrier"], board_size)
+    return body
+
+
+def validate_reveal_body(value: object) -> Mapping[str, Any]:
+    """Validate the Step-3 live reveal: disclosed move and restated public hint."""
+    body = require_closed(value, _REVEAL_KEYS, "body")
+    require_safe_int(body["step"], "body.step", 1)
+    if body["move"] not in _MOVE_TOKENS:
+        reject("MALFORMED", "body.move is not a fixed movement token")
+    if not isinstance(body["hint"], str) or len(body["hint"]) > 4096:
+        reject("MALFORMED", "body.hint must be text of at most 4096 characters")
     return body

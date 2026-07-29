@@ -62,19 +62,20 @@ function exactArray(value, expected, code, label) {
   }
 }
 
-function privateScan(value, path = []) {
+function privateScan(value, path = [], allow = []) {
   if (Array.isArray(value)) {
-    for (const child of value) privateScan(child, path);
+    for (const child of value) privateScan(child, path, allow);
     return;
   }
   if (!record(value)) return;
   for (const [key, child] of Object.entries(value)) {
     const next = [...path, key];
-    const barrier = next.join(".") === "body.barrier.position";
-    if (PRIVATE_FIELDS.has(key) && !barrier) {
-      fail("PRIVATE_FIELD_LEAK", `private field ${next.join(".")}`);
+    const joined = next.join(".");
+    const allowed = joined === "body.barrier.position" || allow.includes(joined);
+    if (PRIVATE_FIELDS.has(key) && !allowed) {
+      fail("PRIVATE_FIELD_LEAK", `private field ${joined}`);
     }
-    privateScan(child, next);
+    privateScan(child, next, allow);
   }
 }
 
@@ -90,9 +91,9 @@ function coordinate(value, label, context) {
   ];
 }
 
-function envelope(value, expectedType, nowMs, context, maximumBytes, scan = true) {
+function envelope(value, expectedType, nowMs, context, maximumBytes, scan = true, allow = []) {
   requireLimits(value, maximumBytes, 64);
-  if (scan) privateScan(value);
+  if (scan) privateScan(value, [], allow);
   const message = closed(value, ENVELOPE_KEYS, "message");
   lowerHex(message.message_id, 32, "message_id");
   const sent = safeInt(message.sent_at_ms, "sent_at_ms");

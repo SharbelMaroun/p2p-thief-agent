@@ -9,7 +9,7 @@ const RECORD_KEYS = [
   "step", "turn_message_id", "commitment_sha256", "payload", "nonce",
 ];
 
-function verifyRecords(records, turns, nextStep, context) {
+function verifyRecords(records, turns, nextStep, context, reveals) {
   if (!Array.isArray(records) || records.length !== turns.size) {
     fail("OUT_OF_ORDER", "audit must cover every locked turn");
   }
@@ -36,6 +36,9 @@ function verifyRecords(records, turns, nextStep, context) {
         !sameValue(reveal.barrier, turn.barrier) ||
         revealHash(reveal, record.nonce, context) !== turn.commitment_sha256) {
       fail("COMMITMENT_MISMATCH", "audit record does not match locked turn");
+    }
+    if (reveals.has(step) && reveal.move !== reveals.get(step)) {
+      fail("COMMITMENT_MISMATCH", "audit move contradicts the live reveal");
     }
   }
   return auditHash(context, records);
