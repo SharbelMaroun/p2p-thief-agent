@@ -5,7 +5,7 @@ types and functions and the deterministic baseline strategy are re-exported here
 adapters never import internal modules directly or duplicate business logic.
 """
 
-from p2p_thief_agent import domain, protocol, strategy
+from p2p_thief_agent import domain, protocol, state, strategy
 from p2p_thief_agent.domain import (
     DEFAULT_BARRIER_QUOTA,
     Action,
@@ -48,6 +48,25 @@ from p2p_thief_agent.protocol import (
     verify_commitment,
 )
 from p2p_thief_agent.sdk.api import ThiefSdk
+from p2p_thief_agent.state import (
+    CAPTURE_COP,
+    CAPTURE_THIEF,
+    DEFAULT_SURVIVAL_THRESHOLD,
+    SURVIVAL_COP,
+    SURVIVAL_THIEF,
+    TECHNICAL_LOSS_SCORE,
+    TIE_SCORE,
+    KnownBarriers,
+    Outcome,
+    ThiefLocalState,
+    ThiefSnapshot,
+    choose_local_action,
+    local_outcome,
+    rank_local_actions,
+    resolve_outcome,
+    step_with_baseline,
+    thief_score,
+)
 from p2p_thief_agent.strategy import (
     choose_action,
     edge_contacts,
@@ -60,16 +79,27 @@ from p2p_thief_agent.strategy import (
 )
 
 __all__ = [
+    "CAPTURE_COP",
+    "CAPTURE_THIEF",
     "DEFAULT_BARRIER_QUOTA",
+    "DEFAULT_SURVIVAL_THRESHOLD",
     "Action",
     "BarrierField",
     "Board",
     "CaptureReason",
     "Coordinate",
     "DomainError",
+    "KnownBarriers",
     "OriginCorner",
+    "Outcome",
     "PROFILE",
+    "SURVIVAL_COP",
+    "SURVIVAL_THIEF",
+    "TECHNICAL_LOSS_SCORE",
+    "TIE_SCORE",
+    "ThiefLocalState",
     "ThiefSdk",
+    "ThiefSnapshot",
     "VERSION",
     "CanonicalizationError",
     "ConformanceError",
@@ -84,6 +114,7 @@ __all__ = [
     "canonical_sha256",
     "canonicalize",
     "choose_action",
+    "choose_local_action",
     "commitment_sha256",
     "domain",
     "edge_contacts",
@@ -94,6 +125,7 @@ __all__ = [
     "is_trapped",
     "legal_actions",
     "loads",
+    "local_outcome",
     "manhattan_distance",
     "min_threat_distance",
     "mobility",
@@ -101,11 +133,16 @@ __all__ = [
     "open_remote_session",
     "onward_reach",
     "rank_actions",
+    "rank_local_actions",
     "rejection",
     "resolve_move",
+    "resolve_outcome",
     "protocol",
     "source_sha256",
+    "state",
+    "step_with_baseline",
     "strategy",
+    "thief_score",
     "validate_offer",
     "validate_barrier_placement",
     "verify_commitment",
