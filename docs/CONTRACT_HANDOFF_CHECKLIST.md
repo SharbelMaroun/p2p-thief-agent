@@ -1,6 +1,9 @@
 # Interoperability Conformance Checklist
 
-Status: **IN PROGRESS — STAGE A PROFILE DEFINITION**
+Status: **STAGE A + STAGE B EVIDENCE COMPLETE — STAGE C ACCEPTANCE PENDING** (updated
+2026-07-29). Stages A and B have exit evidence in the repository; Stage C is a
+coordinator verdict that has not been issued, so the contract checker stays fail-closed
+at `PENDING` / exit 1.
 
 ## Why this document changed on 2026-07-28
 
@@ -36,40 +39,41 @@ An item with no authority label is not part of the profile.
 
 ## Stage A — profile definition
 
-- [ ] Author a Thief-owned conformance profile listing every tool name, argument name,
-      message shape, and acknowledgement form.
-- [ ] Label every item book-confirmed, Option-B project choice, or `UNKNOWN`.
-- [ ] Define canonicalization exactly, with reproducible vectors covering nested
+- [x] Author a Thief-owned conformance profile listing every tool name, argument name,
+      message shape, and acknowledgement form. — `WIRE_CONFORMANCE_PROFILE.md`
+- [x] Label every item book-confirmed, Option-B project choice, or `UNKNOWN`.
+- [x] Define canonicalization exactly, with reproducible vectors covering nested
       objects, numbers, non-ASCII text, **and escaping** (quotes, backslashes, control
-      characters, non-BMP codepoints).
-- [ ] Define the commitment construction and nonce profile, keeping the nonce outside
-      the payload.
-- [ ] Separate the hash domains: move commitment, agreed-configuration hash, and
-      configuration source-byte hash are three different values.
-- [ ] State the version and capability negotiation mechanism, or record its absence as
-      an explicit `UNKNOWN` with the interoperability risk named.
-- [ ] Define behaviour on encountering an unknown field, an unknown version, and a
-      missing optional tool.
-- [ ] Author the profile in this repository. Do not copy, transcribe, or reconstruct any
+      characters, non-BMP codepoints). — `protocol/canonical.py`; `test_canonical*.py`
+- [x] Define the commitment construction and nonce profile, keeping the nonce outside
+      the payload. — `protocol/commitment.py` (book construction, `token_hex(16)`)
+- [x] Separate the hash domains: move commitment, agreed-configuration hash, and
+      configuration source-byte hash are three different values. — `commitment_sha256`,
+      `agreed_configuration_sha256`, `source_sha256`
+- [x] State the version and capability negotiation mechanism, or record its absence as
+      an explicit `UNKNOWN` with the interoperability risk named. — `protocol/negotiation.py`
+- [x] Define behaviour on encountering an unknown field, an unknown version, and a
+      missing optional tool. — `UNKNOWN_FIELD` / `UNSUPPORTED_PROFILE` / optional-capability handling
+- [x] Author the profile in this repository. Do not copy, transcribe, or reconstruct any
       peer's controlled file (`THIEF-002`).
 
 ## Stage B — conformance evidence against an unknown opponent
 
-- [ ] Build a neutral stub opponent that shares no source file with this repository or
-      any peer repository.
-- [ ] The Thief accepts a conforming offer from the stub.
-- [ ] The Thief produces an offer the stub accepts.
-- [ ] Both directions pass: Thief-proposes and Thief-accepts.
-- [ ] Two different valid participant/match identities work without editing any profile
-      file.
-- [ ] Negative vectors fail closed before gameplay: participant mismatch, negotiated-value
+- [x] Build a neutral stub opponent that shares no source file with this repository or
+      any peer repository. — `tests/neutral_stub/` (independent Node implementation)
+- [x] The Thief accepts a conforming offer from the stub.
+- [x] The Thief produces an offer the stub accepts.
+- [x] Both directions pass: Thief-proposes and Thief-accepts.
+- [x] Two different valid participant/match identities work without editing any profile
+      file. — bidirectional two-identity negotiation tests
+- [x] Negative vectors fail closed before gameplay: participant mismatch, negotiated-value
       mismatch, unsupported version, hash mismatch, ordering violation, replayed message,
-      and private-field leakage.
-- [ ] A message that reveals true position, move, intent/verdict, or a nonce before the
-      audit is rejected.
-- [ ] Canonicalization vectors are reproduced by an implementation that does not share
-      this repository's serializer configuration.
-- [ ] All standard quality gates pass.
+      and private-field leakage. — `test_neutral_stub_failures.py`, `test_neutral_offer_validation.py`
+- [x] A message that reveals true position, move, intent/verdict, or a nonce before the
+      audit is rejected. — leakage vectors
+- [x] Canonicalization vectors are reproduced by an implementation that does not share
+      this repository's serializer configuration. — Node neutral stub reproduces the vectors
+- [x] All standard quality gates pass. — 452 tests, 95.36% branch, ruff/file-length/secrets/CLI/diff green
 
 ## Stage C — acceptance
 
@@ -86,12 +90,12 @@ verdict.
 
 | Required value | Current state |
 |---|---|
-| Thief conformance profile | IN PROGRESS |
-| Neutral stub opponent | PENDING |
-| Bidirectional conformance evidence | PENDING |
-| Escaping and cross-implementation vectors | PENDING |
-| `CONFORMANCE_PROFILE: ACCEPTED` | PENDING |
-| `M2_GAMEPLAY: GO` | PENDING |
+| Thief conformance profile | AUTHORED (`WIRE_CONFORMANCE_PROFILE.md`) |
+| Neutral stub opponent | BUILT (`tests/neutral_stub/`) |
+| Bidirectional conformance evidence | PRESENT (two identities, both directions) |
+| Escaping and cross-implementation vectors | PRESENT (escaping + non-BMP; Node reproduces) |
+| `CONFORMANCE_PROFILE: ACCEPTED` | PENDING (coordinator verdict, not issued) |
+| `M2_GAMEPLAY: GO` | PENDING (coordinator verdict, not issued) |
 
 ## Checker semantics
 

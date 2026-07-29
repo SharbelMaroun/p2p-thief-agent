@@ -19,6 +19,25 @@ does not stop unrelated work.
 | U-019 | Official template required/optional fields, types, enums, bounds, and additional-property rules | Artifact validation | Formal schemas or dated authoritative clarification |
 | U-021 | Exact six-sub-game role assignment, including whether Cop and Thief must alternate every sub-game and which team starts in which role | League scheduling | **REOPENED 2026-07-28 by coordinator verdict.** Simulator confirms odd-natural/even-opposite alternation, but the book does not, and the recorded course/lecturer direction is not an authenticated Moodle announcement. Needs an authenticated lecturer answer before alternation may be treated as binding. See [COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md). |
 
+## Provisional implementations as of 2026-07-29 (still OPEN)
+
+The code now embodies a working, provisional choice for several of the items above. These
+notes record *what the implementation currently assumes* so it is auditable; they do
+**not** close the UNKNOWN. Under the standing rule that provisional shared-contract
+foundations must not be finalized, closure remains an explicit coordinator verdict. The
+coordinator delegated the handling of these on 2026-07-29 and this conservative
+"note-but-keep-open" recording was chosen deliberately.
+
+| ID | Provisional implementation in code | Status |
+|---|---|---|
+| U-002 | RFC-8785 (JCS) canonicalization in `protocol/canonical.py`; three separated hash domains (`commitment_sha256`, `agreed_configuration_sha256`, `source_sha256`) | **OPEN** — `config_sha256` scope and cross-peer byte procedure not accepted |
+| U-003 | Tool names, message fields, envelopes, sizes, acknowledgements, idempotency in `protocol/` and `WIRE_CONFORMANCE_PROFILE.md`, proved against the neutral stub | **OPEN** — Thief-authored profile; no cross-peer acceptance |
+| U-004 | Step-0 sequence and transition ordering in the book four-step flow (`protocol/session*.py`) | **OPEN** — not confirmed against an authenticated shared state machine |
+| U-005 | Committed payload = sorted-compact-escaped JSON with nonce `token_hex(16)` outside the payload | **OPEN** — exact field roster not cross-peer accepted |
+| U-014 | Capture precedence and terminal technical-loss scoring implemented (`domain/capture.py`, `state/scoring.py`) | **OPEN** — full live-turn event ordering still unresolved |
+
+None of these may be treated as binding on an unknown opponent until accepted.
+
 ## Closed in this reconciliation
 
 README component count and tag naming are confirmed in `SR-007`/`SR-008`. Appendix F
