@@ -57,6 +57,29 @@ def thief_score(outcome: Outcome) -> int:
     return _THIEF_SCORES[outcome]
 
 
+# Simulator AuditPayload.result_claim vocabulary (capture / survival / timeout). The
+# simulator groups timeout / tamper / stopped as the 0/0 technical-loss bucket, so a
+# TECHNICAL_LOSS maps to "timeout" on the wire.
+_WIRE_RESULT_CLAIM: dict[Outcome, str] = {
+    Outcome.CAPTURE: "capture",
+    Outcome.SURVIVAL: "survival",
+    Outcome.TECHNICAL_LOSS: "timeout",
+}
+
+
+def wire_result_claim(outcome: Outcome) -> str:
+    """Map a terminal Outcome to the simulator's AuditPayload.result_claim string.
+
+    A TIE is decided only at series aggregation, never as a per-sub-game claim, so it
+    has no wire result_claim.
+    """
+    if not isinstance(outcome, Outcome):
+        raise DomainError(f"outcome must be an Outcome, got {type(outcome).__name__}")
+    if outcome is Outcome.TIE:
+        raise DomainError("a tie is a series-level result, not a sub-game result_claim")
+    return _WIRE_RESULT_CLAIM[outcome]
+
+
 def resolve_outcome(
     *,
     captured: bool,
