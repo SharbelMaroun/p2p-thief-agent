@@ -19,6 +19,38 @@ does not stop unrelated work.
 | U-019 | Official template required/optional fields, types, enums, bounds, and additional-property rules | Artifact validation | Formal schemas or dated authoritative clarification |
 | U-021 | Exact six-sub-game role assignment, including whether Cop and Thief must alternate every sub-game and which team starts in which role | League scheduling | **REOPENED 2026-07-28 by coordinator verdict.** Simulator confirms odd-natural/even-opposite alternation, but the book does not, and the recorded course/lecturer direction is not an authenticated Moodle announcement. Needs an authenticated lecturer answer before alternation may be treated as binding. See [COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md). |
 
+## Authoritative lecturer answers — 2026-07-29
+
+The coordinator relayed the lecturer's authoritative interop answers and directed that
+**the book construction is retained where it conflicts with the simulator**. Governing
+rule: the reference simulator `Game-P2P-Cop-Chase` (rmisegal — a sanctioned learning aid,
+distinct from the `THIEF-002`-forbidden companion Cop repo) defines exact wire
+serialization; the project book remains authoritative for concepts and rules.
+
+Resolved on this basis:
+
+- **U-021 role scheduling — CLOSED.** Six-sub-game series alternates roles: sub-games
+  1, 3, 5 use the natural role and 2, 4, 6 the swapped role; the **Thief always moves
+  first** every sub-game. `LS-001` promoted to CONFIRMED per this lecturer answer relayed
+  and accepted by the coordinator on 2026-07-29. Dependent scope: M7 series orchestration.
+- **U-014 event ordering — CLOSED.** Within a turn: apply the move, emit scent at the new
+  cell, apply grid-wide decay `τ(t+1)=max(0,(1-ρ)τ+Δτ)`, then evaluate capture/victory
+  after position and barrier updates. Dependent scope: M6 scent and the turn state machine.
+- **U-005 committed payload / nonce — RESOLVED as "keep book".** The coordinator retained
+  the book Ch. 5.3 construction already implemented (nonce inside the sorted-compact
+  payload, no delimiter, `ensure_ascii=True`, `token_hex(16)`). The simulator variant
+  (nonce outside, `|` delimiter, `ensure_ascii=False`) is recorded but **not adopted**.
+
+Answered by the lecturer but the code currently diverges — kept OPEN to avoid doc/code
+drift until the coordinator authorizes the wire re-alignment:
+
+- **U-002 / U-003, negotiation identity, audit `result_claim`.** The simulator uses tools
+  `negotiate` / `receive_turn` / `submit_audit` / `receive_control`, a single
+  canonical-JSON `config_sha256`, no `identity.role` in negotiation, and
+  `result_claim ∈ {capture, survival, timeout}`. Our repo currently ships Option-B
+  variants (`receive_move` + `receive_reveal`, three hash domains, role-bearing offers,
+  a four-value `Outcome`). Re-alignment is pending an explicit decision.
+
 ## Provisional implementations as of 2026-07-29 (still OPEN)
 
 The code now embodies a working, provisional choice for several of the items above. These
@@ -62,3 +94,7 @@ Moodle announcement or original lecturer message. `U-021` is therefore reopened 
 `LS-001` is reverted to `UNKNOWN`. Alternation must not be treated as binding in
 normative contract documents until an authenticated lecturer answer is obtained. See
 [COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md).
+
+**U-021 — CLOSED 2026-07-29.** The required lecturer answer was obtained and relayed by
+the coordinator: sub-games 1, 3, 5 natural role, 2, 4, 6 swapped, Thief moves first. See
+the "Authoritative lecturer answers" section above; `LS-001` is now CONFIRMED.
