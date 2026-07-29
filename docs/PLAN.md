@@ -1,8 +1,10 @@
 # Plan
 
-Status: M0 and M2 are `DONE`; M1 is `IN PROGRESS` at M1-013. M3–M9 are
-`PENDING` and proceed in order. Nothing is classified `BLOCKED`; unresolved decisions
-are requested explicitly rather than inferred.
+Status: M0, M2, and M3 are `DONE`; M1 is `IN PROGRESS` at M1-013 with Stage A/B evidence
+built and Stage C acceptance pending. M4–M9 are `PENDING` and proceed in order. The M4
+substance is implemented and doubles as M1 Stage-B evidence (2026-07-29 "Both" ruling),
+but M4 completion awaits M1 Stage C. Nothing is classified `BLOCKED`; unresolved
+decisions are requested explicitly rather than inferred.
 
 The Thief M0–M1 scaffold is based on remote main
 `e1cc4992cd1c9a7705edf13fc976f85482ce601b`. It has package, SDK, CLI, test, and
@@ -31,7 +33,7 @@ truth (`SR-004`, `THIEF-001`).
 | M0 | Evidence and source reconciliation | Correct source hierarchy, traceable Appendix E/F evidence, explicit unknowns/conflicts, reconciled repository history | `DONE` |
 | M1 | Interoperability conformance profile | Author a Thief-owned wire profile from book-confirmed rules and Option-B choices, prove it bidirectionally against a neutral stub opponent, and obtain profile acceptance | `IN PROGRESS` |
 | M2 | Core domain rules | Coordinates, actions, grid, legal movement, barrier and capture semantics behind the SDK | `DONE` |
-| M3 | Local state, scoring and deterministic baseline | Immutable local history, disclosed-barrier state, scoring, and deterministic legal baseline | `PENDING` |
+| M3 | Local state, scoring and deterministic baseline | Immutable local history, disclosed-barrier state, scoring, and deterministic legal baseline | `DONE` |
 | M4 | Protocol, canonicalization and commit-reveal | Accepted public messages, exact canonical bytes, state transitions, commitment verification, and audit outcomes | `PENDING` |
 | M5 | FastMCP runtime and resilience | Symmetric server/client peer, gateway, idempotency, deadlines, watchdog, recovery, and tunnel path | `PENDING` |
 | M6 | Scent, belief and private strategy | Confirmed scent physics, public observations, Thief-local belief, and private strategy | `PENDING` |

@@ -28,6 +28,15 @@ were reviews of external artifacts and no peer byte was ever integrated.
 Current work starts at `M1-013`; later M1 tasks remain `PENDING` until their exit
 evidence is reached.
 
+**2026-07-29 reconciliation.** Stage A and Stage B exit evidence now exists: the
+Thief-owned wire profile (`WIRE_CONFORMANCE_PROFILE.md`), RFC-8785 canonicalization with
+escaping and non-BMP vectors, separated hash domains, the independent Node neutral stub
+(`tests/neutral_stub/`), bidirectional two-identity conformance, and fail-closed
+negative/leakage vectors — tracked box by box in `CONTRACT_HANDOFF_CHECKLIST.md`. Stage C
+acceptance (`CONFORMANCE_PROFILE: ACCEPTED` naming a revision, then `M2_GAMEPLAY: GO`) is
+**not yet recorded**, so `M1-012`…`M1-017` keep their statuses pending that coordinator
+verdict, and the contract checker stays fail-closed at `PENDING` / exit 1.
+
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
 | M1-001 | Maintain independently installable package, public SDK, and behavior-free CLI | DONE | Frozen uv sync and CLI tests |
@@ -76,19 +85,36 @@ task; the corresponding milestone row keeps its own status.
 |---|---|---|---|
 | EXC-001 | Implement the deterministic Thief baseline policy on existing public domain APIs | DONE | `test_strategy_metrics.py`, `test_baseline_strategy.py`, `test_strategy_sdk.py`; `PRD_strategy.md`; branch `agent/thief-baseline-strategy` |
 
-`EXC-001` does **not** close `M3-004`. It adds no Thief-local state, no history, no
-scoring, and no turn state machine, so the M3 integration evidence is still `PENDING`.
+`EXC-001` did **not** close `M3-004`: it added no Thief-local state, no history, no
+scoring, and no turn state machine. `M3-004` was completed separately on 2026-07-29 by
+the `state/policy.py` integration, which binds this baseline to the immutable local
+state without altering the pure `EXC-001` module.
 
 ## M3 — Local state, scoring and deterministic baseline
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M3-001 | Model immutable Thief-local state and history snapshots | PENDING | Local-truth and immutability tests |
-| M3-002 | Track known disclosed barriers without Cop-private truth | PENDING | Provenance/boundary tests |
-| M3-003 | Implement accepted scoring and outcome calculation | PENDING | Capture, survival, tie, and technical-loss tests |
-| M3-004 | Integrate the completed deterministic legal baseline policy | PENDING | Tie-break, fallback, trapped, repeatability, and local-state integration tests |
+| M3-001 | Model immutable Thief-local state and history snapshots | DONE | `test_local_state.py`; `state/local_state.py`; `M3_LOCAL_STATE.md` |
+| M3-002 | Track known disclosed barriers without Cop-private truth | DONE | `test_known_barriers.py`; `state/known_barriers.py` |
+| M3-003 | Implement accepted scoring and outcome calculation | DONE | `test_scoring.py`; `state/scoring.py` (FIXED Appendix F Table 17) |
+| M3-004 | Integrate the completed deterministic legal baseline policy | DONE | `test_local_policy.py`; `state/policy.py` |
+
+Coordinator accepted M3-001..004 as DONE on 2026-07-29. The `state` package is
+contract-independent, holds no Cop-private truth, and is re-exported through the SDK;
+all four modules are at 100% branch coverage within the green suite.
 
 ## M4 — Protocol, canonicalization and commit-reveal
+
+**Flag #2 ruling (2026-07-29): "Both".** The substance of `M4-001`…`M4-005` is
+implemented — public envelopes/message models, exact canonical bytes with shared
+vectors, explicit protocol states with illegal-transition rejection, the book
+commit/acknowledge/reveal/nonce-secrecy flow, and audit mismatch / technical-loss
+outcomes — living in `protocol/` with tests under `tests/`. The coordinator classified
+this work as **both** M1 Stage-B conformance evidence **and** the M4 milestone substance.
+The listed exit evidence therefore already exists, but formal M4 completion still awaits
+M1 Stage-C acceptance (see the M1 note above), so these rows stay `PENDING` — not because
+the code is missing, but because the gate that authorizes protocol acceptance has not
+been recorded.
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
