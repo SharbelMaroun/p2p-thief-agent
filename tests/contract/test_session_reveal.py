@@ -7,7 +7,6 @@ import pytest
 from p2p_thief_agent.protocol.profile import ConformanceError
 from tests.contract.conformance_fixtures import (
     NONCE_1,
-    NONCE_2,
     NOW_MS,
     audit_record,
     make_audit,
@@ -32,7 +31,7 @@ def test_reveal_discloses_move_and_keeps_nonce_hidden() -> None:
     assert result["status"] == "revealed"
     assert result["step"] == 1
     assert result["move"] == "N"
-    assert session._reveals == {1: "N"}
+    assert session._reveals == {1: {"move": "N", "hint": "Central Park"}}
 
 
 def test_reveal_before_commit_is_out_of_order() -> None:
@@ -44,21 +43,30 @@ def test_reveal_before_commit_is_out_of_order() -> None:
 
 def test_reveal_out_of_sequence_is_out_of_order() -> None:
     session, _ = committed()
-    turn2, _, _ = make_turn(2, nonce=NONCE_2)
-    session.receive_move(turn2, now_ms=NOW_MS)
     with pytest.raises(ConformanceError) as captured:
         session.receive_reveal(make_reveal(2), now_ms=NOW_MS)
     assert captured.value.code == "OUT_OF_ORDER"
 
 
-def test_replayed_step_after_reveal_is_replayed_message() -> None:
+def test_semantic_reveal_retry_acknowledges_or_conflicts_deterministically() -> None:
     session, _ = committed()
-    session.receive_reveal(make_reveal(move="N"), now_ms=NOW_MS)
+    first = session.receive_reveal(make_reveal(move="N"), now_ms=NOW_MS)
+    repeated = session.receive_reveal(
+        make_reveal(move="N", message_id="b" * 32), now_ms=NOW_MS
+    )
+
+    assert repeated["status"] == "revealed"
+    assert repeated["acknowledges"] == "b" * 32
+    assert repeated["move"] == first["move"]
+    assert session.next_reveal_step == 2
+
     with pytest.raises(ConformanceError) as captured:
         session.receive_reveal(
-            make_reveal(move="S", message_id="b" * 32), now_ms=NOW_MS
+            make_reveal(move="S", message_id="c" * 32), now_ms=NOW_MS
         )
-    assert captured.value.code == "REPLAYED_MESSAGE"
+    assert captured.value.code == "COMMITMENT_MISMATCH"
+    assert session.technical_loss is False
+    assert session._closed is None
 
 
 def test_exact_retry_is_idempotent_and_conflict_is_detected() -> None:

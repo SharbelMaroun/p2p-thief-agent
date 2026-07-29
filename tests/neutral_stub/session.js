@@ -6,7 +6,8 @@ const { fail, rejection } = require("./errors");
 const { idempotencyHash } = require("./hashes");
 const { envelope, closed, safeInt, PROFILE, VERSION } = require("./schema");
 const { sessionContext } = require("./session_context");
-const { revealBody, turnBody } = require("./turn");
+const { receiveReveal } = require("./session_reveal");
+const { turnBody } = require("./turn");
 
 const ACTION_KEYS = ["tool", "message", "now_ms"];
 
@@ -52,6 +53,9 @@ class Session {
     if (cached.result !== null) return cached.result;
     if (this.closed !== null) fail("OUT_OF_ORDER", "turn stream is closed");
     if (body.step < this.nextStep) fail("REPLAYED_MESSAGE", "turn step was consumed");
+    if (this.nextReveal < this.nextStep) {
+      fail("OUT_OF_ORDER", "previous turn is awaiting its live reveal");
+    }
     if (body.step > this.nextStep || body.step > this.context.turn_cap) {
       fail("OUT_OF_ORDER", "turn is not the next expected step");
     }
@@ -64,25 +68,7 @@ class Session {
   }
 
   reveal(value, nowMs) {
-    const message = envelope(
-      value, "move_reveal", nowMs, this.context, 16_384, true, ["body.move"],
-    );
-    const body = revealBody(message.body);
-    const cached = this.cached(message);
-    if (cached.result !== null) return cached.result;
-    if (this.closed !== null) fail("OUT_OF_ORDER", "reveal stream is closed");
-    if (body.step < this.nextReveal) fail("REPLAYED_MESSAGE", "move step was revealed");
-    if (body.step !== this.nextReveal || body.step >= this.nextStep) {
-      fail("OUT_OF_ORDER", "reveal must follow the next locked commitment");
-    }
-    const turn = this.turns.get(body.step);
-    if (body.hint !== turn.hint) {
-      fail("COMMITMENT_MISMATCH", "revealed hint does not match the locked turn");
-    }
-    const result = this.ack(message, "revealed", { step: body.step, move: body.move });
-    this.reveals.set(body.step, body.move);
-    this.nextReveal += 1;
-    return this.remember(cached, result);
+    return receiveReveal(this, value, nowMs);
   }
 
   audit(value, nowMs) {
@@ -92,6 +78,9 @@ class Session {
     if (cached.result !== null) return cached.result;
     if (this.closed === "audited") fail("REPLAYED_MESSAGE", "audit was already accepted");
     if (this.closed !== null) fail("OUT_OF_ORDER", "audit stream is closed");
+    if (this.nextReveal !== this.nextStep) {
+      fail("OUT_OF_ORDER", "every locked turn must be live-revealed first");
+    }
     const digest = verifyRecords(
       body.records, this.turns, this.nextStep, this.context, this.reveals,
     );

@@ -35,14 +35,27 @@ def test_reveal_before_commit_is_out_of_order() -> None:
     assert code(response["results"][0]) == "OUT_OF_ORDER"
 
 
-def test_replayed_reveal_is_replayed_message() -> None:
-    turn, _, _ = make_turn()
+def test_semantic_reveal_retry_acknowledges_or_conflicts_deterministically() -> None:
+    turn, payload, nonce = make_turn()
     response = node_session([
         action("receive_move", turn),
         action("receive_reveal", make_reveal(move="N")),
+        action("receive_reveal", make_reveal(move="N", message_id="b" * 32)),
         action("receive_reveal", make_reveal(move="S", message_id="b" * 32)),
     ])
-    assert code(response["results"][2]) == "REPLAYED_MESSAGE"
+
+    assert response["results"][2]["status"] == "revealed"
+    assert response["results"][2]["acknowledges"] == "b" * 32
+    assert code(response["results"][3]) == "IDEMPOTENCY_CONFLICT"
+
+    conflict = node_session([
+        action("receive_move", turn),
+        action("receive_reveal", make_reveal(move="N")),
+        action("receive_reveal", make_reveal(move="S", message_id="c" * 32)),
+        action("submit_audit", make_audit([audit_record(turn, payload, nonce)])),
+    ])
+    assert code(conflict["results"][2]) == "COMMITMENT_MISMATCH"
+    assert conflict["results"][3]["status"] == "verified"
 
 
 def test_restated_hint_mismatch_is_commitment_mismatch() -> None:

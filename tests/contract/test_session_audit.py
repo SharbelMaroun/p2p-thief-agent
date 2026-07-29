@@ -12,6 +12,7 @@ from tests.contract.conformance_fixtures import (
     audit_record,
     make_audit,
     make_payload,
+    make_reveal,
     make_session,
     make_turn,
 )
@@ -24,7 +25,11 @@ def locked_two_turns():
     second_payload = make_payload(2, move="E", hint="Broadway")
     second, _, _ = make_turn(2, nonce=NONCE_2, payload=second_payload)
     session.receive_move(first, now_ms=NOW_MS)
+    session.receive_reveal(make_reveal(), now_ms=NOW_MS)
     session.receive_move(second, now_ms=NOW_MS)
+    session.receive_reveal(
+        make_reveal(2, move="E", hint="Broadway"), now_ms=NOW_MS
+    )
     records = [
         audit_record(first, first_payload, NONCE_1),
         audit_record(second, second_payload, NONCE_2),

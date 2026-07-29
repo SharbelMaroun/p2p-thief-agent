@@ -51,6 +51,18 @@ def test_build_validate_and_accept_exact_acknowledgement() -> None:
     }
 
 
+def test_live_reveal_is_required_while_control_remains_optional() -> None:
+    """A peer without Step-3 reveal support is rejected before gameplay."""
+    missing_reveal = offer()
+    missing_reveal["required_capabilities"].remove("receive_reveal")
+    assert_code(missing_reveal, "CAPABILITY_MISMATCH")
+
+    without_control = offer()
+    without_control["optional_capabilities"] = []
+    negotiated = validate_offer(without_control, expected_recipient=THIEF, now_ms=1500)
+    assert negotiated.capabilities == REQUIRED_CAPABILITIES
+
+
 @pytest.mark.parametrize(
     ("updates", "recipient", "now", "code"),
     [

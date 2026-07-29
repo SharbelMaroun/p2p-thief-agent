@@ -42,6 +42,8 @@ class TurnSessionMixin:
             step = body["step"]
             if step < self.next_step:  # type: ignore[attr-defined]
                 reject("REPLAYED_MESSAGE", "turn step was already accepted")
+            if self.next_reveal_step < self.next_step:  # type: ignore[attr-defined]
+                reject("OUT_OF_ORDER", "previous turn is awaiting its live reveal")
             if (
                 step > self.next_step  # type: ignore[attr-defined]
                 or step > self.turn_cap  # type: ignore[attr-defined]

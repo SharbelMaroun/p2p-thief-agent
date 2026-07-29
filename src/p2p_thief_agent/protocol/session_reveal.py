@@ -35,16 +35,27 @@ class RevealSessionMixin:
             if self._closed is not None:  # type: ignore[attr-defined]
                 reject("OUT_OF_ORDER", "reveal stream is already closed")
             step = body["step"]
+            repeated = False
             if step < self.next_reveal_step:  # type: ignore[attr-defined]
-                reject("REPLAYED_MESSAGE", "move step was already revealed")
-            if (
+                accepted = self._reveals[step]  # type: ignore[attr-defined]
+                if body["move"] != accepted["move"] or body["hint"] != accepted["hint"]:
+                    reject(
+                        "COMMITMENT_MISMATCH",
+                        "move reveal conflicts with the accepted live reveal",
+                    )
+                repeated = True
+            elif (
                 step != self.next_reveal_step  # type: ignore[attr-defined]
                 or step >= self.next_step  # type: ignore[attr-defined]
             ):
                 reject("OUT_OF_ORDER", "reveal must follow the next locked commitment")
-            turn = self._turns[step]  # type: ignore[attr-defined]
-            if body["hint"] != turn["hint"]:
-                reject("COMMITMENT_MISMATCH", "revealed hint does not match the locked turn")
+            if not repeated:
+                turn = self._turns[step]  # type: ignore[attr-defined]
+                if body["hint"] != turn["hint"]:
+                    reject(
+                        "COMMITMENT_MISMATCH",
+                        "revealed hint does not match the locked turn",
+                    )
         except ConformanceError as error:
             remember_error(self._seen, message, error)  # type: ignore[attr-defined]
             raise
@@ -58,6 +69,10 @@ class RevealSessionMixin:
             "step": step,
             "move": body["move"],
         }
-        self._reveals[step] = body["move"]  # type: ignore[attr-defined]
-        self.next_reveal_step += 1  # type: ignore[attr-defined]
+        if not repeated:
+            self._reveals[step] = {  # type: ignore[attr-defined]
+                "move": body["move"],
+                "hint": body["hint"],
+            }
+            self.next_reveal_step += 1  # type: ignore[attr-defined]
         return remember_success(self._seen, message, acknowledgement)  # type: ignore[attr-defined]

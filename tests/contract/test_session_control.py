@@ -11,6 +11,7 @@ from tests.contract.conformance_fixtures import (
     audit_record,
     make_audit,
     make_control,
+    make_reveal,
     make_session,
     make_turn,
 )
@@ -38,6 +39,24 @@ def test_heartbeat_is_state_preserving_and_idempotent() -> None:
     assert session.next_step == 1
 
 
+def test_control_remains_available_while_live_reveal_is_pending() -> None:
+    """Heartbeat and abort retain their semantics during the Step-3 wait."""
+    session = make_session(optional_control=True)
+    session.receive_move(make_turn()[0], now_ms=NOW_MS)
+
+    heartbeat = session.receive_control(make_control(), now_ms=NOW_MS)
+    abort = session.receive_control(
+        make_control("abort", message_id="d" * 32),
+        now_ms=NOW_MS,
+    )
+
+    assert heartbeat["control"] == "heartbeat"
+    assert abort["control"] == "abort"
+    with pytest.raises(ConformanceError) as captured:
+        session.receive_reveal(make_reveal(), now_ms=NOW_MS)
+    assert captured.value.code == "OUT_OF_ORDER"
+
+
 def test_abort_closes_stream_and_new_abort_is_replay() -> None:
     session = make_session(optional_control=True)
     abort = make_control("abort")
@@ -61,6 +80,7 @@ def test_verified_audit_closes_turn_and_audit_streams() -> None:
     session = make_session()
     turn, payload, nonce = make_turn()
     session.receive_move(turn, now_ms=NOW_MS)
+    session.receive_reveal(make_reveal(), now_ms=NOW_MS)
     audit = make_audit([audit_record(turn, payload, nonce)])
     session.submit_audit(audit, now_ms=NOW_MS)
 

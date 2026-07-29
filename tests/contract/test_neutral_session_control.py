@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 
-from tests.contract.conformance_fixtures import make_control, make_turn
+from tests.contract.conformance_fixtures import make_control, make_reveal, make_turn
 from tests.contract.neutral_helpers import action, node_session
 
 
@@ -42,6 +42,21 @@ def test_heartbeat_retry_abort_and_closed_state() -> None:
     assert response["results"][2]["control"] == "abort"
     assert response["results"][3]["error"]["code"] == "OUT_OF_ORDER"
     assert response["results"][4]["error"]["code"] == "REPLAYED_MESSAGE"
+    assert response["state"]["closed"] == "abort"
+
+
+def test_control_remains_available_while_live_reveal_is_pending() -> None:
+    """The neutral harness keeps control independent of the reveal phase."""
+    response = node_session([
+        action("receive_move", make_turn()[0]),
+        action("receive_control", make_control()),
+        action("receive_control", make_control("abort", message_id="d" * 32)),
+        action("receive_reveal", make_reveal()),
+    ])
+
+    assert response["results"][1]["control"] == "heartbeat"
+    assert response["results"][2]["control"] == "abort"
+    assert response["results"][3]["error"]["code"] == "OUT_OF_ORDER"
     assert response["state"]["closed"] == "abort"
 
 

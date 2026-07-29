@@ -66,6 +66,26 @@ def test_closed_offer_and_primitives_fail(mutation: str, expected: str) -> None:
     assert result_for(proposed)["rejection"]["error"]["code"] == expected
 
 
+def test_live_reveal_is_required_while_control_remains_optional() -> None:
+    """The neutral peer rejects the old capability set before gameplay."""
+    missing_reveal = offer("alpha", "beta", "missing-reveal")
+    missing_reveal["required_capabilities"].remove("receive_reveal")
+    assert result_for(missing_reveal)["rejection"]["error"]["code"] == (
+        "CAPABILITY_MISMATCH"
+    )
+
+    without_control = offer("alpha", "beta", "without-control")
+    without_control["optional_capabilities"] = []
+    response = result_for(without_control)
+    assert response["ok"] is True
+    assert response["ack"]["accepted_capabilities"] == [
+        "negotiate",
+        "receive_move",
+        "receive_reveal",
+        "submit_audit",
+    ]
+
+
 @pytest.mark.parametrize("field", ["game_id", "game_uid", "sub_game_number", "remote_role"])
 def test_active_match_context_mismatch_rejects(field: str) -> None:
     proposed = offer("alpha", "beta", "active-game")
