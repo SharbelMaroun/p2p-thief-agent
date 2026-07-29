@@ -26,6 +26,7 @@ from p2p_thief_agent.state.scoring import (
     Outcome,
     resolve_outcome,
     thief_score,
+    wire_result_claim,
 )
 
 __all__ = [
@@ -46,4 +47,5 @@ __all__ = [
     "resolve_outcome",
     "step_with_baseline",
     "thief_score",
+    "wire_result_claim",
 ]

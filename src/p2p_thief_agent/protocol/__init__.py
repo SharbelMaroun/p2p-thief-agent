@@ -1,55 +1,76 @@
-"""Public primitives for the proposed Option-B conformance profile."""
+"""Simulator-conformant peer-to-peer wire protocol.
 
-from p2p_thief_agent.protocol.canonical import (
-    CanonicalizationError,
-    agreed_configuration_sha256,
+Envelope-free message types, commit-reveal crypto, sealing helpers, and the signed-terms
+handshake, all independently authored to match the reference simulator
+(`Game-P2P-Cop-Chase`) for cross-agent interoperability. The superseded self-authored
+Option-B conformance profile and its neutral stub are archived under
+`archive/pre-sim-realign/`.
+"""
+
+from p2p_thief_agent.protocol.crypto import (
+    NONCE_BYTES,
+    CryptoError,
+    audit_records,
+    canonical_json,
     canonical_sha256,
-    canonicalize,
-    loads,
-    source_sha256,
-)
-from p2p_thief_agent.protocol.commitment import (
-    audit_sha256,
-    commitment_sha256,
+    commit_of,
     new_nonce,
-    verify_commitment,
+    seal,
+    verify,
 )
-from p2p_thief_agent.protocol.negotiated_runtime import open_remote_session
-from p2p_thief_agent.protocol.negotiation import (
-    NegotiatedOffer,
-    accept_offer,
-    validate_offer,
+from p2p_thief_agent.protocol.handshake import (
+    AGREEMENT_TERMS,
+    REQUIRED_TERMS,
+    Handshake,
+    config_sha256,
+    identity_block,
+    missing_required_terms,
 )
-from p2p_thief_agent.protocol.negotiation_state import NegotiationState
-from p2p_thief_agent.protocol.offers import build_offer
-from p2p_thief_agent.protocol.profile import (
-    PROFILE,
-    VERSION,
-    ConformanceError,
-    rejection,
+from p2p_thief_agent.protocol.sealing import (
+    StepDecision,
+    build_turn_message,
+    sealed_spec_record,
+    sealed_step_payload,
+    sealed_step_record,
+    state_str,
 )
-from p2p_thief_agent.protocol.session import ConformanceSession
+from p2p_thief_agent.protocol.wire import (
+    CONTROL_KINDS,
+    RESULT_CLAIMS,
+    ROLES,
+    AuditPayload,
+    ControlMessage,
+    TurnMessage,
+    WireError,
+)
 
 __all__ = [
-    "PROFILE",
-    "VERSION",
-    "CanonicalizationError",
-    "ConformanceError",
-    "ConformanceSession",
-    "NegotiationState",
-    "NegotiatedOffer",
-    "accept_offer",
-    "agreed_configuration_sha256",
-    "audit_sha256",
-    "build_offer",
+    "AGREEMENT_TERMS",
+    "AuditPayload",
+    "CONTROL_KINDS",
+    "ControlMessage",
+    "CryptoError",
+    "Handshake",
+    "NONCE_BYTES",
+    "REQUIRED_TERMS",
+    "RESULT_CLAIMS",
+    "ROLES",
+    "StepDecision",
+    "TurnMessage",
+    "WireError",
+    "audit_records",
+    "build_turn_message",
+    "canonical_json",
     "canonical_sha256",
-    "canonicalize",
-    "commitment_sha256",
-    "loads",
+    "commit_of",
+    "config_sha256",
+    "identity_block",
+    "missing_required_terms",
     "new_nonce",
-    "open_remote_session",
-    "rejection",
-    "source_sha256",
-    "validate_offer",
-    "verify_commitment",
+    "seal",
+    "sealed_spec_record",
+    "sealed_step_payload",
+    "sealed_step_record",
+    "state_str",
+    "verify",
 ]

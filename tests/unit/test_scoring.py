@@ -3,6 +3,7 @@
 import pytest
 
 from p2p_thief_agent.domain import DomainError
+from p2p_thief_agent.protocol.wire import RESULT_CLAIMS
 from p2p_thief_agent.state.scoring import (
     CAPTURE_COP,
     CAPTURE_THIEF,
@@ -14,6 +15,7 @@ from p2p_thief_agent.state.scoring import (
     Outcome,
     resolve_outcome,
     thief_score,
+    wire_result_claim,
 )
 
 
@@ -36,6 +38,21 @@ def test_thief_score_for_every_outcome():
 def test_thief_score_rejects_non_outcome():
     with pytest.raises(DomainError):
         thief_score("capture")
+
+
+def test_wire_result_claim_maps_to_valid_sim_claims():
+    assert wire_result_claim(Outcome.CAPTURE) == "capture"
+    assert wire_result_claim(Outcome.SURVIVAL) == "survival"
+    assert wire_result_claim(Outcome.TECHNICAL_LOSS) == "timeout"
+    for outcome in (Outcome.CAPTURE, Outcome.SURVIVAL, Outcome.TECHNICAL_LOSS):
+        assert wire_result_claim(outcome) in RESULT_CLAIMS
+
+
+def test_wire_result_claim_rejects_tie_and_non_outcome():
+    with pytest.raises(DomainError, match="series-level"):
+        wire_result_claim(Outcome.TIE)
+    with pytest.raises(DomainError):
+        wire_result_claim("capture")
 
 
 def test_capture_is_terminal():
