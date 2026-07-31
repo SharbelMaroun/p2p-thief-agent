@@ -21,7 +21,7 @@ contract or runtime evidence is unavailable.
 | `docs/ADR_STATUS_REVIEW.md` | Yes | Inventory of the nine live ADRs: 6 `Pending`, 3 `Proposed`, 0 accepted. ADR-0006 was superseded on 2026-07-29 and archived | Decide the locally decidable ADRs; the rest need external input |
 | `docs/TEAM_INFO.md` | Yes | Identity confirmed 2026-07-28; `U-016` closed | Nothing outstanding |
 | `pyproject.toml` / `uv.lock` | Yes | Independently installable M1 scaffold | Keep uv lock and metadata current |
-| `src/` / `tests/` / `scripts/` | Yes | M2 core domain, M3 local state and scoring, the baseline strategy, and the simulator-conformant protocol layer, all behind the SDK; **232 tests at 99.71% branch coverage** (re-measured 2026-07-31) | Add live runtime and transport behavior through TDD after the contract gate |
+| `src/` / `tests/` / `scripts/` | Yes | M2 core domain, M3 local state and scoring, the baseline strategy, and the simulator-conformant protocol layer, all behind the SDK; **241 tests at 99.71% branch coverage** (re-measured end of day 2026-07-31) | Add live runtime and transport behavior through TDD after the contract gate |
 | Thief conformance profile | Partly | Copy model superseded 2026-07-28 under `THIEF-002`; four Cop candidates were reviewed and none was ever copied. The profile is now **authored and adopted** as `SIM_WIRE_PROTOCOL.md` (2026-07-29), but the neutral-stub evidence was retired with the old Option-B profile and not rebuilt, so the checker correctly remains `PENDING` | Re-prove the adopted profile against an independent stub (`M1-015`–`M1-017`), then obtain profile acceptance |
 | Active shared/private runtime config | No | Intentionally absent | ADR-0004 plus accepted contract |
 | Runtime, GUI, replay, Gmail evidence | No | Out of M1 scope | Later gated milestones |
@@ -58,8 +58,8 @@ or provenance material and cannot override current direct evidence.
 
 ## Verdict
 
-All local quality gates pass, re-measured 2026-07-31: ruff clean, **232 tests at 99.71%
-branch coverage**, file lengths and secret scan clean, and the shared-contract checker
+All local quality gates pass, re-measured end of day 2026-07-31: ruff clean, **241 tests
+at 99.71% branch coverage**, file lengths and secret scan clean, and the contract checker
 correctly fail-closed at `PENDING` with exit 1. The M1 scaffold results remain in
 [M1_VERIFICATION.md](M1_VERIFICATION.md).
 

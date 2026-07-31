@@ -75,14 +75,15 @@ layer, and the M3 local-state, scoring, and baseline-integration package.
 > `protocol/negotiation.py`, and roughly twenty conformance tests, and retiring the
 > Node stub into `archive/pre-sim-realign/`. The counts below replace it.
 
-Measured gates on 2026-07-31:
+Measured gates at end of day 2026-07-31 (counts are a dated snapshot and move as tests
+are added; the authoritative check is running the suite, not this table):
 
 | Command/check | Actual result |
 |---|---|
 | `uv run ruff check .` | Exit 0; all checks passed |
-| `uv run pytest --cov --cov-branch --cov-fail-under=85` | Exit 0; **232 passed**; 99.71% branch coverage |
-| `uv run python scripts/check_file_lengths.py` | Exit 0; 33 source/script and 20 test files checked |
-| `uv run python scripts/check_secrets.py` | Exit 0; 131 text files, zero findings |
+| `uv run pytest --cov --cov-branch --cov-fail-under=85` | Exit 0; **241 passed**; 99.71% branch coverage |
+| `uv run python scripts/check_file_lengths.py` | Exit 0; 33 source/script and 21 test files checked |
+| `uv run python scripts/check_secrets.py` | Exit 0; 133 text files, zero findings |
 | `uv run p2p-thief --help` / `--version` | Exit 0; `p2p-thief 1.00` |
 | `uv run python scripts/check_shared_contracts.py` | Exit 1; `PENDING` (fail-closed; no accepted conformance profile) |
 | `git diff --check` | Exit 0; no whitespace errors |

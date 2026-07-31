@@ -89,8 +89,14 @@ An item with no authority label is not part of the profile.
 - [x] A message that reveals true position, move, intent/verdict, or a nonce before the
       audit is rejected. — leakage vectors
 - [x] Canonicalization vectors are reproduced by an implementation that does not share
-      this repository's serializer configuration. — Node neutral stub reproduces the vectors
-- [x] All standard quality gates pass. — 452 tests, 95.36% branch, ruff/file-length/secrets/CLI/diff green
+      this repository's serializer configuration. — *the Node stub that satisfied this was
+      retired on 2026-07-29.* **Re-satisfied by stronger evidence**:
+      `tests/unit/test_reference_vector.py` reproduces a commit hash emitted by the
+      **reference simulator** itself, which is a foreign implementation rather than one
+      this project wrote. Scope is the commitment domain only
+- [x] All standard quality gates pass. — *the "452 tests, 95.36%" figure recorded here was
+      the pre-realign tree.* Current: **241 tests, 99.71% branch**, ruff / file-length /
+      secrets / CLI / diff green (end of day 2026-07-31)
 
 ## Stage C — acceptance
 
