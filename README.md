@@ -55,7 +55,7 @@ is open M1 work, and the contract checker stays fail-closed until it exists. See
 
 ## Install and inspect
 
-Python 3.10 or newer and
+Python 3.11 or newer and
 [uv](https://docs.astral.sh/uv/) are required.
 
 ```text
