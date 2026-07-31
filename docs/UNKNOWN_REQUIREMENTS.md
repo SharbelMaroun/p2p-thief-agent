@@ -17,7 +17,8 @@ does not stop unrelated work.
 | U-015 | Scope permitted for simulator code reuse under its license/provenance | Provenance | License/lecturer review and ADR-0008 |
 | U-017 | Newer Moodle instructions and lecturer announcements | Potential final-release areas | Obtain dated official posts |
 | U-019 | Official template required/optional fields, types, enums, bounds, and additional-property rules | Artifact validation | Formal schemas or dated authoritative clarification |
-| U-021 | Exact six-sub-game role assignment, including whether Cop and Thief must alternate every sub-game and which team starts in which role | League scheduling | **REOPENED 2026-07-28 by coordinator verdict.** Simulator confirms odd-natural/even-opposite alternation, but the book does not, and the recorded course/lecturer direction is not an authenticated Moodle announcement. Needs an authenticated lecturer answer before alternation may be treated as binding. See [COORDINATOR_VERDICT_2026-07-28.md](COORDINATOR_VERDICT_2026-07-28.md). |
+| U-021 | ~~Exact six-sub-game role assignment~~ | ~~League scheduling~~ | **CLOSED 2026-07-29.** Reopened 2026-07-28 by coordinator verdict, then closed the following day when the required lecturer answer was obtained and relayed by the coordinator: sub-games 1, 3, 5 natural role, 2, 4, 6 swapped, **Thief moves first**. Provenance is a coordinator-relayed lecturer answer, not a Moodle announcement, and is recorded at that level. See the closure note below and `C-012`. |
+| U-022 | Whether surviving *exactly* `[Survival Threshold]` turns is a Thief win, given Appendix F table 15 sets `[Step Limit]` and `[Survival Threshold]` to the same value (35) | Terminal-outcome scoring; series aggregation | Coordinator ruling plus a boundary test. This repository is the Thief, so the reading directly decides its own wins; see `C-017` and `M3-005` |
 
 ## Authoritative lecturer answers — 2026-07-29
 
