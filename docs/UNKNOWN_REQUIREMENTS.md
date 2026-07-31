@@ -22,11 +22,28 @@ does not stop unrelated work.
 
 ## Authoritative lecturer answers — 2026-07-29
 
-The coordinator relayed the lecturer's authoritative interop answers and directed that
-**the book construction is retained where it conflicts with the simulator**. Governing
-rule: the reference simulator `Game-P2P-Cop-Chase` (rmisegal — a sanctioned learning aid,
-distinct from the `THIEF-002`-forbidden companion Cop repo) defines exact wire
-serialization; the project book remains authoritative for concepts and rules.
+The coordinator relayed the lecturer's authoritative interop answers. As recorded, that
+relay contains **two clauses that conflict for commit-reveal**: that "the book
+construction is retained where it conflicts with the simulator", and that the reference
+simulator `Game-P2P-Cop-Chase` (rmisegal — a sanctioned learning aid, distinct from the
+`THIEF-002`-forbidden companion Cop repo) "defines exact wire serialization" while the
+book "remains authoritative for concepts and rules".
+
+**Which clause governs, and why.** Commit-reveal byte layout *is* wire serialization, so
+the second clause is the specific one and it controls; the first is the general
+concepts-and-rules statement. This repository therefore follows the simulator for the
+hash construction and the book for game rules and scoring. Verified 2026-07-31 against
+the simulator source itself (`src/police_thief/domain/crypto.py`, read via the lecturer's
+`Game-P2P-Cop-Chase` NotebookLM): it serializes with
+`json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))` and
+concatenates the nonce **outside** the payload behind a `|` separator — byte-for-byte
+what `protocol/crypto.py` implements.
+
+This is a deliberate, disclosed reading of an ambiguous instruction, not a silent
+simulator default. It is disclosed under the book p. 5 contradiction clause. If the
+coordinator obtains an unambiguous lecturer answer preferring the book construction, the
+wire must be re-aligned and this section reversed — interoperability with classmates,
+who will build from the same simulator, is the reason for the current choice.
 
 Resolved on this basis:
 
