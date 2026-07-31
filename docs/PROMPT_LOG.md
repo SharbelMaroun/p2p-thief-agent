@@ -281,3 +281,69 @@
 - **Lesson:** lexicographic ranking beat a weighted sum precisely because no calibration
   data exists to justify weights. And when a test fails, decide whether the code or the
   expectation is wrong before changing either — here the policy was right twice.
+
+---
+
+> **Second logging gap, recorded honestly (2026-08-01).** No entries were written
+> between 2026-07-28 and 2026-08-01, while the 2026-07-29 simulator-wire realignment,
+> M4, and `M5-002` were built. Those steps are not reconstructed here: the P-012…P-018
+> reconstruction above was already a compromise, and repeating it would keep growing a
+> log of inferred prompts. The work itself is in `TODO.md` and the git history. Entries
+> from P-019 are written in the sessions that performed them.
+
+## P-019 — Closing the private-configuration boundary and the agreement gate
+- **Date:** 2026-08-01 · **Tool:** Claude Opus 5 (agentic CLI) + NotebookLM
+- **Goal:** `M5-002f` and `M5-014` — where the opponent's address comes from, and whether
+  this peer will agree to play at all.
+- **Prompt (essence):** "continue to work according to the unDone TODO file in 2 repos,
+  and according to the 2 links in the notebookLM (please keep in touch with them and
+  always ask them), and also according to the md files under `inst`".
+- **Output:** `shared/private_config.py` reads `[network].opponent_url` from one explicit
+  private TOML path and is the only door to an opponent address; `assert_no_network_address`
+  is the lock on the other, refusing a shared match object that carries an address by
+  member **name** or by **value**. `protocol/agreement.py` decides whether to play —
+  signature, required terms, Appendix F floors, then every term compared against our own,
+  refusing **by name** — and is wired into the live `InboundPeer` handler rather than left
+  as an unused module.
+- **Refinement:** the reference was consulted before writing, which settled the section and
+  key names, the separate `config/police/` and `config/thief/` directories, and a flat "no"
+  to whether the shared JSON ever carries a network address. That closed keys `ADR-0004`
+  had left `PENDING`.
+- **Lesson:** two checks, not one. A leak guard that only matches member *names* is evaded
+  by renaming the key; one that only matches *values* is evaded by an unusual format. Either
+  alone reads as thorough and is not.
+
+## P-020 — A required term that would have refused the lecturer's own template
+- **Date:** 2026-08-01 · **Tool:** Claude Opus 5 (agentic CLI) + NotebookLM (both notebooks)
+- **Goal:** settle whether `min_center_intensity` belongs in the required agreed terms.
+- **Prompt (essence):** "check the second notebook. always check in both of them when needed."
+- **Output:** the book PDF's Appendix F table 16 has exactly three rows, all `Fixed`, and
+  **no** minimum-centre row; the lecturer's own `agreed-config` template carries the same
+  three keys and no fourth. This repository listed the term in `REQUIRED_TERMS`, so it would
+  have rejected the very configuration template teams are meant to share, reporting it as a
+  missing agreed term. Removed from `REQUIRED_TERMS`, kept in `AGREEMENT_TERMS` so it is
+  still compared when a peer sends it, and pinned by a regression test.
+- **Refinement:** the pinned simulator *does* require the key and its own config carries it,
+  which is why the wrong reading looked defensible. The source-of-truth order decided it: a
+  simulator behaviour contradicting both the book and the lecturer's template is not authority.
+- **Lesson:** the constant had been written once, exported, and called by **no decision path**,
+  so no test could catch it — it only became visible when wired into a live refusal. A constant
+  that claims to encode a rule should be pinned to the document that states the rule.
+
+## P-021 — Auditing the documents against what was actually built
+- **Date:** 2026-08-01 · **Tool:** Claude Opus 5 (agentic CLI)
+- **Goal:** check every `docs/` file for claims the code had outgrown.
+- **Prompt (essence):** "before this check if you updated all the md files under `docs` folder
+  in both repos" — then, separately, whether the prompt log and README report sections were
+  being kept current.
+- **Output:** across both repositories seven documents were stale. `PRD_p2p_mcp` listed built
+  features as "not yet built"; both `PLAN` files marked M5 untouched; `ADR-0004` still called
+  the private keys open; the README still required Python 3.10. Recorded `C-022`: the book's
+  per-turn `Reveal` phase says peers exchange the actual move, while the wire reference sends
+  none — move, true position, verdict, and nonce stay private until the audit.
+- **Refinement:** the audit was run as a grep for *claims of absence* ("not yet built", "does
+  not exist", "still absent") rather than by re-reading every file, which found the stale rows
+  directly. Hardcoded totals were replaced with durable statements rather than fresh numbers.
+- **Lesson:** documents rot silently in the direction of *understating* progress, and a
+  correction applied to a code docstring does not propagate to the document of record — in the
+  companion repository an ADR still carried a claim its own code had already retracted.

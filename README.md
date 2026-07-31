@@ -29,10 +29,17 @@ no shared-contract byte, MCP endpoint, or Cop-owned file. See
 
 Commit-reveal, canonical hashing, the wire message types, and the signed-terms
 handshake are implemented as pure protocol logic under `src/p2p_thief_agent/protocol/`
-and documented in [SIM_WIRE_PROTOCOL.md](docs/SIM_WIRE_PROTOCOL.md). The repository
-still deliberately implements no live peer runtime, FastMCP transport, public tunnel,
-scent field, belief map, LLM, Gmail, GUI, or replay behavior, so no game has been
-played against an opponent.
+and documented in [SIM_WIRE_PROTOCOL.md](docs/SIM_WIRE_PROTOCOL.md).
+
+Since then the FastMCP transport has been built on both sides — a server mailbox and
+an outbound client, confined to `adapters/` by a guard test — together with the
+private opponent-URL boundary and the pre-play agreement gate, which refuses a
+mismatched match **by name** before a first move exists. A message has crossed a real
+socket between two operating-system processes, closing the book's stage-2 milestone.
+
+The repository still deliberately implements no turn loop, public tunnel, scent
+field, belief map, LLM, Gmail, GUI, or replay behavior, so **no game has been played
+against an opponent**.
 
 Earlier Cop-bundle reviews are retained as historical audit evidence only. No
 peer-owned file was integrated, and those bundles are not inputs to the current
@@ -122,6 +129,87 @@ packages remain explicit boundaries for their later milestones.
 
 Historical configurations remain quarantined under `config/drafts/`; runtime code must
 not load them. Local private TOML and real `.env` files are ignored.
+
+## Configuration
+
+Configuration is split in two, and the split is load-bearing (`ADR-0004`).
+
+- **Shared, signed, byte-identical.** The per-match game object holds everything
+  that shapes the game — board, movement, scoring, scent, league counts. Both peers
+  must hold the same bytes; it is hashed and signed during the pre-play agreement,
+  and any differing term refuses the match **by name**.
+- **Private, local, never sent.** `config/game.toml` holds this peer's own port,
+  the opponent's URL, model choice, credentials, and per-turn commitment nonces.
+  `config/game.toml.example` is the committed skeleton, matching the book's page 131
+  and the reference's own `config/thief/game.toml`; the real file is git-ignored.
+
+The opponent's address is read only from `[network].opponent_url`, by
+`shared.private_config.load_opponent_url`. The shared object must carry no URL,
+port, or host at all — `assert_no_network_address` refuses one that does, whether
+the address is named like an address or merely looks like one.
+
+## Usage
+
+This peer is not yet runnable as a live agent. The turn loop (`M5-007`) is the
+remaining gap; the SDK, protocol layer, both transport adapters, and the agreement
+gate exist. Today's honest usage surface:
+
+```text
+uv run p2p-thief --version        # 1.00
+uv run python -m p2p_thief_agent --version
+```
+
+A message crossing a real socket between two operating-system processes — the
+book's stage-2 milestone — is exercised by:
+
+```text
+uv run pytest tests/integration/test_localhost_two_processes.py -v
+uv run pytest tests/integration/test_negotiation_gate.py -v
+```
+
+This section will gain the live `peer` invocation, its flags, and replay
+screenshots once the turn loop and a full sub-game land.
+
+## Contributing
+
+The gates enforce the standards, so a change that passes CI already meets them:
+
+- **Style.** `ruff check .` with no findings; do not add per-file ignores to
+  silence one.
+- **File length.** No file over **150 lines** (`scripts/check_file_lengths.py`).
+  Split by responsibility rather than deleting explanatory comments.
+- **Tests.** `pytest --cov --cov-branch --cov-fail-under=85`. New behaviour needs a
+  test that would fail without it. Prefer pinning a rule to the document that states
+  it, so an edited constant fails here rather than in a match.
+- **Secrets.** `scripts/check_secrets.py` must report zero findings. Ports, the
+  opponent URL, credentials, and commitment nonces stay in the git-ignored
+  `config/game.toml` or `.env`.
+- **`THIEF-002`.** No task may be satisfied by reading, cloning, or inspecting the
+  companion Cop repository. The pinned simulator is the sanctioned wire reference:
+  match its wire, never copy its source.
+- **The contract checker** (`scripts/check_shared_contracts.py`) is **fail-closed**
+  and exits non-zero while no accepted parity manifest exists. Never edit it to
+  pass.
+- **Commits.** Stage explicit paths, never `git add .`. Say what changed and *why*,
+  citing the authority (book section, Appendix E/F rule, ADR) when the change
+  encodes a rule.
+- **Documentation.** A behaviour change updates `docs/TODO.md` and every document
+  asserting the old behaviour; `docs/PROMPT_LOG.md` records significant AI-assisted
+  steps with the problem found and the lesson drawn.
+
+## Graded report sections
+
+The submission is graded on a six-section report. Status here is deliberately
+honest — a section is not claimed until it has a runtime result behind it.
+
+| # | Section | Status |
+|---|---|---|
+| 1 | Dec-POMDP model of the game | Pending write-up; the local-state boundary it describes is implemented |
+| 2 | The FastMCP communication dilemma | Pending write-up; the decisions it must describe are recorded in `docs/adr/` and `docs/SPECIFICATION_CONFLICTS.md` |
+| 3 | Implemented strategy | Pending; `strategy/baseline.py` is the deterministic baseline the graded strategy must improve on |
+| 4 | Learning curves, if reinforcement learning is used | Not applicable unless RL is adopted |
+| 5 | Live belief-map and "Verified OK" replay screenshots | Blocked on a full sub-game over the wire |
+| 6 | Companion repository link | Available; see the top of this README |
 
 ## License and provenance
 
