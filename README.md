@@ -197,19 +197,109 @@ The gates enforce the standards, so a change that passes CI already meets them:
   asserting the old behaviour; `docs/PROMPT_LOG.md` records significant AI-assisted
   steps with the problem found and the lesson drawn.
 
-## Graded report sections
+## Report
 
-The submission is graded on a six-section report. Status here is deliberately
-honest — a section is not claimed until it has a runtime result behind it.
+The graded report has six sections. Sections needing a completed match are marked
+blocked rather than filled with claims we cannot show.
 
-| # | Section | Status |
-|---|---|---|
-| 1 | Dec-POMDP model of the game | Pending write-up; the local-state boundary it describes is implemented |
-| 2 | The FastMCP communication dilemma | Pending write-up; the decisions it must describe are recorded in `docs/adr/` and `docs/SPECIFICATION_CONFLICTS.md` |
-| 3 | Implemented strategy | Pending; `strategy/baseline.py` is the deterministic baseline the graded strategy must improve on |
-| 4 | Learning curves, if reinforcement learning is used | Not applicable unless RL is adopted |
-| 5 | Live belief-map and "Verified OK" replay screenshots | Blocked on a full sub-game over the wire |
-| 6 | Companion repository link | Available; see the top of this README |
+### 1. The Dec-POMDP model
+
+The game is a **decentralised, partially observable Markov decision process**.
+
+- **Decentralised.** No server, no referee, no shared memory. Each peer runs in its
+  own operating-system process under its own configuration directory and the two
+  communicate only by message. Neither can inspect the other, so fairness rests on
+  cryptography rather than trust — and under `THIEF-002` this repository is developed
+  without access to the companion peer at all, so the opponent is genuinely unknown.
+- **Partially observable.** The Thief never learns the Cop's position. Each turn it
+  observes its own position, the barriers it has discovered, the Cop's hint, and a
+  commitment hash. Barrier placement is disclosed, so the map of known obstacles grows
+  as the game proceeds — that is the Thief's main source of hard information, and it
+  arrives as a constraint rather than a location.
+- **Markov decision process.** State is the two positions, the barrier field, and the
+  step index; actions are `N`, `S`, `E`, `W`, `STAY`; transitions are deterministic
+  given both actions. Rewards come from the fixed Appendix F table: capture pays the
+  Thief 5, survival 10, a tie 2, and a technical loss **zero to both sides**.
+
+The asymmetry favours the evader in one respect and not another: the Thief **moves
+first** every turn and only has to survive the step limit, but it cannot place
+barriers, so it can never shape the board — it can only read it.
+
+The Thief's local state is deliberately incapable of holding the Cop's position:
+`ThiefLocalState` carries only the board, its own position, its known barriers, and
+the step. The Zero-Trust property is enforced **by construction**, not by discipline.
+
+### 2. The FastMCP communication dilemma
+
+Two agents must talk to play, yet every message is a chance for the opponent to cheat
+or to learn.
+
+**Simultaneity without a referee.** Whoever announced a move first would be at the
+other's mercy, and there is no third party to hold both. **Commit-reveal** resolves
+it: each peer hashes its private decision with a fresh nonce and sends only the
+digest, so no decision can change after seeing the other's. Nonces stay secret until
+the post-game audit, where every commitment is recomputed; one mismatch is an
+automatic zero with no appeal, which makes an audit failure worse than a lost game.
+
+**Deception is legal; forgery is not.** The Thief may lie in its hint — that is the
+strategic layer the project is about — but the lie is sealed. It declares `intent` as
+truth or bluff inside the commitment, so at audit the opponent learns exactly which
+hints were honest. A player may deceive within the turn and cannot deceive about
+having deceived.
+
+**What crosses the wire.** The book describes a per-turn phase where peers exchange
+their actual moves. The pinned reference sends **none**: the live message carries the
+hint, the scent grid, and the commitment hash only, while the move, true position,
+bluff verdict, and nonce stay private until the audit (`C-022`). This repository
+follows the wire, because interoperability is decided by what crosses the socket.
+That decision cost real work — an earlier iteration implemented the book's live
+reveal step and had to remove it (`P-020`), which is the most instructive mistake in
+this project's history.
+
+**Trusting an unknown opponent.** League play is against classmates, so a peer's
+replies cannot be assumed to match ours. Outbound we accept any reply that does not
+explicitly refuse; inbound our tools always acknowledge and validate afterwards, so a
+content rejection is recorded as a game outcome rather than raised at the sender as a
+network fault. Strict in what we send, generous in what we accept.
+
+**Refusing to play is a feature.** Before a first move exists, the pre-play agreement
+compares every negotiated term against our own and refuses a mismatch **by name**,
+enforcing the Appendix F floors — `Fixed` values exactly, `Minimum` values only in
+the harder direction. A refusal an opponent cannot act on would be worth little.
+
+### 3. The implemented strategy
+
+Movement is **pure Python and deterministic**; the language model never selects a
+move. The shipped baseline ranks candidate moves by strict criterion priority rather
+than a weighted sum — discard dead ends, maximise distance from the believed threat,
+maximise mobility, maximise two-ply reach, then minimise corner contact, with a fixed
+action order breaking ties.
+
+Lexicographic ranking was chosen over weights deliberately: no calibration data
+exists that would justify any particular coefficients, and a strict order can be
+audited from the log, while tuned weights cannot. The first definition of "trapping"
+proved nearly vacuous — the cell just vacated is always a legal way back — and was
+replaced by "every exit leads back to the origin".
+
+This is the floor the graded strategy must beat, not the deliverable.
+
+### 4. Learning curves
+
+**Not applicable.** No reinforcement learning is used; the policy is deterministic by
+design, so there is no training run and no curve. If RL is adopted, this section
+gains the curves rather than a placeholder chart.
+
+### 5. Live belief map and "Verified OK" replay screenshots
+
+**Blocked, honestly.** Screenshots need a completed sub-game and no game has been
+played end to end — the turn loop (`M5-007`) is the remaining gap. What is proven
+today under test: a message crosses a real socket into a separate operating-system
+process, and the agreement gate accepts or refuses a match by name.
+
+### 6. Companion repository
+
+<https://github.com/SharbelMaroun/p2p-cop-agent> — the Cop-side peer. Under
+`THIEF-002` it is not an input to this repository's development.
 
 ## License and provenance
 
