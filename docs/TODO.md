@@ -365,8 +365,8 @@ now **envelope-free**: the tool argument *is* the message dict. Row `M4-001` sti
 | M5-003a | Enforce idempotency keys across retries | PENDING | A retried turn cannot double-apply |
 | M5-003b | Reject replayed message identifiers | PENDING | Deterministic rejection, not silent drop |
 | M5-004 | Implement deadlines, watchdog, controlled recovery, and backpressure | PENDING | Timeout/crash/recovery tests |
-| M5-004a | Attach a timestamp and expiry to every request | PENDING | An expired request is a failure, never patience `[book §9]` |
-| M5-004b | Implement bounded retry with backoff | PENDING | `retry_backoff_sec`, `max_retries` from config `[AF-t19]` |
+| M5-004a | Attach a timestamp and expiry to every request | DONE | `services/deadlines.Deadline` carries `started` and `expires`, and the boundary itself counts as expired. Book §8.4.1's boxed note is the spec — *"Missing a Deadline is a Failure, Not Patience"* — permitting exactly two outcomes: retry, or declare a technical loss and clear the queue cleanly. Time is **injected**, so a timeout is proven by passing a number rather than sleeping `[book §8.4.1]` |
+| M5-004b | Implement bounded retry with backoff | DONE | `services/deadlines.attempt` gives each try its own expiry and stops at `max_retries`, raising `DeadlineError` so the caller can declare a technical loss. **Key names confirmed against the pinned reference 2026-08-01**: `network_and_league.response_timeout_sec` (30), `rate_limiter_gatekeeper.retry_backoff_sec` (5), `.max_retries` (3), `network_and_league.watchdog_timeout_sec` (60) — all in the **shared, signed** match object, so neither peer can give itself a longer rope. A slow attempt that overruns its own expiry is **not** retried. Appendix F table 19 marks the first three `Minimum` and the watchdog `Negotiation` `[AF-t19]` |
 | M5-004c | Trip the watchdog at `watchdog_timeout_sec` | PENDING | Default 60 s `[AF-t19]`; the book's 180 s code sample is illustrative `[AE-6]` |
 | M5-004d | Persist state and shut down cleanly on trip | PENDING | `persist_state()` then `controlled_shutdown()` `[AE-7]` |
 | M5-004e | Route a mid-turn disconnect to a terminal technical loss | PENDING | No deadlock path out of the awaiting-reveal state |
@@ -403,7 +403,7 @@ now **envelope-free**: the tool argument *is* the message dict. Row `M4-001` sti
 | M5-011c | Survive a peer that replays an earlier message | PENDING | Idempotency guard rejects it |
 | M5-011d | Survive a peer that sends oversized or malformed input | PENDING | Validation rejects before domain code runs |
 | M5-011e | Survive a peer that disconnects mid-audit | PENDING | The audit outcome is still decided and recorded |
-| M5-012 | Complete the book's stage-2 localhost milestone | PENDING | Book p. 105: a message sent by peer A on localhost is received correctly by peer B. This gate was never opened; M4 substance was built first |
+| M5-012 | Complete the book's stage-2 localhost milestone | DONE | Book p. 105: a message sent by peer A on localhost is received correctly by peer B. **Closed by `M5-002e`** — `tests/integration/test_localhost_two_processes.py` spawns a real second interpreter, sends over HTTP, and reads back the transcript that process wrote. This row duplicated `M5-002e` and was left `PENDING` after it closed; reconciled 2026-08-01 when re-reading the ledger. Its sub-rows `M5-012b`..`M5-012e` are superseded by `M5-014` (negotiate) and `M5-007` (turn, sub-game, audit) |
 | M5-012a | Launch two peers on distinct localhost ports | PENDING | Separate processes, separate config directories `[AE-1]` |
 | M5-012b | Exchange one negotiate round trip | PENDING | Offer out, acceptance back, both sides agree the terms hash |
 | M5-012c | Exchange one turn round trip | PENDING | Commit out, acknowledgement back, reveal accepted |

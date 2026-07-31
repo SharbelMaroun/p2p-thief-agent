@@ -40,3 +40,5 @@ Official filenames are `declaration_<game_id>.json`,
 The book's Chapter 4.3 formula applies multiplicative decay:
 `τ(t+1) = max(0, (1-ρ) × τ(t) + Δτ)`. Exact observation and turn ordering still require
 an accepted contract. Do not copy the simulator's subtractive implementation.
+
+**Table 19 status detail, verified against the book PDF 2026-08-01.** The rate/concurrency, retry-delay, retry-count and queue rows are `MINIMUM`; the **watchdog timeout for deadlock detection (60 s) is `NEGOTIATION`**, not `MINIMUM`. The distinction matters because a `MINIMUM` may only be made stricter, whereas a negotiated value may move either way by agreement. The response timeout (30 s) and watchdog timeout live in `network_and_league`; the retry and queue limits live in `rate_limiter_gatekeeper` — all in the **shared, signed** match object, so neither peer can give itself a longer rope.
