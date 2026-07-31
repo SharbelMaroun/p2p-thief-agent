@@ -7,7 +7,10 @@ name = "p2p-thief-agent"
 dynamic = ["version"]
 description = "Thief peer package for a distributed Cops-and-Robbers project"
 readme = "README.md"
-requires-python = ">=3.10"
+# 3.11 is the floor because the private per-peer config is TOML (book p. 131) and
+# `tomllib` entered the standard library in 3.11. CI runs 3.12 and the course
+# reference runs 3.13, so 3.10 was a support claim nothing ever exercised.
+requires-python = ">=3.11"
 license = { file = "LICENSE" }
 authors = [{ name = "Sharbel Maroun and Amr safadi" }]
 dependencies = [

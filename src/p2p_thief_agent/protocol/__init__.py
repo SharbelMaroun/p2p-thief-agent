@@ -7,6 +7,16 @@ Option-B conformance profile and its neutral stub are archived under
 `archive/pre-sim-realign/`.
 """
 
+from p2p_thief_agent.protocol.agreement import (
+    FIXED_TERMS,
+    MINIMUM_TERMS,
+    AgreementError,
+    accept_offer,
+    check_appendix_f,
+    differing_terms,
+    signed_offer_is_valid,
+    validate_participants,
+)
 from p2p_thief_agent.protocol.crypto import (
     NONCE_BYTES,
     CryptoError,
@@ -46,11 +56,14 @@ from p2p_thief_agent.protocol.wire import (
 
 __all__ = [
     "AGREEMENT_TERMS",
+    "AgreementError",
     "AuditPayload",
     "CONTROL_KINDS",
     "ControlMessage",
     "CryptoError",
+    "FIXED_TERMS",
     "Handshake",
+    "MINIMUM_TERMS",
     "NONCE_BYTES",
     "REQUIRED_TERMS",
     "RESULT_CLAIMS",
@@ -58,7 +71,12 @@ __all__ = [
     "StepDecision",
     "TurnMessage",
     "WireError",
+    "accept_offer",
     "audit_records",
+    "check_appendix_f",
+    "differing_terms",
+    "signed_offer_is_valid",
+    "validate_participants",
     "build_turn_message",
     "canonical_json",
     "canonical_sha256",

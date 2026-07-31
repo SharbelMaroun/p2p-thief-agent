@@ -16,6 +16,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 
 from p2p_thief_agent.peer.transport import JsonObject
+from p2p_thief_agent.protocol.agreement import AgreementError, accept_offer
 from p2p_thief_agent.protocol.crypto import audit_records
 from p2p_thief_agent.protocol.wire import AuditPayload, ControlMessage, TurnMessage, WireError
 
@@ -27,12 +28,16 @@ OK_RESPONSE: JsonObject = {"ok": True}
 class InboundPeer:
     """Validate inbound tool calls for one sub-game, holding no transport state."""
 
-    __slots__ = ("_dispatch", "audits_verified", "opponent_group", "turns")
+    __slots__ = ("_dispatch", "agreed_terms", "audits_verified", "my_terms", "opponent_group", "turns")
 
-    def __init__(self) -> None:
+    def __init__(self, my_terms: Mapping[str, object] | None = None) -> None:
         self.turns: list[TurnMessage] = []
         self.opponent_group: str | None = None
         self.audits_verified: list[dict] = []
+        # This peer's own agreed terms. Supplied once the runtime has loaded the
+        # shared match object; until then `negotiate` can only check the shape.
+        self.my_terms: Mapping[str, object] | None = my_terms
+        self.agreed_terms: dict | None = None
         self._dispatch: dict[str, Callable[[Mapping[str, object]], JsonObject]] = {
             "negotiate": self.negotiate,
             "receive_turn": self.receive_turn,
@@ -41,11 +46,12 @@ class InboundPeer:
         }
 
     def negotiate(self, message: Mapping[str, object]) -> JsonObject:
-        """Record the opponent's agreement message and its per-group identity.
+        """Decide whether this peer will play, and record the opponent's identity.
 
-        Signature and terms verification belongs to `protocol.handshake` and needs
-        this peer's own terms, which the runtime supplies at `M5-004`. Here the
-        message must only carry the members the wire requires.
+        When the runtime has supplied `my_terms`, this is the real Appendix E rule
+        11 gate: signature, Appendix F, and every term compared against our own,
+        refusing by name. Without them only the wire shape can be checked, which is
+        the state before the shared match object is loaded (`M5-014`).
         """
         for field in ("terms", "nonce", "signature"):
             if field not in message:
@@ -53,6 +59,11 @@ class InboundPeer:
         identity = message.get("identity")
         if identity is not None and not isinstance(identity, Mapping):
             raise WireError("negotiate identity must be an object")
+        if self.my_terms is not None:
+            try:
+                self.agreed_terms = accept_offer(message, self.my_terms)
+            except AgreementError as exc:
+                raise WireError(f"negotiate refused: {exc}") from exc
         self.opponent_group = (identity or {}).get("group_id")
         return dict(OK_RESPONSE)
 

@@ -15,8 +15,19 @@ input. Active per-match JSON will be generated only from an accepted profile and
 validated negotiated values. Historical drafts remain evidence only and are never
 loaded by runtime code.
 
-Any future Thief private TOML remains local, role-specific, and ignored by Git. Exact
-private keys and compatibility behavior are `PENDING` under ADR-0004.
+The Thief private TOML is local, role-specific, and ignored by Git. `game.toml.example`
+is the committed skeleton; the real `config/game.toml` is never shared, signed, or sent.
+
+The exact private keys were `PENDING` under ADR-0004 and are now settled (`M5-002f`,
+2026-07-31), matching the skeleton the book publishes on page 131 and the pinned wire
+reference's own `config/thief/game.toml`. The opponent's address is read only from
+`[network].opponent_url`, by `shared.private_config.load_opponent_url`. The shared
+match JSON carries no URL, port, host, or any network address at all; a peer that tries
+to put one there is refused by `assert_no_network_address`.
+
+Ports, opponent URL, models, credentials, tunnels, strategy tuning, and per-turn
+commitment nonces are private. The public negotiation challenge nonce is wire data, not
+private configuration.
 
 Opposite-role Cop drafts are preserved outside the active configuration tree under
 `archive/pre-audit/opposite-role-config/`.
