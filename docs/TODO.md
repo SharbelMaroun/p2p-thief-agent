@@ -355,12 +355,12 @@ now **envelope-free**: the tool argument *is* the message dict. Row `M4-001` sti
 | M5-001a | Define the five subsystem ports behind the gateway | PENDING | MCP connector, decision module, log manager, deadline tracker, watchdog `[AE-3]` |
 | M5-001b | Forbid subsystem-to-subsystem imports by test | PENDING | Import-graph test fails on any direct peer link |
 | M5-001c | Keep decision logic out of the gateway | PENDING | It coordinates; it does not decide `[book §9]` |
-| M5-002 | Run the Thief as both FastMCP server and client | PENDING | Separate-process integration tests |
-| M5-002a | Expose the four tools on a local FastMCP server | PENDING | `negotiate`, `receive_turn`, `submit_audit`, `receive_control`, each taking one argument with no envelope. Corrected 2026-07-31: this row previously named `receive_move`, the withdrawn Option-B name. A server exposing `receive_move` is unreachable by any agent built from the reference simulator. See `SIM_WIRE_PROTOCOL.md` |
-| M5-002b | Confine every FastMCP import to an adapters layer | PENDING | A guard test proves the SDK and protocol layers import no FastMCP |
-| M5-002c | Implement the outbound client against the opponent URL | PENDING | Argument shaping matches `SIM_WIRE_PROTOCOL.md` |
-| M5-002d | Decide and document the tool acknowledgement semantics | PENDING | Whether a validation failure is a transport error or a game outcome must be explicit, since the opponent's retry behaviour depends on it |
-| M5-002e | Prove a message round-trips between two processes | PENDING | Parent DoD; book stage-2 milestone |
+| M5-002 | Run the Thief as both FastMCP server and client | IN PROGRESS | Server, client, and an in-memory round trip all exist and pass; the parent DoD is **separate-process** integration (`M5-002e`), which is not yet done |
+| M5-002a | Expose the four tools on a local FastMCP server | DONE | `adapters.build_server` exposes `negotiate`, `receive_turn`, `submit_audit`, `receive_control`, each taking one argument with no envelope. A test asserts `receive_move` — the withdrawn Option-B name — is **not** reachable. See `SIM_WIRE_PROTOCOL.md` |
+| M5-002b | Confine every FastMCP import to an adapters layer | DONE | A guard test walks every module under `src/` and fails on any non-`adapters` importer of fastmcp |
+| M5-002c | Implement the outbound client against the opponent URL | DONE | `adapters.FastMCPClient` implements `peer.PeerTransport`; argument keywords come from `peer.TOOL_ARGUMENTS`, the single place they are written, so inbound and outbound cannot drift apart |
+| M5-002d | Decide and document the tool acknowledgement semantics | DONE | **Decision:** tools never validate and never raise; `drain` validates afterwards and a failure there is a recorded game outcome. This diverges from the reference, which validates structurally inside the tool and raises. The divergence is kept because a *tampered audit is structurally well-formed* yet must be scored as a technical loss (`AE-19`); a peer that raises invites the opponent to retry a decided loss as a transport fault. Recorded in `adapters/fastmcp_server.py` and `PRD_p2p_mcp.md` |
+| M5-002e | Prove a message round-trips between two processes | PENDING | Parent DoD; book stage-2 milestone. The in-memory loopback proves the call shapes but runs both halves in **one** process, so it cannot prove process separation (`AE-1`/`AE-2`) or real socket behaviour. Needs two OS processes on distinct ports |
 | M5-003 | Enforce accepted idempotency, acknowledgement, and duplicate handling | PENDING | Duplicate/reorder tests |
 | M5-003a | Enforce idempotency keys across retries | PENDING | A retried turn cannot double-apply |
 | M5-003b | Reject replayed message identifiers | PENDING | Deterministic rejection, not silent drop |
@@ -376,11 +376,11 @@ now **envelope-free**: the tool argument *is* the message dict. Row `M4-001` sti
 | M5-005b | Exchange only the public URL | PENDING | `[AE-10]`; provider choice stays local |
 | M5-005c | Rehearse a full game across two machines | PENDING | Book stage-5 milestone |
 | M5-006 | Run the Thief in its own process under its own config directory | PENDING | `[AE-1]` `[AE-2]`: no shared memory, no shared stateful module, no shared variables with any other role |
-| M5-002f | Read the opponent URL from private configuration only | PENDING | Never from the shared JSON `[ADR-0004]` |
-| M5-002g | Fail cleanly on an unreachable opponent URL | PENDING | Connection refused surfaces as a transport fault, not a crash |
-| M5-002h | Fail cleanly on a malformed opponent response | PENDING | Non-JSON or missing payload is rejected deterministically |
-| M5-002i | Keep the client stateless between calls | PENDING | No hidden session state leaks across turns |
-| M5-002j | Document the client contract in `PRD_p2p_mcp.md` | PENDING | Call shapes and fault mapping recorded |
+| M5-002f | Read the opponent URL from private configuration only | PENDING | Never from the shared JSON `[ADR-0004]`. The client takes `target` explicitly and reads no configuration at all, so it *cannot* reach the shared object — but that is a weaker property than the one asked for. Closing this needs the private-TOML loader, which does not exist yet, plus a test that the shared terms carry no opponent URL |
+| M5-002g | Fail cleanly on an unreachable opponent URL | DONE | `http://127.0.0.1:1/mcp` raises `TransportError`, never a crash |
+| M5-002h | Fail cleanly on a malformed opponent response | DONE | A reply that is not a JSON object raises `TransportError` deterministically. The client is **liberal** about the ack shape — `{"ok": true}`, `{"status": "ok"}`, and `{"status": "delivered"}` are all accepted — because the profile never fixed the opponent's shape; only an explicit `ok: false` / failing `status` / non-empty `error` is a `PeerRejectionError` |
+| M5-002i | Keep the client stateless between calls | DONE | `__slots__` makes hidden per-turn state impossible rather than merely absent; each call opens and closes its own session |
+| M5-002j | Document the client contract in `PRD_p2p_mcp.md` | DONE | Call shapes, the two-way fault mapping, and the acknowledgement decision recorded |
 | M5-007 | Implement the turn loop around the transport | PENDING | One iteration is compute → commit → await ack → reveal → verify → advance |
 | M5-007a | Drive the loop from the protocol state machine | PENDING | Every step is a declared transition `[AE-4]` |
 | M5-007b | Make one turn atomic against partial failure | PENDING | A mid-turn fault leaves no half-applied state |
