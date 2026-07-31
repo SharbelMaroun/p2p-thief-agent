@@ -281,3 +281,101 @@
 - **Lesson:** lexicographic ranking beat a weighted sum precisely because no calibration
   data exists to justify weights. And when a test fails, decide whether the code or the
   expectation is wrong before changing either — here the policy was right twice.
+
+---
+
+> **Provenance note for P-019 … P-022.** Reconstructed on 2026-08-01 from the commit
+> record, the documents each step produced, and the `Co-Authored-By` trailers, because
+> the log had fallen behind between 2026-07-28 and 2026-08-01. Not transcribed from the
+> original sessions: each "Prompt (essence)" records the evident task and the human's
+> stated intent, not verbatim wording. P-023 onward were written in the sessions that
+> performed them.
+
+## P-019 — Replacing the copy model with a conformance model
+- **Date:** 2026-07-28 · **Tool:** Claude (agentic CLI) · *reconstructed*
+- **Goal:** decide what M1 actually has to prove, after a coordinator verdict rejected the previous premise.
+- **Prompt (essence):** record the coordinator's `NO` verdict, revert the role-alternation claim it rejected, and stop treating byte-parity with the companion repository as the goal.
+- **Output:** `THIEF-002` recorded as development-time independence from the Cop repository; the copy model superseded by an interoperability conformance model; the M2 domain built under the same contract-independent authorization; the deterministic Thief baseline strategy behind the SDK.
+- **Refinement:** the reasoning that settled it: league play is against **unknown classmates**, so matching one companion repository byte-for-byte is evidence about that repository only. The Thief therefore authors its own wire profile and must prove itself against something neutral.
+- **Lesson:** matching one specific peer is not interoperability. A conformance gate has to be defined against a spec and an independent stub, or it only ever proves that two copies of the same assumption agree.
+
+## P-020 — Building the book's wire, then removing it
+- **Date:** 2026-07-28 → 2026-07-29 · **Tool:** Claude (agentic CLI) · *reconstructed*
+- **Goal:** implement the book's commit-reveal flow literally, including its live third phase.
+- **Prompt (essence):** follow the coordinator's ruling and adopt the book's construction — rename the turn tool to `receive_move` and add the live `receive_reveal` step the book's figure 6 describes.
+- **Output:** the book construction adopted, the tool renamed, `receive_reveal` implemented, live-reveal capability required in the profile, and commit-to-reveal ordering enforced before audit. Then, on receiving authoritative wire answers, **all of it was withdrawn**: the tool reverted to `receive_turn` and the live reveal was removed.
+- **Refinement:** the withdrawal was not a partial edit. The whole Option-B protocol layer was replaced by the simulator wire in one deliberate commit, with the superseded modules, the Node stub, and the conformance tests written against the old profile archived rather than deleted, so the history stays inspectable.
+- **Lesson:** the most expensive week of this project was spent implementing a documented flow that the wire does not use. The book describes what the protocol *means*; the reference shows what actually crosses the socket, and only the second one an opponent can observe. Ask the wire before building to it.
+
+## P-021 — Re-aligning the protocol layer in six deliberate steps
+- **Date:** 2026-07-29 · **Tool:** Claude (agentic CLI) · *reconstructed*
+- **Goal:** move the entire protocol layer onto the simulator wire without losing reviewability.
+- **Prompt (essence):** re-align commitment construction, message types, crypto, sealing, handshake, and outcome mapping to the simulator, one reviewable commit each.
+- **Output:** six numbered commits (`M4 re-align 1/6` … `6/6`) followed by the breaking replacement commit, plus `SIM_WIRE_PROTOCOL.md` as the authoritative record and the lecturer's answers closing `U-021` and `U-014`.
+- **Refinement:** numbering the commits `n/6` in advance made an eight-commit rewrite reviewable in pieces and made it obvious if a step was skipped.
+- **Lesson:** a breaking change is safer as a labelled sequence than as one large commit — and archiving the superseded layer costs nothing next to the ability to answer "what did we used to do, and why did we stop?"
+
+## P-022 — Reconciling the documents with the re-alignment
+- **Date:** 2026-07-31 · **Tool:** Claude (agentic CLI) · *reconstructed*
+- **Goal:** find every document still describing the world before the wire re-alignment.
+- **Prompt (essence):** check both repositories deeply against the instruction documents; the lecturer will not forgive missing points.
+- **Output:** eight documents corrected; the M5 tool name fixed from the withdrawn `receive_move` back to `receive_turn`; the wire pinned to real reference output; Stage C conformance-profile acceptance recorded; `M5-002` adapters and the stage-2 localhost milestone closed.
+- **Refinement:** the tool-name defect is the one worth remembering — a build instruction still said `receive_move` while the repository's own specification said `receive_turn`. Two agents built to those two documents would have been unable to connect at all.
+- **Lesson:** a refactor is not finished when the tests pass. Documents that outlive a decision will be followed by whoever reads them next, and a stale build instruction is executable in the worst sense.
+
+## P-023 — Closing the private-configuration boundary and the agreement gate
+- **Date:** 2026-08-01 · **Tool:** Claude Opus 5 (agentic CLI) + NotebookLM
+- **Goal:** `M5-002f` and `M5-014` — where the opponent's address comes from, and whether
+  this peer will agree to play at all.
+- **Prompt (essence):** "continue to work according to the unDone TODO file in 2 repos,
+  and according to the 2 links in the notebookLM (please keep in touch with them and
+  always ask them), and also according to the md files under `inst`".
+- **Output:** `shared/private_config.py` reads `[network].opponent_url` from one explicit
+  private TOML path and is the only door to an opponent address; `assert_no_network_address`
+  is the lock on the other, refusing a shared match object that carries an address by
+  member **name** or by **value**. `protocol/agreement.py` decides whether to play —
+  signature, required terms, Appendix F floors, then every term compared against our own,
+  refusing **by name** — and is wired into the live `InboundPeer` handler rather than left
+  as an unused module.
+- **Refinement:** the reference was consulted before writing, which settled the section and
+  key names, the separate `config/police/` and `config/thief/` directories, and a flat "no"
+  to whether the shared JSON ever carries a network address. That closed keys `ADR-0004`
+  had left `PENDING`.
+- **Lesson:** two checks, not one. A leak guard that only matches member *names* is evaded
+  by renaming the key; one that only matches *values* is evaded by an unusual format. Either
+  alone reads as thorough and is not.
+
+## P-024 — A required term that would have refused the lecturer's own template
+- **Date:** 2026-08-01 · **Tool:** Claude Opus 5 (agentic CLI) + NotebookLM (both notebooks)
+- **Goal:** settle whether `min_center_intensity` belongs in the required agreed terms.
+- **Prompt (essence):** "check the second notebook. always check in both of them when needed."
+- **Output:** the book PDF's Appendix F table 16 has exactly three rows, all `Fixed`, and
+  **no** minimum-centre row; the lecturer's own `agreed-config` template carries the same
+  three keys and no fourth. This repository listed the term in `REQUIRED_TERMS`, so it would
+  have rejected the very configuration template teams are meant to share, reporting it as a
+  missing agreed term. Removed from `REQUIRED_TERMS`, kept in `AGREEMENT_TERMS` so it is
+  still compared when a peer sends it, and pinned by a regression test.
+- **Refinement:** the pinned simulator *does* require the key and its own config carries it,
+  which is why the wrong reading looked defensible. The source-of-truth order decided it: a
+  simulator behaviour contradicting both the book and the lecturer's template is not authority.
+- **Lesson:** the constant had been written once, exported, and called by **no decision path**,
+  so no test could catch it — it only became visible when wired into a live refusal. A constant
+  that claims to encode a rule should be pinned to the document that states the rule.
+
+## P-025 — Auditing the documents against what was actually built
+- **Date:** 2026-08-01 · **Tool:** Claude Opus 5 (agentic CLI)
+- **Goal:** check every `docs/` file for claims the code had outgrown.
+- **Prompt (essence):** "before this check if you updated all the md files under `docs` folder
+  in both repos" — then, separately, whether the prompt log and README report sections were
+  being kept current.
+- **Output:** across both repositories seven documents were stale. `PRD_p2p_mcp` listed built
+  features as "not yet built"; both `PLAN` files marked M5 untouched; `ADR-0004` still called
+  the private keys open; the README still required Python 3.10. Recorded `C-022`: the book's
+  per-turn `Reveal` phase says peers exchange the actual move, while the wire reference sends
+  none — move, true position, verdict, and nonce stay private until the audit.
+- **Refinement:** the audit was run as a grep for *claims of absence* ("not yet built", "does
+  not exist", "still absent") rather than by re-reading every file, which found the stale rows
+  directly. Hardcoded totals were replaced with durable statements rather than fresh numbers.
+- **Lesson:** documents rot silently in the direction of *understating* progress, and a
+  correction applied to a code docstring does not propagate to the document of record — in the
+  companion repository an ADR still carried a claim its own code had already retracted.

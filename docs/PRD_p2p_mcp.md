@@ -76,11 +76,18 @@ object is therefore accepted unless it explicitly signals failure via
 own shape would read every successful delivery from a simulator-built classmate
 as a refusal and abandon a healthy game.
 
-**Not yet built:** separate-process integration (`M5-002e`, the book's stage-2
-milestone), the private-TOML loader that supplies the opponent URL (`M5-002f`),
-idempotency (`M5-003`), deadlines and watchdog (`M5-004`), the tunnel
-(`M5-005`), and the turn loop (`M5-007`). Nothing yet drives these adapters as a
-game.
+**Built since:** the separate-process round trip closed the book's stage-2
+milestone (`M5-002e`); `shared/private_config.py` supplies the opponent URL from
+`[network].opponent_url` and is the only door to one, while
+`assert_no_network_address` refuses a shared match object that carries an address
+(`M5-002f`); and `protocol/agreement.py` decides whether this peer will play at
+all — signature, required terms, Appendix F floors, then every term compared
+against our own, refusing **by name** — wired into the live `InboundPeer` handler
+(`M5-014`).
+
+**Not yet built:** idempotency (`M5-003`), deadlines and watchdog (`M5-004`), the
+tunnel (`M5-005`), and the turn loop (`M5-007`). The adapters and the agreement
+gate exist; nothing yet drives them as a whole game.
 
 ## Future acceptance criteria and tests
 
