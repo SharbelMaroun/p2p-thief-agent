@@ -14,19 +14,29 @@ schema or shared-contract byte, and it does not implement live runtime behavior.
 conformance checker remains fail-closed at `PENDING` until an exact accepted profile
 revision is recorded.
 
-## Future public endpoints
+## Future public endpoints — SUPERSEDED 2026-07-29
 
-The future FastMCP surface will expose:
+> **Do not build from this list.** It records the 2026-07-28 book-aligned surface,
+> which the simulator-wire adoption replaced the next day. The live tool surface is
+> **`negotiate`, `receive_turn`, `submit_audit`, optional `receive_control`** — four
+> tools, no `receive_move`, no separate live-reveal tool — specified in
+> [SIM_WIRE_PROTOCOL.md](SIM_WIRE_PROTOCOL.md) and mirrored in
+> [PRD_p2p_mcp.md](PRD_p2p_mcp.md).
+
+The superseded 2026-07-28 surface was:
 
 - `negotiate`
-- `receive_move` — the book's named turn tool (§2.3.2), superseding the earlier
-  Option-B `receive_move` name per the 2026-07-28 coordinator ruling
-- `receive_reveal` — the required book Step-3 live reveal
+- `receive_move` — the book's named turn tool (§2.3.2), adopted over the earlier
+  Option-B `receive_turn` name per the 2026-07-28 coordinator ruling
+- `receive_reveal` — the book Step-3 live reveal
 - `submit_audit`
 - `receive_control` (optional)
 
+That ruling was itself reversed on 2026-07-29, restoring `receive_turn` and dropping
+the separate live-reveal tool: the reveal travels in the audit payload.
+
 `submit_audit` is the **server** tool. `exchange_audit` is only a **client-side**
-method and is never exposed as a server tool.
+method and is never exposed as a server tool. That part still holds.
 
 ## Commit-reveal shape — reversed twice; read the last block only
 

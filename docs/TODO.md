@@ -356,7 +356,7 @@ now **envelope-free**: the tool argument *is* the message dict. Row `M4-001` sti
 | M5-001b | Forbid subsystem-to-subsystem imports by test | PENDING | Import-graph test fails on any direct peer link |
 | M5-001c | Keep decision logic out of the gateway | PENDING | It coordinates; it does not decide `[book §9]` |
 | M5-002 | Run the Thief as both FastMCP server and client | PENDING | Separate-process integration tests |
-| M5-002a | Expose the four tools on a local FastMCP server | PENDING | `negotiate`, `receive_move`, `submit_audit`, `receive_control` |
+| M5-002a | Expose the four tools on a local FastMCP server | PENDING | `negotiate`, `receive_turn`, `submit_audit`, `receive_control`, each taking one argument with no envelope. Corrected 2026-07-31: this row previously named `receive_move`, the withdrawn Option-B name. A server exposing `receive_move` is unreachable by any agent built from the reference simulator. See `SIM_WIRE_PROTOCOL.md` |
 | M5-002b | Confine every FastMCP import to an adapters layer | PENDING | A guard test proves the SDK and protocol layers import no FastMCP |
 | M5-002c | Implement the outbound client against the opponent URL | PENDING | Argument shaping matches `SIM_WIRE_PROTOCOL.md` |
 | M5-002d | Decide and document the tool acknowledgement semantics | PENDING | Whether a validation failure is a transport error or a game outcome must be explicit, since the opponent's retry behaviour depends on it |

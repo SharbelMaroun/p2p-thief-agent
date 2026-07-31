@@ -1,6 +1,8 @@
 # PRD — Peer-to-Peer FastMCP
 
-Status: structural and reliability boundaries confirmed; wire contract pending.
+Status: structural and reliability boundaries confirmed; the wire contract was
+**settled on 2026-07-29** by adopting the simulator wire — see
+[SIM_WIRE_PROTOCOL.md](SIM_WIRE_PROTOCOL.md), which is the authoritative record.
 
 ## Confirmed requirements
 
@@ -14,12 +16,20 @@ Status: structural and reliability boundaries confirmed; wire contract pending.
 - Appendix F defaults are 30-second response and 60-second watchdog timeouts
   (`AF-019`).
 
-## Contract gate
+## Tool surface — settled
 
-Exact MCP tool names, envelopes, fields, idempotency keys, ordering, acknowledgements,
-ports, maximum sizes, and recovery messages remain in `U-003`/`U-006` and ADR-0001/0002.
-Simulator names such as `negotiate`, `receive_move`, `submit_audit`, and
-`receive_control` are candidate interoperability choices, not book-mandated names.
+The four tools are **`negotiate`**, **`receive_turn`**, **`submit_audit`**, and optional
+**`receive_control`**, each taking a single argument (`message`, `message`, `payload`,
+`message`) with **no envelope** — the argument *is* the message dict.
+
+> `receive_move` is **not** a tool in this profile. It was the earlier Option-B/book
+> name and was withdrawn when the simulator wire was adopted on 2026-07-29. Building a
+> server that exposes `receive_move` would leave this peer unreachable by any agent
+> written against the reference simulator, which is what classmates build from.
+
+These are interoperability choices matching the reference simulator, not book-mandated
+names — the book leaves tool naming open. Ports remain private (`U-006`). Idempotency
+keys, ordering, maximum sizes, and recovery messages are M5 runtime design.
 
 ## Future acceptance criteria and tests
 

@@ -1,14 +1,25 @@
 # Plan
 
-Status: M0, M2, and M3 are `DONE`; M1 is `IN PROGRESS` at M1-013 with Stage A/B evidence
-built and Stage C acceptance pending. M4–M9 are `PENDING` and proceed in order. The M4
-substance is implemented and doubles as M1 Stage-B evidence (2026-07-29 "Both" ruling),
-but M4 completion awaits M1 Stage C. Nothing is classified `BLOCKED`; unresolved
-decisions are requested explicitly rather than inferred.
+Status: M0, M2, and M3 are `DONE`; M1 is `IN PROGRESS` at M1-013. M4–M9 are `PENDING`
+and proceed in order. The M4 substance is implemented — commit-reveal, canonical
+hashing, wire message models, and the signed-terms handshake all ship under
+`protocol/` — but M4 completion awaits M1 Stage C. Nothing is classified `BLOCKED`;
+unresolved decisions are requested explicitly rather than inferred.
 
-The Thief M0–M1 scaffold is based on remote main
-`e1cc4992cd1c9a7705edf13fc976f85482ce601b`. It has package, SDK, CLI, test, and
-quality boundaries but no gameplay or peer runtime.
+**Stage-B status, corrected 2026-07-31.** Stage A is satisfied by
+[SIM_WIRE_PROTOCOL.md](SIM_WIRE_PROTOCOL.md). Stage B is **partly** satisfied: the
+Node stub that proved the earlier Option-B profile was retired to
+`archive/pre-sim-realign/` when the wire was re-aligned on 2026-07-29, so no stub
+exercises the current profile. What does exist is stronger for the commitment domain
+alone — `tests/unit/test_reference_vector.py` reproduces a commit hash emitted by the
+**reference simulator** during a real match, which is foreign-implementation evidence
+rather than self-authored vectors. Stage B for the tool surface, negotiation, and
+message shapes remains unproven (`M1-015`–`M1-017`).
+
+Beyond the M0–M1 scaffold this repository now implements the M2 core domain, M3 local
+state and scoring, the deterministic baseline strategy, and the protocol layer. It has
+no peer runtime, transport, or FastMCP dependency: `fastmcp` is deliberately absent
+from `pyproject.toml` until `M5-002` begins.
 
 ## Architecture boundary
 
@@ -75,7 +86,7 @@ M1 is now an **interoperability conformance gate**, specified in
   canonicalization with escaping vectors and separated hash domains.
 - **Stage B** — that profile is proved bidirectionally against a neutral stub opponent
   sharing no source file with any peer, with two participant identities and fail-closed
-  negative vectors.
+  negative vectors. *Currently only partly met — see the Stage-B note at the top.*
 - **Stage C** — the coordinator accepts the profile, then separately issues
   `M2_GAMEPLAY: GO`.
 
@@ -93,7 +104,8 @@ profile exists.
 
 ## Decision gates
 
-The ten placeholders under [adr/](adr/README.md) do not authorize runtime behavior.
+The nine live placeholders under [adr/](adr/README.md) do not authorize runtime
+behavior (ADR-0006 was superseded on 2026-07-29 and archived).
 Shared-impact decisions require direct evidence and explicit acceptance. In particular,
 schema versions, participant/match binding, canonicalization, `config_sha256` scope,
 extension policy, and neutral-opponent failure semantics must be explicitly decided
