@@ -1,0 +1,26 @@
+{
+  "_source": "docs/sample-run/log_segal-police-team-vs-segal-thief-team_g01.json, records[0]",
+  "_provenance": "Reference simulator Game-P2P-Cop-Chase (rmisegal), read 2026-07-31 via the lecturer's published NotebookLM. This is real match output produced by the reference implementation, not a value this project invented.",
+  "_why": "Independent cross-implementation evidence for the commit construction. A same-language test cannot catch a shared wrong assumption; this record was produced by different code on a different machine. It exercises float rendering (ram_gb 31.8, vram_gb 6.0), which is the classic cross-language canonicalization hazard.",
+  "_construction": "sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(',',':')) + '|' + nonce)",
+  "payload": {
+    "step": 0,
+    "type": "system_spec",
+    "spec": {
+      "os": "Windows 11 (10.0.26200)",
+      "cpu_type": "Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz",
+      "cpu_cores": 8,
+      "cpu_freq_mhz": 2400,
+      "ram_gb": 31.8,
+      "gpu_type": "NVIDIA GeForce RTX 2060",
+      "gpu_cores_or_cuda": "CUDA (core count not exposed by driver)",
+      "vram_gb": 6.0
+    },
+    "model": "claude-opus-4-8[1m]",
+    "code_version": "1.12",
+    "group_name": "Segal-Thief-Team",
+    "sub_game_number": 1
+  },
+  "nonce": "5f72978b482c02eeb3d8a20b01e619b9",
+  "commit": "78a31c516536350bfdb8a3ee4ba3e131ae0676d7b4b95d02ff94b1aa84b85e65"
+}

@@ -9,8 +9,10 @@ description = "Thief peer package for a distributed Cops-and-Robbers project"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
-authors = [{ name = "P2P Thief Agent team" }]
-dependencies = []
+authors = [{ name = "Sharbel Maroun and Amr safadi" }]
+dependencies = [
+    "fastmcp>=3.4.5,<4",
+]
 
 [project.scripts]
 p2p-thief = "p2p_thief_agent.cli:main"

@@ -8,10 +8,11 @@ shared-contract byte.
 
 Scores are reported from the Thief's own perspective, because this is the Thief agent.
 Table 17 fixes both role columns for capture, survival, and tie, so those public
-constants are exposed too. Technical loss is deliberately asymmetric: the book fixes
-the penalised party at zero (`AE-019`) and does not fix the opponent's column, so this
-module scores only the local Thief's technical loss as zero -- matching the protocol's
-terminal technical-loss score -- and never invents the counterpart value.
+constants are exposed too. Technical loss is **symmetric**, not asymmetric: chapter 3
+table 2 (PDF p. 38) prints its row as `0 | 0` and Appendix E rule 48 writes it as
+"technical loss 0/0", so both peers score zero whichever one falsified. This module
+still reports only the Thief's own column because that is its role, not because the
+counterpart value is unknown.
 """
 
 from __future__ import annotations
@@ -93,6 +94,11 @@ def resolve_outcome(
     terminal, and reaching the survival horizon is a survival. A tie is decided by the
     coordinator or mutual agreement rather than local capture state, so it is never
     inferred here; `thief_score(Outcome.TIE)` still scores it when it is declared.
+
+    The horizon test is inclusive (`steps >= survival_threshold`): chapter 3 table 2
+    defines survival as the Thief surviving "the limit of valid moves" without capture,
+    and Appendix F table 15 sets `[Step Limit]` and `[Survival Threshold]` to the same
+    value, so completing the final step uncaptured is a Thief win. Closes `U-022`.
     """
     _validate_index("steps", steps)
     _validate_index("survival_threshold", survival_threshold)

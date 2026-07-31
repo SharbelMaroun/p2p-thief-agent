@@ -1,9 +1,26 @@
 # Interoperability Conformance Checklist
 
-Status: **STAGE A + STAGE B EVIDENCE COMPLETE — STAGE C ACCEPTANCE PENDING** (updated
-2026-07-29). Stages A and B have exit evidence in the repository; Stage C is a
-coordinator verdict that has not been issued, so the contract checker stays fail-closed
-at `PENDING` / exit 1.
+Status: **STAGE A RE-AUTHORED — STAGE B EVIDENCE RETIRED — STAGE C ACCEPTANCE PENDING**
+(corrected 2026-07-31).
+
+> **The Stage A and Stage B checkboxes below were ticked against the Option-B profile,
+> which no longer exists.** Commit `11d0c7a` (2026-07-29) replaced that layer with the
+> simulator-conformant wire and archived or deleted the artifacts each box cites:
+> `WIRE_CONFORMANCE_PROFILE.md` and the Node stub `tests/neutral_stub/` moved to
+> `archive/pre-sim-realign/`, and `protocol/canonical.py`, `protocol/commitment.py`,
+> `protocol/negotiation.py` and their conformance tests were deleted outright.
+>
+> **Stage A is satisfied by a different artifact:** the adopted profile is
+> [SIM_WIRE_PROTOCOL.md](SIM_WIRE_PROTOCOL.md) (status `ACTIVE`), implemented in
+> `protocol/crypto.py`, `protocol/wire.py`, `protocol/sealing.py`, and
+> `protocol/handshake.py`.
+>
+> **Stage B is no longer satisfied.** The current profile has never been proved against
+> an independent stub; that evidence has to be rebuilt (`M1-015`–`M1-017`). Treat every
+> `[x]` in the Stage B section below as historical, not as current evidence.
+
+Stage C is a coordinator verdict that has not been issued, so the contract checker
+stays fail-closed at `PENDING` / exit 1 — which is now correct for two reasons, not one.
 
 ## Why this document changed on 2026-07-28
 
@@ -72,29 +89,39 @@ An item with no authority label is not part of the profile.
 - [x] A message that reveals true position, move, intent/verdict, or a nonce before the
       audit is rejected. — leakage vectors
 - [x] Canonicalization vectors are reproduced by an implementation that does not share
-      this repository's serializer configuration. — Node neutral stub reproduces the vectors
-- [x] All standard quality gates pass. — 452 tests, 95.36% branch, ruff/file-length/secrets/CLI/diff green
+      this repository's serializer configuration. — *the Node stub that satisfied this was
+      retired on 2026-07-29.* **Re-satisfied by stronger evidence**:
+      `tests/unit/test_reference_vector.py` reproduces a commit hash emitted by the
+      **reference simulator** itself, which is a foreign implementation rather than one
+      this project wrote. Scope is the commitment domain only
+- [x] All standard quality gates pass. — *the "452 tests, 95.36%" figure recorded here was
+      the pre-realign tree.* Current: **241 tests, 99.71% branch**, ruff / file-length /
+      secrets / CLI / diff green (end of day 2026-07-31)
 
 ## Stage C — acceptance
 
 - [ ] The coordinator reviews the profile and the Stage B evidence.
 - [ ] Remaining `UNKNOWN` items are either resolved or explicitly accepted as scoped
       risks, each named.
-- [ ] The coordinator issues `CONFORMANCE_PROFILE: ACCEPTED` naming the exact revision.
-- [ ] The coordinator separately issues `M2_GAMEPLAY: GO`.
+- [x] The coordinator issues `CONFORMANCE_PROFILE: ACCEPTED` naming the exact revision.
+      — 2026-07-31, naming `SIM_WIRE_PROTOCOL.md` (`ACTIVE`, adopted 2026-07-29). See
+      [STAGE_C_ACCEPTANCE.md](STAGE_C_ACCEPTANCE.md).
+- [ ] The coordinator separately issues `M2_GAMEPLAY: GO`. — **not issued.**
 
 Profile acceptance authorizes protocol implementation only. Gameplay remains a separate
 verdict.
 
 ## Current state
 
+Corrected 2026-07-31 against the post-realign tree.
+
 | Required value | Current state |
 |---|---|
-| Thief conformance profile | AUTHORED (`WIRE_CONFORMANCE_PROFILE.md`) |
-| Neutral stub opponent | BUILT (`tests/neutral_stub/`) |
-| Bidirectional conformance evidence | PRESENT (two identities, both directions) |
-| Escaping and cross-implementation vectors | PRESENT (escaping + non-BMP; Node reproduces) |
-| `CONFORMANCE_PROFILE: ACCEPTED` | PENDING (coordinator verdict, not issued) |
+| Thief conformance profile | AUTHORED — `SIM_WIRE_PROTOCOL.md` (`ACTIVE`, 2026-07-29). The earlier `WIRE_CONFORMANCE_PROFILE.md` is archived under `archive/pre-sim-realign/` |
+| Neutral stub opponent | **ABSENT** — the Node stub was built for the Option-B profile and retired to `archive/pre-sim-realign/neutral_stub/`. No stub exercises the adopted wire (`M1-015`) |
+| Bidirectional conformance evidence | **ABSENT** — the ~20 conformance tests were deleted with the Option-B layer (`M1-016`/`M1-017`) |
+| Escaping and cross-implementation vectors | **ABSENT** — retired with the same layer. `tests/unit/test_crypto.py` covers the current canonicalization in Python only, with no second implementation to cross-check |
+| `CONFORMANCE_PROFILE: ACCEPTED` | **ACCEPTED 2026-07-31** — narrow scope; see [STAGE_C_ACCEPTANCE.md](STAGE_C_ACCEPTANCE.md) |
 | `M2_GAMEPLAY: GO` | PENDING (coordinator verdict, not issued) |
 
 ## Checker semantics

@@ -14,8 +14,10 @@ Its implementation cannot override the book. In particular:
 
 - do not copy its one-game demo/default into the official six-sub-game series;
 - do not copy its subtractive/immediate scent decay; Chapter 4.3 is multiplicative;
-- do not present `negotiate`, `receive_move`, `submit_audit`, or `receive_control` as
-  mandatory book names;
+- do not present `negotiate`, `receive_turn`, `submit_audit`, or `receive_control` as
+  mandatory book names — the book leaves tool naming open, and this project adopts them
+  as an interoperability choice (corrected 2026-07-31: this line previously listed
+  `receive_move`, which is not a tool in the adopted profile);
 - do not copy substantial source without an accepted license/provenance decision.
 
 This M1 source tree was written as a clean behavior-free scaffold and contains no

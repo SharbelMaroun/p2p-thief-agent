@@ -2,6 +2,15 @@
 
 Review date: 2026-07-28
 
+> **Dated review — partly overtaken by the 2026-07-29 wire re-alignment.** Everything
+> below describes the Option-B era. Since then, commit `11d0c7a` replaced the protocol
+> layer with the simulator-conformant wire, ADR-0006 was superseded and archived, and
+> the Cop-authored `PROTOCOL_PROFILE.md` / `SHARED_RULES.md` this review cites are no
+> longer inputs to the Thief's workflow under `THIEF-002`. The live tally is **six
+> `Pending`, three `Proposed`, zero accepted** across nine ADR files, and the
+> authoritative record for the wire is `SIM_WIRE_PROTOCOL.md`. Read the rows below as
+> a historical snapshot, not as current status.
+
 This is an **inventory only**. It changes no ADR status, accepts nothing, and
 authorizes no runtime behavior. `docs/adr/README.md` remains the status index; where
 this review and that index disagree about maturity, the index is authoritative until a
@@ -13,7 +22,8 @@ semantics "must be settled before M2". None are settled. M2 proceeded under the
 2026-07-28 contract-independent carve-out, which was legitimate, but the ADR debt is
 real and this review makes it explicit rather than leaving it implied.
 
-Current tally: **7 `Pending`, 3 `Proposed`, 0 accepted.**
+Tally at review date: **7 `Pending`, 3 `Proposed`, 0 accepted.** (Now six `Pending`
+after ADR-0006 was superseded — see the note at the top.)
 
 ## Headline finding
 
