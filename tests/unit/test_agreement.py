@@ -51,10 +51,26 @@ def test_a_term_the_opponent_omits_counts_as_a_disagreement() -> None:
 
 
 def test_a_missing_required_term_is_refused_by_name() -> None:
-    """The reference fails fast on exactly this, so a peer must expect it."""
-    thin = {**TERMS, "min_center_intensity": None}
-    with pytest.raises(AgreementError, match="missing required agreed term"):
+    """A term with no safe default cannot be defaulted away silently."""
+    thin = {**TERMS, "board_size": None}
+    with pytest.raises(AgreementError, match="missing required agreed term.*board_size"):
         accept_offer({"terms": thin, "nonce": NONCE, "signature": commit_of(thin, NONCE)}, thin)
+
+
+def test_the_lecturers_three_key_pheromone_shape_is_accepted() -> None:
+    """`U-023`, settled 2026-08-01 against the book PDF and the artifact template.
+
+    Appendix F table 16 has three rows, all `Fixed`, and no minimum-centre row; the
+    lecturer's own `agreed-config` template carries exactly
+    `pheromone_center_intensity`, `pheromone_decay`, and `pheromone_grid_size`.
+    This peer required a fourth key until 2026-08-01, so it refused the very
+    template teams are meant to share. It must not regress.
+    """
+    lecturers = {k: v for k, v in TERMS.items() if k != "min_center_intensity"}
+    message = {
+        "terms": lecturers, "nonce": NONCE, "signature": commit_of(lecturers, NONCE)
+    }
+    assert accept_offer(message, lecturers) == lecturers
 
 
 def test_terms_tampered_with_after_signing_are_refused() -> None:
