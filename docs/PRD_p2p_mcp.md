@@ -85,9 +85,31 @@ all — signature, required terms, Appendix F floors, then every term compared
 against our own, refusing **by name** — wired into the live `InboundPeer` handler
 (`M5-014`).
 
-**Not yet built:** idempotency (`M5-003`), deadlines and watchdog (`M5-004`), the
-tunnel (`M5-005`), and the turn loop (`M5-007`). The adapters and the agreement
-gate exist; nothing yet drives them as a whole game.
+## A whole sub-game, and how it ends (`M5-007`)
+
+`orchestration/` holds the declared phase machine, `run_turn`, and
+`run_sub_game_over_wire`. One turn is **await → compute → apply → seal → send**; a
+peer must receive before advancing, which makes the exchange a strict alternation.
+**This peer opens** — the book gives the Thief the first move of every cycle, so step
+1 does not wait. A Thief that waited would deadlock against a Cop correctly waiting
+for it.
+
+Termination is not the Cop's mirror. The Cop can only *claim* a capture, because it
+cannot see where the Thief stands; this peer is the one that **knows**. So a
+`capture_claim` is checked against local truth, never believed, and an incorrect claim
+is simply the game continuing. Confirmed against the reference 2026-08-01, whose
+precedence reads capture "when a cop's `capture_claim` is **confirmed by the thief**",
+survival at the threshold, then timeout on silence.
+
+Nothing on the wire forces that answer to be honest — the audit does. Every sealed
+record carries this peer's true position, so a false denial is contradicted by its own
+reveal, and a forgery scores zero for both sides while an honest loss still scores.
+The audit is sent **once per sub-game, after the loop**, and goes out even when this
+peer is taking the technical loss.
+
+**Not yet built:** mutual verification of the *opponent's* audit (the reference has
+both peers swap logs and each verify the other's commits), idempotency (`M5-003`),
+deadlines and watchdog (`M5-004`), and the tunnel (`M5-005`).
 
 ## Future acceptance criteria and tests
 

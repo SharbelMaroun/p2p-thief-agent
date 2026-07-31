@@ -37,9 +37,14 @@ private opponent-URL boundary and the pre-play agreement gate, which refuses a
 mismatched match **by name** before a first move exists. A message has crossed a real
 socket between two operating-system processes, closing the book's stage-2 milestone.
 
-The repository still deliberately implements no turn loop, public tunnel, scent
-field, belief map, LLM, Gmail, GUI, or replay behavior, so **no game has been played
-against an opponent**.
+The turn loop now exists too: a bounded sub-game runs end to end through a declared
+phase machine and reveals its audit, with both crossing a real socket into a separate
+operating-system process.
+
+The repository still deliberately implements no public tunnel, scent field, belief
+map, LLM, Gmail, GUI, or replay behavior — and, decisively, **no second peer that
+plays back**. The opponent's moves in every run so far come from a local script, so
+**no game has been played against a real opponent**.
 
 Earlier Cop-bundle reviews are retained as historical audit evidence only. No
 peer-owned file was integrated, and those bundles are not inputs to the current
@@ -150,9 +155,10 @@ the address is named like an address or merely looks like one.
 
 ## Usage
 
-This peer is not yet runnable as a live agent. The turn loop (`M5-007`) is the
-remaining gap; the SDK, protocol layer, both transport adapters, and the agreement
-gate exist. Today's honest usage surface:
+This peer is not yet runnable as a live agent. The SDK, protocol layer, both
+transport adapters, the agreement gate, and the turn loop all exist; what is missing
+is the wiring that points them at a real opponent and a second peer to answer. Today's
+honest usage surface:
 
 ```text
 uv run p2p-thief --version        # 1.00
@@ -291,10 +297,15 @@ gains the curves rather than a placeholder chart.
 
 ### 5. Live belief map and "Verified OK" replay screenshots
 
-**Blocked, honestly.** Screenshots need a completed sub-game and no game has been
-played end to end — the turn loop (`M5-007`) is the remaining gap. What is proven
-today under test: a message crosses a real socket into a separate operating-system
-process, and the agreement gate accepts or refuses a match by name.
+**Still blocked, but for a narrower reason than before.** A bounded sub-game now runs
+end to end and its audit is delivered: every turn and the final reveal cross a real
+socket into a separate operating-system process, which validates each one — and a
+*tampered* audit is rejected there, so rule 19 is enforced over a real carrier rather
+than asserted locally.
+
+What is missing for a screenshot is a **second peer that plays back**. The Cop's
+replies in those runs come from a local script, so there is no live belief map to
+photograph yet, and there is no GUI.
 
 ### 6. Companion repository
 

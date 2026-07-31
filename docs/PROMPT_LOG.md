@@ -379,3 +379,11 @@
 - **Lesson:** documents rot silently in the direction of *understating* progress, and a
   correction applied to a code docstring does not propagate to the document of record — in the
   companion repository an ADR still carried a claim its own code had already retracted.
+
+## P-026 — Bringing the Thief level, and a defect the phase machine caught
+- **Date:** 2026-08-01 · **Tool:** Claude Opus 5 (agentic CLI) + NotebookLM
+- **Goal:** `M5-007` — the declared phase machine, the turn loop, and a whole sub-game, matching the companion peer's capability without copying it.
+- **Prompt (essence):** bring the Thief level with the Cop, the same way; then a challenge asking whether the notebooks and `inst/` had really been consulted and every document updated.
+- **Output:** `orchestration/` with the phase machine, `run_turn`, and `run_sub_game_over_wire`, plus a sub-game and audit crossing a real socket into a separate process. Two behaviours are genuinely **not** the Cop's mirror: this peer **opens**, because the book gives the Thief the first move of every cycle and a Thief that waited would deadlock against a Cop correctly waiting for it; and a `capture_claim` is **checked against local truth, never believed**, because the Thief is the peer that knows where it stood.
+- **Refinement:** building the second implementation exposed a real defect in the first. Deciding and sealing sat inside `COMMITTING`, but the declared table gives `COMMITTING` exactly one exit, so a seal failure had **no legal transition** and stranded the machine mid-turn. The Thief's stricter version called `fail()` and the phase machine **refused it** — the machine caught the design error, which is the argument for having one. Both peers were corrected. Two test expectations also proved wrong rather than the code: because this peer opens, the opponent's messages land one turn later than their own numbering suggests.
+- **Lesson:** re-deriving rather than copying is not ceremony — it is how the asymmetries surface. A mirrored Thief would have waited on step 1 and deadlocked, and would have trusted a claim it was uniquely able to check.
