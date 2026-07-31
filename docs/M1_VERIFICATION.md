@@ -64,26 +64,32 @@ CLI help/version, empty layer boundaries, and quality tooling only.
 
 The 2026-07-25 record above verified the **M0/M1 scaffold** (8 tests, 92.86%) and is
 retained as history. It no longer describes the repository. Substantial work has since
-landed on `agent/thief-baseline-strategy`: the M2 core domain, the EXC-001 deterministic
-baseline, the full book commit-reveal profile (wire profile, RFC-8785 canonicalization
-with escaping/non-BMP vectors, separated hash domains, independent Node neutral stub,
-bidirectional two-identity negotiation, fail-closed negative/leakage vectors, and the
-four-step Commit → Acknowledge → Reveal → Audit flow), and the M3 local-state, scoring,
-and baseline-integration package.
+landed: the M2 core domain, the EXC-001 deterministic baseline, a commit-reveal protocol
+layer, and the M3 local-state, scoring, and baseline-integration package.
 
-Current measured gates on `agent/thief-baseline-strategy`:
+> **This addendum was itself superseded.** Its original table recorded 452 tests at
+> 95.36% over an Option-B protocol layer that included RFC-8785 canonicalization,
+> separated hash domains, a Node neutral stub, and two-identity negotiation. Commit
+> `11d0c7a` ("replace Option-B profile with simulator wire; archive old layer") removed
+> that layer on 2026-07-29, deleting `protocol/canonical.py`, `protocol/commitment.py`,
+> `protocol/negotiation.py`, and roughly twenty conformance tests, and retiring the
+> Node stub into `archive/pre-sim-realign/`. The counts below replace it.
+
+Measured gates on 2026-07-31:
 
 | Command/check | Actual result |
 |---|---|
 | `uv run ruff check .` | Exit 0; all checks passed |
-| `uv run pytest --cov --cov-branch --cov-fail-under=85` | Exit 0; **452 passed**; 95.36% branch coverage |
-| `uv run python scripts/check_file_lengths.py` | Exit 0; 46 source/script and 64 test files checked |
-| `uv run python scripts/check_secrets.py` | Exit 0; 177 text files, zero findings |
+| `uv run pytest --cov --cov-branch --cov-fail-under=85` | Exit 0; **232 passed**; 99.71% branch coverage |
+| `uv run python scripts/check_file_lengths.py` | Exit 0; 33 source/script and 20 test files checked |
+| `uv run python scripts/check_secrets.py` | Exit 0; 131 text files, zero findings |
 | `uv run p2p-thief --help` / `--version` | Exit 0; `p2p-thief 1.00` |
 | `uv run python scripts/check_shared_contracts.py` | Exit 1; `PENDING` (fail-closed; no accepted conformance profile) |
 | `git diff --check` | Exit 0; no whitespace errors |
 
-Stage A and Stage B exit evidence exists (see `CONTRACT_HANDOFF_CHECKLIST.md`). **Stage C
-acceptance is not recorded**: no `CONFORMANCE_PROFILE: ACCEPTED` and no `M2_GAMEPLAY: GO`
-verdict exists, and the contract checker remains fail-closed at `PENDING` / exit 1. This
-addendum is a descriptive verification snapshot, not an acceptance verdict.
+The shipped protocol layer is the simulator-conformant wire recorded in
+[SIM_WIRE_PROTOCOL.md](SIM_WIRE_PROTOCOL.md). **Stage C acceptance is not recorded**: no
+`CONFORMANCE_PROFILE: ACCEPTED` and no `M2_GAMEPLAY: GO` verdict exists, the adopted
+profile has no independent-stub evidence behind it, and the contract checker remains
+fail-closed at `PENDING` / exit 1. This addendum is a descriptive verification snapshot,
+not an acceptance verdict.

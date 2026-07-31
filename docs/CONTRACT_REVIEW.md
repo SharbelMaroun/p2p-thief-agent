@@ -4,6 +4,15 @@ Initial review date: 2026-07-26
 
 Latest review update: 2026-07-28
 
+> **Historical record — none of its paths are live here.** This document reviews
+> Cop-owned candidate bundles that were never copied into this repository, so every
+> `docs/contracts/…`, `docs/schemas/…`, `tests/fixtures/contracts/…`, `PROTOCOL_PROFILE.md`,
+> `SHARED_RULES.md`, and `PARITY_MANIFEST.json` path names a **peer** file, not a Thief
+> file. The Cop repository has since moved that bundle to its own top-level
+> `shared_contract/` directory. Under `THIEF-002` this repository has no access to any of
+> it, and the copy model these reviews served was withdrawn on 2026-07-28. Retained as
+> audit evidence that four candidates were reviewed and none integrated.
+
 ## Revised-candidate update
 
 The original path-by-path review below remains the historical review of immutable Cop

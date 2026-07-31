@@ -2,6 +2,13 @@
 
 Review date: 2026-07-27; updated: 2026-07-28
 
+> **Historical record.** The `docs/contracts/…`, `docs/schemas/…`, and
+> `tests/fixtures/contracts/…` paths below are **peer-owned** Cop candidate paths, never
+> Thief files; the Cop repository has since relocated that bundle to its own top-level
+> `shared_contract/` directory. The NO-GO verdicts stand as of their date, but the
+> cryptographic question they gate was later settled by the 2026-07-29 adoption of the
+> simulator wire — see `SIM_WIRE_PROTOCOL.md`.
+
 ## Verdict
 
 The supplied direction contains useful book requirements and accurate observations

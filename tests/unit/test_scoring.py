@@ -60,6 +60,13 @@ def test_capture_is_terminal():
 
 
 def test_survival_at_threshold():
+    """The horizon is inclusive: exactly `[Survival Threshold]` steps wins (`U-022`).
+
+    Chapter 3 table 2 defines survival as surviving "the limit of valid moves", and
+    Appendix F table 15 makes the step limit and the survival threshold equal, so the
+    boundary step itself is a Thief win rather than one step short of one.
+    """
+    assert resolve_outcome(captured=False, steps=34, survival_threshold=35) is None
     assert resolve_outcome(captured=False, steps=35, survival_threshold=35) is Outcome.SURVIVAL
     assert resolve_outcome(captured=False, steps=36, survival_threshold=35) is Outcome.SURVIVAL
 

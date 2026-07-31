@@ -5,10 +5,10 @@ does not stop unrelated work.
 
 | ID | Still-open question | Dependent scope | Evidence/decision needed |
 |---|---|---|---|
-| U-002 | Exact canonical serialization beyond the core commit example, signature computation, identity binding, `config_sha256` scope, and byte-comparison procedure | Crypto/config/reporting | Binding protocol text or accepted ADR-0006; `CR-001` settles only sorted compact UTF-8 for the shown commit payload |
-| U-003 | Exact MCP tool names, message fields, envelopes, maximum sizes, acknowledgements, and idempotency rules | Networking | Thief conformance profile plus explicit acceptance of ADR-0001/0002 |
-| U-004 | Exact Step-0 wire sequence and transition ordering | Handshake | Direct official section and accepted state-machine contract |
-| U-005 | Exact committed payload field set and nonce encoding/length | Cryptography | Binding protocol/template evidence or accepted ADR |
+| U-002 | ~~Exact canonical serialization, `config_sha256` scope, and byte-comparison procedure~~ | ~~Crypto/config/reporting~~ | **SETTLED 2026-07-29** by adopting the simulator wire: one `canonical_sha256` (`sort_keys`, `ensure_ascii=False`, compact separators) across commitment, config, and audits. Unilateral adoption, not cross-peer agreement — see the re-alignment note below and `SIM_WIRE_PROTOCOL.md` |
+| U-003 | ~~Exact MCP tool names, message fields, envelopes, sizes, acknowledgements, idempotency~~ | ~~Networking~~ | **SETTLED 2026-07-29**: `negotiate` / `receive_turn` / `submit_audit` / `receive_control`, no envelope. Not yet exercised against a live opponent |
+| U-004 | ~~Exact handshake wire sequence and transition ordering~~ | ~~Handshake~~ | **SETTLED 2026-07-29** by `protocol/handshake.py` (signed terms, role-free identity). The separate **Step-0 hardware attestation** of rule 24 is unimplemented and tracked in `TODO.md`, not here |
+| U-005 | ~~Exact committed payload construction and nonce encoding/length~~ | ~~Cryptography~~ | **SETTLED 2026-07-29**: `SHA256(canonical_json(payload) + "\|" + nonce)`, nonce outside the payload, `token_hex(16)`. Verification re-hashes the payload as received, so no cross-peer field roster is required |
 | U-006 | Exact peer ports and local endpoint configuration | Networking | Accepted private-config design; official values if any |
 | U-009 | Gmail draft-versus-send mode and exact OAuth/credential workflow | Reporting | Appendix A, dated clarification, or accepted ADR-0010 |
 | U-010 | Whether a shared executable stateless package is permitted | Packaging | Lecturer clarification; this repository consumes no peer package |
@@ -18,7 +18,7 @@ does not stop unrelated work.
 | U-017 | Newer Moodle instructions and lecturer announcements | Potential final-release areas | Obtain dated official posts |
 | U-019 | Official template required/optional fields, types, enums, bounds, and additional-property rules | Artifact validation | Formal schemas or dated authoritative clarification |
 | U-021 | ~~Exact six-sub-game role assignment~~ | ~~League scheduling~~ | **CLOSED 2026-07-29.** Reopened 2026-07-28 by coordinator verdict, then closed the following day when the required lecturer answer was obtained and relayed by the coordinator: sub-games 1, 3, 5 natural role, 2, 4, 6 swapped, **Thief moves first**. Provenance is a coordinator-relayed lecturer answer, not a Moodle announcement, and is recorded at that level. See the closure note below and `C-012`. |
-| U-022 | Whether surviving *exactly* `[Survival Threshold]` turns is a Thief win, given Appendix F table 15 sets `[Step Limit]` and `[Survival Threshold]` to the same value (35) | Terminal-outcome scoring; series aggregation | Coordinator ruling plus a boundary test. This repository is the Thief, so the reading directly decides its own wins; see `C-017` and `M3-005` |
+| U-022 | ~~Whether surviving *exactly* `[Survival Threshold]` turns is a Thief win~~ | ~~Terminal-outcome scoring; series aggregation~~ | **CLOSED 2026-07-31.** The book resolves it without a coordinator ruling. Chapter 3 table 2 (PDF p. 38) defines the survival row as the Thief surviving "the limit of valid moves" without capture, and Appendix F table 15 sets `[Step Limit]` and `[Survival Threshold]` to the same value, so the horizon test is **inclusive**: completing the final step uncaptured is a Thief win. `resolve_outcome` already used `steps >= survival_threshold`; the reading is now recorded and covered by a boundary test. See `C-017` |
 
 ## Authoritative lecturer answers — 2026-07-29
 
@@ -37,20 +37,30 @@ Resolved on this basis:
 - **U-014 event ordering — CLOSED.** Within a turn: apply the move, emit scent at the new
   cell, apply grid-wide decay `τ(t+1)=max(0,(1-ρ)τ+Δτ)`, then evaluate capture/victory
   after position and barrier updates. Dependent scope: M6 scent and the turn state machine.
-- **U-005 committed payload / nonce — RESOLVED as "keep book".** The coordinator retained
-  the book Ch. 5.3 construction already implemented (nonce inside the sorted-compact
-  payload, no delimiter, `ensure_ascii=True`, `token_hex(16)`). The simulator variant
-  (nonce outside, `|` delimiter, `ensure_ascii=False`) is recorded but **not adopted**.
+- **U-005 committed payload / nonce — superseded 2026-07-29.** This entry recorded a
+  2026-07-28 "keep book" ruling (nonce inside the sorted-compact payload, no delimiter,
+  `ensure_ascii=True`) and stated that the simulator variant was "not adopted". **The
+  wire re-alignment described below then happened**, and the simulator variant *was*
+  adopted. The paragraph is retained only to date the reversal.
 
-Answered by the lecturer but the code currently diverges — kept OPEN to avoid doc/code
-drift until the coordinator authorizes the wire re-alignment:
+**The re-alignment is done, not pending.** Commit `11d0c7a` ("replace Option-B profile
+with simulator wire; archive old layer") replaced the Option-B protocol layer on
+2026-07-29. The shipped surface is now the simulator's: tools `negotiate` /
+`receive_turn` / `submit_audit` / `receive_control`, one canonical-JSON
+`config_sha256`, role-free negotiation identity, `result_claim ∈ {capture, survival,
+timeout}`, and
 
-- **U-002 / U-003, negotiation identity, audit `result_claim`.** The simulator uses tools
-  `negotiate` / `receive_turn` / `submit_audit` / `receive_control`, a single
-  canonical-JSON `config_sha256`, no `identity.role` in negotiation, and
-  `result_claim ∈ {capture, survival, timeout}`. Our repo currently ships Option-B
-  variants (`receive_move` + `receive_reveal`, three hash domains, role-bearing offers,
-  a four-value `Outcome`). Re-alignment is pending an explicit decision.
+```text
+commit = SHA256(canonical_json(payload) + "|" + nonce)
+canonical_json = json.dumps(sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+```
+
+The authoritative record is [SIM_WIRE_PROTOCOL.md](SIM_WIRE_PROTOCOL.md) (status
+`ACTIVE`). `U-002`, `U-003`, `U-004`, and `U-005` are settled **by that adoption**, not
+by a fresh lecturer answer. The Option-B modules the earlier text referenced
+(`protocol/canonical.py`, `protocol/commitment.py`, `protocol/negotiation.py`) were
+deleted in the same commit; the archived profile and its coordinator ruling are kept at
+`archive/pre-sim-realign/`. See the ADR-0006 note in [adr/README.md](adr/README.md).
 
 ## Provisional implementations as of 2026-07-29 (still OPEN)
 
@@ -61,15 +71,20 @@ foundations must not be finalized, closure remains an explicit coordinator verdi
 coordinator delegated the handling of these on 2026-07-29 and this conservative
 "note-but-keep-open" recording was chosen deliberately.
 
-| ID | Provisional implementation in code | Status |
-|---|---|---|
-| U-002 | RFC-8785 (JCS) canonicalization in `protocol/canonical.py`; three separated hash domains (`commitment_sha256`, `agreed_configuration_sha256`, `source_sha256`) | **OPEN** — `config_sha256` scope and cross-peer byte procedure not accepted |
-| U-003 | Tool names, message fields, envelopes, sizes, acknowledgements, idempotency in `protocol/` and `WIRE_CONFORMANCE_PROFILE.md`, proved against the neutral stub | **OPEN** — Thief-authored profile; no cross-peer acceptance |
-| U-004 | Step-0 sequence and transition ordering in the book four-step flow (`protocol/session*.py`) | **OPEN** — not confirmed against an authenticated shared state machine |
-| U-005 | Committed payload = sorted-compact-escaped JSON with nonce `token_hex(16)` outside the payload | **OPEN** — exact field roster not cross-peer accepted |
-| U-014 | Capture precedence and terminal technical-loss scoring implemented (`domain/capture.py`, `state/scoring.py`) | **OPEN** — full live-turn event ordering still unresolved |
+This table described the **pre-realign** Option-B layer and named modules that no longer
+exist. It is replaced by the shipped state below.
 
-None of these may be treated as binding on an unknown opponent until accepted.
+| ID | Implementation in the shipped code | Status |
+|---|---|---|
+| U-002 | Single canonical JSON in `protocol/crypto.py` (`sort_keys=True`, `ensure_ascii=False`, compact separators); one `canonical_sha256` serves the commitment, the agreed config, and audits | Settled by the 2026-07-29 wire adoption; no cross-peer acceptance yet |
+| U-003 | Tools `negotiate` / `receive_turn` / `submit_audit` / `receive_control` with no envelope — the tool argument *is* the message dict (`protocol/wire.py`) | Settled by the 2026-07-29 wire adoption; not exercised against a live opponent |
+| U-004 | Signed-terms handshake in `protocol/handshake.py`: each peer signs `commit_of(terms, nonce)` and verifies the opponent signed the same terms; identity carries no role | Settled by the 2026-07-29 wire adoption; Step-0 hardware attestation is still unimplemented |
+| U-005 | `commit = SHA256(canonical_json(payload) + "\|" + nonce)`, nonce **outside** the payload, `secrets.token_hex(16)`; sealed step roster in `protocol/sealing.py` | Settled by the 2026-07-29 wire adoption; verification re-hashes the payload as received, so the opponent's field roster is never constrained |
+| U-014 | Capture precedence and terminal technical-loss scoring in `domain/capture.py` and `state/scoring.py` | **OPEN** — full live-turn event ordering still unresolved |
+
+The settled rows describe a unilateral adoption of the simulator wire, not a bilateral
+agreement. None of them binds an unknown opponent until a live interoperability run
+proves it.
 
 ## Closed in this reconciliation
 

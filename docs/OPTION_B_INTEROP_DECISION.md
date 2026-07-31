@@ -28,21 +28,28 @@ The future FastMCP surface will expose:
 `submit_audit` is the **server** tool. `exchange_audit` is only a **client-side**
 method and is never exposed as a server tool.
 
-## Commit-reveal shape — SUPERSEDED BY BOOK on 2026-07-28
+## Commit-reveal shape — reversed twice; read the last block only
 
-> The Option-B commit-reveal construction and no-live-reveal flow below were **reversed**
-> by the coordinator on 2026-07-28 in favour of the book construction and the book's
-> four-step flow. See
-> [COORDINATOR_RULING_COMMIT_REVEAL_2026-07-28.md](COORDINATOR_RULING_COMMIT_REVEAL_2026-07-28.md)
-> and `ADR-0006`.
-
-Book-ruled construction now in force:
-
-- The nonce is a field **inside** the hashed JSON payload; there is **no delimiter**.
-- Serialization is the book's `json.dumps(sort_keys=True, separators=(",", ":"))` with
-  default `ensure_ascii=True` (non-ASCII escaped), UTF-8 encoded, then SHA-256.
-- The turn flow is the book's four steps: Commit → Acknowledge → live Reveal
-  (Move + Hint, nonce hidden) → Final Reveal (all nonces at end of game).
+> **1. Option-B (original, below): superseded 2026-07-28.** The coordinator reversed it
+> in favour of the book construction. That ruling is archived at
+> `archive/pre-sim-realign/COORDINATOR_RULING_COMMIT_REVEAL_2026-07-28.md` together with
+> the now-superseded `ADR-0006`.
+>
+> **2. Book construction: superseded 2026-07-29.** Commit `11d0c7a` replaced the whole
+> protocol layer with the simulator-conformant wire, which restores the external nonce
+> and the `"|"` delimiter. The book-ruled bullets that used to stand here were removed
+> because they describe neither the shipped code nor any live decision.
+>
+> **3. In force today** — see [SIM_WIRE_PROTOCOL.md](SIM_WIRE_PROTOCOL.md) (`ACTIVE`):
+>
+> ```text
+> commit = SHA256(canonical_json(payload) + "|" + nonce)   # nonce OUTSIDE the payload
+> canonical_json = json.dumps(sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+> ```
+>
+> The Option-B text preserved below therefore happens to match the shipped construction
+> again, but it is retained as history: the authority for the current wire is
+> `SIM_WIRE_PROTOCOL.md`, not this document.
 
 Superseded Option-B shape (retained for history, not implemented): true `move`,
 `position`, `intent`, and `nonce` revealed only in the final audit, with the commitment

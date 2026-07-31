@@ -264,7 +264,7 @@ state without altering the pure `EXC-001` module.
 | M3-003b | Encode the technical-loss zero | DONE | `[AE-19]` `[AE-48]` |
 | M3-003c | Map outcomes to the simulator `result_claim` set | DONE | `wire_result_claim` → `capture`/`survival`/`timeout`; Tie stays in the scoring layer |
 | M3-004 | Integrate the completed deterministic legal baseline policy | DONE | `test_local_policy.py`; `state/policy.py` |
-| M3-005 | Resolve the step-limit / survival-threshold boundary | PENDING | Appendix F table 15 sets `[Step Limit]` and `[Survival Threshold]` to the same value (35), leaving it undefined whether surviving *exactly* the threshold is a Thief win. Coordinator ruling recorded as `U-022` in `UNKNOWN_REQUIREMENTS.md`, with conflict `C-017` recording the source defect, plus a boundary test either way |
+| M3-005 | Resolve the step-limit / survival-threshold boundary | DONE | Closed 2026-07-31 from the book, without needing a coordinator ruling: chapter 3 table 2 defines survival as surviving "the limit of valid moves", and table 15 makes the limit equal the threshold, so the horizon is **inclusive**. `resolve_outcome` already used `steps >= survival_threshold`; `test_survival_at_threshold` now pins 34/35/36 explicitly. `U-022` closed, `C-017` `RESOLVED` |
 | M3-005a | Register the boundary as a numbered unknown | DONE | `U-022` registered naming both readings; conflict `C-017` records the source defect |
 | M3-005b | Add a boundary test pinning the chosen reading | PENDING | Turn `threshold-1`, `threshold`, `threshold+1` each asserted |
 | M3-005c | Disclose the choice in the academic report | PENDING | Book p. 5 contradiction clause |
@@ -887,7 +887,7 @@ these is coordinator work, not engineering work.
 | Unknown | Question | Blocks |
 |---|---|---|
 | ~~`U-021`~~ | **CLOSED 2026-07-29.** Within-series role schedule: sub-games 1/3/5 natural, 2/4/6 swapped, Thief first. Coordinator-relayed lecturer answer; `C-012` updated to match on 2026-07-31 | no longer blocking |
-| `U-022` | Whether surviving exactly `[Survival Threshold]` turns is a Thief win. Appendix F table 15 sets step limit and survival threshold to the same value | `M3-005`, `M3-005b`, `M7-001c` |
+| ~~`U-022`~~ | ~~Whether surviving exactly `[Survival Threshold]` turns is a Thief win~~ — **CLOSED 2026-07-31**: chapter 3 table 2 defines survival as surviving "the limit of valid moves" and table 15 equates limit and threshold, so the horizon is inclusive | `M3-005`, `M3-005b`, `M7-001c` |
 | `U-013` | Config schema shape | `M1-014`, `M7-002b` |
 | `U-006` | Port assignment | `M5-002a` |
 | `U-009` | Gmail workflow and account setup | `M7-005`, `M7-006` |

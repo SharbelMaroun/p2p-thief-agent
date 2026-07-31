@@ -18,11 +18,11 @@ contract or runtime evidence is unavailable.
 | Proposed gate-resolution review | Yes | Simulator mechanics and supplied constants separated from coordinator acceptance | Update only after a pinned coordinator handoff or authenticated lecturer evidence |
 | Mechanism PRDs | Yes | Confirmed boundaries plus open details | Close each mechanism's named unknowns |
 | `docs/PROMPT_LOG.md` | Yes | Current through P-018; P-012–P-016 are reconstructed, not transcribed | Append significant AI-assisted work as it happens, not in arrears |
-| `docs/ADR_STATUS_REVIEW.md` | Yes | Inventory of the ten ADRs: 7 `Pending`, 3 `Proposed`, 0 accepted | Decide the four locally decidable ADRs; the rest need external input |
+| `docs/ADR_STATUS_REVIEW.md` | Yes | Inventory of the nine live ADRs: 6 `Pending`, 3 `Proposed`, 0 accepted. ADR-0006 was superseded on 2026-07-29 and archived | Decide the locally decidable ADRs; the rest need external input |
 | `docs/TEAM_INFO.md` | Yes | Identity confirmed 2026-07-28; `U-016` closed | Nothing outstanding |
 | `pyproject.toml` / `uv.lock` | Yes | Independently installable M1 scaffold | Keep uv lock and metadata current |
-| `src/` / `tests/` / `scripts/` | Yes | M2 core domain and the contract-independent baseline strategy behind the SDK; 139 tests at 99.36% branch coverage | Add protocol, runtime, and transport behavior through TDD after the contract gate |
-| Thief conformance profile | No | Copy model superseded 2026-07-28 under `THIEF-002`; four Cop candidates were reviewed and none was ever copied. Checker remains `PENDING` | Author the profile (`M1-013`/`M1-014`), prove it against a neutral stub (`M1-015`–`M1-017`), then obtain profile acceptance |
+| `src/` / `tests/` / `scripts/` | Yes | M2 core domain, M3 local state and scoring, the baseline strategy, and the simulator-conformant protocol layer, all behind the SDK; **232 tests at 99.71% branch coverage** (re-measured 2026-07-31) | Add live runtime and transport behavior through TDD after the contract gate |
+| Thief conformance profile | Partly | Copy model superseded 2026-07-28 under `THIEF-002`; four Cop candidates were reviewed and none was ever copied. The profile is now **authored and adopted** as `SIM_WIRE_PROTOCOL.md` (2026-07-29), but the neutral-stub evidence was retired with the old Option-B profile and not rebuilt, so the checker correctly remains `PENDING` | Re-prove the adopted profile against an independent stub (`M1-015`–`M1-017`), then obtain profile acceptance |
 | Active shared/private runtime config | No | Intentionally absent | ADR-0004 plus accepted contract |
 | Runtime, GUI, replay, Gmail evidence | No | Out of M1 scope | Later gated milestones |
 
@@ -42,8 +42,12 @@ Presence is not currency. These are recorded rather than silently carried:
   under the contract-independent carve-out instead. See `ADR_STATUS_REVIEW.md`.
 - ADR-0004 and ADR-0005 have stale text — they predate `LS-002`, the `rate_limits`
   reclassification, and the scent-formula authority conflict recorded as finding N-4.
-- No ADR references the Option B decision, although Option B proposes answers to
-  ADR-0001, ADR-0002, and part of ADR-0006.
+- **The ADR set has not caught up with the 2026-07-29 wire re-alignment.** ADR-0006 was
+  superseded and archived, and no ADR records the adopted simulator wire; the only
+  authoritative record is `SIM_WIRE_PROTOCOL.md`. Documents written before that date
+  (`CONTRACT_REVIEW.md`, `CONTRACT_HANDOFF_CHECKLIST.md`, `ADR_STATUS_REVIEW.md`,
+  `GATE_RESOLUTION_REVIEW.md`, `OPTION_B_INTEROP_DECISION.md`, `PROMPT_LOG.md`) still
+  describe the Option-B layer and name modules that were deleted with it.
 - `PROMPT_LOG.md` fell 17 commits behind before being reconstructed on 2026-07-28.
 
 ## Historical material
@@ -54,9 +58,9 @@ or provenance material and cannot override current direct evidence.
 
 ## Verdict
 
-All local quality gates pass: ruff clean, 139 tests at 99.36% branch coverage, file
-lengths and secret scan clean, and the shared-contract checker correctly fail-closed at
-`PENDING` with exit 1. The M1 scaffold results remain in
+All local quality gates pass, re-measured 2026-07-31: ruff clean, **232 tests at 99.71%
+branch coverage**, file lengths and secret scan clean, and the shared-contract checker
+correctly fail-closed at `PENDING` with exit 1. The M1 scaffold results remain in
 [M1_VERIFICATION.md](M1_VERIFICATION.md).
 
 The combined M1 gate still awaits provisional copy authorization, parity/conformance
