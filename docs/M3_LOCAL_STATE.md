@@ -81,6 +81,8 @@ CLI, and `git diff --check` gates pass; the contract checker remains fail-closed
 
 > The suite total recorded here when M3 landed was `452 passed` at `95.36%`. That
 > counted the Option-B protocol layer and its conformance tests, which commit
-> `11d0c7a` removed on 2026-07-29. The current total is **241 passed at 99.71%**
-> (end of day 2026-07-31). Whole-suite totals are dated snapshots; the per-module
-> claim above is the durable one.
+> `11d0c7a` removed on 2026-07-29, and the total has moved several times since as
+> M5 landed. **Whole-suite totals are deliberately not restated**: a hard-coded
+> count is stale the moment the next test lands, and a number that rots is worse
+> than no number because a reader trusts it. The per-module claim above is the
+> durable one; run the suite for the current total.
