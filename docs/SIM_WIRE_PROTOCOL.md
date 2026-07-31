@@ -84,6 +84,31 @@ Each peer signs `commit_of(terms, nonce)` and verifies the opponent signed the *
 terms. Identity is per-group and **carries no role** (roles alternate across sub-games);
 it is exchanged but not signed. `config_sha256 = canonical_sha256(terms)`.
 
+### Verified against the reference — 2026-07-31
+
+Checked before implementing `M5-004`, per the standing rule to consult the lecturer's
+`Game-P2P-Cop-Chase` notebook first. Four properties confirmed, one trap avoided.
+
+| Property | Reference | This repo |
+|---|---|---|
+| Signature object | the shared agreed terms, 16-byte nonce concatenated **outside** behind `\|` | `commit_of(terms, nonce)` — same |
+| `config_sha256` scope | `canonical_sha256(shared_terms)` over the **whole** terms dict, not a subset | `config_sha256()` — same |
+| Role in negotiation | absent — "roles switch across the sub-games, so no role and no `sub_game_number` appear here" | `identity_block()` carries no role — same |
+| Identity members | `group_id`, `group_name`, `members`, `repos`, `mcp_servers`, `llm_model`, `spec` | `identity_block()` — same seven |
+| Mismatch behaviour | "refuses to play on any mismatch"; aborts "naming exactly which term is missing" | `verify_peer()` raises; `missing_required_terms()` names them |
+
+**The trap.** One source line reads "signed terms now include `game_id`, `game_uid`,
+`num_games`", which would have meant our `AGREEMENT_TERMS` was missing two keys and
+every signature check against a classmate would fail. Following up established the
+opposite: `game_id` and `game_uid` are **not in the negotiated terms dictionary**. They
+are computed as a *pure function of shared inputs* so both peers derive identical values
+with no negotiation step, and they surface only as top-level keys in the emitted
+`config_*.json` and `log_*.json` artifacts.
+
+Adding them to the signed terms would therefore have **created** the interop failure it
+looked like it was preventing. `AGREEMENT_TERMS` is correct unchanged. The deterministic
+derivation of the two identifiers is M7 artifact work and is still open.
+
 ## Outcome / scoring
 
 `state.scoring.wire_result_claim(Outcome)` maps the M3 outcome to the wire claim:
