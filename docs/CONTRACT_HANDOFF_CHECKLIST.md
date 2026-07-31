@@ -97,8 +97,10 @@ An item with no authority label is not part of the profile.
 - [ ] The coordinator reviews the profile and the Stage B evidence.
 - [ ] Remaining `UNKNOWN` items are either resolved or explicitly accepted as scoped
       risks, each named.
-- [ ] The coordinator issues `CONFORMANCE_PROFILE: ACCEPTED` naming the exact revision.
-- [ ] The coordinator separately issues `M2_GAMEPLAY: GO`.
+- [x] The coordinator issues `CONFORMANCE_PROFILE: ACCEPTED` naming the exact revision.
+      — 2026-07-31, naming `SIM_WIRE_PROTOCOL.md` (`ACTIVE`, adopted 2026-07-29). See
+      [STAGE_C_ACCEPTANCE.md](STAGE_C_ACCEPTANCE.md).
+- [ ] The coordinator separately issues `M2_GAMEPLAY: GO`. — **not issued.**
 
 Profile acceptance authorizes protocol implementation only. Gameplay remains a separate
 verdict.
@@ -113,7 +115,7 @@ Corrected 2026-07-31 against the post-realign tree.
 | Neutral stub opponent | **ABSENT** — the Node stub was built for the Option-B profile and retired to `archive/pre-sim-realign/neutral_stub/`. No stub exercises the adopted wire (`M1-015`) |
 | Bidirectional conformance evidence | **ABSENT** — the ~20 conformance tests were deleted with the Option-B layer (`M1-016`/`M1-017`) |
 | Escaping and cross-implementation vectors | **ABSENT** — retired with the same layer. `tests/unit/test_crypto.py` covers the current canonicalization in Python only, with no second implementation to cross-check |
-| `CONFORMANCE_PROFILE: ACCEPTED` | PENDING (coordinator verdict, not issued) |
+| `CONFORMANCE_PROFILE: ACCEPTED` | **ACCEPTED 2026-07-31** — narrow scope; see [STAGE_C_ACCEPTANCE.md](STAGE_C_ACCEPTANCE.md) |
 | `M2_GAMEPLAY: GO` | PENDING (coordinator verdict, not issued) |
 
 ## Checker semantics

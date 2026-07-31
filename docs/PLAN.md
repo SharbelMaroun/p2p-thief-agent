@@ -95,8 +95,11 @@ any more, and no peer file may be copied. The reviews above remain valid as revi
 an external artifact; they are not a route to consuming one.
 
 M1 is complete only after Stages A and B have exit evidence and Stage C acceptance is
-explicitly recorded. Stage C is `PENDING`, not assumed. Profile acceptance authorizes
-protocol implementation only and never opens gameplay on its own.
+explicitly recorded. **Stage C was accepted on 2026-07-31** in
+[STAGE_C_ACCEPTANCE.md](STAGE_C_ACCEPTANCE.md), on the strength of the
+reference-implementation vector rather than on assertion. The acceptance is narrow:
+it authorizes protocol and runtime implementation, leaves `M1-015`–`M1-017` open, and
+does **not** open gameplay — `M2_GAMEPLAY: GO` is a separate verdict and is not issued.
 
 The contract checker stays fail-closed at `PENDING` with exit 1 throughout. Its message
 retains historical copy-model wording; under this model it means no accepted conformance
