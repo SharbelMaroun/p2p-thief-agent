@@ -266,13 +266,13 @@ state without altering the pure `EXC-001` module.
 | M3-004 | Integrate the completed deterministic legal baseline policy | DONE | `test_local_policy.py`; `state/policy.py` |
 | M3-005 | Resolve the step-limit / survival-threshold boundary | DONE | Closed 2026-07-31 from the book, without needing a coordinator ruling: chapter 3 table 2 defines survival as surviving "the limit of valid moves", and table 15 makes the limit equal the threshold, so the horizon is **inclusive**. `resolve_outcome` already used `steps >= survival_threshold`; `test_survival_at_threshold` now pins 34/35/36 explicitly. `U-022` closed, `C-017` `RESOLVED` |
 | M3-005a | Register the boundary as a numbered unknown | DONE | `U-022` registered naming both readings; conflict `C-017` records the source defect |
-| M3-005b | Add a boundary test pinning the chosen reading | PENDING | Turn `threshold-1`, `threshold`, `threshold+1` each asserted |
+| M3-005b | Add a boundary test pinning the chosen reading | DONE | `test_scoring.py::test_survival_at_threshold` asserts 34/35/36 (threshold-1/threshold/threshold+1); `test_sub_game.py::test_surviving_the_threshold_wins_inclusively` pins the same horizon in the live loop |
 | M3-005c | Disclose the choice in the academic report | PENDING | Book p. 5 contradiction clause |
 | M3-006 | Expose state, scoring, and policy through the SDK | DONE | Adapters never import `state` internals `[G§4.1]` |
 | M3-007 | Prove the baseline policy is deterministic | DONE | Identical inputs yield an identical action every run |
 | M3-007a | Fix the tie-break order explicitly | DONE | No reliance on set or dict iteration order |
 | M3-007b | Prefer cells with greater onward reach | DONE | Mobility and dead-end avoidance are explicit metrics |
-| M3-008 | Prove the local state never holds Cop-private truth | PENDING | The property holds **by construction** — `ThiefLocalState` has only `board`, `position`, `known_barriers`, `step`, `last_action`, and `history` — but no test asserts it, so a future field could break `[AE-8]` silently. Needs an explicit field-whitelist test |
+| M3-008 | Prove the local state never holds Cop-private truth | DONE | `test_local_state.py::test_local_state_holds_no_cop_private_truth_by_field_whitelist` pins the exact field set of `ThiefLocalState` and `ThiefSnapshot`, so a later Cop-truth field breaks the suite rather than leaking silently `[AE-8]` |
 | M3-009 | Prove scoring reads config rather than constants | DONE | Changing the config changes the award; no literal 20 or 10 in the policy path |
 | M3-010 | Cover the state layer at full branch coverage | DONE | All four `state` modules at 100% branch within the green suite |
 | M3-011 | Document the local-state and scoring model | DONE | `M3_LOCAL_STATE.md` describes the built behaviour |
