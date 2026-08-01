@@ -403,11 +403,11 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M5-007b | Make one turn atomic against partial failure | DONE | A turn is sealed **exactly once**; a failed send never re-seals, because a second hash for one step is an audit mismatch and an automatic zero `[AE-019]`. Deciding and sealing were moved into `COMPUTING_MOVE`, the only phase the table permits `TECHNICAL_LOSS` from — they were briefly inside `COMMITTING`, where a seal failure had **no legal exit** and stranded the machine mid-turn. The companion peer carried the same latent defect and was corrected the same day |
 | M5-007c | Bound the loop by the negotiated step limit | DONE | `run_sub_game_over_wire` is bounded by `survival_threshold` and validates it, and the horizon is **inclusive** — completing the final step uncaught is a win, not one step short (`U-022`) `[AF-t15]` |
 | M5-007d | Emit a structured log line per phase transition | DONE | `run_turn` takes an `on_transition` callback fired on every phase entered, and `PhaseMachine.history` keeps the ordered record. The log manager that consumes them is `M5-008` |
-| M5-008 | Implement the log manager subsystem | PENDING | Append-only, structured, sufficient to reconstruct the match |
-| M5-008a | Record every sent and received message | PENDING | Enough to satisfy the end-of-game audit `[AE-36]` |
-| M5-008b | Record commitments and, at audit time, nonces | PENDING | Nonces written only after the final reveal `[AE-18]` |
-| M5-008c | Keep the log append-only | PENDING | No in-place edit path exists |
-| M5-008d | Write logs under a per-match path | PENDING | Matches never overwrite each other |
+| M5-008 | Implement the log manager subsystem | DONE | `services/log_manager.py` — append-only, structured, sufficient to reconstruct the match; `test_log_manager.py`. All four sub-tasks below |
+| M5-008a | Record every sent and received message | DONE | `record_sent`/`record_received` (plus `record_transition`/`record_commitment`); `test_records_sent_and_received_messages_in_order` `[AE-36]` |
+| M5-008b | Record commitments and, at audit time, nonces | DONE | `record_commitment` logs the commit; `reveal_nonce` raises before `open_audit()` and only logs the nonce after the final reveal `[AE-18]` |
+| M5-008c | Keep the log append-only | DONE | No edit/delete method exists (`test_there_is_no_method_to_edit_or_delete_an_entry`); the file is opened in append mode and `entries` returns a copy |
+| M5-008d | Write logs under a per-match path | DONE | The file name carries the `game_uid`; a reopen appends rather than truncating; `test_the_log_path_is_per_match`, `test_the_log_is_written_append_only_and_survives_a_reopen` |
 | M5-009 | Implement the deadline tracker subsystem | PENDING | Every outbound request carries an expiry and is reaped on breach |
 | M5-009a | Reap expired requests rather than awaiting them | PENDING | Past expiry is failure, never patience `[book §9]` |
 | M5-009b | Clear the queue cleanly on a declared technical loss | PENDING | No orphaned pending request survives |

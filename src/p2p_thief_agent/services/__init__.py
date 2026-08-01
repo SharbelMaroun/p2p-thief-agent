@@ -21,6 +21,8 @@ from p2p_thief_agent.services.gatekeeper import (
     QueueStatus,
     guard,
 )
+from p2p_thief_agent.services.log_manager import LogError, LogManager
+from p2p_thief_agent.services.watchdog import Watchdog, WatchdogError, WatchdogState
 
 __all__ = [
     "CONCURRENT_REQUESTS",
@@ -28,7 +30,12 @@ __all__ = [
     "REQUESTS_PER_MINUTE",
     "Gatekeeper",
     "GatekeeperError",
+    "LogError",
+    "LogManager",
     "QueueStatus",
+    "Watchdog",
+    "WatchdogError",
+    "WatchdogState",
     "guard",
     "MAX_RETRIES",
     "RESPONSE_TIMEOUT",
