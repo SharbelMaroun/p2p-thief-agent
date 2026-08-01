@@ -16,6 +16,7 @@ from p2p_thief_agent.adapters.fastmcp_server import (
     PeerInboxes,
     build_server,
     drain,
+    take_turn,
 )
 
 __all__ = [
@@ -27,4 +28,5 @@ __all__ = [
     "build_server",
     "drain",
     "signals_refusal",
+    "take_turn",
 ]

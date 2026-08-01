@@ -336,6 +336,77 @@ any wire or interop question and left the book as the sole authority; the bounda
 (`elapsed > timeout`) was therefore taken from its page-83 code verbatim, deliberately
 unlike the deadline's `>=`.
 
+#### The play loop: driving the mailbox (`M5-019`, 2026-08-02)
+
+The FastMCP server this peer runs is a **passive mailbox** — its four tools enqueue the
+opponent's message, acknowledge it, and do nothing else. The turn loop is the mirror
+image: it consumes a message and never looks for one. Nothing joined the two, which
+meant every sub-game test had to hand the loop a *scripted* opponent, and a peer could
+not play a match unattended.
+
+The join is a polling turn source. Each wait drains the mailbox, hands back the next
+turn the peer **accepted**, and is bounded — Appendix E rule 6 makes a deadline
+mandatory "to prevent deadlocks while waiting for the opponent", so silence returns
+`None` and the loop takes its declared exit to `TECHNICAL_LOSS` instead of blocking.
+The wait also **pulses the heartbeat every iteration**, because book section 8.4.2 puts
+the watchdog on the main game loop and waiting for an opponent is precisely the window
+in which a frozen peer and a patient one are indistinguishable.
+
+Three behaviours in the mailbox side are there because each would otherwise break an
+unattended match invisibly: a *rejected* turn is consumed (leaving it queued makes the
+poller re-reject it forever and starve the real turn behind it), a *second* queued turn
+is left in place (draining both discards the next step rather than playing it), and the
+other three mailboxes are drained first (a control or audit message parked in front of
+a turn stalls the game). A whole sub-game now plays with **no message fed in by hand**.
+
+**The Thief's asymmetry matters here.** This peer *opens* every cycle — the book gives
+it the first move — so step 1 sends without waiting and the poller becomes load-bearing
+from step 2 onward. The mirror-image mistake is not hypothetical: a Thief that waits
+for step 1 deadlocks against a Cop that is correctly waiting for it, and the companion
+repository's test harness contained exactly that error until a failing test exposed it.
+
+*Problems hit building it.* The two notebooks appeared to **contradict each other**:
+the reference drives its runtime by polling its own inboxes at `poll_interval_seconds`,
+while the book mandates a strict state machine rather than a loop. Treating that as a
+conflict would have meant choosing one and quietly dropping the other; the actual
+resolution is that they answer different questions — polling is only *how* a queued
+message is picked up, and the phase machine still decides what may legally follow.
+
+*What is still not built.* The `serve` CLI (`M5-019e`). `build_server(...).run()` is a
+blocking call, so launching a peer needs the server on a background thread plus
+autonomous negotiation sequencing. A **passive** `serve` — one that mailboxes without
+playing — was rejected in the companion repository as proving connectivity rather than
+a game; that decision is honoured here rather than quietly reversed.
+
+*A blocker that got worse on inspection.* The book's stage-5 milestone requires
+**screenshots from the Replay App showing "Verified OK", plus the Live GUI belief map**
+as its evidence. Both are `M8` deliverables, so the two-machine game cannot be
+*evidenced* even once the hardware and the CLI exist.
+
+*A ledger gap this exposed.* `docs/TODO.md` had **no row at all** for the play loop —
+the companion repo named it only inside a blocked row's prose, and here it was named
+nowhere. The single most load-bearing missing piece in the repository was invisible to
+any search for open tasks. It is now `M5-019`, with sub-rows.
+
+#### Ledger reconciliation (2026-08-02)
+
+That gap prompted an audit of every open `M5` row against the code actually present.
+Six rows were wrong:
+
+- **`M5-016` (backpressure) was already done and never recorded.** `services/gatekeeper.py`
+  and nine tests implement it, one of which — `test_a_full_queue_refuses_loudly_rather_than_discarding`
+  — states the row's Definition of Done almost verbatim. Closing it required no code.
+- **`M5-012a`…`f` were stale.** The parent `M5-012` closed on 2026-08-01; its six
+  sub-rows were left reading `PENDING` underneath a `DONE` parent. Four are superseded
+  by `M5-014` and `M5-007`; two are genuinely done.
+
+Three rows were checked and **confirmed genuinely open** — `M5-011` (adversarial-peer
+proof), `M5-013a/b` (subsystem diagram and failure-path table), `M5-018` (SDK/transport
+guard). The evidence of each check is written into the row so the next session does not
+repeat it. That negative result matters: in conversation I had guessed `M5-011` and
+`M5-018` were probably already satisfied, and both turned out to be real work. A
+reconciliation that records only the good news drifts the ledger the other way.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
