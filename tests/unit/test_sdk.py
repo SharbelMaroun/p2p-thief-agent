@@ -21,3 +21,11 @@ def test_sdk_identity_is_immutable() -> None:
 
     with pytest.raises(FrozenInstanceError):
         sdk.role = "cop"  # type: ignore[misc]
+
+
+def test_sdk_reaches_commit_seal_verify_audit_and_handshake() -> None:
+    """`M4-008`: the protocol surface is reachable through the SDK, not via internals."""
+    from p2p_thief_agent import sdk
+
+    for name in ("commit_of", "seal", "verify", "audit_records", "Handshake"):
+        assert hasattr(sdk, name), f"SDK must expose {name}"

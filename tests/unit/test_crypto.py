@@ -70,6 +70,25 @@ def test_new_nonce_is_fresh_lowercase_hex():
     assert re.fullmatch(r"[0-9a-f]{32}", new_nonce())
 
 
+def test_two_identical_moves_produce_different_commitments():
+    """`M4-010a` / `AE-18`: a fresh nonce per commit defeats a dictionary attack."""
+    payload = {"step": 1, "move": "N"}
+    first, second = seal(payload), seal(payload)
+    assert first["nonce"] != second["nonce"]
+    assert first["commit"] != second["commit"]
+
+
+def test_verify_rejects_a_near_miss_commitment():
+    """`M4-012`: constant-time compare still rejects a digest differing in one byte."""
+    payload = {"step": 1, "move": "N"}
+    sealed = seal(payload)
+    last = sealed["commit"][-1]
+    near_miss = sealed["commit"][:-1] + ("0" if last != "0" else "1")
+    with pytest.raises(CryptoError):
+        verify(payload, sealed["nonce"], near_miss)
+    verify(payload, sealed["nonce"], sealed["commit"])
+
+
 def test_canonical_sha256_is_key_order_independent():
     assert canonical_sha256({"a": 1, "b": 2}) == canonical_sha256({"b": 2, "a": 1})
 

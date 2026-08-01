@@ -53,7 +53,7 @@ milestone is "the behaviour is observed", never "the code is written".
 | M2 | Complete hardened domain suite: movement, barriers, capture | closed |
 | EXC-001 | Deterministic baseline policy on public domain APIs | closed |
 | M3 | Immutable local state, scoring, and baseline integration | closed except `M3-005` |
-| M4 | Independent vectors, tamper tests, and commit-reveal round trip | **authorized to complete** (profile ACCEPTED 2026-07-31) but **NOT complete** — a 2026-08-01 verification found real gaps: M4-002a/b (escaping/non-BMP vectors), M4-006a/b/c (Step-0 attestation), M4-010a, M4-012 (constant-time compare), M4-013 (transport-import guard). Being completed in ID order |
+| M4 | Independent vectors, tamper tests, and commit-reveal round trip | **all M4-001…M4-017 tasks DONE 2026-08-01** (profile ACCEPTED 2026-07-31 authorized completion; the 2026-08-01 gaps — canonical vectors, Step-0 attestation, adversarial vectors, constant-time compare, transport-import guard — are now closed and tested). Milestone closure is the coordinator's verdict to record |
 | M5 | The Thief runs as server and client and completes a resilient game | **open — no transport exists yet** |
 | M6 | Legal deterministic behaviour under observation and fallback tests | open |
 | M7 | One complete series produces accepted audit artifacts | open |
@@ -309,58 +309,58 @@ longer pending: `CONFORMANCE_PROFILE: ACCEPTED` was recorded 2026-07-31
 (`STAGE_C_ACCEPTANCE.md`), whose stated effect is "M4 may be completed and M5 may
 begin", so these rows are **authorized to close** — they were never blocked on an
 unrecorded gate, the trackers were simply stale. Second, a row-by-row verification the
-same day found M4 is **not actually built out**, contradicting the handoff's "M0–M4
-complete". Being completed in ID order. **Closed so far (2026-08-01):** `M4-002a`/`b`/`c`
-(canonicalization vectors, `test_canonical_vectors.py`) and `M4-006a`/`b`/`c` (Step-0
-git-commit + token-budget binding and the pre-move ordering guard, `test_attestation.py`
-/ `test_sealing.py`). **Still open:** `verify()` compares digests with `!=` rather than
-`hmac.compare_digest` (`M4-012`, book §8); no test pins that two identical moves commit
-differently (`M4-010a`); no guard proves the protocol layer imports no transport
-(`M4-013`); and `M4-008`/`M4-009`/`M4-011` need a row-by-row evidence pass.
-`M2_GAMEPLAY: GO` stays deliberately withheld until M4 is genuinely complete and a
-first interop run exists.
+same day found M4 was **not actually built out**, contradicting the handoff's "M0–M4
+complete". It has since been completed in ID order and **all M4-001…M4-017 rows are now
+DONE** (2026-08-01): canonicalization vectors (`test_canonical_vectors.py`), Step-0
+attestation with git-commit + token-budget binding and the pre-move ordering guard
+(`test_attestation.py`, `test_sealing.py`), the SDK protocol surface (`M4-008`), the five
+adversarial tampering classes (`test_audit_vectors.py`), `verify` now using
+`hmac.compare_digest` (`M4-012`), the dictionary-attack defence (`M4-010a`), LF/non-ASCII
+byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol_boundary.py`,
+`M4-013`). Formal M4 milestone closure remains the coordinator's verdict, and
+`M2_GAMEPLAY: GO` stays deliberately withheld until a first live interop run exists.
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M4-001 | Implement the envelope-free simulator-conformant message models | PENDING | Schema/version/identity failure tests. Retitled 2026-07-31: `protocol/wire.py` is envelope-free — the tool argument *is* the message dict — so the former "public envelopes" wording described the retired Option-B design |
-| M4-001a | Model `TurnMessage`, `ControlMessage`, and `AuditPayload` | PENDING | `protocol/wire.py`; matches `SIM_WIRE_PROTOCOL.md` |
-| M4-001b | Reject unknown, missing, and mistyped fields | PENDING | Negative vectors per message type |
+| M4-001 | Implement the envelope-free simulator-conformant message models | DONE | `protocol/wire.py` (100% branch); `test_wire.py` covers schema/version/identity failures. Envelope-free — the tool argument *is* the message dict |
+| M4-001a | Model `TurnMessage`, `ControlMessage`, and `AuditPayload` | DONE | `protocol/wire.py`; matches `SIM_WIRE_PROTOCOL.md`; `test_wire.py` |
+| M4-001b | Reject unknown, missing, and mistyped fields | DONE | `test_wire.py` negative vectors per message type |
 | M4-002 | Implement exact canonical bytes and shared test vectors | DONE | `test_canonical_vectors.py` (2026-08-01) + `test_crypto.py` + `test_reference_vector.py`; all three sub-tasks DONE |
 | M4-002a | Pin the canonicalization form | DONE | `test_canonical_vectors.py` pins exact bytes for key-ordering, preserved array order, float rendering (`6.0`/`31.8`), quote/backslash/control escaping, and non-BMP raw UTF-8 under `ensure_ascii=False` — closing the gap `STAGE_C_ACCEPTANCE.md` flagged |
 | M4-002b | Separate the hash domains | DONE | `test_canonical_vectors.py::test_commitment_and_config_hash_domains_do_not_collide` — the nonce-bound commitment can never equal a bare `canonical_sha256` of the same payload |
 | M4-002c | Reproduce the pinned simulator's commitment bytes exactly | DONE | `test_reference_vector.py` reproduces a commit hash emitted by the reference simulator itself, by reimplementation only `[ADR-0008]` |
-| M4-003 | Implement explicit protocol states and illegal-transition rejection | PENDING | Transition table tests |
-| M4-004 | Implement SHA-256 commit, acknowledgement, reveal, and nonce secrecy | PENDING | Normal/order/tamper tests |
-| M4-004a | Generate nonces with `secrets`, never `random` | PENDING | `token_hex(16)`, fresh per commit `[book §8]` |
-| M4-004b | Keep the nonce hidden until the final audit | PENDING | Reveal carries move and hint only `[AE-18]` |
-| M4-004c | Enforce commit-before-reveal ordering | PENDING | An out-of-order reveal is rejected |
-| M4-005 | Implement audit mismatch and technical-loss outcomes | PENDING | Replayable audit failure tests |
-| M4-005a | Recompute every commitment at audit and compare | PENDING | Any mismatch is a technical loss, no appeal `[AE-19]` |
+| M4-003 | Implement explicit protocol states and illegal-transition rejection | DONE | `orchestration/phases.py` transition table; `test_phases.py` asserts every undeclared transition raises (also `M5-007a`) |
+| M4-004 | Implement SHA-256 commit, acknowledgement, reveal, and nonce secrecy | DONE | `crypto.seal`/`verify` + phase ordering; `test_crypto.py`, `test_sub_game_audit.py` |
+| M4-004a | Generate nonces with `secrets`, never `random` | DONE | `new_nonce` = `secrets.token_hex(16)`, fresh per commit; `test_crypto.py` `[book §8]` |
+| M4-004b | Keep the nonce hidden until the final audit | DONE | The public `TurnMessage` carries commit/hint/smell_grid, never the nonce; the nonce lives in the private ledger and is revealed only in the audit records `[AE-18]` |
+| M4-004c | Enforce commit-before-reveal ordering | DONE | The phase machine requires `AWAITING_REVEAL` before `VERIFYING`; an out-of-order transition raises `PhaseError`; `test_phases.py` |
+| M4-005 | Implement audit mismatch and technical-loss outcomes | DONE | `audit_records` + `state/scoring`; `test_sub_game_audit.py` |
+| M4-005a | Recompute every commitment at audit and compare | DONE | `audit_records` recomputes every commitment; a mismatch is a technical loss, no appeal; `test_sub_game_audit.py` `[AE-19]` |
 | M4-006 | Implement Step-0 host, code, and token attestation | DONE | All three sub-tasks DONE 2026-08-01. `sealed_spec_record` binds spec/model/code_version/group/sub-game (as the reference sim) **plus** `github_commit` and `token_budget`; `protocol/attestation.require_pregame_attestation` enforces the pre-move ordering. `test_sealing.py`, `test_attestation.py` |
 | M4-006a | Bind the exact running Git commit into the sealed record | DONE | `sealed_spec_record(github_commit=…)` seals it into the step-0 commitment; `shared/git_info.running_git_commit` resolves the running HEAD (injected runner, fail-closed on a non-40-hex SHA). The same value later populates `github_commit` `[AE-53]` |
 | M4-006b | Seal the agreed LLM token budget | DONE | `sealed_spec_record(token_budget=…)` seals the agreed budget; refuses a non-negative-int budget `[AE-54]` |
 | M4-006c | Prove Step-0 completes before the first move | DONE | `require_pregame_attestation` raises `AttestationError` naming any step ≥ 1 sealed before the step-0 `system_spec` record; `test_attestation.py` is the ordering test. Live wiring into the running sub-game (seal the spec at game start, then guard) lands with the Step-0 runtime hook in M5 |
 | M4-007 | Retitle the M4 rows to match the envelope-free wire | DONE | `M4-001` retitled and the section note corrected on 2026-07-31; neither now describes the retired Option-B envelope design |
-| M4-008 | Expose the protocol layer through the SDK | PENDING | The SDK reaches commit, seal, verify, audit, and handshake `[G§4.1]` |
-| M4-009 | Cover commit-reveal with adversarial vectors | PENDING | Every tampering class is detected, not merely most |
-| M4-009a | Detect a mutated move at audit | PENDING | Recomputed hash diverges |
-| M4-009b | Detect a mutated intent flag | PENDING | The bluff flag is inside the seal |
-| M4-009c | Detect a mutated or substituted nonce | PENDING | Nonce is part of the hashed input |
-| M4-009d | Detect a single-byte mutation anywhere in the record | PENDING | SHA-256 is bit-sensitive; proven end to end |
-| M4-009e | Detect a reordered step sequence | PENDING | Step index is bound into the record |
-| M4-010 | Prove nonce generation quality | PENDING | Fresh per commit, cryptographically sourced, never reused |
-| M4-010a | Prove two identical moves produce different commitments | PENDING | The dictionary-attack defence, demonstrated `[AE-18]` |
-| M4-011 | Prove canonicalization is byte-stable across platforms | PENDING | LF endings and fixed encoding give identical bytes |
-| M4-011a | Prove CRLF cannot enter a controlled file | PENDING | CRLF would break every hash |
-| M4-011b | Prove non-ASCII content hashes identically | PENDING | `ensure_ascii=False` behaviour pinned |
-| M4-012 | Compare digests in constant time | PENDING | `compare_digest`, never `==` `[book §8]` |
-| M4-013 | Prove the protocol layer imports no transport | PENDING | Guard test; the protocol must work over any carrier |
-| M4-014 | Document the protocol layer | PENDING | `PRD_commit_reveal.md` and `SIM_WIRE_PROTOCOL.md` match the built construction |
-| M4-015 | Implement the signed-terms handshake | PENDING | Role-free identity, `config_sha256`, and required-terms checking |
-| M4-015a | Reject a handshake missing a required term | PENDING | `missing_required_terms` covers every mandatory field |
-| M4-015b | Reject a handshake whose config hash differs | PENDING | `[AE-11]`; refuse to play on mismatch |
-| M4-016 | Keep the committed payload field set flexible | PENDING | The opponent re-hashes the revealed payload, so the field set is not itself an interop constraint — but the canonical form and concatenation are |
-| M4-017 | Maintain the archived Option-B layer as history only | PENDING | `archive/pre-sim-realign/` is never imported or resurrected |
+| M4-008 | Expose the protocol layer through the SDK | DONE | `p2p_thief_agent.sdk` re-exports `commit_of`, `seal`, `verify`, `audit_records`, `Handshake` (and the sealing/canonical helpers); `test_sdk.py::test_sdk_reaches_commit_seal_verify_audit_and_handshake` `[G§4.1]` |
+| M4-009 | Cover commit-reveal with adversarial vectors | DONE | `test_audit_vectors.py`; all five tampering classes below `[AE-19]` |
+| M4-009a | Detect a mutated move at audit | DONE | `test_audit_vectors.py::test_a_mutated_move_is_detected` — recomputed hash diverges |
+| M4-009b | Detect a mutated intent flag | DONE | `test_a_mutated_intent_flag_is_detected` — the bluff verdict is inside the seal |
+| M4-009c | Detect a mutated or substituted nonce | DONE | `test_a_substituted_nonce_is_detected` |
+| M4-009d | Detect a single-byte mutation anywhere in the record | DONE | `test_a_single_byte_mutation_anywhere_is_detected` (one byte in `hint`) |
+| M4-009e | Detect a reordered step sequence | DONE | `test_a_renumbered_step_index_is_detected` + `test_audit_reports_the_failed_step_whatever_order_records_arrive_in`: the step is bound in the payload, so order is irrelevant |
+| M4-010 | Prove nonce generation quality | DONE | `test_crypto.py`: `new_nonce` is fresh 32-hex CSPRNG output; see `M4-010a` |
+| M4-010a | Prove two identical moves produce different commitments | DONE | `test_crypto.py::test_two_identical_moves_produce_different_commitments` — the dictionary-attack defence `[AE-18]` |
+| M4-011 | Prove canonicalization is byte-stable across platforms | DONE | `M4-011a` (LF) + `M4-011b` (non-ASCII) below |
+| M4-011a | Prove CRLF cannot enter a controlled file | DONE | `.gitattributes` pins `eol=lf` globally and per type; `test_protocol_boundary.py::test_gitattributes_pins_lf_on_controlled_files` |
+| M4-011b | Prove non-ASCII content hashes identically | DONE | `test_canonical_vectors.py::test_non_ascii_and_non_bmp_serialize_raw_not_escaped` pins `ensure_ascii=False` |
+| M4-012 | Compare digests in constant time | DONE | `crypto.verify` now uses `hmac.compare_digest`, never `==`; `test_crypto.py::test_verify_rejects_a_near_miss_commitment` `[book §8]` |
+| M4-013 | Prove the protocol layer imports no transport | DONE | `test_protocol_boundary.py::test_protocol_layer_imports_no_transport` walks `protocol/` and fails on any `fastmcp`/`adapters`/`peer`/socket/http import |
+| M4-014 | Document the protocol layer | DONE | `PRD_commit_reveal.md` and `SIM_WIRE_PROTOCOL.md` describe the built construction (commit/canonical/handshake/attestation) |
+| M4-015 | Implement the signed-terms handshake | DONE | `protocol/handshake.py` + `agreement.py`: role-free identity, `config_sha256`, required-terms; `test_handshake.py`, `test_agreement.py` |
+| M4-015a | Reject a handshake missing a required term | DONE | `missing_required_terms` covers every mandatory field; `test_handshake.py` |
+| M4-015b | Reject a handshake whose config hash differs | DONE | `accept_offer` compares terms and refuses a mismatch by name (stronger than a bare hash compare); `test_agreement.py` `[AE-11]` |
+| M4-016 | Keep the committed payload field set flexible | DONE | `verify` re-hashes the revealed payload, so the field set is not an interop constraint; `test_crypto.py::test_verify_accepts_any_payload_roster` |
+| M4-017 | Maintain the archived Option-B layer as history only | DONE | No `src/` or `tests/` module imports `archive/` (verified 2026-08-01); the protocol boundary guard (`test_protocol_boundary.py`) keeps the live layer clean |
 
 ---
 
