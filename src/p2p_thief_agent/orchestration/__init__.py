@@ -5,6 +5,7 @@ receive callable and imports no FastMCP symbol, so a whole sub-game runs without
 socket and the same code runs over one.
 """
 
+from p2p_thief_agent.orchestration.delivery import deliver
 from p2p_thief_agent.orchestration.gateway import Gateway
 from p2p_thief_agent.orchestration.phases import (
     TRANSITIONS,
@@ -55,6 +56,7 @@ __all__ = [
     "TurnLoopError",
     "TurnRecord",
     "WatchdogPort",
+    "deliver",
     "is_sealed_once",
     "run_sub_game_over_wire",
     "run_turn",

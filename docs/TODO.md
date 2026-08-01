@@ -411,9 +411,9 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M5-009 | Implement the deadline tracker subsystem | DONE | `services/deadline_tracker.py`: `RequestTracker` registers each outbound request under a key with a deadline from the agreed limits, and reaps those past expiry; `test_deadline_tracker.py`. Also satisfies the gateway's `DeadlineTracker` port |
 | M5-009a | Reap expired requests rather than awaiting them | DONE | `RequestTracker.reap(now)` removes and returns every request past its expiry; `test_expired_requests_are_reaped_and_live_ones_kept` `[book §9]` |
 | M5-009b | Clear the queue cleanly on a declared technical loss | DONE | `RequestTracker.clear()` drops every pending request; `test_clear_drops_every_pending_request_on_a_technical_loss` — no orphan survives |
-| M5-010 | Handle opponent-side rejection responses | PENDING | A peer's content rejection is scored, not retried forever |
-| M5-010a | Distinguish rejection from transport failure | PENDING | Retry applies to one and not the other |
-| M5-010b | Terminate deterministically on an unrecoverable rejection | PENDING | The match reaches a defined terminal state |
+| M5-010 | Handle opponent-side rejection responses | DONE | `PeerRejectionError` vs `TransportError` are disjoint (`adapters.fastmcp_client.signals_refusal`); `orchestration/delivery.deliver` retries only transport faults; a rejection terminates the sub-game (`test_delivery.py`, `test_sub_game.py`) |
+| M5-010a | Distinguish rejection from transport failure | DONE | `deliver` uses `retry_on=(TransportError,)`: a transient transport fault is retried to the agreed limit, a `PeerRejectionError` propagates on the first occurrence; `test_delivery.py` |
+| M5-010b | Terminate deterministically on an unrecoverable rejection | DONE | A rejection routes through the turn loop to a terminal `Outcome.TECHNICAL_LOSS`; `test_sub_game.py::test_an_opponent_rejection_terminates_the_sub_game` |
 | M5-011 | Prove the runtime under adversarial peer behaviour | PENDING | A hostile or broken opponent cannot hang or corrupt this peer |
 | M5-011a | Survive a peer that never responds | PENDING | Deadline plus watchdog produce a terminal outcome |
 | M5-011b | Survive a peer that responds out of order | PENDING | The state machine rejects the transition `[AE-5]` |
