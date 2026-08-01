@@ -22,7 +22,8 @@ Every difference from that sketch is deliberate and in this repository's grain:
 - **The threshold is negotiated, not hard-coded.** It comes from the shared, signed
   match object (``network_and_league.watchdog_timeout_sec``, default 60 `[AF-t19]`);
   the sample's 180 is illustrative, and Appendix F table 19 marks this value
-  *Negotiation*. ``deadlines.WATCHDOG_TIMEOUT`` is the single place the key is written.
+  *Negotiation*. ``limits.WATCHDOG_TIMEOUT`` is the single place the key is written,
+  shared with the Deadline Tracker without either subsystem importing the other.
 - **`persist_state` and `controlled_shutdown` are injected callbacks.** This module
   owns *when* to persist and tear down and in *what order*; it never owns *how*.
 - **The trip fires exactly once.** A controlled shutdown is not a loop: once it has
@@ -40,7 +41,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from enum import Enum
 
-from p2p_thief_agent.services.deadlines import WATCHDOG_TIMEOUT, read_limit
+from p2p_thief_agent.services.limits import WATCHDOG_TIMEOUT, read_limit
 
 
 class WatchdogError(RuntimeError):
