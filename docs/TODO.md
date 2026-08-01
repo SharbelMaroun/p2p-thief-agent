@@ -368,10 +368,10 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M5-001 | Route runtime coordination through one Thief gateway | PENDING | Architecture/boundary tests |
-| M5-001a | Define the five subsystem ports behind the gateway | PENDING | MCP connector, decision module, log manager, deadline tracker, watchdog `[AE-3]` |
-| M5-001b | Forbid subsystem-to-subsystem imports by test | PENDING | Import-graph test fails on any direct peer link |
-| M5-001c | Keep decision logic out of the gateway | PENDING | It coordinates; it does not decide `[book §9]` |
+| M5-001 | Route runtime coordination through one Thief gateway | DONE | `orchestration/gateway.py` — `Gateway` holds one port of each subsystem and wires them (`on_transition` fans a phase out to log + watchdog; `play_sub_game` delegates to the turn loop). `test_gateway.py`, `test_orchestrator_boundary.py` `[AE-3]` |
+| M5-001a | Define the five subsystem ports behind the gateway | DONE | `orchestration/ports.py`: `DecisionModule`, `LogPort`, `DeadlineTracker`, `WatchdogPort` Protocols + `PeerTransport` reused as the MCP-connector port `[AE-3]` |
+| M5-001b | Forbid subsystem-to-subsystem imports by test | DONE | `test_orchestrator_boundary.py` walks `src/` and fails on any import from one of the five subsystems to another. Fixing the one violation (watchdog→deadlines) drove extracting the shared limit reader into `services/limits.py` |
+| M5-001c | Keep decision logic out of the gateway | DONE | The gateway computes no move — `play_sub_game` delegates to the Decision Module port; `test_play_sub_game_delegates_the_move_to_the_decision_module` proves the module, not the gateway, decides `[book §9]` |
 | M5-002 | Run the Thief as both FastMCP server and client | DONE | Server, client, an in-memory round trip, **and** a separate-process round trip over HTTP all pass (`M5-002e`). Live-match concerns — negotiation, deadlines, the turn loop — belong to `M5-003`/`M5-004`/`M5-007` |
 | M5-002a | Expose the four tools on a local FastMCP server | DONE | `adapters.build_server` exposes `negotiate`, `receive_turn`, `submit_audit`, `receive_control`, each taking one argument with no envelope. A test asserts `receive_move` — the withdrawn Option-B name — is **not** reachable. See `SIM_WIRE_PROTOCOL.md` |
 | M5-002b | Confine every FastMCP import to an adapters layer | DONE | A guard test walks every module under `src/` and fails on any non-`adapters` importer of fastmcp |
