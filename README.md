@@ -273,6 +273,29 @@ compares every negotiated term against our own and refuses a mismatch **by name*
 enforcing the Appendix F floors — `Fixed` values exactly, `Minimum` values only in
 the harder direction. A refusal an opponent cannot act on would be worth little.
 
+**Bounded waiting (added 2026-08-01).** Every wait is now finite. The book is blunt
+about why — *"Missing a Deadline is a Failure, Not Patience"* — and permits only two
+outcomes when an expiry passes: retry, or declare a technical loss and clear the
+queue. An un-expiring pending request is named as the direct path to freezing. So
+each attempt carries its own expiry, retries stop at the agreed limit, and an attempt
+that overruns its own deadline is **not** retried: the retry budget does not rescue a
+missed deadline.
+
+The four limits live in the **shared, signed** match object rather than private
+configuration, which is the part worth noticing — a peer able to set its own timeout
+could stall an opponent legitimately. Reading them from the agreed bytes makes that
+impossible rather than merely impolite.
+
+*Problems hit building it.* Three. The reference notebook froze twice and the query
+had to be re-sent three times before it submitted — logged rather than skipped,
+because a tool failure is not permission to skip a verification step. Re-reading the
+ledgers first turned up two rows still marked open for work already finished, which
+would have sent someone to redo it. And the book PDF contradicted our own parameter
+baseline in a small way: Appendix F table 19 marks the watchdog timeout
+**`Negotiation`**, not `Minimum` like the retry limits beside it — a distinction that
+matters, since a `Minimum` may only be tightened while a negotiated value can move
+either way. Both baselines were corrected.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a

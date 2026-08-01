@@ -12,9 +12,15 @@
 
 version = "1.00"
 
+# Book page 131 and the audit of 2026-08-01: the [game] block must carry the group
+# identity, the sub-game number, the member list, and the repository URLs — not just
+# the two names this example previously held.
 [game]
 group_name = "private-unconfigured"
 group_id = "private-unconfigured"
+sub_game_number = 1
+members = ["private-unconfigured"]
+repos = { cop = "https://example.invalid/cop", thief = "https://example.invalid/thief" }
 
 # The opponent's address is private local knowledge and is read ONLY from here, by
 # `shared.private_config.load_opponent_url`. The shared match JSON must carry no URL,
