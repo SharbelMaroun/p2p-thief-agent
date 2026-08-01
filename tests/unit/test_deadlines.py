@@ -14,8 +14,8 @@ from p2p_thief_agent.services.deadlines import (
     RetryPolicy,
     attempt,
     limits_from_match,
-    read_limit,
 )
+from p2p_thief_agent.services.limits import LimitError, read_limit
 
 MATCH = {
     "network_and_league": {"response_timeout_sec": 30, "watchdog_timeout_sec": 60},
@@ -55,7 +55,7 @@ def test_the_defaults_match_appendix_f_table_19() -> None:
 
 @pytest.mark.parametrize("bad", [-1, True, "30", 1.5])
 def test_a_nonsensical_limit_is_refused_rather_than_coerced(bad: object) -> None:
-    with pytest.raises(DeadlineError, match="non-negative integer"):
+    with pytest.raises(LimitError, match="non-negative integer"):
         read_limit({"network_and_league": {"response_timeout_sec": bad}},
                    "network_and_league", "response_timeout_sec", 30)
 

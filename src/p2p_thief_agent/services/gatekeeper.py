@@ -30,7 +30,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 
-from p2p_thief_agent.services.deadlines import read_limit
+from p2p_thief_agent.services.limits import read_limit
 
 REQUESTS_PER_MINUTE = ("rate_limiter_gatekeeper", "requests_per_minute", 30)
 CONCURRENT_REQUESTS = ("rate_limiter_gatekeeper", "concurrent_requests", 2)

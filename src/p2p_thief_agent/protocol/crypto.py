@@ -15,6 +15,7 @@ the agreed configuration, so every hash domain shares one serialization.
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import secrets
 from typing import Any
@@ -54,9 +55,14 @@ def seal(payload: dict[str, Any]) -> dict[str, str]:
 
 
 def verify(payload: dict[str, Any], nonce: str, commit: str) -> None:
-    """Raise CryptoError unless (payload, nonce) hashes to commit."""
+    """Raise CryptoError unless (payload, nonce) hashes to commit.
+
+    The digests are compared with ``hmac.compare_digest``, never ``==`` (book §8): a
+    plain string compare short-circuits on the first differing byte and leaks, through
+    timing, how much of a forged commitment was correct.
+    """
     actual = commit_of(payload, nonce)
-    if actual != commit:
+    if not hmac.compare_digest(actual, commit):
         raise CryptoError(
             f"commit mismatch: expected {commit[:16]}..., recomputed {actual[:16]}..."
         )

@@ -41,6 +41,20 @@ def test_history_snapshots_accumulate_in_order():
     assert [s.step for s in state.trajectory()] == [0, 1, 2]
 
 
+def test_local_state_holds_no_cop_private_truth_by_field_whitelist():
+    """`M3-008` / `AE-8`: any field outside this set could smuggle in objective Cop truth.
+
+    The privacy property holds by construction, but only a test makes it stay true — a
+    later `police_position` field would break here rather than silently at a match.
+    """
+    state_fields = {f.name for f in dataclasses.fields(ThiefLocalState)}
+    assert state_fields == {
+        "board", "position", "known_barriers", "step", "last_action", "history",
+    }
+    snapshot_fields = {f.name for f in dataclasses.fields(ThiefSnapshot)}
+    assert snapshot_fields == {"step", "position", "known_barriers", "action"}
+
+
 def test_state_is_frozen():
     state = _start()
     with pytest.raises(dataclasses.FrozenInstanceError):

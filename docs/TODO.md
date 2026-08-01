@@ -53,7 +53,7 @@ milestone is "the behaviour is observed", never "the code is written".
 | M2 | Complete hardened domain suite: movement, barriers, capture | closed |
 | EXC-001 | Deterministic baseline policy on public domain APIs | closed |
 | M3 | Immutable local state, scoring, and baseline integration | closed except `M3-005` |
-| M4 | Independent vectors, tamper tests, and commit-reveal round trip | **authorized to complete** (profile ACCEPTED 2026-07-31) but **NOT complete** — a 2026-08-01 verification found real gaps: M4-002a/b (escaping/non-BMP vectors), M4-006a/b/c (Step-0 attestation), M4-010a, M4-012 (constant-time compare), M4-013 (transport-import guard). Being completed in ID order |
+| M4 | Independent vectors, tamper tests, and commit-reveal round trip | **all M4-001…M4-017 tasks DONE 2026-08-01** (profile ACCEPTED 2026-07-31 authorized completion; the 2026-08-01 gaps — canonical vectors, Step-0 attestation, adversarial vectors, constant-time compare, transport-import guard — are now closed and tested). Milestone closure is the coordinator's verdict to record |
 | M5 | The Thief runs as server and client and completes a resilient game | **open — no transport exists yet** |
 | M6 | Legal deterministic behaviour under observation and fallback tests | open |
 | M7 | One complete series produces accepted audit artifacts | open |
@@ -266,13 +266,13 @@ state without altering the pure `EXC-001` module.
 | M3-004 | Integrate the completed deterministic legal baseline policy | DONE | `test_local_policy.py`; `state/policy.py` |
 | M3-005 | Resolve the step-limit / survival-threshold boundary | DONE | Closed 2026-07-31 from the book, without needing a coordinator ruling: chapter 3 table 2 defines survival as surviving "the limit of valid moves", and table 15 makes the limit equal the threshold, so the horizon is **inclusive**. `resolve_outcome` already used `steps >= survival_threshold`; `test_survival_at_threshold` now pins 34/35/36 explicitly. `U-022` closed, `C-017` `RESOLVED` |
 | M3-005a | Register the boundary as a numbered unknown | DONE | `U-022` registered naming both readings; conflict `C-017` records the source defect |
-| M3-005b | Add a boundary test pinning the chosen reading | PENDING | Turn `threshold-1`, `threshold`, `threshold+1` each asserted |
+| M3-005b | Add a boundary test pinning the chosen reading | DONE | `test_scoring.py::test_survival_at_threshold` asserts 34/35/36 (threshold-1/threshold/threshold+1); `test_sub_game.py::test_surviving_the_threshold_wins_inclusively` pins the same horizon in the live loop |
 | M3-005c | Disclose the choice in the academic report | PENDING | Book p. 5 contradiction clause |
 | M3-006 | Expose state, scoring, and policy through the SDK | DONE | Adapters never import `state` internals `[G§4.1]` |
 | M3-007 | Prove the baseline policy is deterministic | DONE | Identical inputs yield an identical action every run |
 | M3-007a | Fix the tie-break order explicitly | DONE | No reliance on set or dict iteration order |
 | M3-007b | Prefer cells with greater onward reach | DONE | Mobility and dead-end avoidance are explicit metrics |
-| M3-008 | Prove the local state never holds Cop-private truth | PENDING | The property holds **by construction** — `ThiefLocalState` has only `board`, `position`, `known_barriers`, `step`, `last_action`, and `history` — but no test asserts it, so a future field could break `[AE-8]` silently. Needs an explicit field-whitelist test |
+| M3-008 | Prove the local state never holds Cop-private truth | DONE | `test_local_state.py::test_local_state_holds_no_cop_private_truth_by_field_whitelist` pins the exact field set of `ThiefLocalState` and `ThiefSnapshot`, so a later Cop-truth field breaks the suite rather than leaking silently `[AE-8]` |
 | M3-009 | Prove scoring reads config rather than constants | DONE | Changing the config changes the award; no literal 20 or 10 in the policy path |
 | M3-010 | Cover the state layer at full branch coverage | DONE | All four `state` modules at 100% branch within the green suite |
 | M3-011 | Document the local-state and scoring model | DONE | `M3_LOCAL_STATE.md` describes the built behaviour |
@@ -309,58 +309,58 @@ longer pending: `CONFORMANCE_PROFILE: ACCEPTED` was recorded 2026-07-31
 (`STAGE_C_ACCEPTANCE.md`), whose stated effect is "M4 may be completed and M5 may
 begin", so these rows are **authorized to close** — they were never blocked on an
 unrecorded gate, the trackers were simply stale. Second, a row-by-row verification the
-same day found M4 is **not actually built out**, contradicting the handoff's "M0–M4
-complete": `verify()` compares digests with `!=` rather than `hmac.compare_digest`
-(`M4-012`, book §8); there are no escaping / non-BMP canonicalization vectors and
-`ensure_ascii=False` is unpinned (`M4-002a`/`M4-002b`, also flagged in
-`STAGE_C_ACCEPTANCE.md`); Step-0 attestation lacks the git-commit binding, the token
-seal, and the pre-move ordering test (`M4-006a`/`b`/`c`); no test pins that two
-identical moves commit differently (`M4-010a`); and no guard proves the protocol layer
-imports no transport (`M4-013`). These are being completed in ID order rather than
-marked done. `M2_GAMEPLAY: GO` stays deliberately withheld until M4 is genuinely
-complete and a first interop run exists.
+same day found M4 was **not actually built out**, contradicting the handoff's "M0–M4
+complete". It has since been completed in ID order and **all M4-001…M4-017 rows are now
+DONE** (2026-08-01): canonicalization vectors (`test_canonical_vectors.py`), Step-0
+attestation with git-commit + token-budget binding and the pre-move ordering guard
+(`test_attestation.py`, `test_sealing.py`), the SDK protocol surface (`M4-008`), the five
+adversarial tampering classes (`test_audit_vectors.py`), `verify` now using
+`hmac.compare_digest` (`M4-012`), the dictionary-attack defence (`M4-010a`), LF/non-ASCII
+byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol_boundary.py`,
+`M4-013`). Formal M4 milestone closure remains the coordinator's verdict, and
+`M2_GAMEPLAY: GO` stays deliberately withheld until a first live interop run exists.
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M4-001 | Implement the envelope-free simulator-conformant message models | PENDING | Schema/version/identity failure tests. Retitled 2026-07-31: `protocol/wire.py` is envelope-free — the tool argument *is* the message dict — so the former "public envelopes" wording described the retired Option-B design |
-| M4-001a | Model `TurnMessage`, `ControlMessage`, and `AuditPayload` | PENDING | `protocol/wire.py`; matches `SIM_WIRE_PROTOCOL.md` |
-| M4-001b | Reject unknown, missing, and mistyped fields | PENDING | Negative vectors per message type |
+| M4-001 | Implement the envelope-free simulator-conformant message models | DONE | `protocol/wire.py` (100% branch); `test_wire.py` covers schema/version/identity failures. Envelope-free — the tool argument *is* the message dict |
+| M4-001a | Model `TurnMessage`, `ControlMessage`, and `AuditPayload` | DONE | `protocol/wire.py`; matches `SIM_WIRE_PROTOCOL.md`; `test_wire.py` |
+| M4-001b | Reject unknown, missing, and mistyped fields | DONE | `test_wire.py` negative vectors per message type |
 | M4-002 | Implement exact canonical bytes and shared test vectors | DONE | `test_canonical_vectors.py` (2026-08-01) + `test_crypto.py` + `test_reference_vector.py`; all three sub-tasks DONE |
 | M4-002a | Pin the canonicalization form | DONE | `test_canonical_vectors.py` pins exact bytes for key-ordering, preserved array order, float rendering (`6.0`/`31.8`), quote/backslash/control escaping, and non-BMP raw UTF-8 under `ensure_ascii=False` — closing the gap `STAGE_C_ACCEPTANCE.md` flagged |
 | M4-002b | Separate the hash domains | DONE | `test_canonical_vectors.py::test_commitment_and_config_hash_domains_do_not_collide` — the nonce-bound commitment can never equal a bare `canonical_sha256` of the same payload |
 | M4-002c | Reproduce the pinned simulator's commitment bytes exactly | DONE | `test_reference_vector.py` reproduces a commit hash emitted by the reference simulator itself, by reimplementation only `[ADR-0008]` |
-| M4-003 | Implement explicit protocol states and illegal-transition rejection | PENDING | Transition table tests |
-| M4-004 | Implement SHA-256 commit, acknowledgement, reveal, and nonce secrecy | PENDING | Normal/order/tamper tests |
-| M4-004a | Generate nonces with `secrets`, never `random` | PENDING | `token_hex(16)`, fresh per commit `[book §8]` |
-| M4-004b | Keep the nonce hidden until the final audit | PENDING | Reveal carries move and hint only `[AE-18]` |
-| M4-004c | Enforce commit-before-reveal ordering | PENDING | An out-of-order reveal is rejected |
-| M4-005 | Implement audit mismatch and technical-loss outcomes | PENDING | Replayable audit failure tests |
-| M4-005a | Recompute every commitment at audit and compare | PENDING | Any mismatch is a technical loss, no appeal `[AE-19]` |
-| M4-006 | Implement Step-0 host, code, and token attestation | PENDING | Appendix E rule 24: OS/CPU/RAM/GPU, model version, group, sub-game, sealed LLM token budget, and the exact running Git commit are sealed before the first move. `sealing.sealed_spec_record` covers part of this; the missing piece is the Git commit binding and the pre-move ordering test |
-| M4-006a | Bind the exact running Git commit into the sealed record | PENDING | `[AE-53]`; the same value later populates `github_commit` |
-| M4-006b | Seal the agreed LLM token budget | PENDING | `[AE-54]` |
-| M4-006c | Prove Step-0 completes before the first move | PENDING | Ordering test rejects a move before attestation |
+| M4-003 | Implement explicit protocol states and illegal-transition rejection | DONE | `orchestration/phases.py` transition table; `test_phases.py` asserts every undeclared transition raises (also `M5-007a`) |
+| M4-004 | Implement SHA-256 commit, acknowledgement, reveal, and nonce secrecy | DONE | `crypto.seal`/`verify` + phase ordering; `test_crypto.py`, `test_sub_game_audit.py` |
+| M4-004a | Generate nonces with `secrets`, never `random` | DONE | `new_nonce` = `secrets.token_hex(16)`, fresh per commit; `test_crypto.py` `[book §8]` |
+| M4-004b | Keep the nonce hidden until the final audit | DONE | The public `TurnMessage` carries commit/hint/smell_grid, never the nonce; the nonce lives in the private ledger and is revealed only in the audit records `[AE-18]` |
+| M4-004c | Enforce commit-before-reveal ordering | DONE | The phase machine requires `AWAITING_REVEAL` before `VERIFYING`; an out-of-order transition raises `PhaseError`; `test_phases.py` |
+| M4-005 | Implement audit mismatch and technical-loss outcomes | DONE | `audit_records` + `state/scoring`; `test_sub_game_audit.py` |
+| M4-005a | Recompute every commitment at audit and compare | DONE | `audit_records` recomputes every commitment; a mismatch is a technical loss, no appeal; `test_sub_game_audit.py` `[AE-19]` |
+| M4-006 | Implement Step-0 host, code, and token attestation | DONE | All three sub-tasks DONE 2026-08-01. `sealed_spec_record` binds spec/model/code_version/group/sub-game (as the reference sim) **plus** `github_commit` and `token_budget`; `protocol/attestation.require_pregame_attestation` enforces the pre-move ordering. `test_sealing.py`, `test_attestation.py` |
+| M4-006a | Bind the exact running Git commit into the sealed record | DONE | `sealed_spec_record(github_commit=…)` seals it into the step-0 commitment; `shared/git_info.running_git_commit` resolves the running HEAD (injected runner, fail-closed on a non-40-hex SHA). The same value later populates `github_commit` `[AE-53]` |
+| M4-006b | Seal the agreed LLM token budget | DONE | `sealed_spec_record(token_budget=…)` seals the agreed budget; refuses a non-negative-int budget `[AE-54]` |
+| M4-006c | Prove Step-0 completes before the first move | DONE | `require_pregame_attestation` raises `AttestationError` naming any step ≥ 1 sealed before the step-0 `system_spec` record; `test_attestation.py` is the ordering test. Live wiring into the running sub-game (seal the spec at game start, then guard) lands with the Step-0 runtime hook in M5 |
 | M4-007 | Retitle the M4 rows to match the envelope-free wire | DONE | `M4-001` retitled and the section note corrected on 2026-07-31; neither now describes the retired Option-B envelope design |
-| M4-008 | Expose the protocol layer through the SDK | PENDING | The SDK reaches commit, seal, verify, audit, and handshake `[G§4.1]` |
-| M4-009 | Cover commit-reveal with adversarial vectors | PENDING | Every tampering class is detected, not merely most |
-| M4-009a | Detect a mutated move at audit | PENDING | Recomputed hash diverges |
-| M4-009b | Detect a mutated intent flag | PENDING | The bluff flag is inside the seal |
-| M4-009c | Detect a mutated or substituted nonce | PENDING | Nonce is part of the hashed input |
-| M4-009d | Detect a single-byte mutation anywhere in the record | PENDING | SHA-256 is bit-sensitive; proven end to end |
-| M4-009e | Detect a reordered step sequence | PENDING | Step index is bound into the record |
-| M4-010 | Prove nonce generation quality | PENDING | Fresh per commit, cryptographically sourced, never reused |
-| M4-010a | Prove two identical moves produce different commitments | PENDING | The dictionary-attack defence, demonstrated `[AE-18]` |
-| M4-011 | Prove canonicalization is byte-stable across platforms | PENDING | LF endings and fixed encoding give identical bytes |
-| M4-011a | Prove CRLF cannot enter a controlled file | PENDING | CRLF would break every hash |
-| M4-011b | Prove non-ASCII content hashes identically | PENDING | `ensure_ascii=False` behaviour pinned |
-| M4-012 | Compare digests in constant time | PENDING | `compare_digest`, never `==` `[book §8]` |
-| M4-013 | Prove the protocol layer imports no transport | PENDING | Guard test; the protocol must work over any carrier |
-| M4-014 | Document the protocol layer | PENDING | `PRD_commit_reveal.md` and `SIM_WIRE_PROTOCOL.md` match the built construction |
-| M4-015 | Implement the signed-terms handshake | PENDING | Role-free identity, `config_sha256`, and required-terms checking |
-| M4-015a | Reject a handshake missing a required term | PENDING | `missing_required_terms` covers every mandatory field |
-| M4-015b | Reject a handshake whose config hash differs | PENDING | `[AE-11]`; refuse to play on mismatch |
-| M4-016 | Keep the committed payload field set flexible | PENDING | The opponent re-hashes the revealed payload, so the field set is not itself an interop constraint — but the canonical form and concatenation are |
-| M4-017 | Maintain the archived Option-B layer as history only | PENDING | `archive/pre-sim-realign/` is never imported or resurrected |
+| M4-008 | Expose the protocol layer through the SDK | DONE | `p2p_thief_agent.sdk` re-exports `commit_of`, `seal`, `verify`, `audit_records`, `Handshake` (and the sealing/canonical helpers); `test_sdk.py::test_sdk_reaches_commit_seal_verify_audit_and_handshake` `[G§4.1]` |
+| M4-009 | Cover commit-reveal with adversarial vectors | DONE | `test_audit_vectors.py`; all five tampering classes below `[AE-19]` |
+| M4-009a | Detect a mutated move at audit | DONE | `test_audit_vectors.py::test_a_mutated_move_is_detected` — recomputed hash diverges |
+| M4-009b | Detect a mutated intent flag | DONE | `test_a_mutated_intent_flag_is_detected` — the bluff verdict is inside the seal |
+| M4-009c | Detect a mutated or substituted nonce | DONE | `test_a_substituted_nonce_is_detected` |
+| M4-009d | Detect a single-byte mutation anywhere in the record | DONE | `test_a_single_byte_mutation_anywhere_is_detected` (one byte in `hint`) |
+| M4-009e | Detect a reordered step sequence | DONE | `test_a_renumbered_step_index_is_detected` + `test_audit_reports_the_failed_step_whatever_order_records_arrive_in`: the step is bound in the payload, so order is irrelevant |
+| M4-010 | Prove nonce generation quality | DONE | `test_crypto.py`: `new_nonce` is fresh 32-hex CSPRNG output; see `M4-010a` |
+| M4-010a | Prove two identical moves produce different commitments | DONE | `test_crypto.py::test_two_identical_moves_produce_different_commitments` — the dictionary-attack defence `[AE-18]` |
+| M4-011 | Prove canonicalization is byte-stable across platforms | DONE | `M4-011a` (LF) + `M4-011b` (non-ASCII) below |
+| M4-011a | Prove CRLF cannot enter a controlled file | DONE | `.gitattributes` pins `eol=lf` globally and per type; `test_protocol_boundary.py::test_gitattributes_pins_lf_on_controlled_files` |
+| M4-011b | Prove non-ASCII content hashes identically | DONE | `test_canonical_vectors.py::test_non_ascii_and_non_bmp_serialize_raw_not_escaped` pins `ensure_ascii=False` |
+| M4-012 | Compare digests in constant time | DONE | `crypto.verify` now uses `hmac.compare_digest`, never `==`; `test_crypto.py::test_verify_rejects_a_near_miss_commitment` `[book §8]` |
+| M4-013 | Prove the protocol layer imports no transport | DONE | `test_protocol_boundary.py::test_protocol_layer_imports_no_transport` walks `protocol/` and fails on any `fastmcp`/`adapters`/`peer`/socket/http import |
+| M4-014 | Document the protocol layer | DONE | `PRD_commit_reveal.md` and `SIM_WIRE_PROTOCOL.md` describe the built construction (commit/canonical/handshake/attestation) |
+| M4-015 | Implement the signed-terms handshake | DONE | `protocol/handshake.py` + `agreement.py`: role-free identity, `config_sha256`, required-terms; `test_handshake.py`, `test_agreement.py` |
+| M4-015a | Reject a handshake missing a required term | DONE | `missing_required_terms` covers every mandatory field; `test_handshake.py` |
+| M4-015b | Reject a handshake whose config hash differs | DONE | `accept_offer` compares terms and refuses a mismatch by name (stronger than a bare hash compare); `test_agreement.py` `[AE-11]` |
+| M4-016 | Keep the committed payload field set flexible | DONE | `verify` re-hashes the revealed payload, so the field set is not an interop constraint; `test_crypto.py::test_verify_accepts_any_payload_roster` |
+| M4-017 | Maintain the archived Option-B layer as history only | DONE | No `src/` or `tests/` module imports `archive/` (verified 2026-08-01); the protocol boundary guard (`test_protocol_boundary.py`) keeps the live layer clean |
 
 ---
 
@@ -368,17 +368,17 @@ complete and a first interop run exists.
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M5-001 | Route runtime coordination through one Thief gateway | PENDING | Architecture/boundary tests |
-| M5-001a | Define the five subsystem ports behind the gateway | PENDING | MCP connector, decision module, log manager, deadline tracker, watchdog `[AE-3]` |
-| M5-001b | Forbid subsystem-to-subsystem imports by test | PENDING | Import-graph test fails on any direct peer link |
-| M5-001c | Keep decision logic out of the gateway | PENDING | It coordinates; it does not decide `[book §9]` |
+| M5-001 | Route runtime coordination through one Thief gateway | DONE | `orchestration/gateway.py` — `Gateway` holds one port of each subsystem and wires them (`on_transition` fans a phase out to log + watchdog; `play_sub_game` delegates to the turn loop). `test_gateway.py`, `test_orchestrator_boundary.py` `[AE-3]` |
+| M5-001a | Define the five subsystem ports behind the gateway | DONE | `orchestration/ports.py`: `DecisionModule`, `LogPort`, `DeadlineTracker`, `WatchdogPort` Protocols + `PeerTransport` reused as the MCP-connector port `[AE-3]` |
+| M5-001b | Forbid subsystem-to-subsystem imports by test | DONE | `test_orchestrator_boundary.py` walks `src/` and fails on any import from one of the five subsystems to another. Fixing the one violation (watchdog→deadlines) drove extracting the shared limit reader into `services/limits.py` |
+| M5-001c | Keep decision logic out of the gateway | DONE | The gateway computes no move — `play_sub_game` delegates to the Decision Module port; `test_play_sub_game_delegates_the_move_to_the_decision_module` proves the module, not the gateway, decides `[book §9]` |
 | M5-002 | Run the Thief as both FastMCP server and client | DONE | Server, client, an in-memory round trip, **and** a separate-process round trip over HTTP all pass (`M5-002e`). Live-match concerns — negotiation, deadlines, the turn loop — belong to `M5-003`/`M5-004`/`M5-007` |
 | M5-002a | Expose the four tools on a local FastMCP server | DONE | `adapters.build_server` exposes `negotiate`, `receive_turn`, `submit_audit`, `receive_control`, each taking one argument with no envelope. A test asserts `receive_move` — the withdrawn Option-B name — is **not** reachable. See `SIM_WIRE_PROTOCOL.md` |
 | M5-002b | Confine every FastMCP import to an adapters layer | DONE | A guard test walks every module under `src/` and fails on any non-`adapters` importer of fastmcp |
 | M5-002c | Implement the outbound client against the opponent URL | DONE | `adapters.FastMCPClient` implements `peer.PeerTransport`; argument keywords come from `peer.TOOL_ARGUMENTS`, the single place they are written, so inbound and outbound cannot drift apart |
 | M5-002d | Decide and document the tool acknowledgement semantics | DONE | **Decision:** tools never validate and never raise; `drain` validates afterwards and a failure there is a recorded game outcome. This diverges from the reference, which validates structurally inside the tool and raises. The divergence is kept because a *tampered audit is structurally well-formed* yet must be scored as a technical loss (`AE-19`); a peer that raises invites the opponent to retry a decided loss as a transport fault. Recorded in `adapters/fastmcp_server.py` and `PRD_p2p_mcp.md` |
 | M5-002e | Prove a message round-trips between two processes | DONE | **Book stage-2 milestone closed.** `tests/integration/test_localhost_two_processes.py` spawns a real second interpreter on a free port, sends a turn over HTTP, and reads back the JSONL transcript that process wrote; the validating PID is asserted not to be this one (`AE-1`/`AE-2`). A tampered audit is also driven across the socket and confirmed to arrive and be *scored*, not lost as a transport error `[AE-19]` |
-| M5-003 | Enforce accepted idempotency, acknowledgement, and duplicate handling | PENDING | Duplicate/reorder tests |
+| M5-003 | Enforce accepted idempotency, acknowledgement, and duplicate handling | DONE | Both sub-tasks DONE: `InboundPeer.receive_turn` keys on `(step, sender)` and rejects a replay by name (`M5-003a`/`M5-003b`); `test_negotiation_gate.py` / inbound tests |
 | M5-003a | Enforce idempotency keys across retries | DONE | `InboundPeer.receive_turn` keys on `(step, sender)` and refuses a replayed turn, so a retried delivery cannot double-apply. Verified during the 2026-08-01 audit rather than rebuilt |
 | M5-003b | Reject replayed message identifiers | DONE | A replay raises `WireError` naming the step and sender — deterministic rejection, never a silent drop. The reference is *inferred* to simply ignore duplicates (its ping-pong state machine leaves them nowhere to land); this repository rejects explicitly, which its own ledger required and which is strictly more informative to an opponent |
 | M5-004 | Implement deadlines, watchdog, controlled recovery, and backpressure | DONE | All six sub-tasks `M5-004a`…`f` DONE 2026-08-01. Timeout (`test_deadlines.py`), crash/recovery (`test_watchdog.py`), backpressure (`test_gatekeeper.py`), and mid-turn-disconnect (`test_sub_game.py`) tests all green |
@@ -403,17 +403,17 @@ complete and a first interop run exists.
 | M5-007b | Make one turn atomic against partial failure | DONE | A turn is sealed **exactly once**; a failed send never re-seals, because a second hash for one step is an audit mismatch and an automatic zero `[AE-019]`. Deciding and sealing were moved into `COMPUTING_MOVE`, the only phase the table permits `TECHNICAL_LOSS` from — they were briefly inside `COMMITTING`, where a seal failure had **no legal exit** and stranded the machine mid-turn. The companion peer carried the same latent defect and was corrected the same day |
 | M5-007c | Bound the loop by the negotiated step limit | DONE | `run_sub_game_over_wire` is bounded by `survival_threshold` and validates it, and the horizon is **inclusive** — completing the final step uncaught is a win, not one step short (`U-022`) `[AF-t15]` |
 | M5-007d | Emit a structured log line per phase transition | DONE | `run_turn` takes an `on_transition` callback fired on every phase entered, and `PhaseMachine.history` keeps the ordered record. The log manager that consumes them is `M5-008` |
-| M5-008 | Implement the log manager subsystem | PENDING | Append-only, structured, sufficient to reconstruct the match |
-| M5-008a | Record every sent and received message | PENDING | Enough to satisfy the end-of-game audit `[AE-36]` |
-| M5-008b | Record commitments and, at audit time, nonces | PENDING | Nonces written only after the final reveal `[AE-18]` |
-| M5-008c | Keep the log append-only | PENDING | No in-place edit path exists |
-| M5-008d | Write logs under a per-match path | PENDING | Matches never overwrite each other |
-| M5-009 | Implement the deadline tracker subsystem | PENDING | Every outbound request carries an expiry and is reaped on breach |
-| M5-009a | Reap expired requests rather than awaiting them | PENDING | Past expiry is failure, never patience `[book §9]` |
-| M5-009b | Clear the queue cleanly on a declared technical loss | PENDING | No orphaned pending request survives |
-| M5-010 | Handle opponent-side rejection responses | PENDING | A peer's content rejection is scored, not retried forever |
-| M5-010a | Distinguish rejection from transport failure | PENDING | Retry applies to one and not the other |
-| M5-010b | Terminate deterministically on an unrecoverable rejection | PENDING | The match reaches a defined terminal state |
+| M5-008 | Implement the log manager subsystem | DONE | `services/log_manager.py` — append-only, structured, sufficient to reconstruct the match; `test_log_manager.py`. All four sub-tasks below |
+| M5-008a | Record every sent and received message | DONE | `record_sent`/`record_received` (plus `record_transition`/`record_commitment`); `test_records_sent_and_received_messages_in_order` `[AE-36]` |
+| M5-008b | Record commitments and, at audit time, nonces | DONE | `record_commitment` logs the commit; `reveal_nonce` raises before `open_audit()` and only logs the nonce after the final reveal `[AE-18]` |
+| M5-008c | Keep the log append-only | DONE | No edit/delete method exists (`test_there_is_no_method_to_edit_or_delete_an_entry`); the file is opened in append mode and `entries` returns a copy |
+| M5-008d | Write logs under a per-match path | DONE | The file name carries the `game_uid`; a reopen appends rather than truncating; `test_the_log_path_is_per_match`, `test_the_log_is_written_append_only_and_survives_a_reopen` |
+| M5-009 | Implement the deadline tracker subsystem | DONE | `services/deadline_tracker.py`: `RequestTracker` registers each outbound request under a key with a deadline from the agreed limits, and reaps those past expiry; `test_deadline_tracker.py`. Also satisfies the gateway's `DeadlineTracker` port |
+| M5-009a | Reap expired requests rather than awaiting them | DONE | `RequestTracker.reap(now)` removes and returns every request past its expiry; `test_expired_requests_are_reaped_and_live_ones_kept` `[book §9]` |
+| M5-009b | Clear the queue cleanly on a declared technical loss | DONE | `RequestTracker.clear()` drops every pending request; `test_clear_drops_every_pending_request_on_a_technical_loss` — no orphan survives |
+| M5-010 | Handle opponent-side rejection responses | DONE | `PeerRejectionError` vs `TransportError` are disjoint (`adapters.fastmcp_client.signals_refusal`); `orchestration/delivery.deliver` retries only transport faults; a rejection terminates the sub-game (`test_delivery.py`, `test_sub_game.py`) |
+| M5-010a | Distinguish rejection from transport failure | DONE | `deliver` uses `retry_on=(TransportError,)`: a transient transport fault is retried to the agreed limit, a `PeerRejectionError` propagates on the first occurrence; `test_delivery.py` |
+| M5-010b | Terminate deterministically on an unrecoverable rejection | DONE | A rejection routes through the turn loop to a terminal `Outcome.TECHNICAL_LOSS`; `test_sub_game.py::test_an_opponent_rejection_terminates_the_sub_game` |
 | M5-011 | Prove the runtime under adversarial peer behaviour | PENDING | A hostile or broken opponent cannot hang or corrupt this peer |
 | M5-011a | Survive a peer that never responds | PENDING | Deadline plus watchdog produce a terminal outcome |
 | M5-011b | Survive a peer that responds out of order | PENDING | The state machine rejects the transition `[AE-5]` |

@@ -6,7 +6,7 @@ and the audit is what later makes a false denial impossible to profit from.
 """
 
 
-from p2p_thief_agent.adapters.fastmcp_client import TransportError
+from p2p_thief_agent.adapters.fastmcp_client import PeerRejectionError, TransportError
 from p2p_thief_agent.orchestration.phases import PhaseMachine
 from p2p_thief_agent.orchestration.sub_game import run_sub_game_over_wire
 from p2p_thief_agent.state.scoring import Outcome
@@ -108,3 +108,11 @@ def test_a_mid_turn_disconnect_terminates_and_still_reveals_the_proof() -> None:
     assert result.steps == 0
     assert "sealed but not delivered" in result.reason
     assert result.audit is not None and len(result.audit["records"]) == 1
+
+
+def test_an_opponent_rejection_terminates_the_sub_game() -> None:
+    """`M5-010b`: a content rejection reaches a defined terminal state, never a hang."""
+    result = play(Opponent(), transport=Sink(error=PeerRejectionError("declined")))
+    assert result.outcome is Outcome.TECHNICAL_LOSS
+    assert result.steps == 0
+    assert "sealed but not delivered" in result.reason

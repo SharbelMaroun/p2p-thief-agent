@@ -17,6 +17,11 @@ from p2p_thief_agent.protocol.agreement import (
     signed_offer_is_valid,
     validate_participants,
 )
+from p2p_thief_agent.protocol.attestation import (
+    AttestationError,
+    is_attestation,
+    require_pregame_attestation,
+)
 from p2p_thief_agent.protocol.crypto import (
     NONCE_BYTES,
     CryptoError,
@@ -37,6 +42,7 @@ from p2p_thief_agent.protocol.handshake import (
     missing_required_terms,
 )
 from p2p_thief_agent.protocol.sealing import (
+    SealingError,
     StepDecision,
     build_turn_message,
     sealed_spec_record,
@@ -57,6 +63,7 @@ from p2p_thief_agent.protocol.wire import (
 __all__ = [
     "AGREEMENT_TERMS",
     "AgreementError",
+    "AttestationError",
     "AuditPayload",
     "CONTROL_KINDS",
     "ControlMessage",
@@ -68,6 +75,7 @@ __all__ = [
     "REQUIRED_TERMS",
     "RESULT_CLAIMS",
     "ROLES",
+    "SealingError",
     "StepDecision",
     "TurnMessage",
     "WireError",
@@ -75,6 +83,8 @@ __all__ = [
     "audit_records",
     "check_appendix_f",
     "differing_terms",
+    "is_attestation",
+    "require_pregame_attestation",
     "signed_offer_is_valid",
     "validate_participants",
     "build_turn_message",
