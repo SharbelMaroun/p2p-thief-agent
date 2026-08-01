@@ -49,11 +49,11 @@ milestone is "the behaviour is observed", never "the code is written".
 | Milestone | Exit gate | State |
 |---|---|---|
 | M0 | Authority order, provenance, conflicts, and unknowns are evidence-backed | closed |
-| M1 | Stage A profile, Stage B vectors and stub, Stage C coordinator acceptance | Stage C **not recorded**; checker fail-closed |
+| M1 | Stage A profile, Stage B vectors and stub, Stage C coordinator acceptance | Stage A satisfied (`SIM_WIRE_PROTOCOL.md`); **`CONFORMANCE_PROFILE: ACCEPTED` recorded 2026-07-31** (`STAGE_C_ACCEPTANCE.md`, narrow scope); Stage B interop evidence **absent** (`M1-015..017`); `M2_GAMEPLAY: GO` deliberately withheld; checker fail-closed by design |
 | M2 | Complete hardened domain suite: movement, barriers, capture | closed |
 | EXC-001 | Deterministic baseline policy on public domain APIs | closed |
 | M3 | Immutable local state, scoring, and baseline integration | closed except `M3-005` |
-| M4 | Independent vectors, tamper tests, and commit-reveal round trip | substance built; formal close gated on M1 Stage C |
+| M4 | Independent vectors, tamper tests, and commit-reveal round trip | **authorized to complete** (profile ACCEPTED 2026-07-31) but **NOT complete** — a 2026-08-01 verification found real gaps: M4-002a/b (escaping/non-BMP vectors), M4-006a/b/c (Step-0 attestation), M4-010a, M4-012 (constant-time compare), M4-013 (transport-import guard). Being completed in ID order |
 | M5 | The Thief runs as server and client and completes a resilient game | **open — no transport exists yet** |
 | M6 | Legal deterministic behaviour under observation and fallback tests | open |
 | M7 | One complete series produces accepted audit artifacts | open |
@@ -303,15 +303,32 @@ Node stub, profile) was archived under `archive/pre-sim-realign/`. `protocol/wir
 now **envelope-free**: the tool argument *is* the message dict. Row `M4-001` still reads
 "public envelopes" and describes the retired design; see `M4-007`.
 
+**2026-08-01 status correction — the profile is accepted, M4 is not complete.**
+Two findings supersede the "gated on M1 Stage C" framing above. First, the gate is no
+longer pending: `CONFORMANCE_PROFILE: ACCEPTED` was recorded 2026-07-31
+(`STAGE_C_ACCEPTANCE.md`), whose stated effect is "M4 may be completed and M5 may
+begin", so these rows are **authorized to close** — they were never blocked on an
+unrecorded gate, the trackers were simply stale. Second, a row-by-row verification the
+same day found M4 is **not actually built out**, contradicting the handoff's "M0–M4
+complete": `verify()` compares digests with `!=` rather than `hmac.compare_digest`
+(`M4-012`, book §8); there are no escaping / non-BMP canonicalization vectors and
+`ensure_ascii=False` is unpinned (`M4-002a`/`M4-002b`, also flagged in
+`STAGE_C_ACCEPTANCE.md`); Step-0 attestation lacks the git-commit binding, the token
+seal, and the pre-move ordering test (`M4-006a`/`b`/`c`); no test pins that two
+identical moves commit differently (`M4-010a`); and no guard proves the protocol layer
+imports no transport (`M4-013`). These are being completed in ID order rather than
+marked done. `M2_GAMEPLAY: GO` stays deliberately withheld until M4 is genuinely
+complete and a first interop run exists.
+
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
 | M4-001 | Implement the envelope-free simulator-conformant message models | PENDING | Schema/version/identity failure tests. Retitled 2026-07-31: `protocol/wire.py` is envelope-free — the tool argument *is* the message dict — so the former "public envelopes" wording described the retired Option-B design |
 | M4-001a | Model `TurnMessage`, `ControlMessage`, and `AuditPayload` | PENDING | `protocol/wire.py`; matches `SIM_WIRE_PROTOCOL.md` |
 | M4-001b | Reject unknown, missing, and mistyped fields | PENDING | Negative vectors per message type |
-| M4-002 | Implement exact canonical bytes and shared test vectors | PENDING | Independent vector/hash tests |
-| M4-002a | Pin the canonicalization form | PENDING | `canonical_json` with `ensure_ascii=False`; vectors cover escapes and non-BMP |
-| M4-002b | Separate the hash domains | PENDING | Per-turn commitment and `config_sha256` cannot collide |
-| M4-002c | Reproduce the pinned simulator's commitment bytes exactly | PENDING | `commit_of` verified byte-exact against `960499fd…`, by reimplementation only |
+| M4-002 | Implement exact canonical bytes and shared test vectors | DONE | `test_canonical_vectors.py` (2026-08-01) + `test_crypto.py` + `test_reference_vector.py`; all three sub-tasks DONE |
+| M4-002a | Pin the canonicalization form | DONE | `test_canonical_vectors.py` pins exact bytes for key-ordering, preserved array order, float rendering (`6.0`/`31.8`), quote/backslash/control escaping, and non-BMP raw UTF-8 under `ensure_ascii=False` — closing the gap `STAGE_C_ACCEPTANCE.md` flagged |
+| M4-002b | Separate the hash domains | DONE | `test_canonical_vectors.py::test_commitment_and_config_hash_domains_do_not_collide` — the nonce-bound commitment can never equal a bare `canonical_sha256` of the same payload |
+| M4-002c | Reproduce the pinned simulator's commitment bytes exactly | DONE | `test_reference_vector.py` reproduces a commit hash emitted by the reference simulator itself, by reimplementation only `[ADR-0008]` |
 | M4-003 | Implement explicit protocol states and illegal-transition rejection | PENDING | Transition table tests |
 | M4-004 | Implement SHA-256 commit, acknowledgement, reveal, and nonce secrecy | PENDING | Normal/order/tamper tests |
 | M4-004a | Generate nonces with `secrets`, never `random` | PENDING | `token_hex(16)`, fresh per commit `[book §8]` |
@@ -364,12 +381,12 @@ now **envelope-free**: the tool argument *is* the message dict. Row `M4-001` sti
 | M5-003 | Enforce accepted idempotency, acknowledgement, and duplicate handling | PENDING | Duplicate/reorder tests |
 | M5-003a | Enforce idempotency keys across retries | DONE | `InboundPeer.receive_turn` keys on `(step, sender)` and refuses a replayed turn, so a retried delivery cannot double-apply. Verified during the 2026-08-01 audit rather than rebuilt |
 | M5-003b | Reject replayed message identifiers | DONE | A replay raises `WireError` naming the step and sender — deterministic rejection, never a silent drop. The reference is *inferred* to simply ignore duplicates (its ping-pong state machine leaves them nowhere to land); this repository rejects explicitly, which its own ledger required and which is strictly more informative to an opponent |
-| M5-004 | Implement deadlines, watchdog, controlled recovery, and backpressure | PENDING | Timeout/crash/recovery tests |
+| M5-004 | Implement deadlines, watchdog, controlled recovery, and backpressure | DONE | All six sub-tasks `M5-004a`…`f` DONE 2026-08-01. Timeout (`test_deadlines.py`), crash/recovery (`test_watchdog.py`), backpressure (`test_gatekeeper.py`), and mid-turn-disconnect (`test_sub_game.py`) tests all green |
 | M5-004a | Attach a timestamp and expiry to every request | DONE | `services/deadlines.Deadline` carries `started` and `expires`, and the boundary itself counts as expired. Book §8.4.1's boxed note is the spec — *"Missing a Deadline is a Failure, Not Patience"* — permitting exactly two outcomes: retry, or declare a technical loss and clear the queue cleanly. Time is **injected**, so a timeout is proven by passing a number rather than sleeping `[book §8.4.1]` |
 | M5-004b | Implement bounded retry with backoff | DONE | `services/deadlines.attempt` gives each try its own expiry and stops at `max_retries`, raising `DeadlineError` so the caller can declare a technical loss. **Key names confirmed against the pinned reference 2026-08-01**: `network_and_league.response_timeout_sec` (30), `rate_limiter_gatekeeper.retry_backoff_sec` (5), `.max_retries` (3), `network_and_league.watchdog_timeout_sec` (60) — all in the **shared, signed** match object, so neither peer can give itself a longer rope. A slow attempt that overruns its own expiry is **not** retried. Appendix F table 19 marks the first three `Minimum` and the watchdog `Negotiation` `[AF-t19]` |
-| M5-004c | Trip the watchdog at `watchdog_timeout_sec` | PENDING | Default 60 s `[AF-t19]`; the book's 180 s code sample is illustrative `[AE-6]` |
-| M5-004d | Persist state and shut down cleanly on trip | PENDING | `persist_state()` then `controlled_shutdown()` `[AE-7]` |
-| M5-004e | Route a mid-turn disconnect to a terminal technical loss | PENDING | No deadlock path out of the awaiting-reveal state |
+| M5-004c | Trip the watchdog at `watchdog_timeout_sec` | DONE | `services/watchdog.py`: `Watchdog.check(now)` returns `ALIVE`/`SHUTDOWN`; trips on `elapsed > timeout` (book §8.4.2 page-83 code, verbatim). Threshold read from the signed match object via `deadlines.WATCHDOG_TIMEOUT`, default 60 s `[AF-t19]`; the book's 180 s code sample is illustrative `[AE-6]`. Time injected — a freeze is proven by passing a number, never sleeping. `test_watchdog.py` |
+| M5-004d | Persist state and shut down cleanly on trip | DONE | On trip `Watchdog.check` calls `persist_state()` **then** `controlled_shutdown()` in that order (injected callbacks), returns `SHUTDOWN`, and fires exactly once. Teardown runs even if persistence raises (a controlled shutdown must release its connections); a heartbeat after shutdown is refused fail-closed `[AE-7]`. `test_watchdog.py` |
+| M5-004e | Route a mid-turn disconnect to a terminal technical loss | DONE | The reference sim implements **no** watchdog, so this is proven at the loop level instead: `turn_loop` routes silence, a dropped send from `AWAITING_REVEAL`, and a seal failure to `TECHNICAL_LOSS` (`test_turn_loop.py`), and `sub_game` catches every `TurnLoopError` into a terminal `Outcome.TECHNICAL_LOSS` that still reveals its audit — no deadlock out of the awaiting-reveal state (`test_sub_game.py::test_a_mid_turn_disconnect_terminates_and_still_reveals_the_proof`) |
 | M5-004f | Enforce queue depth and backpressure | DONE | `services/gatekeeper.py`. Guidelines §5: **"Overflow is queued, not rejected"** — a busy gate returns `False` rather than raising, and `queue_status()` reports depth, capacity, in-flight and totals. The only failure is a genuinely full queue, which raises rather than discarding. Limits are Appendix F table 19 `Minimum` values from the signed match object (30 / 2 / 100). Book ch. 9.3.1 aims the Gatekeeper at **outbound** Gmail/LLM calls; inbound duplicates are `InboundPeer`'s job. **"FIFO" dropped from the title** — the book notebook marked it *inferred*, not stated `[G§5.3]` `[AF-t19]` |
 | M5-005 | Validate localhost and public-tunnel paths against identical fixtures | PENDING | Connectivity and failure evidence |
 | M5-005a | Keep tunnel credentials out of shared configuration | PENDING | `[AE-39]`; secrets stay private `[G§7.4]` |

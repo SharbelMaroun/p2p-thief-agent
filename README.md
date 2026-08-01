@@ -316,6 +316,26 @@ out never to say FIFO - it was our inference wearing a citation. The word was
 removed. A task that credits the book for something the book never said is how an
 invented requirement becomes permanent.
 
+**The Watchdog (added 2026-08-01).** Where a deadline bounds a single request, the
+watchdog watches the whole game loop. If no heartbeat arrives for longer than the
+agreed `watchdog_timeout_sec`, it performs a **controlled shutdown**: `persist_state()`
+to save the game for later recovery, then `controlled_shutdown()` to release the MCP
+connections and close the logs — in that order, once, and with teardown guaranteed to
+run even if saving state fails. Time is injected, so a freeze is exercised by passing
+a number rather than sleeping through minutes. This closes the `M5-004` reliability set
+(deadlines, watchdog, mid-turn-disconnect terminal loss, backpressure). A dropped send
+mid-turn has no deadlock exit: the turn loop routes it, and every sub-game to a
+terminal technical loss whose audit is still revealed, is proven by test.
+
+*Problems hit building it.* Two worth recording. First, no NotebookLM tool was
+available in this environment, so — with the coordinator's authorization — the work
+was verified against the higher authority the notebooks only summarize: the book PDF,
+Appendix E/F, and the authorized reference simulator on disk. Second, that simulator
+implements **no watchdog at all** — a book-mandated pattern it skipped — which removed
+any wire or interop question and left the book as the sole authority; the boundary
+(`elapsed > timeout`) was therefore taken from its page-83 code verbatim, deliberately
+unlike the deadline's `>=`.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
