@@ -388,6 +388,25 @@ the companion repo named it only inside a blocked row's prose, and here it was n
 nowhere. The single most load-bearing missing piece in the repository was invisible to
 any search for open tasks. It is now `M5-019`, with sub-rows.
 
+#### Ledger reconciliation (2026-08-02)
+
+That gap prompted an audit of every open `M5` row against the code actually present.
+Six rows were wrong:
+
+- **`M5-016` (backpressure) was already done and never recorded.** `services/gatekeeper.py`
+  and nine tests implement it, one of which — `test_a_full_queue_refuses_loudly_rather_than_discarding`
+  — states the row's Definition of Done almost verbatim. Closing it required no code.
+- **`M5-012a`…`f` were stale.** The parent `M5-012` closed on 2026-08-01; its six
+  sub-rows were left reading `PENDING` underneath a `DONE` parent. Four are superseded
+  by `M5-014` and `M5-007`; two are genuinely done.
+
+Three rows were checked and **confirmed genuinely open** — `M5-011` (adversarial-peer
+proof), `M5-013a/b` (subsystem diagram and failure-path table), `M5-018` (SDK/transport
+guard). The evidence of each check is written into the row so the next session does not
+repeat it. That negative result matters: in conversation I had guessed `M5-011` and
+`M5-018` were probably already satisfied, and both turned out to be real work. A
+reconciliation that records only the good news drifts the ledger the other way.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
