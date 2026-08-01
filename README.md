@@ -407,6 +407,55 @@ repeat it. That negative result matters: in conversation I had guessed `M5-011` 
 `M5-018` were probably already satisfied, and both turned out to be real work. A
 reconciliation that records only the good news drifts the ledger the other way.
 
+#### Launching a peer: hosting and readiness (`M5-019e`, 2026-08-02)
+
+With the play loop built, the next gap was the process to host it. Two mechanical
+halves landed, both testable without a real match: `adapters/serving.py` puts the
+mailbox on a **daemon** thread after a port pre-check, and `services/readiness.py`
+waits — bounded — for an opponent that has not started yet.
+
+**The bind address is the part worth reading.** The reference binds `127.0.0.1` (thief 8801, police 8802). The
+book prints `mcp.run(transport="http", host="0.0.0.0", port=8000)` with the comment
+"Bind the server so a tunnel can expose it publicly", and rule 10 reads "Use tunnels
+to expose the local server to the public internet. **Sanction: Inability to compete
+against opponents**". The reference is not wrong — it runs both peers on one machine —
+but copying it would produce a peer that passes every local test and is **invisible
+through the tunnel**, failing only at the two-machine rehearsal where it reads as a
+network fault rather than a one-word bug. The book outranks the simulator, so the
+default is `0.0.0.0` and a test pins it, because nothing local would ever catch a
+change back.
+
+Two smaller decisions, each guarding a hang. The server thread is a **daemon**, so a
+finished match cannot be kept alive by a mailbox nobody is reading — the failure the
+watchdog exists to catch, reintroduced at the process level. And `ensure_port_free`
+runs *before* the thread starts, so a stale peer still holding the port fails loudly
+at launch instead of yielding a server that never binds while the game loop waits for
+messages that cannot arrive.
+
+Readiness is deliberately **not** `deadlines.py` or `watchdog.py`. Those exist to make
+waiting a failure, because rule 6 requires it. Startup is the one phase where an
+unreachable peer is expected and harmless: before the game exists there is nothing to
+forfeit. Keeping it a separate module is what stops that leniency leaking into the
+match. It still gives up after `connect_timeout_seconds`, and returns `False` rather
+than raising — nobody having launched the other process is an operator situation, not
+a protocol fault.
+
+*Problem hit.* The first `ensure_port_free` set `SO_REUSEADDR` on its probe socket out
+of habit, and **the check silently never fired**: on Windows that option lets a socket
+bind a port another process already holds, which is exactly the condition the function
+exists to detect. A test that held a port and asserted the raise caught it. A
+detection probe wants the strictest bind available, not the most permissive.
+
+*Still not built (`M5-019f`).* Negotiation-to-first-move sequencing — send offer, poll
+for the counter-signature, verify both directions, then play. The reference confirms
+play starts only after both verifications pass; the book adds that Step-0 must be
+exchanged and mutually signed and that the pre-game declaration is written after
+negotiation but before play. No `serve` command is wired until that lands, because a
+`serve` that comes up and mailboxes without playing is the passive server rejected on
+2026-08-01 in the companion repository. **Thief-specific:** once negotiation
+completes this peer must send step 1 without waiting, because it opens every
+cycle — a Thief that waits deadlocks against a Cop correctly waiting for it.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
