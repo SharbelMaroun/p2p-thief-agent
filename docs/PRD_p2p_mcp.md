@@ -107,9 +107,19 @@ reveal, and a forgery scores zero for both sides while an honest loss still scor
 The audit is sent **once per sub-game, after the loop**, and goes out even when this
 peer is taking the technical loss.
 
+**Reliability, built (`M5-004`).** `services/deadlines.py` bounds every single request
+(retry or declare a technical loss, never wait); `services/watchdog.py` is the
+system-wide freeze net — on `elapsed > watchdog_timeout_sec` (book §8.4.2) it runs
+`persist_state()` then `controlled_shutdown()` once and returns `SHUTDOWN`, with time
+injected so a freeze needs no real wait; `services/gatekeeper.py` queues overflow
+rather than dropping it. A mid-turn disconnect has no deadlock exit: `turn_loop` and
+`sub_game` route silence, a dropped send, and a seal failure to a terminal technical
+loss that still reveals its audit.
+
 **Not yet built:** mutual verification of the *opponent's* audit (the reference has
-both peers swap logs and each verify the other's commits), idempotency (`M5-003`),
-deadlines and watchdog (`M5-004`), and the tunnel (`M5-005`).
+both peers swap logs and each verify the other's commits), idempotency parent close
+(`M5-003`), the orchestrator gateway that hosts these subsystems (`M5-001`), the log
+manager (`M5-008`), and the tunnel (`M5-005`).
 
 ## Future acceptance criteria and tests
 

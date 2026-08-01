@@ -6,6 +6,7 @@ and the audit is what later makes a false denial impossible to profit from.
 """
 
 
+from p2p_thief_agent.adapters.fastmcp_client import TransportError
 from p2p_thief_agent.orchestration.phases import PhaseMachine
 from p2p_thief_agent.orchestration.sub_game import run_sub_game_over_wire
 from p2p_thief_agent.state.scoring import Outcome
@@ -93,3 +94,17 @@ def test_the_thief_opens_so_a_one_step_game_needs_no_incoming_turn() -> None:
     result = play(Opponent(), threshold=1)
     assert result.outcome is Outcome.SURVIVAL
     assert result.steps == 1
+
+
+def test_a_mid_turn_disconnect_terminates_and_still_reveals_the_proof() -> None:
+    """`M5-004e`: a dropped send from AWAITING_REVEAL ends the sub-game, never hangs.
+
+    The opener seals its step, the delivery fails on a dropped tunnel, and the sub-game
+    reaches a terminal technical loss rather than blocking. The audit is still built and
+    returned, so this side's one sealed record stands even though the peer went away.
+    """
+    result = play(Opponent(), transport=Sink(error=TransportError("tunnel dropped")))
+    assert result.outcome is Outcome.TECHNICAL_LOSS
+    assert result.steps == 0
+    assert "sealed but not delivered" in result.reason
+    assert result.audit is not None and len(result.audit["records"]) == 1
