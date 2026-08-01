@@ -16,7 +16,7 @@ SUBSYSTEMS = {
     "mcp_connector": ("adapters", "peer"),
     "decision_module": ("strategy", "state.policy"),
     "log_manager": ("services.log_manager",),
-    "deadline_tracker": ("services.deadlines",),
+    "deadline_tracker": ("services.deadlines", "services.deadline_tracker"),
     "watchdog": ("services.watchdog",),
 }
 

@@ -408,9 +408,9 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M5-008b | Record commitments and, at audit time, nonces | DONE | `record_commitment` logs the commit; `reveal_nonce` raises before `open_audit()` and only logs the nonce after the final reveal `[AE-18]` |
 | M5-008c | Keep the log append-only | DONE | No edit/delete method exists (`test_there_is_no_method_to_edit_or_delete_an_entry`); the file is opened in append mode and `entries` returns a copy |
 | M5-008d | Write logs under a per-match path | DONE | The file name carries the `game_uid`; a reopen appends rather than truncating; `test_the_log_path_is_per_match`, `test_the_log_is_written_append_only_and_survives_a_reopen` |
-| M5-009 | Implement the deadline tracker subsystem | PENDING | Every outbound request carries an expiry and is reaped on breach |
-| M5-009a | Reap expired requests rather than awaiting them | PENDING | Past expiry is failure, never patience `[book §9]` |
-| M5-009b | Clear the queue cleanly on a declared technical loss | PENDING | No orphaned pending request survives |
+| M5-009 | Implement the deadline tracker subsystem | DONE | `services/deadline_tracker.py`: `RequestTracker` registers each outbound request under a key with a deadline from the agreed limits, and reaps those past expiry; `test_deadline_tracker.py`. Also satisfies the gateway's `DeadlineTracker` port |
+| M5-009a | Reap expired requests rather than awaiting them | DONE | `RequestTracker.reap(now)` removes and returns every request past its expiry; `test_expired_requests_are_reaped_and_live_ones_kept` `[book §9]` |
+| M5-009b | Clear the queue cleanly on a declared technical loss | DONE | `RequestTracker.clear()` drops every pending request; `test_clear_drops_every_pending_request_on_a_technical_loss` — no orphan survives |
 | M5-010 | Handle opponent-side rejection responses | PENDING | A peer's content rejection is scored, not retried forever |
 | M5-010a | Distinguish rejection from transport failure | PENDING | Retry applies to one and not the other |
 | M5-010b | Terminate deterministically on an unrecoverable rejection | PENDING | The match reaches a defined terminal state |

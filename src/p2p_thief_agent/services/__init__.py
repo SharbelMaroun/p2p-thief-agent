@@ -1,5 +1,9 @@
 """Thief runtime services: reliability patterns that keep the peer from freezing."""
 
+from p2p_thief_agent.services.deadline_tracker import (
+    DeadlineTrackerError,
+    RequestTracker,
+)
 from p2p_thief_agent.services.deadlines import (
     Deadline,
     DeadlineError,
@@ -47,6 +51,8 @@ __all__ = [
     "WATCHDOG_TIMEOUT",
     "Deadline",
     "DeadlineError",
+    "DeadlineTrackerError",
+    "RequestTracker",
     "RetryPolicy",
     "attempt",
     "limits_from_match",
