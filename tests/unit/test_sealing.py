@@ -1,7 +1,10 @@
 """Unit tests for the simulator-conformant sealing helpers."""
 
+import pytest
+
 from p2p_thief_agent.protocol.crypto import verify
 from p2p_thief_agent.protocol.sealing import (
+    SealingError,
     StepDecision,
     build_turn_message,
     sealed_spec_record,
@@ -9,6 +12,17 @@ from p2p_thief_agent.protocol.sealing import (
     sealed_step_record,
     state_str,
 )
+
+COMMIT = "0123456789abcdef0123456789abcdef01234567"
+
+
+def spec_record(**overrides) -> dict:
+    kwargs = {
+        "spec": {"cpu": "x"}, "model": "cli-default", "group_name": "sharNamr",
+        "github_commit": COMMIT, "token_budget": 100000,
+    }
+    kwargs.update(overrides)
+    return sealed_spec_record(**kwargs)
 
 
 def decision() -> StepDecision:
@@ -44,11 +58,29 @@ def test_sealed_step_record_commits_and_verifies():
 
 
 def test_sealed_spec_record_is_step_zero():
-    record = sealed_spec_record(spec={"cpu": "x"}, model="cli-default", group_name="sharNamr")
+    record = spec_record()
     assert record["payload"]["step"] == 0
     assert record["payload"]["type"] == "system_spec"
     assert record["payload"]["group_name"] == "sharNamr"
     verify(record["payload"], record["nonce"], record["commit"])
+
+
+def test_sealed_spec_record_binds_the_git_commit_and_token_budget():
+    """`M4-006a`/`M4-006b`: the running commit (AE-53) and token budget (AE-54) are sealed."""
+    payload = spec_record()["payload"]
+    assert payload["github_commit"] == COMMIT
+    assert payload["token_budget"] == 100000
+
+
+def test_sealed_spec_record_refuses_a_missing_commit():
+    with pytest.raises(SealingError, match="github_commit is required"):
+        spec_record(github_commit="")
+
+
+@pytest.mark.parametrize("bad", [-1, True, "100", 1.5])
+def test_sealed_spec_record_refuses_a_nonsensical_token_budget(bad):
+    with pytest.raises(SealingError, match="token_budget must be a non-negative integer"):
+        spec_record(token_budget=bad)
 
 
 def test_build_turn_message_carries_commit_and_timestamp():

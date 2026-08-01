@@ -19,6 +19,10 @@ from p2p_thief_agent.protocol.wire import TurnMessage
 from p2p_thief_agent.shared import __version__
 
 
+class SealingError(ValueError):
+    """Raised when a step-0 attestation is built without its mandatory bindings."""
+
+
 @dataclass(frozen=True, slots=True)
 class StepDecision:
     """One turn's private decision: the true move, the bluff verdict, and the hint."""
@@ -87,16 +91,34 @@ def sealed_spec_record(
     spec: dict,
     model: str,
     group_name: str,
+    github_commit: str,
+    token_budget: int,
     sub_game_number: int = 1,
     code_version: str = __version__,
 ) -> dict:
-    """Return the sealed step-0 host-spec + identity declaration record."""
+    """Return the sealed step-0 host-spec + identity declaration record.
+
+    Beyond the reference simulator's step-0 fields (which this shares verbatim), this
+    binds the **exact running Git commit** (`AE-53`) and the **agreed LLM token budget**
+    (`AE-54`) into the sealed payload. Both are fixed before the first move and, being
+    inside the commitment, cannot be revised afterwards. They fail closed: an absent
+    commit or a nonsensical budget would make the per-game commit/token accounting
+    meaningless, so this refuses rather than sealing a hollow attestation.
+    """
+    if not github_commit:
+        raise SealingError("github_commit is required for the step-0 attestation (AE-53)")
+    if isinstance(token_budget, bool) or not isinstance(token_budget, int) or token_budget < 0:
+        raise SealingError(
+            f"token_budget must be a non-negative integer, got {token_budget!r}"
+        )
     payload = {
         "step": 0,
         "type": "system_spec",
         "spec": spec,
         "model": model,
         "code_version": code_version,
+        "github_commit": github_commit,
+        "token_budget": token_budget,
         "group_name": group_name,
         "sub_game_number": sub_game_number,
     }

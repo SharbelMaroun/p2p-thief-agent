@@ -310,15 +310,15 @@ longer pending: `CONFORMANCE_PROFILE: ACCEPTED` was recorded 2026-07-31
 begin", so these rows are **authorized to close** — they were never blocked on an
 unrecorded gate, the trackers were simply stale. Second, a row-by-row verification the
 same day found M4 is **not actually built out**, contradicting the handoff's "M0–M4
-complete": `verify()` compares digests with `!=` rather than `hmac.compare_digest`
-(`M4-012`, book §8); there are no escaping / non-BMP canonicalization vectors and
-`ensure_ascii=False` is unpinned (`M4-002a`/`M4-002b`, also flagged in
-`STAGE_C_ACCEPTANCE.md`); Step-0 attestation lacks the git-commit binding, the token
-seal, and the pre-move ordering test (`M4-006a`/`b`/`c`); no test pins that two
-identical moves commit differently (`M4-010a`); and no guard proves the protocol layer
-imports no transport (`M4-013`). These are being completed in ID order rather than
-marked done. `M2_GAMEPLAY: GO` stays deliberately withheld until M4 is genuinely
-complete and a first interop run exists.
+complete". Being completed in ID order. **Closed so far (2026-08-01):** `M4-002a`/`b`/`c`
+(canonicalization vectors, `test_canonical_vectors.py`) and `M4-006a`/`b`/`c` (Step-0
+git-commit + token-budget binding and the pre-move ordering guard, `test_attestation.py`
+/ `test_sealing.py`). **Still open:** `verify()` compares digests with `!=` rather than
+`hmac.compare_digest` (`M4-012`, book §8); no test pins that two identical moves commit
+differently (`M4-010a`); no guard proves the protocol layer imports no transport
+(`M4-013`); and `M4-008`/`M4-009`/`M4-011` need a row-by-row evidence pass.
+`M2_GAMEPLAY: GO` stays deliberately withheld until M4 is genuinely complete and a
+first interop run exists.
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
@@ -336,10 +336,10 @@ complete and a first interop run exists.
 | M4-004c | Enforce commit-before-reveal ordering | PENDING | An out-of-order reveal is rejected |
 | M4-005 | Implement audit mismatch and technical-loss outcomes | PENDING | Replayable audit failure tests |
 | M4-005a | Recompute every commitment at audit and compare | PENDING | Any mismatch is a technical loss, no appeal `[AE-19]` |
-| M4-006 | Implement Step-0 host, code, and token attestation | PENDING | Appendix E rule 24: OS/CPU/RAM/GPU, model version, group, sub-game, sealed LLM token budget, and the exact running Git commit are sealed before the first move. `sealing.sealed_spec_record` covers part of this; the missing piece is the Git commit binding and the pre-move ordering test |
-| M4-006a | Bind the exact running Git commit into the sealed record | PENDING | `[AE-53]`; the same value later populates `github_commit` |
-| M4-006b | Seal the agreed LLM token budget | PENDING | `[AE-54]` |
-| M4-006c | Prove Step-0 completes before the first move | PENDING | Ordering test rejects a move before attestation |
+| M4-006 | Implement Step-0 host, code, and token attestation | DONE | All three sub-tasks DONE 2026-08-01. `sealed_spec_record` binds spec/model/code_version/group/sub-game (as the reference sim) **plus** `github_commit` and `token_budget`; `protocol/attestation.require_pregame_attestation` enforces the pre-move ordering. `test_sealing.py`, `test_attestation.py` |
+| M4-006a | Bind the exact running Git commit into the sealed record | DONE | `sealed_spec_record(github_commit=…)` seals it into the step-0 commitment; `shared/git_info.running_git_commit` resolves the running HEAD (injected runner, fail-closed on a non-40-hex SHA). The same value later populates `github_commit` `[AE-53]` |
+| M4-006b | Seal the agreed LLM token budget | DONE | `sealed_spec_record(token_budget=…)` seals the agreed budget; refuses a non-negative-int budget `[AE-54]` |
+| M4-006c | Prove Step-0 completes before the first move | DONE | `require_pregame_attestation` raises `AttestationError` naming any step ≥ 1 sealed before the step-0 `system_spec` record; `test_attestation.py` is the ordering test. Live wiring into the running sub-game (seal the spec at game start, then guard) lands with the Step-0 runtime hook in M5 |
 | M4-007 | Retitle the M4 rows to match the envelope-free wire | DONE | `M4-001` retitled and the section note corrected on 2026-07-31; neither now describes the retired Option-B envelope design |
 | M4-008 | Expose the protocol layer through the SDK | PENDING | The SDK reaches commit, seal, verify, audit, and handshake `[G§4.1]` |
 | M4-009 | Cover commit-reveal with adversarial vectors | PENDING | Every tampering class is detected, not merely most |
