@@ -101,15 +101,49 @@ def _apply(peer: InboundPeer, tool: str, message: JsonObject) -> Delivery:
         return Delivery(tool, accepted=False, reason=str(exc))
 
 
+def _drain_box(box: queue.Queue, peer: InboundPeer, tool: str) -> list[Delivery]:
+    """Validate every message queued in one mailbox, in arrival order."""
+    results: list[Delivery] = []
+    while True:
+        try:
+            message = box.get_nowait()
+        except queue.Empty:
+            return results
+        results.append(_apply(peer, tool, message))
+
+
 def drain(inboxes: PeerInboxes, peer: InboundPeer) -> list[Delivery]:
     """Drain every mailbox through the peer, recording accept/reject outcomes."""
     results: list[Delivery] = []
     for tool, box_name in _ROUTES:
-        box: queue.Queue = getattr(inboxes, box_name)
-        while True:
-            try:
-                message = box.get_nowait()
-            except queue.Empty:
-                break
-            results.append(_apply(peer, tool, message))
+        results.extend(_drain_box(getattr(inboxes, box_name), peer, tool))
     return results
+
+
+def take_turn(inboxes: PeerInboxes, peer: InboundPeer) -> JsonObject | None:
+    """Return the opponent's next *accepted* turn, or `None` if none is queued.
+
+    This is the `TakeTurn` source the polling loop drives (`M5-019`). Three
+    behaviours here are deliberate:
+
+    * The other three mailboxes are drained first, so a negotiate, audit, or
+      control message cannot sit behind the turn we are waiting for. Only a turn
+      is returned, because only a turn advances the loop.
+    * A rejected turn is **consumed and skipped**, not returned and not left in
+      place. The rejection is already a recorded game outcome; leaving it queued
+      would make the poller re-reject the same message every interval and starve
+      the real turn behind it.
+    * Turns are pulled one at a time and the loop **stops at the first accepted
+      one**, leaving any later turns queued. A hostile peer can send several at
+      once, and draining them all would discard the next step rather than play it.
+    """
+    for tool, box_name in _ROUTES:
+        if box_name != "turns":
+            _drain_box(getattr(inboxes, box_name), peer, tool)
+    while True:
+        try:
+            message = inboxes.turns.get_nowait()
+        except queue.Empty:
+            return None
+        if _apply(peer, "receive_turn", message).accepted:
+            return message
