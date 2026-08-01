@@ -296,6 +296,26 @@ baseline in a small way: Appendix F table 19 marks the watchdog timeout
 matters, since a `Minimum` may only be tightened while a negotiated value can move
 either way. Both baselines were corrected.
 
+**The Gatekeeper (added 2026-08-01).** Outbound calls now pass through a rate
+limiter that queues overflow instead of refusing it. The guidelines are explicit -
+*"Overflow is queued, not rejected"* - which inverts the usual instinct: a busy gate
+tells the caller to wait and **keeps** the work, and only a genuinely full queue
+fails, loudly, because silently discarding a call is worse than admitting defeat.
+The limits (30 requests/minute, 2 concurrent, queue depth 100) come from the signed
+match object, so neither peer can quietly give itself more room.
+
+*Problems hit building it.* Two, both about scope rather than code. Idempotency was
+already done - the receive-side intake had been deduplicating and rejecting replays
+since an earlier milestone - so checking first turned a planned feature into a
+verification. And the book narrowed it again: the Gatekeeper guards **outbound**
+Gmail and LLM calls against rate-limit bans, not the inbound peer mailbox. Building
+it as an inbound queue would have been a plausible and completely useless answer.
+
+Worth recording: our own task title said *"FIFO queue depth"*, and the book turned
+out never to say FIFO - it was our inference wearing a citation. The word was
+removed. A task that credits the book for something the book never said is how an
+invented requirement becomes permanent.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
