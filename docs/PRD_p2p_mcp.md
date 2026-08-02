@@ -117,9 +117,68 @@ rather than dropping it. A mid-turn disconnect has no deadlock exit: `turn_loop`
 loss that still reveals its audit.
 
 **Not yet built:** mutual verification of the *opponent's* audit (the reference has
-both peers swap logs and each verify the other's commits), idempotency parent close
-(`M5-003`), the orchestrator gateway that hosts these subsystems (`M5-001`), the log
-manager (`M5-008`), and the tunnel (`M5-005`).
+both peers swap logs and each verify the other's commits), the `serve` CLI
+(`M5-019e`), and the tunnel (`M5-005`). *Corrected 2026-08-02 — this list previously
+also named `M5-001` (gateway), `M5-003` (idempotency), and `M5-008` (log manager),
+all of which had since been built. A PRD that keeps claiming a shipped feature is
+missing is worse than one that says nothing.*
+
+## The play loop: driving the mailbox (`M5-019`)
+
+The section above describes what *coordinates* a turn. It does not describe what
+*starts* one, and until 2026-08-02 nothing did. The server adapter is a passive
+mailbox — its four tools enqueue and acknowledge — while `run_turn` only ever
+consumes a message it is handed. The two never met, so a peer could not play
+unattended and every sub-game test supplied a scripted opponent.
+
+`orchestration/polling.py` is the join:
+
+```text
+  opponent → FastMCP tool → PeerInboxes.turns          (adapters, passive)
+                                   │
+                       adapters.take_turn              (validate, hand back one turn)
+                                   │
+                       polling.poll_for_turn           (bounded wait, heartbeat)
+                                   │
+                       polling.turn_receiver           (a `Receive` for run_turn)
+                                   │
+                       orchestration.run_turn          (phase machine still gates)
+```
+
+**Polling does not replace the state machine.** The reference drives its runtime by
+polling its own inboxes at `[network].poll_interval_seconds` (0.5 s shipped), while
+book section 8.3 mandates a strict state machine. Both hold, because they answer
+different questions: polling is only *how* a queued message is picked up, and
+`PhaseMachine` still decides what may legally follow.
+
+**The wait is bounded and it pulses.** Appendix E rule 6 requires a deadline "to
+prevent deadlocks while waiting for the opponent", so silence returns `None` and
+`run_turn` takes its declared exit to `TECHNICAL_LOSS`. Book section 8.4.2 puts the
+watchdog on the main game loop, so every poll iteration emits a heartbeat.
+
+**The Thief opens.** This peer takes the first move of every cycle, so step 1 sends
+without waiting and the poller is load-bearing from step 2 onward. A Thief that
+waited for step 1 would deadlock against a Cop correctly waiting for it.
+
+`take_turn` adds three rules to the mailbox, each guarding a failure that would
+otherwise be invisible in an unattended match:
+
+| Rule | Why |
+|---|---|
+| A rejected turn is **consumed** | else the poller re-rejects it every interval and starves the real turn behind it |
+| A second queued turn is **left** | else a peer sending two at once costs us the next step instead of playing it |
+| Other mailboxes drained **first** | else a negotiate/audit/control message parked in front of a turn stalls the game |
+
+Pinned by `test_polling`, `test_turn_receiver`, `test_take_turn`, and
+`test_autonomous_play` — the last plays a whole sub-game whose only turn source is
+the mailbox.
+
+**Not yet built (`M5-019e`).** No `serve` CLI: `build_server(...).run()` blocks, so
+launching a peer needs the server on a background thread plus autonomous negotiation
+sequencing. When it is built it must bind `host="0.0.0.0"` — confirmed in the book at
+`police_thief_p2p_Summary.md:657`, "bind the server so a tunnel can expose it
+publicly". The localhost test harness binds `127.0.0.1`, which passes every local
+check and is unreachable through a tunnel.
 
 ## Future acceptance criteria and tests
 
