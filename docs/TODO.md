@@ -457,11 +457,11 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M6-001 | Implement confirmed multiplicative scent physics | PENDING | Emission/decay/clipping tests |
-| M6-001a | Emit a 5×5 field centred on the agent | PENDING | Centre `τ = 0.9` `[AF-t16]` `[PRD-scent]` |
-| M6-001b | Apply `τ(t+1) = max(0, (1-ρ)·τ(t) + Δτ)` per full turn | PENDING | Decay runs once after both sides act |
-| M6-001c | Pin the radial profile with numeric vectors | PENDING | 0.90 / 0.62 / 0.20 / 0.14 / 0.04 to documented precision |
-| M6-001d | Clip intensities to non-negative | PENDING | A never-visited cell reads 0 |
+| M6-001 | Implement confirmed multiplicative scent physics | DONE | `perception/scent.py` (100% branch); `test_scent.py`. All four sub-tasks below. The eight `5×5` cells at squared-distance 5 are unnamed by book Figure 4 and carry `U-025` (a flagged provisional residual, never a silent guess) |
+| M6-001a | Emit a 5×5 field centred on the agent | DONE | `emission_field()` returns a 5×5 field with the agent's own cell at the FIXED `0.9`; `test_the_field_is_5x5_centred_on_the_agent_at_0_9` `[AF-t16]` `[PRD-scent]` |
+| M6-001b | Apply `τ(t+1) = max(0, (1-ρ)·τ(t) + Δτ)` per full turn | DONE | `settle` (one cell) and `advance_field` (whole field) implement the book §4.3 update at ρ = 0.10; decay **retains** 90% (`C-014`), not removes it. `advance_field` is a single per-turn step, called after both peers act; `test_decay_retains_ninety_percent_not_ten`, `test_advance_field_applies_the_update_cell_by_cell` |
+| M6-001c | Pin the radial profile with numeric vectors | DONE | `test_the_radial_profile_matches_book_figure_4` pins the five book-confirmed classes exactly — centre `0.90`, cross `0.62`, diagonal `0.20`, mid-side `0.14`, corner `0.04` (Figure 4, p.44). The unnamed eight are pinned against the `U-025` provisional so a ruling moves test and code together |
+| M6-001d | Clip intensities to non-negative | DONE | `settle` is `max(0, …)`: a never-visited cell reads `0.0` and no update goes negative; `test_intensity_is_clipped_non_negative` |
 | M6-002 | Consume accepted public scent observations in the accepted order | PENDING | Shape/order/boundary tests |
 | M6-002a | Populate and parse `smell_grid` as `{"r,c": intensity}` | PENDING | Matches `SIM_WIRE_PROTOCOL.md` |
 | M6-003 | Maintain a Thief-local belief without objective Cop truth | PENDING | Privacy and update tests |
