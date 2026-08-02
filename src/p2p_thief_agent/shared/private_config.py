@@ -34,6 +34,13 @@ NETWORK_SECTION = "network"
 OPPONENT_URL_KEY = "opponent_url"
 DIALABLE_SCHEMES = ("http://", "https://")
 
+# This peer runs under its own role directory, never the opponent's (`M5-006`).
+# The book and the pinned reference both split private config as `config/<role>/`,
+# so two peers on one machine cannot cross-read each other's ports, URLs, or model
+# choice. Reading is scoped to `thief/` by construction, not by convention `[AE-1]`.
+THIEF_ROLE = "thief"
+PRIVATE_CONFIG_NAME = "game.toml"
+
 # Member names that name a network address, and so belong only in private TOML.
 ADDRESS_MEMBERS = frozenset(
     {
@@ -91,6 +98,21 @@ def opponent_url(config: Mapping) -> str:
 def load_opponent_url(path: str | Path) -> str:
     """Read the opponent's address from one explicit private TOML path."""
     return opponent_url(load_private_config(path))
+
+
+def thief_config_path(config_root: str | Path) -> Path:
+    """Return this peer's own private-config path: `<config_root>/thief/game.toml`.
+
+    Role-scoped by construction (`M5-006`): the Thief resolves only its own
+    directory, so it can never read the police peer's private settings even when
+    both run from one checkout `[AE-1]` `[AE-2]`.
+    """
+    return Path(config_root) / THIEF_ROLE / PRIVATE_CONFIG_NAME
+
+
+def load_thief_private_config(config_root: str | Path) -> dict:
+    """Load the Thief's private TOML from its own `config/thief/` directory."""
+    return load_private_config(thief_config_path(config_root))
 
 
 def assert_no_network_address(shared: Mapping) -> None:

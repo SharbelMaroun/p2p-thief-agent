@@ -143,10 +143,11 @@ Configuration is split in two, and the split is load-bearing (`ADR-0004`).
   that shapes the game — board, movement, scoring, scent, league counts. Both peers
   must hold the same bytes; it is hashed and signed during the pre-play agreement,
   and any differing term refuses the match **by name**.
-- **Private, local, never sent.** `config/game.toml` holds this peer's own port,
+- **Private, local, never sent.** `config/thief/game.toml` holds this peer's own port,
   the opponent's URL, model choice, credentials, and per-turn commitment nonces.
-  `config/game.toml.example` is the committed skeleton, matching the book's page 131
-  and the reference's own `config/thief/game.toml`; the real file is git-ignored.
+  `config/thief/game.toml.example` is the committed skeleton in the Thief's own role
+  directory, matching the book's page 131 and the reference's own `config/thief/game.toml`;
+  the real file is git-ignored.
 
 The opponent's address is read only from `[network].opponent_url`, by
 `shared.private_config.load_opponent_url`. The shared object must carry no URL,
