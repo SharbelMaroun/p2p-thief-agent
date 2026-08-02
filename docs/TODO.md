@@ -54,7 +54,7 @@ milestone is "the behaviour is observed", never "the code is written".
 | EXC-001 | Deterministic baseline policy on public domain APIs | closed |
 | M3 | Immutable local state, scoring, and baseline integration | closed except `M3-005` |
 | M4 | Independent vectors, tamper tests, and commit-reveal round trip | **all M4-001…M4-017 tasks DONE 2026-08-01** (profile ACCEPTED 2026-07-31 authorized completion; the 2026-08-01 gaps — canonical vectors, Step-0 attestation, adversarial vectors, constant-time compare, transport-import guard — are now closed and tested). Milestone closure is the coordinator's verdict to record |
-| M5 | The Thief runs as server and client and completes a resilient game | **open — no transport exists yet** |
+| M5 | The Thief runs as server and client and completes a resilient game | **in progress** — transport is built: both FastMCP adapters, a real two-process HTTP round trip (`M5-002`/`M5-002e`), the turn loop and sub-game (`M5-007`), the gateway (`M5-001`), and the full reliability set (`M5-004`, `M5-008`, `M5-009`, `M5-010`) are DONE. Remaining: the tunnel rehearsal (`M5-005`, external infra), adversarial-peer proof (`M5-011`), architecture docs (`M5-013`), and `M5-015`…`M5-018` |
 | M6 | Legal deterministic behaviour under observation and fallback tests | open |
 | M7 | One complete series produces accepted audit artifacts | open |
 | M8 | Unknown-opponent rehearsal and evidence screenshots pass | open |
@@ -874,7 +874,7 @@ next. Stage 6 substance was implemented before stage 2 existed; `M5-002e` closes
 | Stage | Subject | Owning tasks | State |
 |---|---|---|---|
 | 1 | Base logic: grid, movement, barriers, capture | `M2-001`…`M2-006` | complete |
-| 2 | Basic MCP infrastructure over localhost | `M5-002`, `M5-002e` | **open — not started** |
+| 2 | Basic MCP infrastructure over localhost | `M5-002`, `M5-002e` | complete — `M5-002e` observed a message sent by a real second interpreter over HTTP and read back from its transcript (`test_localhost_two_processes.py`) |
 | 3 | Blind strategy module | `EXC-001`, `M3-004` | complete |
 | 4 | Natural language and scent | `M6-001`…`M6-005` | open |
 | 5 | Cloud exposure and tunnelling | `M5-005`, `M5-005c` | open |
@@ -923,8 +923,8 @@ Ordering constraints that no amount of parallel work removes.
 | # | Item | Depends on | Note |
 |---|---|---|---|
 | 1 | M1 Stage-C acceptance | coordinator | Not engineering work; it currently gates all of M4 formally |
-| 2 | `M5-002` FastMCP server and client | `M4` substance (built) | No transport exists in this repo at all today |
-| 3 | `M5-002e` localhost end-to-end | item 2 | Closes the book stage-2 gate that was never opened |
+| 2 | `M5-002` FastMCP server and client | `M4` substance (built) | DONE — both adapters ship under `adapters/` and `fastmcp` is a live dependency |
+| 3 | `M5-002e` localhost end-to-end | item 2 | DONE — the book stage-2 gate is observed running two real interpreters over HTTP |
 | 4 | `M5-005c` tunnel rehearsal | item 3 | First test against real latency and NAT |
 | 5 | `M8-003c` warm-up vs a classmate | item 4 | **External dependency: another team's schedule** |
 | 6 | `M9-001a` counted league games | item 5, `M7-005` | **External dependency**; a game without a sent report scores nothing |
