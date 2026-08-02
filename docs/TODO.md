@@ -54,7 +54,7 @@ milestone is "the behaviour is observed", never "the code is written".
 | EXC-001 | Deterministic baseline policy on public domain APIs | closed |
 | M3 | Immutable local state, scoring, and baseline integration | closed except `M3-005` |
 | M4 | Independent vectors, tamper tests, and commit-reveal round trip | **all M4-001…M4-017 tasks DONE 2026-08-01** (profile ACCEPTED 2026-07-31 authorized completion; the 2026-08-01 gaps — canonical vectors, Step-0 attestation, adversarial vectors, constant-time compare, transport-import guard — are now closed and tested). Milestone closure is the coordinator's verdict to record |
-| M5 | The Thief runs as server and client and completes a resilient game | **in progress** — transport is built: both FastMCP adapters, a real two-process HTTP round trip (`M5-002`/`M5-002e`), the turn loop and sub-game (`M5-007`), the gateway (`M5-001`), and the full reliability set (`M5-004`, `M5-008`, `M5-009`, `M5-010`) are DONE. Remaining: the tunnel rehearsal (`M5-005`, external infra), architecture docs (`M5-013`), and `M5-015`…`M5-018`; adversarial-peer proof (`M5-011`) is DONE |
+| M5 | The Thief runs as server and client and completes a resilient game | **in progress** — transport is built: both FastMCP adapters, a real two-process HTTP round trip (`M5-002`/`M5-002e`), the turn loop and sub-game (`M5-007`), the gateway (`M5-001`), and the full reliability set (`M5-004`, `M5-008`, `M5-009`, `M5-010`) are DONE. Remaining: the tunnel rehearsal (`M5-005`, external infra), architecture docs (`M5-013`), scent-lock at negotiation (`M5-015`, needs the M6 scent model), backpressure signalling (`M5-016`), and same-terminal-outcome agreement (`M5-017`); adversarial-peer proof (`M5-011`) and the SDK transport guard (`M5-018`) are DONE |
 | M6 | Legal deterministic behaviour under observation and fallback tests | open |
 | M7 | One complete series produces accepted audit artifacts | open |
 | M8 | Unknown-opponent rehearsal and evidence screenshots pass | open |
@@ -440,7 +440,7 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M5-015 | Exchange and verify the scent-model lock at negotiation | PENDING | Mismatch refuses the match before the first move `[AE-23]` |
 | M5-016 | Implement backpressure signalling | PENDING | A full queue signals rather than silently dropping `[G§5.3]` |
 | M5-017 | Prove two peers reach the same terminal outcome | PENDING | Both sides agree the result before any report is composed |
-| M5-018 | Keep transport concerns out of the SDK | PENDING | A guard test proves the SDK imports no transport module |
+| M5-018 | Keep transport concerns out of the SDK | DONE | `test_sdk_boundary.py`: a static walk of `sdk/` fails on any transport import, and a fresh subprocess importing `p2p_thief_agent.sdk` proves no `fastmcp`/`httpx`/`requests` stack reaches `sys.modules` `[G§4.1]` |
 
 ---
 
