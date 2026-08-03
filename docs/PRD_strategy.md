@@ -73,3 +73,24 @@ M3-004: formal M3 integration remains `PENDING`, and this module adds no local s
 no scoring, and no turn state machine. Manhattan distance and the criterion order are
 implementation choices, not official rules, and no shared-contract byte depends on
 them.
+
+## Belief-driven evasion (`M6-004`, built 2026-08-03)
+
+The baseline ranks legal actions against *given* threats; `M6-004` supplies the threat
+from the belief instead of from an observed Police cell. `strategy/belief_policy.py`:
+
+- `believed_cop_cell(belief, board)` reads the single most-likely Cop cell off the
+  perception-layer distribution, breaking ties at the lowest `(row, col)` so the choice is
+  deterministic (`M6-004g`).
+- `choose_evasive_action(board, position, belief, barriers)` hands that cell to
+  `choose_action` as the threat, so evasion, dead-end avoidance, legality, and the fixed
+  tie-break are all inherited unchanged. A belief that misdirects the Thief — even one
+  peaked on a wall or on its own cell — can therefore never produce an illegal move
+  (`M6-004e`), and nothing on the path is an LLM or a network call (`M6-004b`, guarded by
+  `test_movement_llm_free.py`, `AE-25`). The policy is weight-free, so no tuning value can
+  leak into the shared JSON (`M6-004h`).
+
+The move is always pure Python. The verbal layer (`verbal/hints.py`,
+[PRD_scent_belief](PRD_scent_belief.md)) is strictly separate: a zero-token template
+provider by default (`AF-t21`), natural-language only, within the agreed word limit, and
+never a coordinate channel (`AE-27`).
