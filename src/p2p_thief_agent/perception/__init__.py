@@ -25,6 +25,12 @@ from p2p_thief_agent.perception.scent import (
     emission_field,
     settle,
 )
+from p2p_thief_agent.perception.scent_lock import (
+    SCENT_MODEL_TERM,
+    scent_model_hash,
+    scent_model_record,
+    with_scent_lock,
+)
 from p2p_thief_agent.perception.trust import (
     NEUTRAL_TRUST,
     trust_weighted,
@@ -36,6 +42,7 @@ __all__ = [
     "EMISSION_CENTER",
     "FIELD_SIZE",
     "NEUTRAL_TRUST",
+    "SCENT_MODEL_TERM",
     "BeliefError",
     "ObservationError",
     "advance_field",
@@ -46,8 +53,11 @@ __all__ = [
     "encode_smell_grid",
     "normalize",
     "parse_smell_grid",
+    "scent_model_hash",
+    "scent_model_record",
     "settle",
     "trust_weighted",
     "uniform_belief",
     "update_trust",
+    "with_scent_lock",
 ]
