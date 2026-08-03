@@ -53,10 +53,39 @@ hint), so no objective truth can enter — proven by `apply_evidence` having no 
 for a real cell. `normalize` falls back to max-entropy uniform on a zero total, so a
 contradiction never divides by zero (`M6-003c`).
 
-**Still open (design-heavy):** turning scent into a likelihood, decoding a
-natural-language hint into belief-space evidence (`M6-003e`, no coordinate protocol,
-`AE-27`), and the **per-hint trust factor** that weights a hint by the sender's running
-trust and lowers it when scent contradicts the hint (`M6-003b` trust, `M6-003f`).
+### Hint decoding and the trust factor (`M6-003b`/`M6-003e`/`M6-003f`, design 2026-08-03)
+
+The book delegates strategy and belief design to the team, so the following are recorded
+team decisions, not spec values — open to revision, but chosen to honour every binding
+rule.
+
+**What an inbound hint is.** The Thief's belief is over the **Cop's** position. We treat an
+inbound hint as the opponent's free-text claim about **where it is or which way it is
+heading** — a claim that may be truthful or a bluff. It therefore decodes into evidence
+about the Cop's cell, and the trust factor plus the Cop's own scent arbitrate its honesty.
+
+**Decoding (`M6-003e`), deterministic and coordinate-free.** `perception/hint.decode_hint`
+scans the hint for a small set of natural-language **directional cues** —
+north/up/top, south/down/bottom, east/right, west/left, center/middle, corner — and turns
+each into a per-cell **gradient** weight (e.g. "north" favours low row indices). The
+gradients multiply, and the result is normalised into a likelihood. This is deterministic
+pure Python, so it can feed the move without the LLM (`AE-25`), and it uses only common
+directional vocabulary, never an agreed `"r,c"` coordinate protocol (`AE-27`). A hint with
+no recognised cue — or an empty/absent one — yields a **uniform** likelihood: missing
+evidence is not an error (`M6-003c`, `M6-009c`).
+
+**Trust factor (`M6-003b`).** Each opponent carries a running trust `∈ [0, 1]` (neutral
+`0.5`). `perception/trust.trust_weighted` blends the hint's likelihood toward uniform by
+`(1 − trust)`, so a low-trust hint barely moves the belief and a zero-trust hint is
+ignored entirely — the hint is applied through `apply_evidence` at its trust-tempered
+strength.
+
+**Trust update (`M6-003f`).** `perception/trust.update_trust` compares the hint's
+likelihood against the **scent-derived** belief (where the Cop's own residue actually
+points). Agreement above the no-correlation baseline raises trust; a hint that points where
+scent shows nothing lowers it — a claimed direction with no scent residue is evidence of a
+lie. Trust stays clipped to `[0, 1]`. How fast trust falls and whether it recovers is
+`M6-027`.
 
 ## Future acceptance criteria and tests
 

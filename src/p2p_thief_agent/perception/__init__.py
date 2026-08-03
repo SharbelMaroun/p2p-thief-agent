@@ -10,6 +10,7 @@ from p2p_thief_agent.perception.belief import (
     normalize,
     uniform_belief,
 )
+from p2p_thief_agent.perception.hint import decode_hint
 from p2p_thief_agent.perception.observation import (
     ObservationError,
     encode_smell_grid,
@@ -24,20 +25,29 @@ from p2p_thief_agent.perception.scent import (
     emission_field,
     settle,
 )
+from p2p_thief_agent.perception.trust import (
+    NEUTRAL_TRUST,
+    trust_weighted,
+    update_trust,
+)
 
 __all__ = [
     "DECAY_RATE",
     "EMISSION_CENTER",
     "FIELD_SIZE",
+    "NEUTRAL_TRUST",
     "BeliefError",
     "ObservationError",
     "advance_field",
     "apply_evidence",
+    "decode_hint",
     "emission_delta",
     "emission_field",
     "encode_smell_grid",
     "normalize",
     "parse_smell_grid",
     "settle",
+    "trust_weighted",
     "uniform_belief",
+    "update_trust",
 ]
