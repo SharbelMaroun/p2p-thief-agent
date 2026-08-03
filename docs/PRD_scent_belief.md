@@ -33,6 +33,31 @@ Book Figure 4 (p.44) fixes the radial profile of the new emission Δτ by distan
 "reduced by 90%" prose corrected to a 90% **retain** under `C-014`. Fifteen of the
 seventeen named cells and the eight `U-025` cells are pinned by `test_scent.py`.
 
+## Public scent observation on the wire (`M6-002`, built 2026-08-02)
+
+`perception/observation.py` is the boundary between the `smell_grid` wire field — a
+sparse `{"r,c": intensity}` map (`SIM_WIRE_PROTOCOL.md`) — and the `(row, col) → intensity`
+map the belief layer reads. `parse_smell_grid` decodes it order-independently and rejects
+a malformed key or a non-numeric/negative intensity by name; `encode_smell_grid` produces
+the sparse form, omitting silent cells (an unseen cell is absent, not zero, `M6-006a`) and
+emitting keys in a deterministic sorted order. Off-board rejection needs the negotiated
+grid and is `M6-006b`.
+
+## Thief-local belief (`M6-003`, foundation built 2026-08-02)
+
+`perception/belief.py` holds a probability distribution over the Cop's position — never
+the Cop's actual cell (`AE-8`, `AE-9`). `uniform_belief` sizes it to the **negotiated**
+grid; `apply_evidence` is the Bayes update `posterior ∝ prior × likelihood` renormalised,
+where the likelihood is computed by the caller from a **public** observation (scent or a
+hint), so no objective truth can enter — proven by `apply_evidence` having no parameter
+for a real cell. `normalize` falls back to max-entropy uniform on a zero total, so a
+contradiction never divides by zero (`M6-003c`).
+
+**Still open (design-heavy):** turning scent into a likelihood, decoding a
+natural-language hint into belief-space evidence (`M6-003e`, no coordinate protocol,
+`AE-27`), and the **per-hint trust factor** that weights a hint by the sender's running
+trust and lowers it when scent contradicts the hint (`M6-003b` trust, `M6-003f`).
+
 ## Future acceptance criteria and tests
 
 - Center, decay, and neighborhood remain fixed at the official values.
