@@ -94,3 +94,20 @@ The move is always pure Python. The verbal layer (`verbal/hints.py`,
 [PRD_scent_belief](PRD_scent_belief.md)) is strictly separate: a zero-token template
 provider by default (`AF-t21`), natural-language only, within the agreed word limit, and
 never a coordinate channel (`AE-27`).
+
+## Per-turn decision cost (`M6-011`, measured 2026-08-04)
+
+One turn's decision — the belief update from a scent observation and a hint, then the
+evasive-move policy — is pure Python over the grid with no I/O, so it is bounded by
+construction. `scripts/benchmark_decision.py` measures it and writes
+`results/decision_benchmark.json`; `test_decision_benchmark.py` gates a loose worst-case
+bound so a slow machine cannot flake.
+
+| Grid | mean | worst | response budget |
+|---|---|---|---|
+| 7×7 (negotiated minimum) | ~0.9 ms | ~2 ms | 30 000 ms |
+| 20×20 | ~1.5 ms | ~3.5 ms | 30 000 ms |
+
+The decision spends roughly **four orders of magnitude** under the 30 s response timeout
+(`network_and_league.response_timeout_sec`), so computational fairness is never in doubt —
+the Thief cannot stall, and its move never risks the deadline. Feeds `M9-006`.

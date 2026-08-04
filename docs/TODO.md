@@ -509,9 +509,9 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M6-010c | Test with a saturated scent field | DONE | `test_a_saturated_scent_field_does_not_overflow_or_divide_by_zero`: every cell at 0.9 normalises to a legal move, no overflow, no division by zero |
 | M6-010d | Test with the Cop adjacent and with the Cop far | DONE | `test_the_cop_adjacent_and_far_both_give_sane_legal_moves`: both legal; an adjacent western Cop drives a flee that increases distance from it |
 | M6-010e | Test that repeated runs are byte-identical | DONE | `test_repeated_runs_are_byte_identical`: the belief tuples and the chosen action are identical across repeated runs |
-| M6-011 | Benchmark the per-turn decision cost | PENDING | Belief update plus policy stays well inside the response timeout |
-| M6-011a | Measure worst-case belief update time | PENDING | Measured at the negotiated grid size |
-| M6-011b | Record the measurement in the research evidence | PENDING | Feeds `M9-006` and the computational-fairness claim |
+| M6-011 | Benchmark the per-turn decision cost | DONE | `scripts/benchmark_decision.py` + `test_decision_benchmark.py`: the belief update plus policy runs in ~2 ms worst case at the 7×7 grid against a 30 000 ms response budget — four orders of magnitude of headroom. Both sub-tasks below |
+| M6-011a | Measure worst-case belief update time | DONE | `worst_case_ms` measures a full decision at the negotiated grid (7×7) and at 20×20; `test_a_turn_at_the_negotiated_grid_is_orders_inside_the_timeout` asserts the worst case is under 1% of the response budget |
+| M6-011b | Record the measurement in the research evidence | DONE | `scripts/benchmark_decision.py` writes `results/decision_benchmark.json`, and `PRD_strategy.md` records the figures and the computational-fairness reading — feeds `M9-006` |
 | M6-012 | Document the perception and strategy layers | PENDING | `PRD_scent_belief.md` and `PRD_strategy.md` match the built behaviour |
 | M6-012a | Document the belief update rule and its trust factor | PENDING | Formula, inputs, and normalisation |
 | M6-012b | Document the locked scent model and its hash | PENDING | The exact bytes that were locked `[AE-23]` |
