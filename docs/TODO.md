@@ -492,13 +492,13 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M6-007a | Emit on every action including `STAY` | DONE | `deposit(field, board, cell)` takes the agent's cell, not its action, so a `STAY` re-emits on the same cell; `test_staying_still_still_deposits_scent` shows the stayed centre exceeds decay alone `[book §6]` |
 | M6-007b | Read only the opponent's field, never one's own | DONE | `scent_likelihood` turns the *observed* (opponent) field into belief evidence; `test_the_belief_modules_never_read_own_emission` walks `belief`/`hint`/`trust` and proves they never touch the own-emission functions `emit_at`/`deposit` |
 | M6-007c | Make suppression impossible by construction | DONE | `deposit`/`emit_at` carry no action and no suppression flag (signature-pinned), and `emit_at` always yields a non-empty field for an on-board cell; `test_emission_cannot_be_conditioned_or_suppressed` |
-| M6-008 | Implement hint generation | PENDING | A hint is produced each turn, truthful or bluffed, within the agreed limits |
-| M6-008a | Carry an explicit truth/bluff intent flag | PENDING | Sealed in the commitment so it cannot be revised later |
-| M6-008b | Generate from a zero-token template provider | PENDING | Default path; no network, no account `[AF-t21]` |
-| M6-008c | Enforce the word limit at generation time | PENDING | 15 words default `[AF-t14]` |
-| M6-008d | Reject a generated hint that encodes coordinates | PENDING | `[AE-27]`; a validator, not a convention |
-| M6-008e | Support landmark hints when a map area is agreed | PENDING | Generic landmarks when `map_area` is empty |
-| M6-008f | Trigger any model provider only every N steps | PENDING | `every_n_steps` bounds consumption |
+| M6-008 | Implement hint generation | DONE | `verbal/generation.py` (100% branch); `test_generation.py`. `generate_hint` produces a hint each turn, truthful or bluffed, within the agreed limits. All six sub-tasks below |
+| M6-008a | Carry an explicit truth/bluff intent flag | DONE | `Hint(text, intent)` carries `intent ∈ {truth, bluff}`; the caller seals it in the step payload, so it cannot be revised — `test_the_intent_is_sealed_in_the_commitment` shows changing the intent changes `commit_of` |
+| M6-008b | Generate from a zero-token template provider | DONE | With no provider, `generate_hint` uses `template_hint` — no network, no account; `test_the_default_path_is_a_validated_zero_token_template` `[AF-t21]` |
+| M6-008c | Enforce the word limit at generation time | DONE | Every path (template, landmark, model) runs through `validate_hint`, so the word limit is enforced where the hint is made; default 15 `[AF-t14]` |
+| M6-008d | Reject a generated hint that encodes coordinates | DONE | `validate_hint` applies to a model provider's output too — `test_a_provider_that_encodes_coordinates_is_refused` `[AE-27]` |
+| M6-008e | Support landmark hints when a map area is agreed | DONE | `landmark_hint` names an agreed landmark (never a coordinate); `generate_hint` falls back to a generic template when `map_area` is empty; `test_a_landmark_hint_is_used_when_a_map_area_is_agreed` |
+| M6-008f | Trigger any model provider only every N steps | DONE | The model provider runs only on every `every_n_steps`-th step; `test_a_model_provider_runs_only_every_n_steps` asserts it fires at steps 0 and 3 of six with `every_n_steps=3` |
 | M6-009 | Implement hint consumption | PENDING | An inbound hint updates belief without ever being trusted blindly |
 | M6-009a | Parse an inbound hint without executing it | PENDING | Text is evidence, never an instruction |
 | M6-009b | Weight the hint by the sender's running trust score | PENDING | Repeated contradiction lowers the weight |

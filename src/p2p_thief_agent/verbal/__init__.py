@@ -4,6 +4,12 @@ Kept strictly apart from movement — a hint is never a coordinate channel (`AE-
 LLM never decides a move (`AE-25`). The default provider needs no model or network.
 """
 
+from p2p_thief_agent.verbal.generation import (
+    INTENTS,
+    Hint,
+    generate_hint,
+    landmark_hint,
+)
 from p2p_thief_agent.verbal.hints import (
     HINT_WORD_LIMIT,
     HintError,
@@ -13,7 +19,11 @@ from p2p_thief_agent.verbal.hints import (
 
 __all__ = [
     "HINT_WORD_LIMIT",
+    "INTENTS",
+    "Hint",
     "HintError",
+    "generate_hint",
+    "landmark_hint",
     "template_hint",
     "validate_hint",
 ]
