@@ -4,7 +4,7 @@ import pytest
 
 from p2p_thief_agent.protocol.crypto import commit_of
 from p2p_thief_agent.verbal.generation import generate_hint, landmark_hint
-from p2p_thief_agent.verbal.hints import HINT_WORD_LIMIT, HintError
+from p2p_thief_agent.verbal.hints import HINT_WORD_LIMIT, HintError, validate_hint
 
 MAP_AREA = ["old bridge", "market square", "harbour gate"]
 
@@ -55,10 +55,21 @@ def test_a_model_provider_runs_only_every_n_steps() -> None:
     assert calls == [0, 3]  # only every third step reached the model
 
 
-def test_a_provider_that_encodes_coordinates_is_refused() -> None:
-    """`M6-008d`: validation applies to a model's output too, not only the template."""
-    with pytest.raises(HintError, match="coordinates"):
-        generate_hint(0, provider=lambda _s: "meet me at 3,4", every_n_steps=1)
+def test_a_provider_that_encodes_coordinates_is_refused_and_falls_back() -> None:
+    """`M6-008d`: a model that leaks coordinates is refused; a legal template is sent instead."""
+    hint = generate_hint(0, provider=lambda _s: "meet me at 3,4", every_n_steps=1)
+    assert validate_hint(hint.text) == hint.text  # the emitted hint is legal
+    assert "3,4" not in hint.text
+    assert hint.text == generate_hint(0).text  # the token-free fallback
+
+
+def test_a_provider_outage_never_forfeits_the_turn() -> None:
+    """`M6-013b`: a provider that raises falls back silently to a template."""
+    def broken(_step: int) -> str:
+        raise RuntimeError("model unreachable")
+
+    hint = generate_hint(0, provider=broken, every_n_steps=1)
+    assert hint.text == generate_hint(0).text  # same template, no error propagated
 
 
 def test_a_non_positive_step_interval_is_rejected() -> None:

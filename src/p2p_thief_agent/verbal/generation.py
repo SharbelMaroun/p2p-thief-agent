@@ -54,6 +54,13 @@ def landmark_hint(step: int, map_area: Sequence[str], max_words: int = HINT_WORD
     return validate_hint(phrase, max_words)
 
 
+def _default_text(step: int, map_area: Sequence[str] | None, max_words: int) -> str:
+    """The token-free path: a landmark hint if a map area is agreed, else a generic template."""
+    if map_area:
+        return landmark_hint(step, map_area, max_words)
+    return template_hint(step, max_words)
+
+
 def generate_hint(
     step: int,
     *,
@@ -65,18 +72,22 @@ def generate_hint(
 ) -> Hint:
     """Produce this turn's hint and its sealed intent, token-free by default (`M6-008b`).
 
-    The model ``provider``, when given, runs only on every ``every_n_steps``-th step; every
-    other step — and every step at all when no provider is given — uses a landmark hint if a
-    ``map_area`` is agreed, else a generic template. All paths are validated.
+    The model ``provider``, when given, runs only on every ``every_n_steps``-th step. If it
+    is absent, throttled off this step, **fails (an outage), or returns an invalid hint** —
+    coordinates or over the word limit — the token-free default is used instead. So a provider
+    problem never forfeits a turn and never leaks a bad hint (`M6-013b`, `M6-008d`); the
+    fallback is an ordinary template, indistinguishable to the opponent.
     """
     if intent not in INTENTS:
         raise HintError(f"intent must be one of {INTENTS}, got {intent!r}")
     if every_n_steps < 1:
         raise HintError(f"every_n_steps must be at least 1, got {every_n_steps}")
+    text: str | None = None
     if provider is not None and step % every_n_steps == 0:
-        text = validate_hint(provider(step), max_words)
-    elif map_area:
-        text = landmark_hint(step, map_area, max_words)
-    else:
-        text = template_hint(step, max_words)
+        try:
+            text = validate_hint(provider(step), max_words)
+        except Exception:  # noqa: BLE001 - any provider outage or bad output must fall back
+            text = None
+    if text is None:
+        text = _default_text(step, map_area, max_words)
     return Hint(text=text, intent=intent)
