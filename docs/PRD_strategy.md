@@ -111,3 +111,20 @@ bound so a slow machine cannot flake.
 The decision spends roughly **four orders of magnitude** under the 30 s response timeout
 (`network_and_league.response_timeout_sec`), so computational fairness is never in doubt —
 the Thief cannot stall, and its move never risks the deadline. Feeds `M9-006`.
+
+## Belief-driven evasion vs the blind baseline (`M6-015`, measured 2026-08-04)
+
+A deterministic greedy Cop chases the Thief across four fixed start scenarios on the 7×7
+grid (`M6-015a`). The Cop deposits scent it cannot suppress; the Thief either ignores it
+(blind baseline) or senses it and flees the believed Cop cell (belief-driven). Survival is
+the steps lasted, max 35 per scenario.
+
+| Policy | Total survival (4 × 35 = 140 max) |
+|---|---|
+| Blind baseline | 52 |
+| Belief-driven | 125 |
+
+Belief-driven evasion more than doubles survival, so it earns its place over the blind
+baseline (`M6-015b` — had it not, the number would say so and the policy would be reverted).
+Reproduce with `scripts/strategy_comparison.py` (`results/strategy_comparison.json`); the
+figure is gated by `test_strategy_comparison.py`. Feeds `M9-007a`.
