@@ -518,7 +518,7 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M6-013 | Keep the verbal layer strictly optional | DONE | Disabling every provider still produces a complete, legal game; `test_verbal_optional.py` + the fallback path in `verbal/generation.generate_hint`. Both sub-tasks below |
 | M6-013a | Prove a full series runs at zero tokens | DONE | `test_a_full_series_plays_a_complete_legal_game_at_zero_tokens`: six sub-games of 35 steps run the whole loop (generate → consume → move) with no provider, so no token is spent `[AF-t21]` |
 | M6-013b | Prove a provider outage never forfeits a turn | DONE | `generate_hint` catches any provider outage or bad output and falls back to the token-free template — an ordinary hint, indistinguishable to the opponent; `test_a_provider_outage_never_forfeits_the_turn` |
-| M6-014 | Add regression vectors for the scent field | PENDING | Stored expected fields guard against silent physics drift |
+| M6-014 | Add regression vectors for the scent field | DONE | `test_scent_regression.py` pins golden vectors: the exact 5×5 emission field, the five-turn pure-decay sequence (`0.9→0.81→…→0.59049`), the repeated-emission STAY sequence, and a board deposit + STAY — so any change to the profile, the decay factor, or the board deposit breaks a test rather than drifting silently |
 | M6-015 | Measure strategy quality against the baseline | PENDING | Belief-driven evasion must beat the blind baseline or be reverted |
 | M6-015a | Define the comparison protocol | PENDING | Fixed seeds, fixed opponent policy, repeated runs |
 | M6-015b | Record the result either way | PENDING | A negative result is evidence, not a failure to hide |
