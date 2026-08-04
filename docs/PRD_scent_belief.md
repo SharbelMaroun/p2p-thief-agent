@@ -108,3 +108,55 @@ exactly as a move does and no path can skip or fake the trail (`M6-007a`, `M6-00
 observed field into a likelihood for `apply_evidence` (empty ⇒ uniform). The Thief's own
 `deposit` output is encoded outbound and never fed here — a guard proves the belief modules
 never touch the own-emission functions, so own scent can never become evidence (`M6-007b`).
+
+## Reference: belief update rule and the locked scent model (`M6-012`)
+
+### Belief update formulas (`M6-012a`)
+
+Let `b` be the current belief over the `R×C` grid (`Σ b = 1`) and `L` a likelihood from a
+public observation. The update is Bayes, renormalised (`perception/belief.apply_evidence`):
+
+```text
+posterior[i,j] = b[i,j] · L[i,j] / Σ_{k,l} b[k,l] · L[k,l]
+normalize(M)   = M / ΣM,  and if ΣM = 0 then normalize(M) = uniform   (M6-003c)
+```
+
+A scent observation becomes `L` by `scent_likelihood` (intensity per cell, normalised). A
+hint becomes `L` by `decode_hint`, then tempered by the sender's trust `t ∈ [0,1]` before it
+is applied (`perception/trust.trust_weighted`):
+
+```text
+L_eff = t · normalize(L_hint) + (1 − t) · uniform          (M6-003b)
+```
+
+Trust itself moves by the overlap of the hint with the Cop's own scent, against the overlap
+an uninformative hint would score (`perception/trust.update_trust`, `M6-003f`):
+
+```text
+agreement = Σ L_hint · b_scent
+signal    = clip(agreement / (1/(R·C)) − 1, −1, 1)
+t'        = clip(t + rate · signal, 0, 1)
+```
+
+The belief holds only a distribution — never the Cop's real cell — and the update takes no
+parameter for objective truth (`AE-8`, `AE-9`, proven by `test_belief.py`).
+
+### The locked scent model (`M6-012b`)
+
+`perception/scent_lock.scent_model_record` is the exact object hashed and locked at
+negotiation (`AE-23`). Its members are:
+
+```text
+model                                = "multiplicative-decay"
+update                               = "tau_next = max(0, (1 - decay_per_step) * tau + emission)"
+center_intensity                     = 0.9
+decay_per_step                       = 0.10
+field_size                           = 5
+emission_profile_by_squared_distance = {"0":0.90, "1":0.62, "2":0.20, "4":0.14, "5":0.04, "8":0.04}
+```
+
+`scent_model_hash = canonical_sha256(record)` — the same canonicalisation as the config and
+commitments, so the lock is byte-comparable. `with_scent_lock` stamps it into the signed
+terms; a peer running any other formula, constant, or profile (including a different `U-025`
+value for the squared-distance-5 ring) produces a different hash and is refused by name
+before the first move.
