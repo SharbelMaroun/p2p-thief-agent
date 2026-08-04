@@ -97,3 +97,14 @@ lie. Trust stays clipped to `[0, 1]`. How fast trust falls and whether it recove
 - Belief policy is a Thief-local design behind the SDK, not a transport concern.
 
 No scent or belief implementation is included in M1.
+
+## Board-level field and involuntary emission (`M6-007`, built 2026-08-03)
+
+`perception/field.py` lays the emission profile onto the whole board. `deposit(field,
+board, cell)` decays the field and stamps a fresh 5×5 emission at the agent's cell — it
+takes the *cell*, never the *action*, and carries no suppression flag, so a `STAY` re-emits
+exactly as a move does and no path can skip or fake the trail (`M6-007a`, `M6-007c`).
+`scent_likelihood(observed, board)` is the bridge into belief: it turns the **opponent's**
+observed field into a likelihood for `apply_evidence` (empty ⇒ uniform). The Thief's own
+`deposit` output is encoded outbound and never fed here — a guard proves the belief modules
+never touch the own-emission functions, so own scent can never become evidence (`M6-007b`).

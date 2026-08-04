@@ -488,10 +488,10 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M6-006a | Encode the emitted field into `smell_grid` | DONE | `encode_smell_grid` emits the sparse `{"r,c": intensity}` map — silent/zero/below-precision cells omitted, keys in sorted order; `test_encoding_omits_silent_cells_rather_than_zero_filling` |
 | M6-006b | Parse an opponent field defensively | DONE | `parse_smell_grid(grid, board)` rejects a malformed key, a non-numeric/negative intensity, **and** any cell off the negotiated board — an opponent's field is untrusted input; `test_an_off_board_cell_is_rejected_against_the_negotiated_grid` |
 | M6-006c | Pin the numeric precision on the wire | DONE | `encode_smell_grid` rounds every intensity to `SCENT_PRECISION` (6 dp), so an identical field serialises to byte-identical bytes on both peers — the property the locked scent-model hash depends on; `test_encoding_rounds_to_the_pinned_precision` |
-| M6-007 | Prove the scent model is symmetric and involuntary | PENDING | Emission follows movement automatically; no path can suppress or fake it |
-| M6-007a | Emit on every action including `STAY` | PENDING | Staying still still deposits scent `[book §6]` |
-| M6-007b | Read only the opponent's field, never one's own | PENDING | A test proves own-scent is never used as evidence |
-| M6-007c | Make suppression impossible by construction | PENDING | No flag or branch can skip emission |
+| M6-007 | Prove the scent model is symmetric and involuntary | DONE | `perception/field.py` (100% branch); `test_field.py`. Emission follows the agent's cell automatically and no path can suppress or fake it; all three sub-tasks below |
+| M6-007a | Emit on every action including `STAY` | DONE | `deposit(field, board, cell)` takes the agent's cell, not its action, so a `STAY` re-emits on the same cell; `test_staying_still_still_deposits_scent` shows the stayed centre exceeds decay alone `[book §6]` |
+| M6-007b | Read only the opponent's field, never one's own | DONE | `scent_likelihood` turns the *observed* (opponent) field into belief evidence; `test_the_belief_modules_never_read_own_emission` walks `belief`/`hint`/`trust` and proves they never touch the own-emission functions `emit_at`/`deposit` |
+| M6-007c | Make suppression impossible by construction | DONE | `deposit`/`emit_at` carry no action and no suppression flag (signature-pinned), and `emit_at` always yields a non-empty field for an on-board cell; `test_emission_cannot_be_conditioned_or_suppressed` |
 | M6-008 | Implement hint generation | PENDING | A hint is produced each turn, truthful or bluffed, within the agreed limits |
 | M6-008a | Carry an explicit truth/bluff intent flag | PENDING | Sealed in the commitment so it cannot be revised later |
 | M6-008b | Generate from a zero-token template provider | PENDING | Default path; no network, no account `[AF-t21]` |

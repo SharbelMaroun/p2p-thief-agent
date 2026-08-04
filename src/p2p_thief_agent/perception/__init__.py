@@ -10,6 +10,12 @@ from p2p_thief_agent.perception.belief import (
     normalize,
     uniform_belief,
 )
+from p2p_thief_agent.perception.field import (
+    blank_field,
+    deposit,
+    emit_at,
+    scent_likelihood,
+)
 from p2p_thief_agent.perception.hint import decode_hint
 from p2p_thief_agent.perception.observation import (
     ObservationError,
@@ -47,12 +53,16 @@ __all__ = [
     "ObservationError",
     "advance_field",
     "apply_evidence",
+    "blank_field",
     "decode_hint",
+    "deposit",
     "emission_delta",
     "emission_field",
+    "emit_at",
     "encode_smell_grid",
     "normalize",
     "parse_smell_grid",
+    "scent_likelihood",
     "scent_model_hash",
     "scent_model_record",
     "settle",
