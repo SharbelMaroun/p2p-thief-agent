@@ -10,6 +10,7 @@ from p2p_thief_agent.perception.belief import (
     normalize,
     uniform_belief,
 )
+from p2p_thief_agent.perception.consume import consume_hint
 from p2p_thief_agent.perception.field import (
     blank_field,
     deposit,
@@ -54,6 +55,7 @@ __all__ = [
     "advance_field",
     "apply_evidence",
     "blank_field",
+    "consume_hint",
     "decode_hint",
     "deposit",
     "emission_delta",

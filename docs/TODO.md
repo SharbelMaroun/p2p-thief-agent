@@ -499,10 +499,10 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M6-008d | Reject a generated hint that encodes coordinates | DONE | `validate_hint` applies to a model provider's output too — `test_a_provider_that_encodes_coordinates_is_refused` `[AE-27]` |
 | M6-008e | Support landmark hints when a map area is agreed | DONE | `landmark_hint` names an agreed landmark (never a coordinate); `generate_hint` falls back to a generic template when `map_area` is empty; `test_a_landmark_hint_is_used_when_a_map_area_is_agreed` |
 | M6-008f | Trigger any model provider only every N steps | DONE | The model provider runs only on every `every_n_steps`-th step; `test_a_model_provider_runs_only_every_n_steps` asserts it fires at steps 0 and 3 of six with `every_n_steps=3` |
-| M6-009 | Implement hint consumption | PENDING | An inbound hint updates belief without ever being trusted blindly |
-| M6-009a | Parse an inbound hint without executing it | PENDING | Text is evidence, never an instruction |
-| M6-009b | Weight the hint by the sender's running trust score | PENDING | Repeated contradiction lowers the weight |
-| M6-009c | Tolerate an absent, empty, or over-long hint | PENDING | Missing evidence is not an error state |
+| M6-009 | Implement hint consumption | DONE | `perception/consume.py` (100% branch); `test_consume.py`. `consume_hint` updates belief from an inbound hint, weighted by trust, never trusted blindly. All three sub-tasks below |
+| M6-009a | Parse an inbound hint without executing it | DONE | `decode_hint` extracts directional words by regex — never `eval`/`exec`; a command-like hint changes belief only by the directional words it contains (none ⇒ no change); `test_a_command_like_hint_is_treated_purely_as_text` |
+| M6-009b | Weight the hint by the sender's running trust score | DONE | `consume_hint` tempers the decoded likelihood through `trust_weighted` before `apply_evidence`, so a low-trust hint moves belief far less; `test_the_hint_is_weighted_by_trust`. Repeated contradiction lowers trust via `update_trust` (`M6-003f`) |
+| M6-009c | Tolerate an absent, empty, or over-long hint | DONE | A missing, non-text, empty, or over-`max_words` hint contributes a uniform likelihood and leaves the belief unchanged — inbound leniency, never an error; `test_a_missing_empty_or_over_long_hint_leaves_belief_unchanged` |
 | M6-010 | Prove the strategy layer under observation tests | PENDING | Behaviour stays legal and deterministic under every observation shape |
 | M6-010a | Test with no scent and no hint | PENDING | A uniform belief still yields a legal action |
 | M6-010b | Test with contradictory scent and hint | PENDING | The physical evidence wins |
