@@ -20,7 +20,7 @@ from p2p_thief_agent.shared.private_config import (
 )
 
 ROOT = Path(__file__).resolve().parents[2]
-EXAMPLE_TOML = ROOT / "config" / "game.toml.example"
+EXAMPLE_TOML = ROOT / "config" / "thief" / "game.toml.example"
 
 PRIVATE = """
 [network]

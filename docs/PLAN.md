@@ -1,10 +1,13 @@
 # Plan
 
-Status: M0, M2, and M3 are `DONE`; M1 is `IN PROGRESS` at M1-013. M4–M9 are `PENDING`
-and proceed in order. The M4 substance is implemented — commit-reveal, canonical
-hashing, wire message models, and the signed-terms handshake all ship under
-`protocol/` — but M4 completion awaits M1 Stage C. Nothing is classified `BLOCKED`;
-unresolved decisions are requested explicitly rather than inferred.
+Status: M0, M2, and M3 are `DONE`; M1 is `IN PROGRESS` at M1-013. M5 is `IN PROGRESS`;
+M6–M9 are `PENDING` and proceed in order. The M4 substance is implemented — commit-reveal,
+canonical hashing, wire message models, and the signed-terms handshake all ship under
+`protocol/`, and every `M4-001`…`M4-017` row is `DONE` (2026-08-01). The M1 Stage-C
+profile acceptance M4 was gated on was recorded 2026-07-31
+([STAGE_C_ACCEPTANCE.md](STAGE_C_ACCEPTANCE.md), narrow scope), so M4 completion now awaits
+only the coordinator's formal milestone verdict, not an unrecorded gate. Nothing is
+classified `BLOCKED`; unresolved decisions are requested explicitly rather than inferred.
 
 **Stage-B status, corrected 2026-07-31.** Stage A is satisfied by
 [SIM_WIRE_PROTOCOL.md](SIM_WIRE_PROTOCOL.md). Stage B is **partly** satisfied: the
@@ -17,9 +20,12 @@ rather than self-authored vectors. Stage B for the tool surface, negotiation, an
 message shapes remains unproven (`M1-015`–`M1-017`).
 
 Beyond the M0–M1 scaffold this repository now implements the M2 core domain, M3 local
-state and scoring, the deterministic baseline strategy, and the protocol layer. It has
-no peer runtime, transport, or FastMCP dependency: `fastmcp` is deliberately absent
-from `pyproject.toml` until `M5-002` begins.
+state and scoring, the deterministic baseline strategy, the protocol layer, and the M5
+peer runtime. `fastmcp` is a live dependency: `adapters/fastmcp_server.py` and
+`adapters/fastmcp_client.py` expose the four-tool server and the outbound client, and
+`tests/integration/` drives a real two-process HTTP round trip (`M5-002` DONE). Cop and
+Thief still share no runtime filesystem, mutable state, or private truth — every FastMCP
+import is confined to the `adapters` layer by a guard test.
 
 ## Architecture boundary
 
@@ -45,8 +51,8 @@ truth (`SR-004`, `THIEF-001`).
 | M1 | Interoperability conformance profile | Author a Thief-owned wire profile from book-confirmed rules and Option-B choices, prove it bidirectionally against a neutral stub opponent, and obtain profile acceptance | `IN PROGRESS` |
 | M2 | Core domain rules | Coordinates, actions, grid, legal movement, barrier and capture semantics behind the SDK | `DONE` |
 | M3 | Local state, scoring and deterministic baseline | Immutable local history, disclosed-barrier state, scoring, and deterministic legal baseline | `DONE` |
-| M4 | Protocol, canonicalization and commit-reveal | Accepted public messages, exact canonical bytes, state transitions, commitment verification, and audit outcomes | `DONE` — *corrected 2026-08-02: this row still read `PENDING` although every `M4-001`…`M4-017` row in `TODO.md` is DONE, including the constant-time compare, canonicalization vectors, Step-0 attestation and adversarial vectors added 2026-08-01* |
-| M5 | FastMCP runtime and resilience | Symmetric server/client peer, gateway, idempotency, deadlines, watchdog, recovery, play loop, and tunnel path | `IN PROGRESS` — **done:** server, client, the two-process round trip, the private opponent-URL boundary, the negotiation refusal gate, the turn loop and sub-game, idempotency, the full reliability set (deadlines, watchdog with `persist_state`/`controlled_shutdown`, mid-turn-disconnect terminal loss, backpressure), the orchestrator gateway (`M5-001`), the log manager (`M5-008`), the deadline tracker (`M5-009`), retry-aware delivery (`M5-010`), and (2026-08-02) the **autonomous play loop** (`M5-019`) that drives the mailbox, so a sub-game now plays with nothing fed in by hand. **Remaining:** adversarial-peer proof (`M5-011`), architecture docs (`M5-013`), `M5-015`…`M5-018`, the `serve` CLI (`M5-019e`), and the tunnel path (`M5-005`, which also needs M8 screenshot evidence). *Row corrected 2026-08-02: it still listed the gateway and log manager as remaining, both of which had shipped* |
+| M4 | Protocol, canonicalization and commit-reveal | Accepted public messages, exact canonical bytes, state transitions, commitment verification, and audit outcomes | `DONE` — *corrected 2026-08-02: this row still read `PENDING` although every `M4-001`…`M4-017` row in `TODO.md` is DONE, including the constant-time compare, canonicalization vectors, Step-0 attestation and adversarial vectors added 2026-08-01. Formal milestone closure is the coordinator's verdict* |
+| M5 | FastMCP runtime and resilience | Symmetric server/client peer, gateway, idempotency, deadlines, watchdog, recovery, play loop, and tunnel path | `IN PROGRESS` — **done:** server, client, the two-process round trip, the private opponent-URL boundary, the negotiation refusal gate, the turn loop and sub-game, idempotency, the full reliability set (deadlines, watchdog with `persist_state`/`controlled_shutdown`, mid-turn-disconnect terminal loss, backpressure `M5-016`), the orchestrator gateway (`M5-001`), the log manager (`M5-008`), the deadline tracker (`M5-009`), retry-aware delivery (`M5-010`), the autonomous play loop (`M5-019`) with hosting and readiness (`M5-019e`) and negotiation sequencing (`M5-019f`), the adversarial-peer proof (`M5-011`), the SDK transport guard (`M5-018`), the own-config-directory (`M5-006`), the architecture docs (`M5-013`), and the same-terminal-outcome proof (`M5-017`). **Remaining — all externally or coordinator/M6-blocked, not skippable engineering:** the tunnel path (`M5-005`, real ngrok/two machines + M8 screenshots), the Step-0/`config_sha256` wire question (`M5-014f`, `U-024`), and the scent-lock at negotiation (`M5-015`, needs the M6 scent model). *Rows corrected 2026-08-02* |
 | M6 | Scent, belief and private strategy | Confirmed scent physics, public observations, Thief-local belief, and private strategy | `PENDING` |
 | M7 | Series orchestration, artifacts, gatekeeper and reporting | Six-sub-game flow, official artifacts, external-call gatekeeper, and agreed JSON reporting | `PENDING` |
 | M8 | GUI, replay, interoperability and security hardening | Local-truth UI, replay/verifier, neutral-opponent E2E, tamper tests, and security review | `PENDING` |

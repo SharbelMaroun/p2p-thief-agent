@@ -117,11 +117,13 @@ rather than dropping it. A mid-turn disconnect has no deadlock exit: `turn_loop`
 loss that still reveals its audit.
 
 **Not yet built:** mutual verification of the *opponent's* audit (the reference has
-both peers swap logs and each verify the other's commits), the `serve` CLI
-(`M5-019e`), and the tunnel (`M5-005`). *Corrected 2026-08-02 — this list previously
-also named `M5-001` (gateway), `M5-003` (idempotency), and `M5-008` (log manager),
-all of which had since been built. A PRD that keeps claiming a shipped feature is
-missing is worse than one that says nothing.*
+both peers swap logs and each verify the other's commits), autonomous negotiation
+sequencing and a `serve` CLI entry point (`M5-019f`), and the tunnel (`M5-005`).
+*Corrected 2026-08-02 — this list previously named `M5-001` (gateway), `M5-003`
+(idempotency), `M5-008` (log manager), and the `M5-019e` hosting/readiness, all of
+which have since been built. Background-thread hosting (`adapters.serve_in_background`)
+and the bounded readiness wait (`services.readiness.wait_for_peer`) close `M5-019e`;
+what remains for an unattended match is the negotiation sequencing in `M5-019f`.*
 
 ## The play loop: driving the mailbox (`M5-019`)
 
@@ -173,12 +175,72 @@ Pinned by `test_polling`, `test_turn_receiver`, `test_take_turn`, and
 `test_autonomous_play` — the last plays a whole sub-game whose only turn source is
 the mailbox.
 
-**Not yet built (`M5-019e`).** No `serve` CLI: `build_server(...).run()` blocks, so
-launching a peer needs the server on a background thread plus autonomous negotiation
-sequencing. When it is built it must bind `host="0.0.0.0"` — confirmed in the book at
-`police_thief_p2p_Summary.md:657`, "bind the server so a tunnel can expose it
-publicly". The localhost test harness binds `127.0.0.1`, which passes every local
-check and is unreachable through a tunnel.
+**Hosting and readiness, built (`M5-019e`).** `build_server(...).run()` blocks, so
+`adapters.serve_in_background` puts the mailbox on a daemon thread after
+`ensure_port_free` fails loudly on a stale peer, and it binds `host="0.0.0.0"` —
+confirmed in the book at `police_thief_p2p_Summary.md:657`, "bind the server so a tunnel
+can expose it publicly" (the localhost harness binds `127.0.0.1`, which passes every
+local check yet is unreachable through a tunnel). `services.readiness.wait_for_peer` is
+the bounded start-order wait, so two separately launched peers converge without a fixed
+order.
+
+**Not yet built (`M5-019f`).** What remains to play fully unattended is the *protocol*
+sequencing — send our signed offer, poll the agreements inbox for the opponent's, verify
+both directions, then open play (this peer opens without waiting) — plus a `serve` CLI
+entry point that wires hosting, readiness, negotiation, and the sub-game together.
+
+## Runtime architecture and failure matrix (`M5-013`)
+
+### Subsystem diagram (`M5-013a`)
+
+Book chapter 9 splits the Orchestrator into five subsystems, and *all* communication
+between them passes through one gateway. `orchestration/gateway.Gateway` is that
+composition root: it holds one port of each subsystem (`M5-001a`) and decides nothing
+itself (`M5-001c`). No subsystem imports another — they meet only at the gateway, a
+boundary a guard test enforces by walking `src/` (`M5-001b`).
+
+```text
+                 opponent peer  ◀── wire (FastMCP) ──▶
+                        ▲
+                        │ (only the MCP Connector touches the socket)
+        ┌───────────────┴───────────────────────────────────┐
+        │                    Gateway                         │
+        │      coordinates the five subsystems; decides      │
+        │      nothing — the move is the Decision Module's    │
+        └───────────────────────────────────────────────────┘
+            │            │            │          │          │
+            ▼            ▼            ▼          ▼          ▼
+    ┌────────────┐ ┌──────────┐ ┌──────────┐ ┌────────┐ ┌──────────┐
+    │    MCP     │ │ Decision │ │   Log    │ │Deadline│ │ Watchdog │
+    │ Connector  │ │  Module  │ │ Manager  │ │Tracker │ │          │
+    │(PeerTransport)│(decide)  │ │(append-  │ │(open a │ │(heartbeat│
+    │            │ │          │ │ only log)│ │request)│ │ + freeze)│
+    └────────────┘ └──────────┘ └──────────┘ └────────┘ └──────────┘
+
+    No arrow runs subsystem→subsystem. The Log Manager and the Watchdog both react
+    to a phase transition, yet neither knows the other exists: `Gateway.on_transition`
+    is what calls both. That is the whole point of routing through the gateway.
+```
+
+### Failure matrix (`M5-013b`)
+
+Every fault class has one defined terminal outcome — none is a hang, and none is a
+silent drop. This is the table `M8-005`'s failure-injection pass exercises end to end.
+
+| Fault class | Caught in | Terminal outcome |
+|---|---|---|
+| Opponent never sends a turn | `polling.poll_for_turn` / `turn_loop._await_opponent` | bounded wait → `TECHNICAL_LOSS` `[AE-7]` |
+| Send fails mid-turn (dropped tunnel) | `turn_loop._deliver` (`TransportError`) | sealed once, never re-sealed → `TECHNICAL_LOSS` `[AE-19]` |
+| Opponent refuses the delivery | `orchestration.delivery.deliver` (`PeerRejectionError`) | not retried → `TECHNICAL_LOSS` |
+| Decision or seal cannot complete | `turn_loop` in `COMPUTING_MOVE` | `machine.fail()` → `TECHNICAL_LOSS` |
+| Transition out of order | `PhaseMachine.to` (`PhaseError`) | refused; state unchanged `[AE-5]` |
+| Replayed turn | `InboundPeer.receive_turn` (`WireError`) | rejected by name; not re-applied |
+| Malformed or oversized message | `TurnMessage.from_dict` (`WireError`) | rejected before any domain code runs |
+| Tampered audit | `InboundPeer.submit_audit` / `audit_records` | *scored* as a technical loss, never dropped `[AE-19]` |
+| Process freeze | `Watchdog.check` (`elapsed > watchdog_timeout_sec`) | `persist_state()` → `controlled_shutdown()` → `SHUTDOWN` |
+| Request deadline expiry | `services.deadlines.attempt` (`DeadlineError`) | retry to the agreed limit, then `TECHNICAL_LOSS` |
+| Outbound queue full | `services.gatekeeper` | backpressure — busy returns `False`, a genuinely full queue raises; never a silent drop `[G§5.3]` |
+| Unreachable or garbled opponent | `adapters.FastMCPClient` (`TransportError`) | deterministic failure, never a crash |
 
 ## Future acceptance criteria and tests
 

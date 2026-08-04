@@ -15,8 +15,11 @@ input. Active per-match JSON will be generated only from an accepted profile and
 validated negotiated values. Historical drafts remain evidence only and are never
 loaded by runtime code.
 
-The Thief private TOML is local, role-specific, and ignored by Git. `game.toml.example`
-is the committed skeleton; the real `config/game.toml` is never shared, signed, or sent.
+The Thief private TOML is local, role-specific, and ignored by Git. It lives in the
+Thief's **own role directory** (`M5-006`): `config/thief/game.toml.example` is the
+committed skeleton, and the real `config/thief/game.toml` is never shared, signed, or
+sent. `shared.private_config.load_thief_private_config` resolves only that directory, so
+this peer can never read a `config/police/` sibling even from one checkout `[AE-1]`.
 
 The exact private keys were `PENDING` under ADR-0004 and are now settled (`M5-002f`,
 2026-07-31), matching the skeleton the book publishes on page 131 and the pinned wire

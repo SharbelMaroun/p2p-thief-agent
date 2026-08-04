@@ -26,8 +26,9 @@ reference and book page 131: each peer reads its own `config/<role>/game.toml` â
 police and thief from **separate directories** â€” and takes the opponent's address
 from `[network].opponent_url`. The section also carries `my_port`,
 `turn_timeout_seconds`, `poll_interval_seconds`, `connect_timeout_seconds`,
-`retry_interval_seconds`, and `audit_send_timeout_seconds`. `config/game.toml.example`
-is the committed skeleton; the real file is git-ignored.
+`retry_interval_seconds`, and `audit_send_timeout_seconds`.
+`config/thief/game.toml.example` is the committed skeleton, in the Thief's own role
+directory (`M5-006`); the real `config/thief/game.toml` is git-ignored.
 
 Asked directly whether the shared negotiated JSON ever carries a URL, port, host, or
 any network address, the answer was **no**: local settings must not "leak into the
