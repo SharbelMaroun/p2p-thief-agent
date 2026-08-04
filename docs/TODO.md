@@ -503,12 +503,12 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M6-009a | Parse an inbound hint without executing it | DONE | `decode_hint` extracts directional words by regex — never `eval`/`exec`; a command-like hint changes belief only by the directional words it contains (none ⇒ no change); `test_a_command_like_hint_is_treated_purely_as_text` |
 | M6-009b | Weight the hint by the sender's running trust score | DONE | `consume_hint` tempers the decoded likelihood through `trust_weighted` before `apply_evidence`, so a low-trust hint moves belief far less; `test_the_hint_is_weighted_by_trust`. Repeated contradiction lowers trust via `update_trust` (`M6-003f`) |
 | M6-009c | Tolerate an absent, empty, or over-long hint | DONE | A missing, non-text, empty, or over-`max_words` hint contributes a uniform likelihood and leaves the belief unchanged — inbound leniency, never an error; `test_a_missing_empty_or_over_long_hint_leaves_belief_unchanged` |
-| M6-010 | Prove the strategy layer under observation tests | PENDING | Behaviour stays legal and deterministic under every observation shape |
-| M6-010a | Test with no scent and no hint | PENDING | A uniform belief still yields a legal action |
-| M6-010b | Test with contradictory scent and hint | PENDING | The physical evidence wins |
-| M6-010c | Test with a saturated scent field | PENDING | No overflow, no division by zero |
-| M6-010d | Test with the Cop adjacent and with the Cop far | PENDING | Both produce sane, legal, distinct choices |
-| M6-010e | Test that repeated runs are byte-identical | PENDING | Determinism is a submission property, not an accident |
+| M6-010 | Prove the strategy layer under observation tests | DONE | `test_strategy_observations.py` drives the whole perception→strategy pipeline (scent + hint → belief → `choose_evasive_action`) under every observation shape; all five sub-tasks below, behaviour legal and deterministic throughout |
+| M6-010a | Test with no scent and no hint | DONE | `test_no_scent_and_no_hint_still_yields_a_legal_action`: a uniform belief still resolves to a legal action |
+| M6-010b | Test with contradictory scent and hint | DONE | `test_physical_evidence_wins_over_a_contradicting_hint`: scent says top-left, a hint lies bottom-right; the contradiction lowers trust and the Thief flees the scent — physical evidence wins |
+| M6-010c | Test with a saturated scent field | DONE | `test_a_saturated_scent_field_does_not_overflow_or_divide_by_zero`: every cell at 0.9 normalises to a legal move, no overflow, no division by zero |
+| M6-010d | Test with the Cop adjacent and with the Cop far | DONE | `test_the_cop_adjacent_and_far_both_give_sane_legal_moves`: both legal; an adjacent western Cop drives a flee that increases distance from it |
+| M6-010e | Test that repeated runs are byte-identical | DONE | `test_repeated_runs_are_byte_identical`: the belief tuples and the chosen action are identical across repeated runs |
 | M6-011 | Benchmark the per-turn decision cost | PENDING | Belief update plus policy stays well inside the response timeout |
 | M6-011a | Measure worst-case belief update time | PENDING | Measured at the negotiated grid size |
 | M6-011b | Record the measurement in the research evidence | PENDING | Feeds `M9-006` and the computational-fairness claim |
