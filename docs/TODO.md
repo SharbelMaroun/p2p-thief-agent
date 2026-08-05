@@ -549,12 +549,12 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-001b | Implement the confirmed six-sub-game role schedule | DONE | The schedule is **injected** — `THIEF_SUBGAMES_NATURAL = (1,3,5)` / `THIEF_SUBGAMES_SWAPPED = (2,4,6)` (`U-021`), passed to `run_thief_series`, so a later correction is a one-line change; `test_the_swapped_schedule_is_injected_not_hard_coded` (`C-012`) |
 | M7-001c | Aggregate cumulative series score | DONE | Per-sub-game Thief scores (Appendix F table 17) sum to `SeriesResult.cumulative_score`; `test_a_natural_series_runs_its_thief_sub_games_under_one_identity` (10+10+5 = 25) |
 | M7-001d | Apply the tie award on a cumulative tie | DONE | A tied sub-game already pays the table's `TIE_SCORE` via `thief_score(Outcome.TIE)`; `is_cumulative_tie(a, b)` detects a level series total, which reporting settles (`M7-017`); `test_a_cumulative_tie_is_detected` `[AF-t17]` |
-| M7-002 | Build accepted declaration, config, log, and result artifacts | PENDING | Schema/link/hash tests |
+| M7-002 | Build accepted declaration, config, log, and result artifacts | IN PROGRESS | The book-confirmed **naming and identity** are built (`reporting/naming.py`, 100% branch, `test_artifact_naming.py`): filenames derive from `game_id` (`AF-021`) and the four artifacts share one `MatchIdentity` (`AR-001`). The exact field **schemas** (`M7-002a`–`d`, `f`, `g`) are `U-019` — the observed template in `JSON_ARTIFACT_SCHEMAS.md` is unauthenticated, so they are **not built as a guessed schema** and await the coordinator's ruling |
 | M7-002a | Emit `declaration_<game_id>.json` | PENDING | Groups, members, both repos, MCP addresses, hardware, model, tokens, times |
 | M7-002b | Emit `config_<game_id>_g<NN>.json` | PENDING | Quantitative parameters plus crypto locks and identity |
 | M7-002c | Emit `log_<game_id>_g<NN>.json` | PENDING | Step-by-step commit-reveal, hashes, nonces |
 | M7-002d | Emit `result_<game_id>.json` | PENDING | Per-group scores and cumulative result; this is the emailed report |
-| M7-002e | Share one `game_uid` across all four artifacts | PENDING | Filenames derive from `game_id` `[AF-§3]` |
+| M7-002e | Share one `game_uid` across all four artifacts | DONE (naming half) | `reporting/naming.py`: `MatchIdentity(game_id, game_uid)` is the one identity every artifact carries (`AR-001`), and `match_filenames` derives all four filenames from that single `game_id` (`AF-021` / `AF-§3`). Stamping the shared `game_uid` **inside** each artifact lands with the schema builders (`U-019`) |
 | M7-002f | Carry four repository links in the result artifact | PENDING | `[AE-49]`; two per group |
 | M7-002g | Carry the per-game commit hash and total tokens | PENDING | `[AE-53]` `[AE-54]` |
 | M7-003 | Implement the centralized external-call gatekeeper | PENDING | FIFO/rate/retry/backpressure tests |
