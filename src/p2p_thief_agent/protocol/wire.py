@@ -7,8 +7,24 @@ end-of-game `AuditPayload`. No Option-B envelope wraps these -- the tool argumen
 the message dict. True position/move/verdict are sealed in `commit` and revealed only at
 the audit, so they never appear in the clear here.
 
-`from_dict` mirrors the simulator's own strictness per type: turn and audit messages
-reject unknown fields, while control messages ignore unrecognized keys.
+**Unknown fields are ignored on every message type (corrected 2026-08-06).** This module
+previously rejected them on turn and audit messages, on the stated grounds that it
+"mirrors the simulator's own strictness per type". That was wrong twice over. Asked
+directly, the reference **ignores extra or unknown fields** when building `TurnMessage`,
+`ControlMessage` *and* `AuditPayload` -- the strictness it does have is about **missing
+required** fields, which still raise. And the rejection was silently fatal for us: a
+refused turn is consumed and skipped by the poller, so a peer sending one unmodelled key
+made this agent go quiet until the deadline, reading as a dropped network connection
+rather than as our own refusal, and costing a technical loss.
+
+It also disagreed with the companion Cop peer, whose schema tolerates extra members. Two
+implementations from one team behaving differently on the same message is the defect,
+independently of which behaviour is right.
+
+Being liberal here cannot break us -- it only ever accepts more -- while being strict can
+lose a decided game. That is the same "strict in what we send, generous in what we
+accept" rule already applied to acknowledgements. Missing *required* fields and invalid
+*values* are still refused, because those we genuinely cannot act on.
 """
 
 from __future__ import annotations
@@ -36,10 +52,13 @@ def _require_fields(data: dict, names: tuple[str, ...], label: str) -> None:
         raise WireError(f"{label} missing fields: {sorted(missing)}")
 
 
-def _reject_unknown(data: dict, allowed: set[str], label: str) -> None:
-    unknown = set(data) - allowed
-    if unknown:
-        raise WireError(f"{label} unknown fields: {sorted(unknown)}")
+def _known_only(data: dict, allowed: set[str]) -> dict:
+    """Return only the fields this message models, dropping any extras.
+
+    Tolerating an unmodelled key costs nothing: it cannot reach any behaviour, because
+    the dataclass never sees it. Refusing one costs a game.
+    """
+    return {key: value for key, value in data.items() if key in allowed}
 
 
 @dataclass(slots=True)
@@ -70,8 +89,7 @@ class TurnMessage:
         _require_fields(
             record, ("step", "sender", "hint", "smell_grid", "commit", "timestamp"), "TurnMessage"
         )
-        _reject_unknown(record, {f.name for f in fields(cls)}, "TurnMessage")
-        return cls(**record)
+        return cls(**_known_only(record, {f.name for f in fields(cls)}))
 
 
 @dataclass(slots=True)
@@ -96,8 +114,7 @@ class ControlMessage:
     def from_dict(cls, data: object) -> ControlMessage:
         record = _require_object(data, "ControlMessage")
         _require_fields(record, ("kind", "sender"), "ControlMessage")
-        allowed = {f.name for f in fields(cls)}
-        return cls(**{key: value for key, value in record.items() if key in allowed})
+        return cls(**_known_only(record, {f.name for f in fields(cls)}))
 
 
 @dataclass(slots=True)
@@ -123,5 +140,4 @@ class AuditPayload:
     def from_dict(cls, data: object) -> AuditPayload:
         record = _require_object(data, "AuditPayload")
         _require_fields(record, ("sender", "records", "result_claim"), "AuditPayload")
-        _reject_unknown(record, {f.name for f in fields(cls)}, "AuditPayload")
-        return cls(**record)
+        return cls(**_known_only(record, {f.name for f in fields(cls)}))
