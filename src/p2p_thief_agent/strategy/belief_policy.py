@@ -27,6 +27,21 @@ from p2p_thief_agent.strategy.baseline import choose_action
 Grid = Sequence[Sequence[float]]
 
 
+def initial_belief(board: Board, cop_start: Coordinate) -> tuple[tuple[float, ...], ...]:
+    """Belief before any observation: the Cop's public start cell is known certainty (`M6-021`).
+
+    The agreed start positions are public, and this peer moves first, so on turn 1 the Cop is
+    exactly at its start — a point mass, not a uniform guess. Later scent observations spread
+    it as the Cop moves.
+    """
+    board.validate_position(cop_start)
+    start = (cop_start.row - board.min_index, cop_start.col - board.min_index)
+    return tuple(
+        tuple(1.0 if (r, c) == start else 0.0 for c in range(board.size))
+        for r in range(board.size)
+    )
+
+
 def believed_cop_cell(belief: Grid, board: Board) -> Coordinate:
     """Return the single most-likely Cop cell, breaking ties by lowest row then column.
 

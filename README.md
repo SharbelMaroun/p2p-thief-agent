@@ -219,10 +219,12 @@ The game is a **decentralised, partially observable Markov decision process**.
   cryptography rather than trust — and under `THIEF-002` this repository is developed
   without access to the companion peer at all, so the opponent is genuinely unknown.
 - **Partially observable.** The Thief never learns the Cop's position. Each turn it
-  observes its own position, the barriers it has discovered, the Cop's hint, and a
-  commitment hash. Barrier placement is disclosed, so the map of known obstacles grows
-  as the game proceeds — that is the Thief's main source of hard information, and it
-  arrives as a constraint rather than a location.
+  observes its own position, the barriers it has discovered, the Cop's hint, the Cop's
+  public **scent field**, and a commitment hash. Barrier placement is disclosed, so the
+  map of known obstacles grows as the game proceeds. From the scent and the hint the
+  Thief maintains a Bayesian **belief** — a probability distribution over where the Cop
+  might be, never the Cop's actual cell, so partial observability is preserved and the
+  belief never crosses the wire (see the strategy section).
 - **Markov decision process.** State is the two positions, the barrier field, and the
   step index; actions are `N`, `S`, `E`, `W`, `STAY`; transitions are deterministic
   given both actions. Rewards come from the fixed Appendix F table: capture pays the
@@ -471,7 +473,28 @@ audited from the log, while tuned weights cannot. The first definition of "trapp
 proved nearly vacuous — the cell just vacated is always a legal way back — and was
 replaced by "every exit leads back to the origin".
 
-This is the floor the graded strategy must beat, not the deliverable.
+**The belief model.** That lexicographic policy is the floor; the shipped strategy adds
+a Bayesian **belief** over the Cop's position and flees it. Each turn the Thief updates
+a probability distribution `b` over the grid — never the Cop's actual cell, so
+Zero-Trust holds — by Bayes, `posterior ∝ b × likelihood`, renormalised (a zero-evidence
+update falls back to uniform rather than dividing by zero). Two public observations form
+the likelihood:
+
+- the Cop's **scent** — the `smell_grid` it cannot help emitting — is a direct
+  likelihood over the Cop's recent cells;
+- a **natural-language hint** is decoded to a directional likelihood (common direction
+  words only, never a coordinate protocol), then **tempered by the sender's trust**:
+  `L_eff = t · L + (1 − t) · uniform`. Trust rises when a hint agrees with the scent and
+  falls when it contradicts it — a claimed direction with no scent residue is evidence of
+  a lie, so a peer that keeps lying moves the belief less and less.
+
+The **distance objective** is then the baseline's: the most likely Cop cell becomes the
+threat, and the policy maximises distance from it with every legality and determinism
+guarantee intact — a belief that misdirects can never produce an illegal move, and the
+language model never touches the decision. Against the blind baseline this more than
+doubles survival — **125 vs 52** steps over four fixed pursuit scenarios
+(`docs/PRD_strategy.md`, `results/strategy_comparison.json`). The formulas are in
+[docs/PRD_scent_belief.md](docs/PRD_scent_belief.md).
 
 ### 4. Learning curves
 

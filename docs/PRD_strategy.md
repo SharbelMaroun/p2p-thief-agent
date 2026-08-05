@@ -94,3 +94,52 @@ The move is always pure Python. The verbal layer (`verbal/hints.py`,
 [PRD_scent_belief](PRD_scent_belief.md)) is strictly separate: a zero-token template
 provider by default (`AF-t21`), natural-language only, within the agreed word limit, and
 never a coordinate channel (`AE-27`).
+
+## Per-turn decision cost (`M6-011`, measured 2026-08-04)
+
+One turn's decision — the belief update from a scent observation and a hint, then the
+evasive-move policy — is pure Python over the grid with no I/O, so it is bounded by
+construction. `scripts/benchmark_decision.py` measures it and writes
+`results/decision_benchmark.json`; `test_decision_benchmark.py` gates a loose worst-case
+bound so a slow machine cannot flake.
+
+| Grid | mean | worst | response budget |
+|---|---|---|---|
+| 7×7 (negotiated minimum) | ~0.9 ms | ~2 ms | 30 000 ms |
+| 20×20 | ~1.5 ms | ~3.5 ms | 30 000 ms |
+
+The decision spends roughly **four orders of magnitude** under the 30 s response timeout
+(`network_and_league.response_timeout_sec`), so computational fairness is never in doubt —
+the Thief cannot stall, and its move never risks the deadline. Feeds `M9-006`.
+
+## Belief-driven evasion vs the blind baseline (`M6-015`, measured 2026-08-04)
+
+A deterministic greedy Cop chases the Thief across four fixed start scenarios on the 7×7
+grid (`M6-015a`). The Cop deposits scent it cannot suppress; the Thief either ignores it
+(blind baseline) or senses it and flees the believed Cop cell (belief-driven). Survival is
+the steps lasted, max 35 per scenario.
+
+| Policy | Total survival (4 × 35 = 140 max) |
+|---|---|
+| Blind baseline | 52 |
+| Belief-driven | 125 |
+
+Belief-driven evasion more than doubles survival, so it earns its place over the blind
+baseline (`M6-015b` — had it not, the number would say so and the policy would be reverted).
+Reproduce with `scripts/strategy_comparison.py` (`results/strategy_comparison.json`); the
+figure is gated by `test_strategy_comparison.py`. Feeds `M9-007a`.
+
+## Random-movement control (`M6-019`, measured 2026-08-04)
+
+Before belief is added, the deterministic baseline must beat chance. Against a random walk
+over legal moves (averaged across five fixed seeds, `M6-019a`) in the same pursuit harness:
+
+| Policy | Total survival (4 × 35 = 140 max) |
+|---|---|
+| Random legal movement | 39.6 (mean) |
+| Deterministic baseline | 52 |
+| Belief-driven | 125 |
+
+The baseline earns its keep over chance, and belief more than doubles it again — a clean
+hierarchy random < baseline < belief-driven. Gated by `test_random_control.py`; feeds
+`M9-007a` (`M6-019b`).

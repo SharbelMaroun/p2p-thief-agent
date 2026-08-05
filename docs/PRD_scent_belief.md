@@ -97,3 +97,88 @@ lie. Trust stays clipped to `[0, 1]`. How fast trust falls and whether it recove
 - Belief policy is a Thief-local design behind the SDK, not a transport concern.
 
 No scent or belief implementation is included in M1.
+
+## Board-level field and involuntary emission (`M6-007`, built 2026-08-03)
+
+`perception/field.py` lays the emission profile onto the whole board. `deposit(field,
+board, cell)` decays the field and stamps a fresh 5×5 emission at the agent's cell — it
+takes the *cell*, never the *action*, and carries no suppression flag, so a `STAY` re-emits
+exactly as a move does and no path can skip or fake the trail (`M6-007a`, `M6-007c`).
+`scent_likelihood(observed, board)` is the bridge into belief: it turns the **opponent's**
+observed field into a likelihood for `apply_evidence` (empty ⇒ uniform). The Thief's own
+`deposit` output is encoded outbound and never fed here — a guard proves the belief modules
+never touch the own-emission functions, so own scent can never become evidence (`M6-007b`).
+
+## Reference: belief update rule and the locked scent model (`M6-012`)
+
+### Belief update formulas (`M6-012a`)
+
+Let `b` be the current belief over the `R×C` grid (`Σ b = 1`) and `L` a likelihood from a
+public observation. The update is Bayes, renormalised (`perception/belief.apply_evidence`):
+
+```text
+posterior[i,j] = b[i,j] · L[i,j] / Σ_{k,l} b[k,l] · L[k,l]
+normalize(M)   = M / ΣM,  and if ΣM = 0 then normalize(M) = uniform   (M6-003c)
+```
+
+A scent observation becomes `L` by `scent_likelihood` (intensity per cell, normalised). A
+hint becomes `L` by `decode_hint`, then tempered by the sender's trust `t ∈ [0,1]` before it
+is applied (`perception/trust.trust_weighted`):
+
+```text
+L_eff = t · normalize(L_hint) + (1 − t) · uniform          (M6-003b)
+```
+
+Trust itself moves by the overlap of the hint with the Cop's own scent, against the overlap
+an uninformative hint would score (`perception/trust.update_trust`, `M6-003f`):
+
+```text
+agreement = Σ L_hint · b_scent
+signal    = clip(agreement / (1/(R·C)) − 1, −1, 1)
+t'        = clip(t + rate · signal, 0, 1)
+```
+
+The belief holds only a distribution — never the Cop's real cell — and the update takes no
+parameter for objective truth (`AE-8`, `AE-9`, proven by `test_belief.py`).
+
+### The locked scent model (`M6-012b`)
+
+`perception/scent_lock.scent_model_record` is the exact object hashed and locked at
+negotiation (`AE-23`). Its members are:
+
+```text
+model                                = "multiplicative-decay"
+update                               = "tau_next = max(0, (1 - decay_per_step) * tau + emission)"
+center_intensity                     = 0.9
+decay_per_step                       = 0.10
+field_size                           = 5
+emission_profile_by_squared_distance = {"0":0.90, "1":0.62, "2":0.20, "4":0.14, "5":0.04, "8":0.04}
+```
+
+`scent_model_hash = canonical_sha256(record)` — the same canonicalisation as the config and
+commitments, so the lock is byte-comparable. `with_scent_lock` stamps it into the signed
+terms; a peer running any other formula, constant, or profile (including a different `U-025`
+value for the squared-distance-5 ring) produces a different hash and is refused by name
+before the first move.
+
+## Offering the scent implementation for parity (`M6-018`)
+
+Book §6 recommends sharing the scent source so both peers run identical logic.
+`perception/scent.py` depends on nothing in this project (only `from __future__`), so it is
+a self-contained reference unit that can be offered to an opponent verbatim — proven by
+`test_scent_shareable.py`. A classmate who adopts it, or reproduces the model in "The locked
+scent model" above, produces byte-identical fields; the `M6-005` lock then verifies that
+parity at negotiation and refuses a mismatch before the first move. Under `THIEF-002` the
+offer is one-directional: this repository publishes its scent logic and its hash and consumes
+nothing from the opponent's repository.
+
+## Trust-decay policy for repeated lies (`M6-027`)
+
+Trust moves linearly and symmetrically (`perception/trust.update_trust`). A hint whose
+directional claim fully contradicts the Cop's scent scores a signal of `−1` and drops trust
+by `rate` (default `0.2`); a fully corroborated hint scores `+1` and raises it by `rate`;
+partial agreement moves it proportionally. Both ends are clipped to `[0, 1]`, so about
+`1/rate` ≈ **five** consecutive lies drive trust to the floor, and a low-trust hint barely
+moves belief (`L_eff = t·L + (1−t)·uniform`). Trust **recovers**: a peer that lied can rebuild
+it by telling the truth, at the same rate — one bad hint is not a life sentence. Pinned by
+`test_trust_decay.py`.

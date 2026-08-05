@@ -7,11 +7,15 @@ the boundary/rejection cases a hostile or buggy peer would hit.
 
 import pytest
 
+from p2p_thief_agent.domain.board import Board
 from p2p_thief_agent.perception.observation import (
+    SCENT_PRECISION,
     ObservationError,
     encode_smell_grid,
     parse_smell_grid,
 )
+
+BOARD = Board(size=7)
 
 
 def test_it_parses_the_wire_shape_into_a_cell_map() -> None:
@@ -65,3 +69,30 @@ def test_a_malformed_grid_is_rejected_by_name(bad: dict) -> None:
 def test_a_non_object_grid_is_rejected() -> None:
     with pytest.raises(ObservationError, match="must be an object"):
         parse_smell_grid([("0,0", 0.9)])
+
+
+def test_an_on_board_cell_is_accepted_against_the_negotiated_grid() -> None:
+    assert parse_smell_grid({"6,6": 0.14}, BOARD) == {(6, 6): 0.14}
+
+
+def test_an_off_board_cell_is_rejected_against_the_negotiated_grid() -> None:
+    """`M6-006b`: an opponent's field is untrusted and cannot carry an impossible cell."""
+    with pytest.raises(ObservationError, match="off the 7x7 board"):
+        parse_smell_grid({"7,0": 0.9}, BOARD)
+
+
+def test_encoding_rounds_to_the_pinned_precision() -> None:
+    """`M6-006c`: two fields differing below the precision serialise to identical bytes."""
+    noisy = {(0, 0): 0.5 + 10 ** -(SCENT_PRECISION + 2)}
+    assert encode_smell_grid(noisy) == encode_smell_grid({(0, 0): 0.5}) == {"0,0": 0.5}
+
+
+def test_a_below_precision_intensity_is_omitted_as_silent() -> None:
+    assert encode_smell_grid({(0, 0): 10 ** -(SCENT_PRECISION + 2)}) == {}
+
+
+def test_the_wire_form_is_idempotent_under_re_encoding() -> None:
+    """`M6-006`: a field survives the round trip without precision drift."""
+    field = {(0, 0): 0.9, (3, 4): 0.020000, (6, 6): 0.04}
+    once = encode_smell_grid(field)
+    assert encode_smell_grid(parse_smell_grid(once, BOARD)) == once
