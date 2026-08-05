@@ -34,6 +34,12 @@ MINIMUM_TERMS: dict[str, int] = {"board_size": 7, "max_steps": 35, "barriers_max
 
 OFFER_FIELDS = ("terms", "nonce", "signature")
 
+# The negotiation member carrying the rule-23 scent lock. Named here rather than
+# imported from `perception`, so the protocol layer never depends on the physics it
+# only transports — a wire module that needed the decision layer to parse a message
+# could not be used without it.
+SCENT_LOCK_FIELD = "scent_model_hash"
+
 
 class AgreementError(ValueError):
     """Raised when an offer is malformed, unsigned, or not acceptable to play."""
@@ -75,13 +81,25 @@ def validate_participants(participants: object, group_id: object = None) -> None
         raise AgreementError(f"group {group_id!r} is not one of the participants")
 
 
-def accept_offer(message: Mapping, my_terms: Mapping) -> dict:
+def accept_offer(
+    message: Mapping,
+    my_terms: Mapping,
+    *,
+    expected_scent_lock: str | None = None,
+) -> dict:
     """Return the agreed terms, or raise naming exactly what stops the match.
 
     The order is deliberate. Structure first, because nothing else can be trusted
     without it; then the signature, so the terms being judged are the ones the
     opponent actually committed to; then Appendix F, which is absolute; and only
     then equality with our own terms, which is the one an opponent can fix.
+
+    `expected_scent_lock` is our Appendix E rule 23 scent-model hash, passed in as a
+    plain value so this layer stays free of the physics that produced it. It is
+    checked **last** and leniently: an offer carrying no lock is accepted, because the
+    pinned simulator publishes none and rule 23 sanctions a *deviation* rather than a
+    silence, while a lock that differs from ours means the two peers would emit
+    different fields and is refused before the first move.
     """
     for field in OFFER_FIELDS:
         if field not in message:
@@ -98,7 +116,19 @@ def accept_offer(message: Mapping, my_terms: Mapping) -> dict:
     differing = differing_terms(my_terms, terms)
     if differing:
         raise AgreementError(f"agreed terms differ on: {', '.join(differing)}")
+    check_scent_lock(message.get(SCENT_LOCK_FIELD), expected_scent_lock)
     return dict(terms)
+
+
+def check_scent_lock(offered: object, expected: str | None) -> None:
+    """Tolerate an absent scent lock; refuse one that disagrees with ours (`AE-23`)."""
+    if expected is None or offered is None:
+        return
+    if offered != expected:
+        raise AgreementError(
+            f"{SCENT_LOCK_FIELD} differs: offer carries {offered!r}, expected {expected!r}; "
+            "Appendix E rule 23 cancels a game on an emission-model deviation"
+        )
 
 
 def signed_offer_is_valid(message: Mapping) -> bool:

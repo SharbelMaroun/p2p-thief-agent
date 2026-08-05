@@ -1,48 +1,71 @@
 """Lock the scent model to a hash both peers must match before play (`M6-005`, `AE-23`).
 
-Appendix E rule 23 makes a scent-model deviation cancel the game, so both peers must run
-byte-identical emission and decay. The three FIXED parameters (centre, decay, field size)
-are already compared as agreed terms — but the **formula** and the **radial emission
-profile** are not on the wire, so two peers could share the parameters yet emit different
-fields. This module canonicalises the whole model — formula, constants, field size, and the
-full book-Figure-4 profile including the `U-025` provisional — into one record and hashes it
-with the same `canonical_sha256` the config and commitments use, so the lock is
-byte-comparable.
+Appendix E rule 23 verbatim: *"Lock the cryptographic hash of the scent model before the
+start of the game. Sanction: Deviation from the formula cancels the game."* The book's
+boxed section (PDF p.31, `inst/police_thief_p2p_Summary.md:1043-1048`) gives the method:
+the parties agree the emission and decay model, verify they **interpret it identically**
+against a concrete numerical example, then lock the agreement with a SHA-256 hash so any
+later deviation is immediately detectable. It also *recommends* — not mandates —
+exchanging the scent mechanism's source code.
 
-`with_scent_lock` stamps that hash into a match's agreed terms; from there the ordinary
-agreement gate (`protocol/agreement.accept_offer`) compares it and refuses **by name** on
-any mismatch, before the first move (`M6-005b`). The locked formula follows the corrected
-reading — at ρ = 0.10 the factor `(1 − ρ)` *retains* 90% of prior scent; the book's p.43
-"reduced by 90%" and p.46 saturation prose are arithmetic errors (`C-014`, `C-015`) and are
-not implemented (`M6-005c`).
+The three FIXED parameters (centre, decay, field size) are already compared as agreed
+terms, and comparing them is **not enough**: two peers can hold identical constants and
+still emit different fields, because the **formula** and the **radial profile** never
+cross the wire on their own. That is exactly where `U-025` sits — the eight cells at
+squared distance 5 have no book value, so absent a lock each peer picks one privately.
+
+So the whole model — formula, constants, field size, and the complete 25-cell profile
+including the negotiated ring — canonicalises into one record and hashes with the same
+`canonical_sha256` the config and commitments use.
+
+**The record shape is the interop contract.** Its member names are what let two
+independently written peers reach the same digest; changing a key is a contract
+revision, not a refactor.
+
+**Tolerate omission, refuse a mismatch.** We always publish our lock. A peer that
+publishes none is still played: the pinned simulator carries no standalone scent hash,
+folding its pheromone terms into `config_sha256` instead, so requiring one would refuse
+every simulator-built classmate — and rule 23 sanctions a *deviation*, not a silence. A
+peer that publishes a **different** lock is refused before the first move, because that
+is the deviation rule 23 cancels the game for.
+
+The locked formula follows the corrected reading — at ρ = 0.10 the factor `(1 − ρ)`
+*retains* 90% of prior scent; the book's p.43 "reduced by 90%" and p.46 saturation prose
+are arithmetic errors (`C-014`, `C-015`) and are not implemented (`M6-005c`).
 """
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-
 from p2p_thief_agent.perception.scent import (
     _CONFIRMED_EMISSION,
-    _PROVISIONAL_D2_5,
     DECAY_RATE,
+    DEFAULT_OUTER_RING_DELTA,
     EMISSION_CENTER,
     FIELD_SIZE,
+    OUTER_RING_SQUARED_DISTANCE,
+    require_outer_ring,
 )
 from p2p_thief_agent.protocol.crypto import canonical_sha256
 
-# The agreed-terms key the lock rides in, so the config signature covers it.
-SCENT_MODEL_TERM = "scent_model_hash"
+# Negotiation-message members the lock rides in. They sit **outside** the signed terms,
+# for the same reason `config_sha256` does: a peer publishing no lock must stay playable.
+SCENT_LOCK_FIELD = "scent_model_hash"
+SCENT_OUTER_RING_FIELD = "scent_outer_ring_delta"
 
 
-def scent_model_record() -> dict:
-    """Return the canonical description of the confirmed scent model (`M6-005a`).
+class ScentLockError(ValueError):
+    """Raised when a peer's scent model does not match the model we locked (`AE-23`)."""
 
-    One record carries the formula, the FIXED constants, the field size, and the emission
-    profile keyed by squared distance — including the `U-025` provisional, so a later ruling
-    on those eight cells changes the lock and forces both peers to re-agree.
+
+def scent_model_record(outer_ring: float = DEFAULT_OUTER_RING_DELTA) -> dict:
+    """Return the canonical description of the scent model this peer will run.
+
+    Keyed by squared distance rather than by cell offset: the model is radially
+    symmetric, and a per-offset record would let two peers agree on the physics yet
+    disagree on the digest purely through how they spell a key.
     """
     profile = {str(distance): value for distance, value in _CONFIRMED_EMISSION.items()}
-    profile["5"] = _PROVISIONAL_D2_5
+    profile[str(OUTER_RING_SQUARED_DISTANCE)] = require_outer_ring(outer_ring)
     return {
         "model": "multiplicative-decay",
         "update": "tau_next = max(0, (1 - decay_per_step) * tau + emission)",
@@ -53,34 +76,53 @@ def scent_model_record() -> dict:
     }
 
 
-def scent_model_hash() -> str:
+def scent_model_hash(outer_ring: float = DEFAULT_OUTER_RING_DELTA) -> str:
     """Return the SHA-256 lock over the canonical scent-model record."""
-    return canonical_sha256(scent_model_record())
+    return canonical_sha256(scent_model_record(outer_ring))
 
 
-def with_scent_lock(terms: Mapping) -> dict:
-    """Return the agreed terms with the scent-model lock stamped in (`M6-005b`).
+def scent_lock_fields(outer_ring: float = DEFAULT_OUTER_RING_DELTA) -> dict:
+    """Return the negotiation-message members that publish our lock (`M6-005b`)."""
+    return {
+        SCENT_LOCK_FIELD: scent_model_hash(outer_ring),
+        SCENT_OUTER_RING_FIELD: require_outer_ring(outer_ring),
+    }
 
-    A peer running a different emission profile or formula produces a different hash, so the
-    agreement gate names `scent_model_hash` as the differing term and refuses the match.
+
+def verify_peer_scent_lock(
+    offered: object,
+    *,
+    outer_ring: float = DEFAULT_OUTER_RING_DELTA,
+) -> None:
+    """Accept an absent lock; refuse one that disagrees with ours (`AE-23`).
+
+    `None` is silence, not deviation — and the reference implementation is silent here.
+    A present-but-different lock means the two peers would emit different fields from
+    the same cell, which rule 23 cancels the game for, so it is caught before the first
+    move rather than at the audit.
     """
-    return {**dict(terms), SCENT_MODEL_TERM: scent_model_hash()}
+    if offered is None:
+        return
+    expected = scent_model_hash(outer_ring)
+    if offered != expected:
+        raise ScentLockError(
+            f"scent model lock mismatch: peer carries {offered!r}, expected {expected!r}; "
+            "Appendix E rule 23 cancels a game on an emission-model deviation"
+        )
 
 
-class ScentLockError(ValueError):
-    """Raised when the running scent model does not match the model locked at negotiation."""
+def assert_scent_locked(
+    agreed_hash: object,
+    *,
+    outer_ring: float = DEFAULT_OUTER_RING_DELTA,
+) -> None:
+    """Runtime check: the model about to run still matches what was locked (`M6-022`).
 
-
-def assert_scent_locked(agreed_hash: object) -> None:
-    """Runtime check: the running scent model must still match the locked hash (`M6-022`).
-
-    Recomputes the model hash from the code that will actually emit and observe, and compares
-    it to the hash agreed at negotiation. Called at sub-game start (where the agreed terms
-    hold `scent_model_hash`), so a code change that drifts this peer's physics from the agreed
-    model fails loudly here rather than silently emitting fields the opponent's audit would
-    reject (`AE-23`).
+    Recomputed from the code that will actually emit and observe, so a later edit that
+    drifts this peer's physics from the agreed model fails loudly here instead of
+    silently emitting fields the opponent's audit would reject.
     """
-    running = scent_model_hash()
+    running = scent_model_hash(outer_ring)
     if running != agreed_hash:
         raise ScentLockError(
             f"running scent model {running} does not match the locked model {agreed_hash!r}"

@@ -29,6 +29,8 @@ from p2p_thief_agent.orchestration.polling import (
     TakeTurn,
     poll_for_turn,
 )
+from p2p_thief_agent.perception.scent import DEFAULT_OUTER_RING_DELTA
+from p2p_thief_agent.perception.scent_lock import scent_lock_fields, scent_model_hash
 from p2p_thief_agent.protocol.agreement import AgreementError, accept_offer
 from p2p_thief_agent.protocol.crypto import CryptoError
 from p2p_thief_agent.protocol.handshake import Handshake
@@ -62,6 +64,7 @@ def negotiate_match(
     timeout: float,
     poll_interval: float = DEFAULT_POLL_INTERVAL,
     heartbeat: Heartbeat | None = None,
+    scent_outer_ring: float = DEFAULT_OUTER_RING_DELTA,
 ) -> AgreedMatch:
     """Send our signed offer, await the opponent's, verify both ways, and agree.
 
@@ -70,8 +73,14 @@ def negotiate_match(
     what names a refusal an opponent can act on. `Handshake.verify_peer` then binds the
     opponent's identity into this peer's handshake and re-confirms the signature covers
     *our* terms. Silence before the deadline is a refusal, not patience (`AE-6`).
+
+    Our Appendix E rule 23 scent lock is **published** on the offer and **compared**
+    against the opponent's when it sends one (`M6-005b`). It rides beside the signed
+    terms rather than inside them so a peer that publishes no lock — the pinned
+    simulator does not — is still playable, while a peer whose emission model differs
+    from ours is refused before a first move exists.
     """
-    send_offer(handshake.signed())
+    send_offer({**handshake.signed(), **scent_lock_fields(scent_outer_ring)})
     offer = poll_for_turn(
         take_offer, clock=clock, sleep=sleep, timeout=timeout,
         poll_interval=poll_interval, heartbeat=heartbeat,
@@ -79,7 +88,9 @@ def negotiate_match(
     if offer is None:
         raise NegotiationError("opponent sent no signed offer before the deadline")
     try:
-        agreed = accept_offer(offer, my_terms)
+        agreed = accept_offer(
+            offer, my_terms, expected_scent_lock=scent_model_hash(scent_outer_ring)
+        )
         handshake.verify_peer(offer)
     except (AgreementError, CryptoError) as exc:
         raise NegotiationError(f"refused the match: {exc}") from exc

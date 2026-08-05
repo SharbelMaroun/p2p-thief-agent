@@ -449,15 +449,70 @@ bind a port another process already holds, which is exactly the condition the fu
 exists to detect. A test that held a port and asserted the raise caught it. A
 detection probe wants the strictest bind available, not the most permissive.
 
-*Still not built (`M5-019f`).* Negotiation-to-first-move sequencing — send offer, poll
-for the counter-signature, verify both directions, then play. The reference confirms
-play starts only after both verifications pass; the book adds that Step-0 must be
-exchanged and mutually signed and that the pre-game declaration is written after
-negotiation but before play. No `serve` command is wired until that lands, because a
-`serve` that comes up and mailboxes without playing is the passive server rejected on
-2026-08-01 in the companion repository. **Thief-specific:** once negotiation
-completes this peer must send step 1 without waiting, because it opens every
-cycle — a Thief that waits deadlocks against a Cop correctly waiting for it.
+*Since closed (`M5-019f`).* Negotiation-to-first-move sequencing now exists in
+`orchestration/negotiation.py`: send the signed offer, poll the agreements mailbox,
+verify both directions, then open play — and because this peer opens every cycle, step 1
+goes out without waiting. The paragraph that stood here said it was not built; that was
+true when written and is no longer.
+
+#### The scent lock that would have refused everyone (`M6-005`, 2026-08-05)
+
+This repository already had a rule-23 scent lock, and reviewing it against a real
+opponent showed it was built to fail in the one situation it existed for.
+
+The lock was stamped **into the signed terms** by `with_scent_lock`, and `accept_offer`
+compares terms over the *union* of both peers' key sets — so any opponent whose offer
+lacked `scent_model_hash` was refused by name. The pinned reference simulator sends no
+such key: it has no standalone scent hash at all, folding its pheromone parameters into
+`config_sha256` instead. Every classmate who built on the reference would have been
+turned away before the first move, over a message they had no reason to send, and the
+refusal would have named a term they had never heard of.
+
+So the lock moved **beside** the signed terms and became lenient in exactly one
+direction: a peer publishing **no** lock is played, a peer publishing a **different**
+one is refused. Appendix E rule 23 sanctions a *deviation from the formula* — silence is
+not deviation. This mirrors the rule already settled for `config_sha256`.
+
+The second half was subtler. `scent_model_hash()` took no arguments: it hashed this
+module's own constants. Hashing your own constant proves only that you have not edited
+your own file — it says nothing about the opponent. The eight cells at squared distance
+5 that book Figure 4 never names (`U-025`) were a private constant inside that hash, so
+two peers could only ever agree by coincidence. They are now a **negotiated parameter**
+with a published default carrying no book authority, and the lock covers the agreed
+model rather than our private one.
+
+*Why `U-025` was never going to be ruled on.* It had sat open awaiting a decision. But
+Figure 4 names five radial classes covering 17 of 25 cells and gives these eight
+**nothing**, so there was no evidence for anyone to weigh. The book answers a different
+question instead (p. 31): agree the emission and decay model, confirm both sides read it
+identically, lock it with SHA-256 — and it *recommends* handing the opponent your scent
+source, which `perception/scent.py` is already structured to allow (`M6-018`). An
+unknown that no source can answer is not a blocked task; it is a design input.
+
+*Problem hit.* The book notebook, asked what Figure 4 prints and told explicitly not to
+interpolate, answered that **all 25** cells are printed, with diagonals at `0.42` and
+the unnamed ring at `0.14`. `inst/police_thief_p2p_Summary.md:947-955` says five
+classes, 17 cells, diagonals `0.20`. It had invented a sixth class and shifted the whole
+ladder to cover the gap it was asked about. The mandatory `inst/` cross-check is what
+caught it; without that step a correct emission table would have been replaced by a
+fabricated one, with the tests rewritten to agree.
+
+*A second guard earned its keep.* `M6-018` asserts `perception/scent.py` imports nothing
+at all, so the module can be handed to an opponent as the book recommends. It failed on
+a **docstring line beginning with the word "from"** — a crude check catching a real
+property, which is the trade a shareability guard should make.
+
+*The evidence.* The companion Cop peer, written independently, produces the identical
+digest `416a57e1…`. Two implementations agreeing is the difference between an
+interoperability contract and a number we hash alone and trust.
+
+*Still open, and deliberately not folded in.* `min_center_intensity`. The reference
+**requires** it and its `validate_agreement` fail-fast aborts without it; this peer
+still refuses an offer that carries it (`U-023`, decided on the grounds that Appendix F
+table 16 has three rows and no floor). Interoperability is not decided by authority
+though — it is decided by what crosses the socket — so this remains a live mutual
+incompatibility with any simulator-built opponent. It is a separate question, and
+burying it inside a scent change would have hidden it.
 
 ### 3. The implemented strategy
 

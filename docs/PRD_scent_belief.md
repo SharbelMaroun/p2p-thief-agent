@@ -156,10 +156,32 @@ emission_profile_by_squared_distance = {"0":0.90, "1":0.62, "2":0.20, "4":0.14, 
 ```
 
 `scent_model_hash = canonical_sha256(record)` — the same canonicalisation as the config and
-commitments, so the lock is byte-comparable. `with_scent_lock` stamps it into the signed
-terms; a peer running any other formula, constant, or profile (including a different `U-025`
-value for the squared-distance-5 ring) produces a different hash and is refused by name
-before the first move.
+commitments, so the lock is byte-comparable. A peer running any other formula, constant, or
+profile (including a different value for the squared-distance-5 ring) produces a different
+hash and is refused by name before the first move.
+
+**Where the lock rides, and why it is lenient (revised 2026-08-05).** `scent_lock_fields()`
+publishes the hash **beside** the signed terms, not inside them, and `accept_offer` compares
+it through `expected_scent_lock`. The earlier design stamped it *into* the terms, and that
+was wrong for league play: `differing_terms` compares the union of both key sets, so every
+opponent that did not send `scent_model_hash` was refused — and the pinned simulator sends
+none, folding its pheromone parameters into `config_sha256` instead. The rule is therefore
+**tolerate omission, refuse a mismatch**, matching how `config_sha256` is already handled:
+Appendix E rule 23 sanctions a *deviation from the formula*, not the absence of a message.
+
+**The squared-distance-5 ring is negotiated, not assumed.** Book Figure 4
+(`inst/police_thief_p2p_Summary.md:947-955`) names five radial classes covering **17 of 25**
+cells and gives these eight none, so no value for them can be derived from any source —
+which is why `U-025` was closed by agreement rather than by a ruling. `DEFAULT_OUTER_RING_DELTA`
+(`0.04`) carries **no book authority**; it is this peer's opening offer, and the lock is what
+makes a disagreement visible before the first move instead of at an audit worth zero to both
+sides. The book prescribes exactly this (PDF p. 31): agree the emission and decay model,
+confirm both sides interpret it identically, then lock it.
+
+The record above is the **interop contract**. Its digest
+`416a57e17434ef21b3209052198a27a0d46e7a0e09fdaa5df3b61e4a8f2711ea` is reproduced exactly by
+the independently written companion Cop peer — which is the only evidence that locking a
+model is worth anything at all.
 
 ## Offering the scent implementation for parity (`M6-018`)
 
