@@ -528,7 +528,7 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M6-019 | Prove evasion improves survival over random legal movement | DONE | `test_random_control.py`: the deterministic baseline survives **52** vs a random legal walk's **39.6** (mean over five seeds) in the `M6-015` pursuit harness — chance is beaten before belief is added. Both sub-tasks below |
 | M6-019a | Establish the random-legal-move control | DONE | A seeded `random.Random` legal-move walk over five fixed seeds (0–4), averaged for a stable comparison across the four fixed pursuit scenarios |
 | M6-019b | Record survival rate for each policy | DONE | `PRD_strategy.md` §"Random-movement control" records the clean hierarchy random 39.6 < baseline 52 < belief-driven 125; feeds `M9-007a` |
-| M6-020 | Handle the belief update when the Cop is provably adjacent | PENDING | Certainty collapses the distribution without breaking normalisation |
+| M6-020 | Handle the belief update when the Cop is provably adjacent | DONE | `test_belief_adjacent.py`: a `0.9` scent reading at an adjacent cell (the emission centre — proof the Cop stands there) collapses belief to a near-point-mass on that cell, yet it still sums to 1 and never divides by zero, and the Thief flees with a legal move that strictly increases distance from the Cop |
 | M6-021 | Handle the first turn with no prior observation | PENDING | The agreed start positions are public; belief begins there |
 | M6-022 | Keep scent physics identical to the locked model at run time | PENDING | A runtime assertion compares against the locked hash `[AE-23]` |
 | M6-023 | Bound belief memory across a long series | PENDING | No unbounded history accumulation over six sub-games |
