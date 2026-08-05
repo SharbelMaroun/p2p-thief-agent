@@ -10,6 +10,7 @@ import pytest
 from p2p_thief_agent.services.gatekeeper import (
     Gatekeeper,
     GatekeeperError,
+    guard,
     limits_from_match,
 )
 
@@ -108,3 +109,17 @@ def test_completing_more_than_was_started_cannot_go_negative() -> None:
     gate = Gatekeeper()
     gate.complete()
     assert gate.queue_status().in_flight == 0
+
+
+def test_guard_routes_a_call_through_the_gate_and_frees_the_slot() -> None:
+    """`M7-003a`: guard admits, runs the call, and always releases its concurrency slot."""
+    gate = Gatekeeper(requests_per_minute=30, concurrent_requests=1, queue_depth=10)
+    assert guard(gate, lambda: "sent", now=0.0) == "sent"
+    assert gate.queue_status().in_flight == 0  # the slot was freed for the next call
+
+
+def test_guard_refuses_when_the_call_would_be_queued() -> None:
+    gate = Gatekeeper(requests_per_minute=30, concurrent_requests=1, queue_depth=10)
+    gate.submit("holding the only slot", now=0.0)
+    with pytest.raises(GatekeeperError, match="queued"):
+        guard(gate, lambda: "sent", now=0.0)
