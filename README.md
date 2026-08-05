@@ -514,6 +514,31 @@ though — it is decided by what crosses the socket — so this remains a live m
 incompatibility with any simulator-built opponent. It is a separate question, and
 burying it inside a scent change would have hidden it.
 
+#### A false claim in our own ledger (`C-024` follow-up, 2026-08-06)
+
+While the companion Cop built its scent-wire layer, the two implementations were
+compared — and this repository's `M6-006c` row was found to justify a correct decision
+with a **wrong reason**.
+
+The row said rounding every intensity to six decimal places gives byte-identical
+serialisation on both peers, "the property the locked scent-model hash depends on."
+It does not. `scent_model_record()` contains exactly `model`, `update`,
+`center_intensity`, `decay_per_step`, `field_size`, and
+`emission_profile_by_squared_distance` — the **model**, never an emitted value. Verified
+by inspection. No lock and no interoperability property rests on the rounding, and a peer
+that rounds differently is still fully conformant.
+
+The rounding stays, because deterministic artifacts and readable logs are worth having.
+The justification is corrected, because a row that credits a cryptographic guarantee to
+something that does not provide it is how a future reader builds on sand — the same
+failure mode as the "FIFO queue depth" citation that turned out never to be in the book.
+
+*Also compared, and deliberately left alone.* This peer encodes a **sparse** grid with
+silent cells omitted; the Cop sends the **full** window including zeros, matching the
+reference. Both parsers accept both forms — verified by round-tripping each encoder
+through the other's parser — because an absent cell and a zero cell mean the same thing.
+The divergence is stylistic, so it is recorded rather than churned.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
