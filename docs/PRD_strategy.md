@@ -128,3 +128,18 @@ Belief-driven evasion more than doubles survival, so it earns its place over the
 baseline (`M6-015b` — had it not, the number would say so and the policy would be reverted).
 Reproduce with `scripts/strategy_comparison.py` (`results/strategy_comparison.json`); the
 figure is gated by `test_strategy_comparison.py`. Feeds `M9-007a`.
+
+## Random-movement control (`M6-019`, measured 2026-08-04)
+
+Before belief is added, the deterministic baseline must beat chance. Against a random walk
+over legal moves (averaged across five fixed seeds, `M6-019a`) in the same pursuit harness:
+
+| Policy | Total survival (4 × 35 = 140 max) |
+|---|---|
+| Random legal movement | 39.6 (mean) |
+| Deterministic baseline | 52 |
+| Belief-driven | 125 |
+
+The baseline earns its keep over chance, and belief more than doubles it again — a clean
+hierarchy random < baseline < belief-driven. Gated by `test_random_control.py`; feeds
+`M9-007a` (`M6-019b`).
