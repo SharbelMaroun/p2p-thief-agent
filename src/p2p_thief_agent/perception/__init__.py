@@ -34,6 +34,8 @@ from p2p_thief_agent.perception.scent import (
 )
 from p2p_thief_agent.perception.scent_lock import (
     SCENT_MODEL_TERM,
+    ScentLockError,
+    assert_scent_locked,
     scent_model_hash,
     scent_model_record,
     with_scent_lock,
@@ -52,8 +54,10 @@ __all__ = [
     "SCENT_MODEL_TERM",
     "BeliefError",
     "ObservationError",
+    "ScentLockError",
     "advance_field",
     "apply_evidence",
+    "assert_scent_locked",
     "blank_field",
     "consume_hint",
     "decode_hint",

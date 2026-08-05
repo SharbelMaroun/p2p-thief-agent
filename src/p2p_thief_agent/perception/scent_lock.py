@@ -65,3 +65,23 @@ def with_scent_lock(terms: Mapping) -> dict:
     agreement gate names `scent_model_hash` as the differing term and refuses the match.
     """
     return {**dict(terms), SCENT_MODEL_TERM: scent_model_hash()}
+
+
+class ScentLockError(ValueError):
+    """Raised when the running scent model does not match the model locked at negotiation."""
+
+
+def assert_scent_locked(agreed_hash: object) -> None:
+    """Runtime check: the running scent model must still match the locked hash (`M6-022`).
+
+    Recomputes the model hash from the code that will actually emit and observe, and compares
+    it to the hash agreed at negotiation. Called at sub-game start (where the agreed terms
+    hold `scent_model_hash`), so a code change that drifts this peer's physics from the agreed
+    model fails loudly here rather than silently emitting fields the opponent's audit would
+    reject (`AE-23`).
+    """
+    running = scent_model_hash()
+    if running != agreed_hash:
+        raise ScentLockError(
+            f"running scent model {running} does not match the locked model {agreed_hash!r}"
+        )
