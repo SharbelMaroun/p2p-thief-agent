@@ -564,14 +564,14 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-003d | Read every limit from configuration | DONE | `Gatekeeper.from_match` reads `requests_per_minute`/`concurrent_requests`/`queue_depth` from the signed match object's `rate_limiter_gatekeeper` (Appendix F table 19 `Minimum`s); no hard-coded rate `[G§7.2]` `[AF-t19]` |
 | M7-004 | Implement accepted private verbal-provider modes | DONE | `verbal/providers.py` (100% branch); `test_providers.py`. The default is the zero-token template (`M6-008`); `gated_model_provider` wraps an operator's model (Ollama/API/CLI) behind the **one** gatekeeper (`M7-003a`), and a mocked model routes through the gate. Sub-task below |
 | M7-004a | Fall back deterministically on provider failure | DONE | With the gate at capacity `guard` raises, and a failing model raises; either way `generate_hint` falls back to the token-free template, so a blocked or broken provider never stalls a turn; `test_a_blocked_provider_falls_back_to_the_template`, `test_a_failing_model_falls_back_to_the_template` |
-| M7-005 | Send the mutually agreed final JSON report through Gmail | PENDING | Mocked recipient/body/attachment/agreement tests |
-| M7-005a | Restrict the OAuth scope to `gmail.send` | PENDING | `[AE-30]`; no read or modify scope |
-| M7-005b | Keep `credentials.json` and `token.json` git-ignored | PENDING | `[AE-39]` `[AE-40]` |
-| M7-005c | Send JSON as an attachment only | PENDING | `[AE-33]` `[AE-34]`; free text is rejected |
-| M7-005d | Send to the confirmed reporting address | PENDING | `rmisegal+uoh26finalgame@gmail.com` per lecturer answer `AF-020`; the book's Table 20 spelling `rimesegal` is a source typo |
-| M7-005e | Back off on HTTP 429 | PENDING | Immediate resend risks account suspension `[book §12]` |
-| M7-005f | Run the full mutual audit before agreeing a result | PENDING | `[AE-36]` |
-| M7-005g | Send independently of the opponent | PENDING | `[AE-32]` `[AE-35]`; a side that does not send scores nothing |
+| M7-005 | Send the mutually agreed final JSON report through Gmail | DONE (mocked; live adapter = `U-009`) | `reporting/email_report.py` (100% branch); `test_email_report.py`. Compose + gated send + 429 backoff, transport **injected** and mocked in tests. The **live `gmail.send` adapter (OAuth, credentials) is `U-009`/`M7-013`** and not built here. Sub-tasks below |
+| M7-005a | Restrict the OAuth scope to `gmail.send` | DONE | `GMAIL_SEND_SCOPE = ".../auth/gmail.send"`; a test asserts no `readonly`/`modify` scope `[AE-30]` |
+| M7-005b | Keep `credentials.json` and `token.json` git-ignored | DONE | `.gitignore` covers `credentials.json`, `token.json`, `*credentials*.json`, `*token*.json` `[AE-39]` `[AE-40]` |
+| M7-005c | Send JSON as an attachment only | DONE | `compose_report` attaches the result as `application/json` (`result_<id>.json`); the body carries no report — `test_the_report_is_a_json_attachment_to_the_confirmed_address` `[AE-33]` `[AE-34]` |
+| M7-005d | Send to the confirmed reporting address | DONE | `REPORTING_ADDRESS = "rmisegal+uoh26finalgame@gmail.com"` (`AF-020`; Table 20 `rimesegal` is a typo) is the default recipient |
+| M7-005e | Back off on HTTP 429 | DONE | `send_report` catches `RateLimitError` (429), sleeps the backoff, and retries to the limit, then fails loudly; `test_a_429_is_backed_off_and_retried` `[book §12]` |
+| M7-005f | Run the full mutual audit before agreeing a result | PENDING | Result agreement follows the mutual audit — owned by `M7-016` `[AE-36]` |
+| M7-005g | Send independently of the opponent | DONE | `send_report` takes no opponent and never waits on one — a side that does not send scores nothing `[AE-32]` `[AE-35]` |
 | M7-006 | Implement the Quota Manager and DOS Detector gates | PENDING | Appendix E rules 28/29 and chapter 9 require **three** gates in series before any Gmail call: a daily Quota Manager, the token bucket (`M7-003`), and a DOS detector that locks the pipeline on runaway-send patterns. Fail-fast at the first rejecting gate; the lock is observable |
 | M7-006a | Implement the daily quota counter | PENDING | Exhausted quota stops all further sends |
 | M7-006b | Implement the DOS detector and pipeline lock | PENDING | Runaway-send patterns lock the pipeline `[AE-29]` |
