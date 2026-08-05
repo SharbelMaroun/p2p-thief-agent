@@ -160,3 +160,14 @@ commitments, so the lock is byte-comparable. `with_scent_lock` stamps it into th
 terms; a peer running any other formula, constant, or profile (including a different `U-025`
 value for the squared-distance-5 ring) produces a different hash and is refused by name
 before the first move.
+
+## Offering the scent implementation for parity (`M6-018`)
+
+Book §6 recommends sharing the scent source so both peers run identical logic.
+`perception/scent.py` depends on nothing in this project (only `from __future__`), so it is
+a self-contained reference unit that can be offered to an opponent verbatim — proven by
+`test_scent_shareable.py`. A classmate who adopts it, or reproduces the model in "The locked
+scent model" above, produces byte-identical fields; the `M6-005` lock then verifies that
+parity at negotiation and refuses a mismatch before the first move. Under `THIEF-002` the
+offer is one-directional: this repository publishes its scent logic and its hash and consumes
+nothing from the opponent's repository.
