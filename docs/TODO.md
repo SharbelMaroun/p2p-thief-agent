@@ -544,34 +544,34 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M7-001 | Orchestrate the accepted six-sub-game series lifecycle | PENDING | Series state/scoring tests |
-| M7-001a | Run six sub-games under one series identity | PENDING | `[AF-t18]`; `sub_game_number` carried into artifacts |
-| M7-001b | Implement the confirmed six-sub-game role schedule | PENDING | `U-021` closed 2026-07-29 on a coordinator-relayed lecturer answer: sub-games 1, 3, 5 natural role, 2, 4, 6 swapped, Thief moves first. Keep the schedule injected rather than hard-coded so a later correction is a one-line change; see `C-012` |
-| M7-001c | Aggregate cumulative series score | PENDING | Per-sub-game lines sum to a series result |
-| M7-001d | Apply the tie award on a cumulative tie | PENDING | `[AF-t17]` |
-| M7-002 | Build accepted declaration, config, log, and result artifacts | PENDING | Schema/link/hash tests |
-| M7-002a | Emit `declaration_<game_id>.json` | PENDING | Groups, members, both repos, MCP addresses, hardware, model, tokens, times |
-| M7-002b | Emit `config_<game_id>_g<NN>.json` | PENDING | Quantitative parameters plus crypto locks and identity |
-| M7-002c | Emit `log_<game_id>_g<NN>.json` | PENDING | Step-by-step commit-reveal, hashes, nonces |
-| M7-002d | Emit `result_<game_id>.json` | PENDING | Per-group scores and cumulative result; this is the emailed report |
-| M7-002e | Share one `game_uid` across all four artifacts | PENDING | Filenames derive from `game_id` `[AF-§3]` |
-| M7-002f | Carry four repository links in the result artifact | PENDING | `[AE-49]`; two per group |
-| M7-002g | Carry the per-game commit hash and total tokens | PENDING | `[AE-53]` `[AE-54]` |
-| M7-003 | Implement the centralized external-call gatekeeper | PENDING | FIFO/rate/retry/backpressure tests |
-| M7-003a | Route every external call through one gatekeeper | PENDING | No service calls an external API directly `[G§5.1]` |
-| M7-003b | Implement the token bucket | PENDING | `tokens ← min(C, tokens + r·Δt)`; allow iff `tokens ≥ 1` `[AE-28]` |
-| M7-003c | Queue overflow rather than rejecting | PENDING | FIFO to `queue_depth`, then backpressure `[G§5.3]` |
-| M7-003d | Read every limit from configuration | PENDING | No hard-coded rate values `[G§7.2]` `[AF-t19]` |
-| M7-004 | Implement accepted private verbal-provider modes | PENDING | Mocked provider/fallback tests |
-| M7-004a | Fall back deterministically on provider failure | PENDING | A blocked provider never stalls a turn |
-| M7-005 | Send the mutually agreed final JSON report through Gmail | PENDING | Mocked recipient/body/attachment/agreement tests |
-| M7-005a | Restrict the OAuth scope to `gmail.send` | PENDING | `[AE-30]`; no read or modify scope |
-| M7-005b | Keep `credentials.json` and `token.json` git-ignored | PENDING | `[AE-39]` `[AE-40]` |
-| M7-005c | Send JSON as an attachment only | PENDING | `[AE-33]` `[AE-34]`; free text is rejected |
-| M7-005d | Send to the confirmed reporting address | PENDING | `rmisegal+uoh26finalgame@gmail.com` per lecturer answer `AF-020`; the book's Table 20 spelling `rimesegal` is a source typo |
-| M7-005e | Back off on HTTP 429 | PENDING | Immediate resend risks account suspension `[book §12]` |
-| M7-005f | Run the full mutual audit before agreeing a result | PENDING | `[AE-36]` |
-| M7-005g | Send independently of the opponent | PENDING | `[AE-32]` `[AE-35]`; a side that does not send scores nothing |
+| M7-001 | Orchestrate the accepted six-sub-game series lifecycle | DONE | `orchestration/series.py` (100% branch); `test_series.py`. `run_thief_series` runs this team's Thief sub-games under one identity and aggregates the score. All four sub-tasks below |
+| M7-001a | Run six sub-games under one series identity | DONE | `run_thief_series(series_id, …)` carries the `series_id` and each `sub_game_number` into every `SubGameResult`; `NUM_SUB_GAMES = 6` `[AF-t18]` |
+| M7-001b | Implement the confirmed six-sub-game role schedule | DONE | The schedule is **injected** — `THIEF_SUBGAMES_NATURAL = (1,3,5)` / `THIEF_SUBGAMES_SWAPPED = (2,4,6)` (`U-021`), passed to `run_thief_series`, so a later correction is a one-line change; `test_the_swapped_schedule_is_injected_not_hard_coded` (`C-012`) |
+| M7-001c | Aggregate cumulative series score | DONE | Per-sub-game Thief scores (Appendix F table 17) sum to `SeriesResult.cumulative_score`; `test_a_natural_series_runs_its_thief_sub_games_under_one_identity` (10+10+5 = 25) |
+| M7-001d | Apply the tie award on a cumulative tie | DONE | A tied sub-game already pays the table's `TIE_SCORE` via `thief_score(Outcome.TIE)`; `is_cumulative_tie(a, b)` detects a level series total, which reporting settles (`M7-017`); `test_a_cumulative_tie_is_detected` `[AF-t17]` |
+| M7-002 | Build accepted declaration, config, log, and result artifacts | DONE (U-019-provisional) | `reporting/` builders for all four artifacts (each module 100% branch; `test_artifacts.py`, `test_artifact_naming.py`). **Schemas follow the documented, unauthenticated template — the coordinator authorised building against it 2026-08-05 pending a `U-019` ruling**, so the exact field set may still change. Naming/identity are book-confirmed. All sub-tasks below |
+| M7-002a | Emit `declaration_<game_id>.json` | DONE (U-019-prov.) | `reporting/declaration.build_declaration`: `_schema`/`schema_version`/`declaration_type`/identity/`links`/`timezone`/times/`num_sub_games`/`max_tokens_per_game`/`groups`, each group carrying members, both repos, `mcp_servers`, `llm_model`, `hardware_spec`, `signature`; validates the group and hardware key sets |
+| M7-002b | Emit `config_<game_id>_g<NN>.json` | DONE (U-019-prov.) | `reporting/config_artifact.build_config`: the seven documented sections plus `agreed_between`, identity, `sub_game_number`, and the `config_sha256` lock over the quantitative content |
+| M7-002c | Emit `log_<game_id>_g<NN>.json` | DONE (U-019-prov.) | `reporting/log_artifact.build_log`: `summary` + the step-by-step commit-reveal `records` (each `payload`/`nonce`/`commit`) + `mutual_agreement`, sufficient to recompute every commitment |
+| M7-002d | Emit `result_<game_id>.json` | DONE (U-019-prov.) | `reporting/result_artifact.build_result`: per-group blocks, per-sub-game lines, and the cumulative `final_result`; this is the emailed report |
+| M7-002e | Share one `game_uid` across all four artifacts | DONE | `MatchIdentity(game_id, game_uid)` is the one identity, `match_filenames` derives all four filenames from the single `game_id` (`AF-021`), and every builder now stamps the shared `game_uid`/`game_id` inside its artifact from that identity (`AR-001` / `AF-§3`) |
+| M7-002f | Carry four repository links in the result artifact | DONE (U-019-prov.) | `build_result` collects the four links (two per group, from each group's `repos`) into `links.repositories` and refuses anything other than four; `test_the_result_carries_four_repo_links_and_per_game_commit_and_tokens` `[AE-49]` |
+| M7-002g | Carry the per-game commit hash and total tokens | DONE (U-019-prov.) | Each result sub-game requires `github_commit` and `tokens`; a missing commit is refused (`test_a_result_missing_the_per_game_commit_is_rejected`) `[AE-53]` `[AE-54]` |
+| M7-003 | Implement the centralized external-call gatekeeper | DONE | `services/gatekeeper.py` (now token-bucket-based) + `services/token_bucket.py`; `test_gatekeeper.py`, `test_token_bucket.py`, `test_external_gatekeeper.py`. All four sub-tasks below |
+| M7-003a | Route every external call through one gatekeeper | DONE | `test_external_gatekeeper.py` walks `src/` and fails on any direct import of a Gmail/LLM API (googleapiclient, smtplib, openai, anthropic, …), so the Gmail (`M7-005`) and verbal (`M7-004`) paths must route through the one gatekeeper `[G§5.1]` |
+| M7-003b | Implement the token bucket | DONE | `services/token_bucket.TokenBucket` implements `AE-28` exactly — `tokens ← min(C, tokens + r·Δt)`, admit iff `tokens ≥ 1`, consume on admit — wired into the gatekeeper's rate decision (`requests_per_minute` tokens refilling at `rpm/60`/s); `test_token_bucket.py` (100% branch) `[AE-28]` |
+| M7-003c | Queue overflow rather than rejecting | DONE | Overflow is **queued, not rejected** — `submit` returns `False` and enqueues to `queue_depth`, and only a genuinely full queue raises `GatekeeperError`; `drain` releases as rate and concurrency allow `[G§5.3]` |
+| M7-003d | Read every limit from configuration | DONE | `Gatekeeper.from_match` reads `requests_per_minute`/`concurrent_requests`/`queue_depth` from the signed match object's `rate_limiter_gatekeeper` (Appendix F table 19 `Minimum`s); no hard-coded rate `[G§7.2]` `[AF-t19]` |
+| M7-004 | Implement accepted private verbal-provider modes | DONE | `verbal/providers.py` (100% branch); `test_providers.py`. The default is the zero-token template (`M6-008`); `gated_model_provider` wraps an operator's model (Ollama/API/CLI) behind the **one** gatekeeper (`M7-003a`), and a mocked model routes through the gate. Sub-task below |
+| M7-004a | Fall back deterministically on provider failure | DONE | With the gate at capacity `guard` raises, and a failing model raises; either way `generate_hint` falls back to the token-free template, so a blocked or broken provider never stalls a turn; `test_a_blocked_provider_falls_back_to_the_template`, `test_a_failing_model_falls_back_to_the_template` |
+| M7-005 | Send the mutually agreed final JSON report through Gmail | DONE (mocked; live adapter = `U-009`) | `reporting/email_report.py` (100% branch); `test_email_report.py`. Compose + gated send + 429 backoff, transport **injected** and mocked in tests. The **live `gmail.send` adapter (OAuth, credentials) is `U-009`/`M7-013`** and not built here. Sub-tasks below |
+| M7-005a | Restrict the OAuth scope to `gmail.send` | DONE | `GMAIL_SEND_SCOPE = ".../auth/gmail.send"`; a test asserts no `readonly`/`modify` scope `[AE-30]` |
+| M7-005b | Keep `credentials.json` and `token.json` git-ignored | DONE | `.gitignore` covers `credentials.json`, `token.json`, `*credentials*.json`, `*token*.json` `[AE-39]` `[AE-40]` |
+| M7-005c | Send JSON as an attachment only | DONE | `compose_report` attaches the result as `application/json` (`result_<id>.json`); the body carries no report — `test_the_report_is_a_json_attachment_to_the_confirmed_address` `[AE-33]` `[AE-34]` |
+| M7-005d | Send to the confirmed reporting address | DONE | `REPORTING_ADDRESS = "rmisegal+uoh26finalgame@gmail.com"` (`AF-020`; Table 20 `rimesegal` is a typo) is the default recipient |
+| M7-005e | Back off on HTTP 429 | DONE | `send_report` catches `RateLimitError` (429), sleeps the backoff, and retries to the limit, then fails loudly; `test_a_429_is_backed_off_and_retried` `[book §12]` |
+| M7-005f | Run the full mutual audit before agreeing a result | PENDING | Result agreement follows the mutual audit — owned by `M7-016` `[AE-36]` |
+| M7-005g | Send independently of the opponent | DONE | `send_report` takes no opponent and never waits on one — a side that does not send scores nothing `[AE-32]` `[AE-35]` |
 | M7-006 | Implement the Quota Manager and DOS Detector gates | PENDING | Appendix E rules 28/29 and chapter 9 require **three** gates in series before any Gmail call: a daily Quota Manager, the token bucket (`M7-003`), and a DOS detector that locks the pipeline on runaway-send patterns. Fail-fast at the first rejecting gate; the lock is observable |
 | M7-006a | Implement the daily quota counter | PENDING | Exhausted quota stops all further sends |
 | M7-006b | Implement the DOS detector and pipeline lock | PENDING | Runaway-send patterns lock the pipeline `[AE-29]` |

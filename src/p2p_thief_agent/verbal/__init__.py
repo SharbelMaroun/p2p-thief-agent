@@ -16,12 +16,20 @@ from p2p_thief_agent.verbal.hints import (
     template_hint,
     validate_hint,
 )
+from p2p_thief_agent.verbal.providers import (
+    MODEL_MODE,
+    TEMPLATE_MODE,
+    gated_model_provider,
+)
 
 __all__ = [
     "HINT_WORD_LIMIT",
     "INTENTS",
+    "MODEL_MODE",
+    "TEMPLATE_MODE",
     "Hint",
     "HintError",
+    "gated_model_provider",
     "generate_hint",
     "landmark_hint",
     "template_hint",

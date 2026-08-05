@@ -16,6 +16,13 @@ is admitted by `protocol/receive.TurnInbox`, which already deduplicates and reje
 replays. Confirmed against the pinned wire reference 2026-08-01 (`THIEF-002`: its behaviour is matched, its source never copied), which notes these limits are
 mostly insurance, since ordinary play generates well under one call per minute.
 
+**Rate is a token bucket (`AE-28`, `M7-003b`).** ``requests_per_minute`` becomes a bucket of
+that many tokens refilling at ``rpm / 60`` per second (`services/token_bucket.py`): a call is
+admitted iff a token is available, and one is consumed only on admission. This permits a
+burst up to a minute's worth and then a steady rate — the behaviour a limiter in front of
+Gmail/LLM needs to avoid a `429` without stalling play. Concurrency and the overflow queue
+are separate concerns layered on top.
+
 **Limits.** ``requests_per_minute`` and ``concurrent_requests`` are Appendix F table
 19 `Minimum` values (30 and 2) and ``queue_depth`` likewise (100); all three live in
 the shared, signed match object under ``rate_limiter_gatekeeper``. Time is injected,
@@ -31,12 +38,13 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 
 from p2p_thief_agent.services.limits import read_limit
+from p2p_thief_agent.services.token_bucket import TokenBucket
 
 REQUESTS_PER_MINUTE = ("rate_limiter_gatekeeper", "requests_per_minute", 30)
 CONCURRENT_REQUESTS = ("rate_limiter_gatekeeper", "concurrent_requests", 2)
 QUEUE_DEPTH = ("rate_limiter_gatekeeper", "queue_depth", 100)
 
-WINDOW_SECONDS = 60.0
+WINDOW_SECONDS = 60.0  # `requests_per_minute` refills at rpm / 60 tokens per second
 
 
 class GatekeeperError(RuntimeError):
@@ -67,11 +75,18 @@ class Gatekeeper:
     requests_per_minute: int = 30
     concurrent_requests: int = 2
     queue_depth: int = 100
-    _sent_at: list[float] = field(default_factory=list, repr=False)
+    _bucket: TokenBucket = field(init=False, repr=False)
     _pending: list[object] = field(default_factory=list, repr=False)
     _in_flight: int = field(default=0, repr=False)
     _admitted: int = field(default=0, repr=False)
     _queued: int = field(default=0, repr=False)
+
+    def __post_init__(self) -> None:
+        # The rate limit is a token bucket (`AE-28`): burst up to a minute's worth, then
+        # refill at rpm / 60 per second. Concurrency and the overflow queue are separate.
+        self._bucket = TokenBucket(
+            float(self.requests_per_minute), self.requests_per_minute / WINDOW_SECONDS
+        )
 
     @classmethod
     def from_match(cls, game: Mapping[str, object]) -> Gatekeeper:
@@ -92,25 +107,13 @@ class Gatekeeper:
             queued=self._queued,
         )
 
-    def _recent(self, now: float) -> int:
-        """Drop timestamps older than the window and return what remains."""
-        self._sent_at = [t for t in self._sent_at if now - t < WINDOW_SECONDS]
-        return len(self._sent_at)
-
-    def has_capacity(self, now: float) -> bool:
-        """Return whether a call may go out immediately, without queueing."""
-        return self._recent(now) < self.requests_per_minute and (
-            self._in_flight < self.concurrent_requests
-        )
-
     def submit(self, item: object, now: float) -> bool:
         """Offer one unit of work. Returns whether it may proceed immediately.
 
         ``False`` means **queued, not rejected** — the guidelines' rule. The caller
-        drains later; nothing is discarded.
+        drains later; nothing is discarded. A token is consumed only when admitted.
         """
-        if self.has_capacity(now):
-            self._sent_at.append(now)
+        if self._in_flight < self.concurrent_requests and self._bucket.allow(now):
             self._in_flight += 1
             self._admitted += 1
             return True
@@ -130,12 +133,11 @@ class Gatekeeper:
     def drain(self, now: float) -> list[object]:
         """Release as much queued work as the rate and concurrency now allow."""
         released: list[object] = []
-        while self._pending and self.has_capacity(now):
-            item = self._pending.pop(0)
-            self._sent_at.append(now)
+        while (self._pending and self._in_flight < self.concurrent_requests
+               and self._bucket.allow(now)):
+            released.append(self._pending.pop(0))
             self._in_flight += 1
             self._admitted += 1
-            released.append(item)
         return released
 
 
