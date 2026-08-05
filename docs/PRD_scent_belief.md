@@ -171,3 +171,14 @@ scent model" above, produces byte-identical fields; the `M6-005` lock then verif
 parity at negotiation and refuses a mismatch before the first move. Under `THIEF-002` the
 offer is one-directional: this repository publishes its scent logic and its hash and consumes
 nothing from the opponent's repository.
+
+## Trust-decay policy for repeated lies (`M6-027`)
+
+Trust moves linearly and symmetrically (`perception/trust.update_trust`). A hint whose
+directional claim fully contradicts the Cop's scent scores a signal of `−1` and drops trust
+by `rate` (default `0.2`); a fully corroborated hint scores `+1` and raises it by `rate`;
+partial agreement moves it proportionally. Both ends are clipped to `[0, 1]`, so about
+`1/rate` ≈ **five** consecutive lies drive trust to the floor, and a low-trust hint barely
+moves belief (`L_eff = t·L + (1−t)·uniform`). Trust **recovers**: a peer that lied can rebuild
+it by telling the truth, at the same rate — one bad hint is not a life sentence. Pinned by
+`test_trust_decay.py`.
