@@ -55,19 +55,24 @@ def test_a_replayed_turn_is_rejected_by_the_idempotency_guard() -> None:
 
 
 def test_oversized_or_malformed_input_is_rejected_before_domain_code_runs() -> None:
-    """`M5-011d`: the wire decoder rejects junk before the game ever sees it.
+    """`M5-011d`: junk never reaches the game, but a usable turn is still played.
 
-    An injected extra field — here carrying a 10 000-character payload a hostile
-    peer might use to probe for a buffer — is refused as an unknown field, and a
-    turn missing required fields is refused as incomplete. Neither reaches domain
-    code, because `TurnMessage.from_dict` runs first.
+    Reworked 2026-08-06. An injected extra field — here a 10 000-character payload a
+    hostile peer might use to probe for a buffer — is **dropped** rather than refused,
+    which is strictly safer: it still never reaches domain code, because the dataclass
+    never sees it, and the legitimate turn underneath it is still played. Refusing the
+    whole message was the weaker answer, since a refused turn is consumed and skipped
+    and the peer then starves waiting for one that never comes.
+
+    A turn missing *required* fields is still refused — that we genuinely cannot act on.
     """
     peer = InboundPeer()
-    with pytest.raises(WireError, match="unknown fields"):
-        peer.receive_turn({**cop_turn(1), "inject": "x" * 10_000})
+    peer.receive_turn({**cop_turn(1), "inject": "x" * 10_000})
+    assert len(peer.turns) == 1
+    assert not any("inject" in str(t) for t in peer.turns)
     with pytest.raises(WireError, match="missing fields"):
         peer.receive_turn({"step": 1, "sender": "police"})
-    assert peer.turns == []
+    assert len(peer.turns) == 1
 
 
 class DropsAtAudit:

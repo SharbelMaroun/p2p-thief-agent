@@ -38,11 +38,19 @@ def test_turn_requires_core_fields():
         TurnMessage.from_dict(incomplete)
 
 
-def test_turn_rejects_unknown_field():
+def test_turn_ignores_an_unknown_field_rather_than_refusing_the_turn():
+    """Corrected 2026-08-06: the reference ignores extras, and refusing cost us games.
+
+    A refused turn is consumed and skipped by the poller, so rejecting one unmodelled
+    key made this peer go silent until the deadline — indistinguishable from a dropped
+    connection. The extra never reaches the dataclass, so tolerating it changes no
+    behaviour; refusing it lost the match.
+    """
     extended = turn_dict()
     extended["position"] = [3, 3]
-    with pytest.raises(WireError, match="unknown fields"):
-        TurnMessage.from_dict(extended)
+    message = TurnMessage.from_dict(extended)
+    assert not hasattr(message, "position")
+    assert message.step == turn_dict()["step"]
 
 
 def test_turn_rejects_bad_sender():
@@ -125,8 +133,16 @@ def test_audit_rejects_bad_result_claim():
         AuditPayload.from_dict({"sender": "thief", "records": [], "result_claim": "tie"})
 
 
-def test_audit_rejects_unknown_field():
-    with pytest.raises(WireError, match="unknown fields"):
-        AuditPayload.from_dict(
-            {"sender": "thief", "records": [], "result_claim": "capture", "x": 1}
-        )
+def test_audit_ignores_an_unknown_field():
+    """An audit that verifies must not be refused over a member we do not model."""
+    payload = AuditPayload.from_dict(
+        {"sender": "thief", "records": [], "result_claim": "capture", "x": 1}
+    )
+    assert payload.sender == "thief"
+    assert not hasattr(payload, "x")
+
+
+def test_a_missing_required_field_is_still_refused():
+    """Tolerance is for extras only: a field we need is one we cannot invent."""
+    with pytest.raises(WireError, match="missing fields"):
+        AuditPayload.from_dict({"sender": "thief", "records": []})
