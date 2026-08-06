@@ -572,10 +572,10 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-005e | Back off on HTTP 429 | DONE | `send_report` catches `RateLimitError` (429), sleeps the backoff, and retries to the limit, then fails loudly; `test_a_429_is_backed_off_and_retried` `[book §12]` |
 | M7-005f | Run the full mutual audit before agreeing a result | PENDING | Result agreement follows the mutual audit — owned by `M7-016` `[AE-36]` |
 | M7-005g | Send independently of the opponent | DONE | `send_report` takes no opponent and never waits on one — a side that does not send scores nothing `[AE-32]` `[AE-35]` |
-| M7-006 | Implement the Quota Manager and DOS Detector gates | PENDING | Appendix E rules 28/29 and chapter 9 require **three** gates in series before any Gmail call: a daily Quota Manager, the token bucket (`M7-003`), and a DOS detector that locks the pipeline on runaway-send patterns. Fail-fast at the first rejecting gate; the lock is observable |
-| M7-006a | Implement the daily quota counter | PENDING | Exhausted quota stops all further sends |
-| M7-006b | Implement the DOS detector and pipeline lock | PENDING | Runaway-send patterns lock the pipeline `[AE-29]` |
-| M7-006c | Prove fail-fast ordering across the three gates | PENDING | Quota → bucket → detector |
+| M7-006 | Implement the Quota Manager and DOS Detector gates | IN PROGRESS | Appendix E rules 28/29 and chapter 9 require **three** gates in series before any Gmail call: a daily Quota Manager, the token bucket (`M7-003`), and a DOS detector that locks the pipeline on runaway-send patterns. Fail-fast at the first rejecting gate; the lock is observable |
+| M7-006a | Implement the daily quota counter | IN PROGRESS | Exhausted quota stops all further sends |
+| M7-006b | Implement the DOS detector and pipeline lock | IN PROGRESS | Runaway-send patterns lock the pipeline `[AE-29]` |
+| M7-006c | Prove fail-fast ordering across the three gates | IN PROGRESS | Quota → bucket → detector |
 | M7-007 | Declare games already played against each opponent | PENDING | Appendix E rules 37/38: every game start carries an accurate count of prior counted games against that opponent, derived from emitted result artifacts rather than hand-entered. A false declaration is absolute disqualification, so the count must be reproducible from the artifact set |
 | M7-007a | Derive the count from emitted result artifacts | PENDING | No hand-entered figure enters the declaration |
 | M7-007b | Exclude warm-up games from the counted total | PENDING | `[AE-52]`; warm-ups are permitted but uncounted |
@@ -594,16 +594,16 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-013 | Implement the OAuth setup path | PENDING | First run creates a token; later runs refresh without human action |
 | M7-013a | Run the consent flow once and store the token locally | PENDING | `token.json` created, never committed `[book App. A]` |
 | M7-013b | Refresh the access token automatically | PENDING | The refresh token gives months of autonomy |
-| M7-013c | Fail closed when no credential is present | PENDING | No silent skip of a mandatory report |
+| M7-013c | Fail closed when no credential is present | IN PROGRESS | No silent skip of a mandatory report |
 | M7-013d | Document the five setup steps for a fresh machine | PENDING | Reproducible by a teammate `[G§2.1]` |
 | M7-014 | Compose the report email | PENDING | MIME message with a JSON attachment and a machine-stable subject |
 | M7-014a | Attach the result artifact as a file | PENDING | Attachment only; body text is never the report `[AE-34]` |
-| M7-014b | Use a deterministic subject naming the game | PENDING | Auto-assignment depends on it `[AE-45]` |
+| M7-014b | Use a deterministic subject naming the game | IN PROGRESS | Auto-assignment depends on it `[AE-45]` |
 | M7-014c | Base64url-encode and send through the API | PENDING | `users().messages().send` with `userId="me"` |
-| M7-015 | Prove reporting under failure | PENDING | No failure mode silently loses a report |
-| M7-015a | Retry after a 429 with backoff | PENDING | Respect the throttle rather than hammering `[book §12]` |
-| M7-015b | Surface a permanently failed send loudly | PENDING | An unsent report costs the game's points `[AE-32]` |
-| M7-015c | Never send twice for one game | PENDING | Duplicate reports risk a conflict verdict `[AE-35]` |
+| M7-015 | Prove reporting under failure | IN PROGRESS | No failure mode silently loses a report |
+| M7-015a | Retry after a 429 with backoff | IN PROGRESS | Respect the throttle rather than hammering `[book §12]` |
+| M7-015b | Surface a permanently failed send loudly | IN PROGRESS | An unsent report costs the game's points `[AE-32]` |
+| M7-015c | Never send twice for one game | IN PROGRESS | Duplicate reports risk a conflict verdict `[AE-35]` |
 | M7-016 | Implement result agreement with the opponent | DONE | `orchestration/settlement.py`, built on this repo's own `protocol.crypto.audit_records`. Four states with four remedies: `AGREED`, `CONFLICT` (rule 35, 0/0 both), `AUDIT_FAILED` (rule 19, 0 for the falsifying group) and `UNANSWERED` |
 | M7-016a | Exchange the computed outcome after the audit | DONE | `agree(audit, ours, theirs)` **takes the audit first**, so agreement is unreachable without one. Rule 36 makes the audit "a mandatory condition before agreement on the JSON result" -- a precondition a caller can forget is not a precondition. An empty series does not pass |
 | M7-016b | Detect and record a disagreement | DONE | A conflict keeps **both** claims in `settlement_record`. Adopting their number to keep the peace files a result we do not believe and destroys the evidence an auditor needs. **Silence is its own state**, not consent -- otherwise a crashed peer decides our report |
