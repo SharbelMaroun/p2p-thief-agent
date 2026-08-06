@@ -664,6 +664,50 @@ reading the *client*. `OPTION_B_INTEROP_DECISION.md` had already settled it: the
 `exchange_audit` is a client-side method that calls the server's `submit_audit`. That
 confusion has now surfaced twice, so the profile records it for whoever asks next.
 
+#### Two ways a config is wrong that value checks never see (`M1-017b`, `M1-017c`, 2026-08-06)
+
+`check_appendix_f` already refused an altered `FIXED` value and a weakened `MINIMUM` one.
+Both inspect *values*. The two vectors left open inspect the document's **shape** and its
+**membership**, and neither had any guard at all.
+
+**Duplicate keys.** `json.loads('{"a":1,"a":2}')` returns `{"a": 2}`. Nothing raises. The
+collision is resolved and forgotten before any of our code sees the object, so no check on
+the parsed dict could ever find it — the refusal has to happen in `object_pairs_hook`,
+the one place the duplicate still exists. Appendix E rule 11 is the citation and it is
+Mandatory: the configuration must be "identical, bit-for-bit, on both sides", sanction
+"disqualification of the game due to lack of symmetry". A document with a repeated key
+cannot satisfy that, and a signature computed over the raw bytes would be verifying a
+different object than the one we parsed.
+
+**Private fields in the shared config.** The book splits configuration by format for
+exactly this reason (`:2901`): the private `config/game.toml` holds "network port, choice
+of strategy models, language mode, LLM settings, email, and group identity", while the
+shared JSON carries the agreed match conditions; `:3001` adds that the private file is
+"not subject to negotiation". So a private key in the negotiated object either leaks how
+we play — the strategy selection is the graded contribution — or drags an unnegotiable
+local value into a document both sides must hold identically. Six classes, one refusal
+each, taken from that sentence rather than imagined. The refusal names every offending
+key, because rule 11's purpose is that both sides converge on one document and a refusal
+that names one mistake at a time takes as many rounds as there are mistakes.
+
+**A bug caught while writing the version guard.** The first version refused anything but
+`1.2`. Our own `reporting/declaration.SCHEMA_VERSION` is `1.1` — the artifacts version
+independently of the match config, so a single global set would have made the guard
+refuse our own declaration artifact. The supported set is now a parameter, and a test
+pins that the two spaces are deliberately separate.
+
+**Where this is honest about its own limits.** Nothing in this repository reads a JSON
+config or artifact back yet — we only emit. So both guards are proven and reachable
+through `sdk.protocol`, but they are not yet on a live path. Their use site is `M7-14`
+(validate every emitted artifact) and `M7-23` (bind the config artifact to the negotiated
+match), and the rows say so rather than implying protection that is not switched on.
+
+*And an error of mine, corrected.* `M1-017` was marked DONE earlier the same day while
+`a`, `b` and `c` were still open, and the suite that closed it covered none of them. The
+parent was reopened rather than left standing as evidence it was not. `M1-015a` closed
+alongside, proven by injection: renaming the stub's `submit_audit` fails three tests
+including a real transport error, and passes again on revert.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
