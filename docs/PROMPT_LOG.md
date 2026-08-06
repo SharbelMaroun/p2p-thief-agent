@@ -119,6 +119,15 @@
 - **`M8-009a` scans the built product, not the tree.** The artifacts are generated at runtime and then leave the machine, so a secret in one would never be committed and the repository scanner would pass. Built with the real builders — and the fixtures deliberately carry repository URLs, an MCP server map, a model name and a signature, which are the fields most likely to smuggle something.
 - **Left open honestly:** `M8-009b` (no private field crosses the wire) — this repository already has `protocol/config_integrity.check_no_private_fields`, so the row needs the wire-level test wired to it rather than new machinery; and `M8-005`/`M8-013` a–c, the fault rehearsals, which need the companion's failure-matrix treatment re-authored here.
 
+- **Date:** 2026-08-07 · **Tool:** Claude Opus 5 (agentic CLI) · **NotebookLM: BOTH notebooks reached** · **Row claimed and pushed before starting**
+- **Goal:** finish `M8-009b` — "confirm no private field crosses the wire", condition "leakage vector per private field class".
+- **This repository already had half the answer, and the half it had was wrong for every other channel.** `config_integrity.check_no_private_fields` correctly refuses any private field in the **shared config**. Run over a legitimate *declaration* group it refuses that too — `['llm:llm_model']` — but rule 24 and `:2229` make `llm_model` **mandatory** there. One guard cannot serve both.
+- **Notebooks (step 3):** the **book** gave the declaration's required disclosure list per group and the never-shared list (`my_port`, `thief_class`/`police_class`, LLM `provider`, `step_deadline_seconds`, `recipient`), plus the turn message's contents. The **reference** confirmed it from code and supplied the deciding detail: `mcp_servers` URLs contain the local port, so the matcher had to work on **keys, not values**, or it would refuse the mandatory disclosure. Verified in `inst/` (step 4) at `:2897`, `:2901`, rule 2.
+- **Output:** `protocol/outbound_fields.py` at **100% branch**, `test_outbound_fields.py` with one vector per class per channel. 1035 pass, 99.53%.
+- **Extends `config_integrity` rather than restating it.** Two lists of private keys would drift, and the drift would stay silent until a match was already disqualified — so the classes are merged at runtime and a test asserts every key the original guard knew is still caught.
+- **Both guards are pinned as correct-for-their-channel**, deliberately: `check_no_private_fields` is right for the shared config and wrong for the declaration, and a test asserts both statements so neither gets "fixed" into agreeing with the other.
+- **Gate findings fixed the designed way.** Ruff wanted the `Error` suffix. The secret scanner flagged the test vectors — correctly, since a key-shaped literal beside `api_key` is exactly what a leak looks like — so they now use the scanner's own placeholder convention instead of an allowlist entry that would weaken it permanently.
+
 ## Best practices derived so far
 1. **Binding values live in one table** — quote Appendix F, never paraphrase numbers.
 2. **Decide, then generate** — architecture-defining choices go to the human first.

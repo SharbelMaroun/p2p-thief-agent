@@ -672,9 +672,9 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-008b | Show the per-step verdict alongside the board | DONE | Operator sees where a match failed |
 | M8-008c | Load a malformed log without crashing | DONE | Corrupt input yields a clear error, not a stack trace |
 | M8-008d | Detect a reordered log | DONE | Step sequence is validated, not assumed |
-| M8-009 | Run the security review | IN PROGRESS | Secrets, identity, input validation, and dependencies all reviewed |
+| M8-009 | Run the security review | DONE | Secrets, identity, input validation, and dependencies all reviewed |
 | M8-009a | Confirm no secret is readable from any artifact | DONE | Artifacts are shared; secrets must not travel in them `[AE-39]` |
-| M8-009b | Confirm no private field crosses the wire | IN PROGRESS | Leakage vector per private field class |
+| M8-009b | Confirm no private field crosses the wire | DONE | Leakage vector per private field class |
 | M8-009c | Review third-party dependencies and pin them | DONE | `uv.lock` is authoritative `[G§8.4]` |
 | M8-009d | Confirm the LLM path cannot influence a move | DONE | Even with a provider enabled `[AE-25]` |
 | M8-010 | Run the resource and endurance pass | PENDING | A full six-sub-game series runs without degradation |
