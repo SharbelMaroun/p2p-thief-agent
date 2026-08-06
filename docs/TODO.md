@@ -571,36 +571,36 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-005c | Send JSON as an attachment only | DONE | `compose_report` attaches the result as `application/json` (`result_<id>.json`); the body carries no report — `test_the_report_is_a_json_attachment_to_the_confirmed_address` `[AE-33]` `[AE-34]` |
 | M7-005d | Send to the confirmed reporting address | DONE | `REPORTING_ADDRESS = "rmisegal+uoh26finalgame@gmail.com"` (`AF-020`; Table 20 `rimesegal` is a typo) is the default recipient |
 | M7-005e | Back off on HTTP 429 | DONE | `send_report` catches `RateLimitError` (429), sleeps the backoff, and retries to the limit, then fails loudly; `test_a_429_is_backed_off_and_retried` `[book §12]` |
-| M7-005f | Run the full mutual audit before agreeing a result | PENDING | Result agreement follows the mutual audit — owned by `M7-016` `[AE-36]` |
+| M7-005f | Run the full mutual audit before agreeing a result | IN PROGRESS | Result agreement follows the mutual audit — owned by `M7-016` `[AE-36]` |
 | M7-005g | Send independently of the opponent | DONE | `send_report` takes no opponent and never waits on one — a side that does not send scores nothing `[AE-32]` `[AE-35]` |
 | M7-006 | Implement the Quota Manager and DOS Detector gates | DONE | `services/send_gates.py`. `:2096` requires **three** gates before Gmail -- Quota Manager, Token Bucket, DOS Detector -- and only the middle one existed here, so a report could reach the API having passed **one gate of three** |
 | M7-006a | Implement the daily quota counter | DONE | `QuotaManager`, a per-day counter that rolls over. `:2083`: "the **final line before account blocking**: if the quota is exhausted, no further requests are sent" |
 | M7-006b | Implement the DOS detector and pipeline lock | DONE | `DosDetector` locks on a burst and **stays locked**. `:2087` says what it guards: "a bug or an infinite loop **in the agent's code**" -- our own runaway, not a hostile peer -- so a lock that cleared after a quiet spell would let the same loop resume |
 | M7-006c | Prove fail-fast ordering across the three gates | DONE | Fail-fast, first refusal short-circuiting. **An API difference caught here that copying would have missed**: this repository's `TokenBucket.allow` *consumes* a token, so `attempt` inspects with `available` and only `send` calls `allow`. A naive check would have burned a token on every request a later gate refused -- a silent, gradual throttle for sends that never happened |
-| M7-007 | Declare games already played against each opponent | PENDING | Appendix E rules 37/38: every game start carries an accurate count of prior counted games against that opponent, derived from emitted result artifacts rather than hand-entered. A false declaration is absolute disqualification, so the count must be reproducible from the artifact set |
-| M7-007a | Derive the count from emitted result artifacts | PENDING | No hand-entered figure enters the declaration |
-| M7-007b | Exclude warm-up games from the counted total | PENDING | `[AE-52]`; warm-ups are permitted but uncounted |
-| M7-008 | Attach every game's configuration artifact to the repository | PENDING | Appendix F.2 items 3 and 4: each game's configuration artifact is named from its `game_id` and committed, so any past game's exact configuration remains retrievable |
-| M7-008a | Commit each game's config under a `game_id`-derived name | PENDING | Artifacts from different games cannot collide |
-| M7-008b | Prove any past game's config is retrievable from the repo | PENDING | A retrieval test walks the committed set |
-| M7-009 | Account for LLM tokens across a series | PENDING | Per-game and per-series totals counted, sealed at Step-0, and reported `[AE-54]` |
-| M7-010 | Emit warm-up games as uncounted | PENDING | A warm-up produces artifacts but never enters the counted total `[AE-52]` |
+| M7-007 | Declare games already played against each opponent | IN PROGRESS | Appendix E rules 37/38: every game start carries an accurate count of prior counted games against that opponent, derived from emitted result artifacts rather than hand-entered. A false declaration is absolute disqualification, so the count must be reproducible from the artifact set |
+| M7-007a | Derive the count from emitted result artifacts | IN PROGRESS | No hand-entered figure enters the declaration |
+| M7-007b | Exclude warm-up games from the counted total | IN PROGRESS | `[AE-52]`; warm-ups are permitted but uncounted |
+| M7-008 | Attach every game's configuration artifact to the repository | IN PROGRESS | Appendix F.2 items 3 and 4: each game's configuration artifact is named from its `game_id` and committed, so any past game's exact configuration remains retrievable |
+| M7-008a | Commit each game's config under a `game_id`-derived name | IN PROGRESS | Artifacts from different games cannot collide |
+| M7-008b | Prove any past game's config is retrievable from the repo | IN PROGRESS | A retrieval test walks the committed set |
+| M7-009 | Account for LLM tokens across a series | IN PROGRESS | Per-game and per-series totals counted, sealed at Step-0, and reported `[AE-54]` |
+| M7-010 | Emit warm-up games as uncounted | IN PROGRESS | A warm-up produces artifacts but never enters the counted total `[AE-52]` |
 | M7-011 | Persist artifacts atomically | DONE | `reporting/emit.write_artifact` writes to a temporary file **in the same directory** then `os.replace`, so the visible file is either the old one or the complete new one, never a prefix. Same-directory is load-bearing: `os.replace` is atomic only within a filesystem. The failure this closes is **silent** -- a truncated artifact looks present, and rule 19's audit reads it as a technical mismatch ("score of 0 for the falsifying group") with nothing distinguishing it from a deliberate forgery |
-| M7-012 | Validate every emitted artifact against its schema | PENDING | An artifact that fails its own schema is never sent |
-| M7-012a | Validate the declaration artifact | PENDING | Required identity, hardware, and timing fields present |
-| M7-012b | Validate the config artifact | PENDING | Every Appendix F parameter present with a legal value |
-| M7-012c | Validate the log artifact | PENDING | Every step carries commitment, nonce, move, and hint |
-| M7-012d | Validate the result artifact | PENDING | Scores, four links, commit hash, and token totals present |
-| M7-012e | Reject an artifact set whose `game_uid` values disagree | PENDING | All four must share one identity `[AF-§3]` |
+| M7-012 | Validate every emitted artifact against its schema | IN PROGRESS | An artifact that fails its own schema is never sent |
+| M7-012a | Validate the declaration artifact | IN PROGRESS | Required identity, hardware, and timing fields present |
+| M7-012b | Validate the config artifact | IN PROGRESS | Every Appendix F parameter present with a legal value |
+| M7-012c | Validate the log artifact | IN PROGRESS | Every step carries commitment, nonce, move, and hint |
+| M7-012d | Validate the result artifact | IN PROGRESS | Scores, four links, commit hash, and token totals present |
+| M7-012e | Reject an artifact set whose `game_uid` values disagree | IN PROGRESS | All four must share one identity `[AF-§3]` |
 | M7-013 | Implement the OAuth setup path | PENDING | First run creates a token; later runs refresh without human action |
 | M7-013a | Run the consent flow once and store the token locally | PENDING | `token.json` created, never committed `[book App. A]` |
-| M7-013b | Refresh the access token automatically | PENDING | The refresh token gives months of autonomy |
+| M7-013b | Refresh the access token automatically | IN PROGRESS | The refresh token gives months of autonomy |
 | M7-013c | Fail closed when no credential is present | DONE | `send_report` refuses when the credential path is absent. A skipped report is indistinguishable from a successful one in a log that only records errors |
-| M7-013d | Document the five setup steps for a fresh machine | PENDING | Reproducible by a teammate `[G§2.1]` |
-| M7-014 | Compose the report email | PENDING | MIME message with a JSON attachment and a machine-stable subject |
-| M7-014a | Attach the result artifact as a file | PENDING | Attachment only; body text is never the report `[AE-34]` |
+| M7-013d | Document the five setup steps for a fresh machine | IN PROGRESS | Reproducible by a teammate `[G§2.1]` |
+| M7-014 | Compose the report email | IN PROGRESS | MIME message with a JSON attachment and a machine-stable subject |
+| M7-014a | Attach the result artifact as a file | IN PROGRESS | Attachment only; body text is never the report `[AE-34]` |
 | M7-014b | Use a deterministic subject naming the game | DONE | **The subject was deterministic but unassignable.** It named the game (`UOH26 Final Result — <game_id>`) and carried no team code, while rule 45 (Mandatory) ties **automatic report assignment** to the 8-character code, sanction "organizational failure that will prevent automatic report assignment". Now `[<team_code>] UOH26 Final Result <game_id>`, with a non-8-character code refused |
-| M7-014c | Base64url-encode and send through the API | PENDING | `users().messages().send` with `userId="me"` |
+| M7-014c | Base64url-encode and send through the API | IN PROGRESS | `users().messages().send` with `userId="me"` |
 | M7-015 | Prove reporting under failure | DONE | All three failure modes covered by `send_report` |
 | M7-015a | Retry after a 429 with backoff | DONE | Backoff on 429, **changed from constant to doubling**. Both honour Appendix F table 19's `Minimum` of 5s, so the original was not wrong -- this is a deliberate strengthening, recorded as such in the test. A fixed delay against a provider still throttling spends every retry at the rate it already refused |
 | M7-015b | Surface a permanently failed send loudly | DONE | `ReportSendError` after the retries, naming the last error |
@@ -609,28 +609,28 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-016a | Exchange the computed outcome after the audit | DONE | `agree(audit, ours, theirs)` **takes the audit first**, so agreement is unreachable without one. Rule 36 makes the audit "a mandatory condition before agreement on the JSON result" -- a precondition a caller can forget is not a precondition. An empty series does not pass |
 | M7-016b | Detect and record a disagreement | DONE | A conflict keeps **both** claims in `settlement_record`. Adopting their number to keep the peace files a result we do not believe and destroys the evidence an auditor needs. **Silence is its own state**, not consent -- otherwise a crashed peer decides our report |
 | M7-016c | Refuse to report an unagreed result | DONE | `require_reportable` gates reporting, and the audit-failure message differs deliberately: their forgery is *their* rule 19 loss, and sending our own contradicting report would convert it into a **shared** rule 35 loss. A test asserts the three refusals carry three distinct messages |
-| M7-017 | Implement series-level score aggregation evidence | PENDING | The cumulative figure is reproducible from the artifact set |
-| M7-017a | Recompute the series total from stored artifacts | PENDING | No in-memory-only total is trusted |
-| M7-017b | Apply the diversity reward for a new opponent | PENDING | `[AF-t18]`; a repeat opponent adds nothing |
-| M7-018 | Run a full local series rehearsal before any counted game | PENDING | Six sub-games, four artifact families, audit, agreement, and a mocked send |
-| M7-018a | Rehearse with a deliberately failing sub-game | PENDING | A technical loss still produces a complete artifact set |
-| M7-018b | Rehearse with a tampered audit | PENDING | Detection, scoring, and reporting all behave |
-| M7-019 | Document the reporting pipeline | PENDING | `PRD_gatekeeper_reporting.md` matches the built gates and flow |
-| M7-020 | Emit the declaration before the first move of each game | PENDING | The pre-game declaration is signed and fixed before play begins |
-| M7-020a | Include both groups and their members | PENDING | Identity is public and agreed |
-| M7-020b | Include both repository links per group | PENDING | Four links total `[AE-49]` |
-| M7-020c | Include the MCP addresses in use | PENDING | Public URLs only; no credential |
-| M7-020d | Include the hardware and model declaration | PENDING | Carried from Step-0 `[AE-24]` |
-| M7-020e | Include the agreed token limit and game times | PENDING | Start and end recorded |
-| M7-021 | Bind the config artifact to the negotiated match | PENDING | The emitted config is the one actually played, not a template |
-| M7-021a | Include every quantitative parameter | PENDING | All Appendix F values with their agreed settings |
-| M7-021b | Include the cryptographic locks | PENDING | Config hash and the scent-model lock `[AE-23]` |
-| M7-022 | Make the log artifact sufficient for an independent audit | PENDING | A third party can re-verify without our code |
-| M7-022a | Record each step's commitment and revealed payload | PENDING | Enough to recompute every hash |
-| M7-022b | Record nonces only in the final audit section | PENDING | Nonce secrecy holds until the end `[AE-18]` |
-| M7-022c | Record the hint and intent per step | PENDING | The verbal layer is auditable too |
-| M7-023 | Keep artifact emission independent of transport health | PENDING | A disconnected game still produces its artifact set |
-| M7-024 | Version the artifact schemas | PENDING | A schema change is visible, not silent `[G§8.1]` |
+| M7-017 | Implement series-level score aggregation evidence | IN PROGRESS | The cumulative figure is reproducible from the artifact set |
+| M7-017a | Recompute the series total from stored artifacts | IN PROGRESS | No in-memory-only total is trusted |
+| M7-017b | Apply the diversity reward for a new opponent | IN PROGRESS | `[AF-t18]`; a repeat opponent adds nothing |
+| M7-018 | Run a full local series rehearsal before any counted game | IN PROGRESS | Six sub-games, four artifact families, audit, agreement, and a mocked send |
+| M7-018a | Rehearse with a deliberately failing sub-game | IN PROGRESS | A technical loss still produces a complete artifact set |
+| M7-018b | Rehearse with a tampered audit | IN PROGRESS | Detection, scoring, and reporting all behave |
+| M7-019 | Document the reporting pipeline | IN PROGRESS | `PRD_gatekeeper_reporting.md` matches the built gates and flow |
+| M7-020 | Emit the declaration before the first move of each game | IN PROGRESS | The pre-game declaration is signed and fixed before play begins |
+| M7-020a | Include both groups and their members | IN PROGRESS | Identity is public and agreed |
+| M7-020b | Include both repository links per group | IN PROGRESS | Four links total `[AE-49]` |
+| M7-020c | Include the MCP addresses in use | IN PROGRESS | Public URLs only; no credential |
+| M7-020d | Include the hardware and model declaration | IN PROGRESS | Carried from Step-0 `[AE-24]` |
+| M7-020e | Include the agreed token limit and game times | IN PROGRESS | Start and end recorded |
+| M7-021 | Bind the config artifact to the negotiated match | IN PROGRESS | The emitted config is the one actually played, not a template |
+| M7-021a | Include every quantitative parameter | IN PROGRESS | All Appendix F values with their agreed settings |
+| M7-021b | Include the cryptographic locks | IN PROGRESS | Config hash and the scent-model lock `[AE-23]` |
+| M7-022 | Make the log artifact sufficient for an independent audit | IN PROGRESS | A third party can re-verify without our code |
+| M7-022a | Record each step's commitment and revealed payload | IN PROGRESS | Enough to recompute every hash |
+| M7-022b | Record nonces only in the final audit section | IN PROGRESS | Nonce secrecy holds until the end `[AE-18]` |
+| M7-022c | Record the hint and intent per step | IN PROGRESS | The verbal layer is auditable too |
+| M7-023 | Keep artifact emission independent of transport health | IN PROGRESS | A disconnected game still produces its artifact set |
+| M7-024 | Version the artifact schemas | IN PROGRESS | A schema change is visible, not silent `[G§8.1]` |
 
 ---
 
