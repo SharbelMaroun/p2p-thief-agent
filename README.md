@@ -594,6 +594,26 @@ is the point. Applying the same design here is logged as a candidate follow-up o
 `M6-019` row; it was not done in this batch, because that row is closed and re-opening a
 teammate's finished work mid-batch is a call for the team, not a side effect of ours.
 
+#### The Cop's bundle no longer contradicts this repository (`X-03` cross-check, 2026-08-06)
+
+`CONTRACT_HANDOFF_CHECKLIST.md` has said since 2026-07-28 that the copy model is retired
+under `THIEF-002` and "must not be revived". The Cop repository agreed in principle but
+not in text: its shared bundle still opened by telling readers it "can be copied into the
+Thief repository byte-for-byte", and its verifier header said the same. Two deliverables,
+two different instructions.
+
+That is now fixed on the Cop side (`X-03`, bundle `0.2.7-proposed`), and the correction
+sharpens something worth recording here too. The retirement is **not** a general rule
+against sharing. Chapter 6 recommends publishing the scent model so both sides run
+identical logic — which is why `M6-018` deliberately keeps `perception/scent.py`
+dependency-free and offerable verbatim. Appendix E rule 2 prohibits sharing *memory or
+variables* ("immediate disqualification due to data leakage"), not specifications.
+
+What the retirement actually rejects is **byte-parity as evidence**. The book's evidence
+of interoperability is a `Verified OK` replay of a real match, and Appendix E rule 52
+permits warm-up games for exactly that purpose — which is the standard `M1-015`–`M1-017`
+are working toward, and a stronger one than copying files could ever provide.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
