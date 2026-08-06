@@ -987,6 +987,58 @@ pixels while the GDI works in physical ones — on a scaled display every window
 is wrong by the scale factor. Declaring the process DPI-aware is what makes the output a
 function of the fixture rather than of the machine's display settings.
 
+### The live GUI
+
+![Live GUI showing a belief heatmap with a green YOUR TURN banner](assets/live-gui-belief-map.png)
+
+*`assets/live-gui-belief-map.png` — the second mandatory submission capture (p.81/189,
+"absolute mandatory"). Taken during a live match: a second operating-system process was
+started, turns crossed a real socket, and the heat map is whatever this agent believed at
+step 2. Asked directly, a reconstructed state would not satisfy the requirement — that is
+the replay viewer's separate exhibit.*
+
+**The opponent is a scripted local peer, not a classmate.** A second agent that plays back
+is still open work, so this is a live match against a stub and is described as such rather
+than implied to be a league game.
+
+**What the screen can never contain.** Rule 8 (Mandatory) — "display true local information
+only", sanction "disqualification due to data breach". Rule 9 (Prohibited) — "do not display
+the full objective board state", sanction **project disqualification**. That is the whole
+project, not a game, so it is enforced structurally rather than by discipline: `LocalTruth`
+has a closed field set with nowhere to hold the opponent's real position, and
+`test_local_truth_boundary.py` fails if anyone adds a field or if the live package imports
+anything that knows one. The reference does the same — its snapshot fixes what crosses to
+the GUI, so its window "is incapable of drawing" the opponent.
+
+The `C?` mark is not a leak. It is *our inference* from scent, which is what a trust map is
+for; `:1647` forbids showing the objective board, not showing a guess.
+
+**This is the Thief's screen, and the roles are inverted.** Our own cell is `T`; the
+inference we draw is about the police, marked `C?`. Taking the companion repository's
+version would have produced a window that labels its own cell `C` and guesses at a thief —
+backwards in a way that reads as correct at a glance. `THIEF-002` forbids reading that
+repository anyway, and this is the kind of thing the rule is for.
+
+**Colour is not the only signal.** Every believed cell also prints its probability, and the
+most likely one is marked in text, so a greyscale print or a red-green deficiency loses
+nothing.
+
+Two findings came out of producing this picture rather than out of building the widget.
+The first capture rendered sixty-three cells as `0%` and one as `100%`: belief converges
+fast because scent evidence is strong and consistent — measured at peak 0.28 after one
+update, 0.32 after two, 0.86 after three and 0.99 by the fourth. Capturing "later in the
+match" is not more impressive, only less informative, so the script captures at step 2 where
+the inference is still visibly an inference. The second is that rounding a diffuse belief to
+`0%` prints a board claiming the opponent is nowhere, which is the opposite of what the
+number is for; below one percent the label now reads `<1%`.
+
+Both images regenerate from committed inputs:
+
+```text
+uv run python scripts/capture_replay_screenshots.py
+uv run python scripts/capture_live_gui_screenshot.py
+```
+
 ### 6. Companion repository
 
 <https://github.com/SharbelMaroun/p2p-cop-agent> — the Cop-side peer. Under
