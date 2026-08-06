@@ -204,3 +204,39 @@ partial agreement moves it proportionally. Both ends are clipped to `[0, 1]`, so
 moves belief (`L_eff = t·L + (1−t)·uniform`). Trust **recovers**: a peer that lied can rebuild
 it by telling the truth, at the same rate — one bad hint is not a life sentence. Pinned by
 `test_trust_decay.py`.
+
+## Evidence priority: scent first, a hint only in the gaps
+
+`inst/police_thief_p2p_Summary.md:508` requires that a hint the scent contradicts must
+"**reduce their trust level and update their map**" — both clauses. `:1020` gives the
+behaviour, and the verb is exact: the pursuer "**ignores** the verbal claim and
+**continues** to track the actual scent source". Not *redirects*; the pursuit does not
+bend at all.
+
+Measuring what this implementation actually does, the ordering is **lexicographic**,
+matching the weight-free policies in `M6-004h`:
+
+1. **Scent decides wherever it can.** A located peak concentrates likelihood on one
+   cell while a bearing spreads it over half the board, so even a `0.04` trace — the
+   faintest value in the book's table — outweighs a contradicting claim held at
+   *complete* trust. The dominance is structural, not an effect of the trust score.
+2. **A hint decides only what scent leaves open.** Given two equal peaks, scent cannot
+   choose and the claim breaks the tie. Without this the verbal layer would be dead
+   code; with step 1 it can never overrule physical evidence.
+
+Trust therefore does not arbitrate the contradiction. It scales how far a claim moves
+belief *within* the space scent leaves, runs forward between turns so a repeated liar is
+believed less each time, and is clamped to `[0, 1]`.
+
+**Cross-repo parity.** The Cop repository reaches this same ordering from an entirely
+different structure — a mapping of cells against this grid of rows. Both repositories now
+pin it in a `test_evidence_priority.py`, because belief never crosses the wire
+(`M6-016`) and no handshake could detect the two sides drifting apart.
+
+**Not in the sources, and not claimed to be.** No numbered Appendix E rule with a
+sanction covers this; `:508` is body text and the override falls out of the Bayesian
+update rather than being decreed. Nothing defines a trust floor or an "ignore a liar
+after N turns" rule, so the decay schedule and the clamp are ours. Because decay is
+multiplicative, trust approaches zero without reaching it, so a distrusted peer can
+still break an exact tie — accepted, because inverting a liar's claim would be worse:
+a liar's statement is evidence of nothing, not evidence of the opposite.

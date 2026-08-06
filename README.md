@@ -539,6 +539,38 @@ reference. Both parsers accept both forms — verified by round-tripping each en
 through the other's parser — because an absent cell and a zero cell mean the same thing.
 The divergence is stylistic, so it is recorded rather than churned.
 
+#### Pinning why the physical evidence wins (`M6-010b` companion, 2026-08-06)
+
+`M6-010b` already proved the outcome the book requires: scent says top-left, a hint lies
+bottom-right, and the Thief flees the scent. What that test could not say is *which*
+mechanism produced the outcome — and measuring it showed the answer is not the one a
+reader would assume.
+
+The protection is structural, not a trust effect. A located scent peak concentrates
+likelihood on a single cell while a directional claim spreads it across half the board,
+so even a `0.04` trace — the faintest value in the book's emission table — outweighs a
+contradicting hint held at **complete** trust. The existing outcome test would therefore
+have passed with the trust machinery disabled.
+
+So `test_evidence_priority.py` now pins the ordering itself, in both directions: scent
+decides wherever it can, and a claim decides only what scent leaves open — given two
+equal peaks, scent cannot choose and the hint breaks the tie. A hint that could never
+change any decision would be dead code; one that could overrule scent would make the
+book's lie detector pointless. The ordering is lexicographic, matching the weight-free
+policies in `M6-004h`.
+
+**This was written because the Cop repository reaches the identical ordering from a
+different data structure** — a mapping of cells there against this grid of rows. Two
+implementations agreeing by construction is worth locking down on both sides: belief
+never crosses the wire (`M6-016`), so no handshake could ever detect the two drifting
+apart. Only a test in each repository can.
+
+The sources require less than this. `inst/police_thief_p2p_Summary.md:508` requires only
+that a contradicted hint lower trust *and* update the map; `:1020` gives the behaviour —
+the pursuer "**ignores** the verbal claim and **continues** to track the actual scent
+source". No trust floor or "ignore a liar after N turns" rule is defined anywhere, so the
+decay schedule and the `[0, 1]` clamp are engineering, and are labelled as such.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
