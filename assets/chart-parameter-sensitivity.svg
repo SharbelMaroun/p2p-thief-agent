@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 594 240" width="594" height="240" role="img">
+<title>Parameter sensitivity: mean survival by arm and board size</title><desc>Each row is one arm; each column one board size swept upward from the Appendix F minimum of 7. Numbers are mean steps survived.</desc>
+<rect width="594" height="240" fill="#ffffff"/>
+<text x="297.0" y="26.0" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#263238" text-anchor="middle" font-weight="bold">Parameter sensitivity: mean survival by arm and board size</text>
+<text x="297.0" y="44.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">Each row is one arm; each column one board size swept upward from the Appendix F minimum of 7. Numbers are mean steps survived.</text>
+<text x="297.0" y="214.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#607d8b" text-anchor="middle" font-weight="normal">board size</text>
+<g transform="translate(18,120.0) rotate(-90)"><text x="0.0" y="0.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#607d8b" text-anchor="middle" font-weight="normal">evasion arm</text></g>
+<text x="135.0" y="68.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">7</text>
+<text x="213.0" y="68.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">8</text>
+<text x="291.0" y="68.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">9</text>
+<text x="369.0" y="68.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">10</text>
+<text x="447.0" y="68.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">11</text>
+<text x="525.0" y="68.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">12</text>
+<text x="86.0" y="105.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">blind</text>
+<rect x="96" y="78" width="78" height="46" fill="#ffffff" stroke="#cfd8dc"/>
+<text x="135.0" y="105.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#263238" text-anchor="middle" font-weight="normal">18.2</text>
+<rect x="174" y="78" width="78" height="46" fill="#ffeaea" stroke="#cfd8dc"/>
+<text x="213.0" y="105.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#263238" text-anchor="middle" font-weight="normal">19.9</text>
+<rect x="252" y="78" width="78" height="46" fill="#fff9f9" stroke="#cfd8dc"/>
+<text x="291.0" y="105.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#263238" text-anchor="middle" font-weight="normal">18.7</text>
+<rect x="330" y="78" width="78" height="46" fill="#ffe9e9" stroke="#cfd8dc"/>
+<text x="369.0" y="105.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#263238" text-anchor="middle" font-weight="normal">19.9</text>
+<rect x="408" y="78" width="78" height="46" fill="#ffd6d6" stroke="#cfd8dc"/>
+<text x="447.0" y="105.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#263238" text-anchor="middle" font-weight="normal">21.5</text>
+<rect x="486" y="78" width="78" height="46" fill="#ffd8d8" stroke="#cfd8dc"/>
+<text x="525.0" y="105.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#263238" text-anchor="middle" font-weight="normal">21.3</text>
+<text x="86.0" y="151.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">belief</text>
+<rect x="96" y="124" width="78" height="46" fill="#ff8a8a" stroke="#cfd8dc"/>
+<text x="135.0" y="151.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#263238" text-anchor="middle" font-weight="normal">27.5</text>
+<rect x="174" y="124" width="78" height="46" fill="#ff5252" stroke="#cfd8dc"/>
+<text x="213.0" y="151.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#263238" text-anchor="middle" font-weight="normal">32.0</text>
+<rect x="252" y="124" width="78" height="46" fill="#ff4a4a" stroke="#cfd8dc"/>
+<text x="291.0" y="151.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#263238" text-anchor="middle" font-weight="normal">32.6</text>
+<rect x="330" y="124" width="78" height="46" fill="#ff3b3b" stroke="#cfd8dc"/>
+<text x="369.0" y="151.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#263238" text-anchor="middle" font-weight="normal">33.8</text>
+<rect x="408" y="124" width="78" height="46" fill="#ff3d3d" stroke="#cfd8dc"/>
+<text x="447.0" y="151.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#263238" text-anchor="middle" font-weight="normal">33.6</text>
+<rect x="486" y="124" width="78" height="46" fill="#ff3333" stroke="#cfd8dc"/>
+<text x="525.0" y="151.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#263238" text-anchor="middle" font-weight="normal">34.5</text>
+<text x="297.0" y="232.0" font-family="Segoe UI,Arial,sans-serif" font-size="9" fill="#607d8b" text-anchor="middle" font-weight="normal">scale: 18.2 (white) to 34.5 (red)</text>
+</svg>

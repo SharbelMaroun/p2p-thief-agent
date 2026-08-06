@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" width="720" height="400" role="img">
+<title>Survival steps by evasion arm</title><desc>24 perimeter openings. Blind is bimodal — 11 total escapes and the rest caught early — while belief is consistent but escapes outright only 4 times.</desc>
+<rect width="720" height="400" fill="#ffffff"/>
+<text x="360.0" y="24.0" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#263238" text-anchor="middle" font-weight="bold">Survival steps by evasion arm</text>
+<text x="360.0" y="42.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">24 perimeter openings. Blind is bimodal — 11 total escapes and the rest caught early — while belief is consistent but escapes outright only 4 times.</text>
+<text x="360.0" y="392.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#607d8b" text-anchor="middle" font-weight="normal">evasion arm</text>
+<g transform="translate(16,200.0) rotate(-90)"><text x="0.0" y="0.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#607d8b" text-anchor="middle" font-weight="normal">steps survived (max 35)</text></g>
+<line x1="70" y1="330.0" x2="690" y2="330.0" stroke="#e0e0e0"/>
+<text x="62.0" y="334.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">0.00</text>
+<line x1="70" y1="275.2" x2="690" y2="275.2" stroke="#e0e0e0"/>
+<text x="62.0" y="279.2" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">7.00</text>
+<line x1="70" y1="220.4" x2="690" y2="220.4" stroke="#e0e0e0"/>
+<text x="62.0" y="224.4" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">14.00</text>
+<line x1="70" y1="165.6" x2="690" y2="165.6" stroke="#e0e0e0"/>
+<text x="62.0" y="169.6" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">21.00</text>
+<line x1="70" y1="110.8" x2="690" y2="110.8" stroke="#e0e0e0"/>
+<text x="62.0" y="114.8" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">28.00</text>
+<line x1="70" y1="56.0" x2="690" y2="56.0" stroke="#e0e0e0"/>
+<text x="62.0" y="60.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">35.00</text>
+<line x1="225.0" y1="314.3" x2="225.0" y2="56.0" stroke="#263238"/>
+<line x1="208.0" y1="314.3" x2="242.0" y2="314.3" stroke="#263238"/>
+<line x1="208.0" y1="56.0" x2="242.0" y2="56.0" stroke="#263238"/>
+<rect x="191.0" y="56.0" width="68.0" height="242.7" fill="#2980b9" fill-opacity="0.35" stroke="#2980b9"/>
+<line x1="191.0" y1="279.1" x2="259.0" y2="279.1" stroke="#2980b9" stroke-width="3"/>
+<text x="225.0" y="348.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">blind</text>
+<text x="225.0" y="362.0" font-family="Segoe UI,Arial,sans-serif" font-size="9" fill="#607d8b" text-anchor="middle" font-weight="normal">n=24</text>
+<line x1="535.0" y1="283.0" x2="535.0" y2="56.0" stroke="#263238"/>
+<line x1="518.0" y1="283.0" x2="552.0" y2="283.0" stroke="#263238"/>
+<line x1="518.0" y1="56.0" x2="552.0" y2="56.0" stroke="#263238"/>
+<rect x="501.0" y="69.7" width="68.0" height="56.8" fill="#e67e22" fill-opacity="0.35" stroke="#e67e22"/>
+<line x1="501.0" y1="106.9" x2="569.0" y2="106.9" stroke="#e67e22" stroke-width="3"/>
+<text x="535.0" y="348.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">belief</text>
+<text x="535.0" y="362.0" font-family="Segoe UI,Arial,sans-serif" font-size="9" fill="#607d8b" text-anchor="middle" font-weight="normal">n=24</text>
+</svg>

@@ -1,0 +1,194 @@
+{
+  "appendix_f_status": "Minimum",
+  "max_steps": 35,
+  "minimum": 7,
+  "parameter": "board_and_agents.grid_size",
+  "points": [
+    {
+      "belief": {
+        "max": 35.0,
+        "mean": 27.5417,
+        "median": 28.5,
+        "min": 6.0,
+        "q1": 26.0,
+        "q3": 33.25,
+        "runs": 24,
+        "stdev": 7.6328
+      },
+      "blind": {
+        "max": 35.0,
+        "mean": 18.2083,
+        "median": 6.5,
+        "min": 2.0,
+        "q1": 4.0,
+        "q3": 35.0,
+        "runs": 24,
+        "stdev": 15.8141
+      },
+      "paired": {
+        "losses": 11,
+        "pairs": 24,
+        "ties": 0,
+        "win_share_of_decisive": 0.5417,
+        "wins": 13
+      },
+      "scenarios": 24,
+      "value": 7
+    },
+    {
+      "belief": {
+        "max": 35.0,
+        "mean": 31.9643,
+        "median": 35.0,
+        "min": 15.0,
+        "q1": 32.0,
+        "q3": 35.0,
+        "runs": 28,
+        "stdev": 5.614
+      },
+      "blind": {
+        "max": 35.0,
+        "mean": 19.8929,
+        "median": 21.5,
+        "min": 3.0,
+        "q1": 4.0,
+        "q3": 35.0,
+        "runs": 28,
+        "stdev": 15.4257
+      },
+      "paired": {
+        "losses": 10,
+        "pairs": 28,
+        "ties": 4,
+        "win_share_of_decisive": 0.5833,
+        "wins": 14
+      },
+      "scenarios": 28,
+      "value": 8
+    },
+    {
+      "belief": {
+        "max": 35.0,
+        "mean": 32.5938,
+        "median": 35.0,
+        "min": 8.0,
+        "q1": 35.0,
+        "q3": 35.0,
+        "runs": 32,
+        "stdev": 6.3999
+      },
+      "blind": {
+        "max": 35.0,
+        "mean": 18.6562,
+        "median": 9.0,
+        "min": 4.0,
+        "q1": 5.0,
+        "q3": 35.0,
+        "runs": 32,
+        "stdev": 14.7202
+      },
+      "paired": {
+        "losses": 2,
+        "pairs": 32,
+        "ties": 12,
+        "win_share_of_decisive": 0.9,
+        "wins": 18
+      },
+      "scenarios": 32,
+      "value": 9
+    },
+    {
+      "belief": {
+        "max": 35.0,
+        "mean": 33.8333,
+        "median": 35.0,
+        "min": 19.0,
+        "q1": 35.0,
+        "q3": 35.0,
+        "runs": 36,
+        "stdev": 3.8285
+      },
+      "blind": {
+        "max": 35.0,
+        "mean": 19.9444,
+        "median": 11.5,
+        "min": 3.0,
+        "q1": 6.0,
+        "q3": 35.0,
+        "runs": 36,
+        "stdev": 14.5719
+      },
+      "paired": {
+        "losses": 2,
+        "pairs": 36,
+        "ties": 15,
+        "win_share_of_decisive": 0.9048,
+        "wins": 19
+      },
+      "scenarios": 36,
+      "value": 10
+    },
+    {
+      "belief": {
+        "max": 35.0,
+        "mean": 33.625,
+        "median": 35.0,
+        "min": 10.0,
+        "q1": 35.0,
+        "q3": 35.0,
+        "runs": 40,
+        "stdev": 4.8553
+      },
+      "blind": {
+        "max": 35.0,
+        "mean": 21.475,
+        "median": 24.5,
+        "min": 4.0,
+        "q1": 7.0,
+        "q3": 35.0,
+        "runs": 40,
+        "stdev": 13.8582
+      },
+      "paired": {
+        "losses": 3,
+        "pairs": 40,
+        "ties": 17,
+        "win_share_of_decisive": 0.8696,
+        "wins": 20
+      },
+      "scenarios": 40,
+      "value": 11
+    },
+    {
+      "belief": {
+        "max": 35.0,
+        "mean": 34.4545,
+        "median": 35.0,
+        "min": 23.0,
+        "q1": 35.0,
+        "q3": 35.0,
+        "runs": 44,
+        "stdev": 2.5285
+      },
+      "blind": {
+        "max": 35.0,
+        "mean": 21.3409,
+        "median": 15.5,
+        "min": 4.0,
+        "q1": 7.75,
+        "q3": 35.0,
+        "runs": 44,
+        "stdev": 13.444
+      },
+      "paired": {
+        "losses": 0,
+        "pairs": 44,
+        "ties": 21,
+        "win_share_of_decisive": 1.0,
+        "wins": 23
+      },
+      "scenarios": 44,
+      "value": 12
+    }
+  ]
+}

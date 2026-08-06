@@ -899,9 +899,46 @@ doubles survival — **125 vs 52** steps over four fixed pursuit scenarios
 
 ### 4. Learning curves
 
-**Not applicable.** No reinforcement learning is used; the policy is deterministic by
-design, so there is no training run and no curve. If RL is adopted, this section
-gains the curves rather than a placeholder chart.
+The book requires learning curves **"if RL was used"** (p.81/189). This policy is
+deterministic and weight-free, so there is no convergence to plot, and the book is silent on
+a substitute. [`docs/RESEARCH-REPORT-Performance-Analysis.md`](docs/RESEARCH-REPORT-Performance-Analysis.md)
+answers the same question by measurement — and the answer is uncomfortable.
+
+![The two metrics rank the strategies in opposite directions](assets/chart-metric-disagreement.svg)
+
+**`M6-015`'s acceptance criterion measures a quantity the game does not score.** It asserts
+that belief-driven evasion beats the blind baseline on *total survival steps*, over four
+fixed openings, and it does: 125 to 52. Widening to all 24 perimeter openings and scoring
+the runs the way Appendix F scores them:
+
+| Metric | blind | belief | Winner |
+|---|---|---|---|
+| Total survival steps | 437 | **661** | belief (1.51×) |
+| Scenarios reaching the horizon | **11** | 4 | blind |
+| **League points** (10 survive / 5 captured, both `Fixed`) | **175** | 140 | **blind** |
+
+There is nothing between 5 and 10: a policy that reliably survives 28 of 35 turns scores
+exactly what one caught on turn 2 scores.
+
+![Survival steps by evasion arm](assets/chart-survival-distribution.svg)
+
+The blind baseline is **bimodal** — 11 outright escapes, the rest caught in 2–7 turns.
+Belief is **consistent** — median 29, standard deviation halved from 15.8 to 7.6 — but
+converts far fewer scenarios into the only outcome that pays. Paired, belief wins 13 and
+loses 11.
+
+This is not proof that blind is the better strategy: it is one deterministic Cop on one
+board, and a pursuer that anticipated evasion could reverse it. It *is* evidence that the
+criterion behind `M6-015` does not track the scoring rules, and that four scenarios were too
+few to notice. Opened as **`M6-015c`** rather than silently patched — changing the strategy
+is a larger decision than a measurement batch.
+
+Six charts, all SVG, all regenerable:
+
+```text
+uv run python scripts/run_experiments.py
+uv run python scripts/render_charts.py
+```
 
 ### 5. Live belief map and "Verified OK" replay screenshots
 
