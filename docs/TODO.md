@@ -584,7 +584,7 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-008b | Prove any past game's config is retrievable from the repo | PENDING | A retrieval test walks the committed set |
 | M7-009 | Account for LLM tokens across a series | PENDING | Per-game and per-series totals counted, sealed at Step-0, and reported `[AE-54]` |
 | M7-010 | Emit warm-up games as uncounted | PENDING | A warm-up produces artifacts but never enters the counted total `[AE-52]` |
-| M7-011 | Persist artifacts atomically | PENDING | A crash mid-write cannot leave a half-written artifact that later fails audit |
+| M7-011 | Persist artifacts atomically | IN PROGRESS | A crash mid-write cannot leave a half-written artifact that later fails audit |
 | M7-012 | Validate every emitted artifact against its schema | PENDING | An artifact that fails its own schema is never sent |
 | M7-012a | Validate the declaration artifact | PENDING | Required identity, hardware, and timing fields present |
 | M7-012b | Validate the config artifact | PENDING | Every Appendix F parameter present with a legal value |
@@ -604,10 +604,10 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-015a | Retry after a 429 with backoff | PENDING | Respect the throttle rather than hammering `[book §12]` |
 | M7-015b | Surface a permanently failed send loudly | PENDING | An unsent report costs the game's points `[AE-32]` |
 | M7-015c | Never send twice for one game | PENDING | Duplicate reports risk a conflict verdict `[AE-35]` |
-| M7-016 | Implement result agreement with the opponent | PENDING | Both sides converge on one result before either reports |
-| M7-016a | Exchange the computed outcome after the audit | PENDING | Agreement follows audit, never precedes it `[AE-36]` |
-| M7-016b | Detect and record a disagreement | PENDING | A conflict is 0/0 for both and must be visible `[AE-35]` |
-| M7-016c | Refuse to report an unagreed result | PENDING | Reporting a disputed outcome invites the conflict sanction |
+| M7-016 | Implement result agreement with the opponent | IN PROGRESS | Both sides converge on one result before either reports |
+| M7-016a | Exchange the computed outcome after the audit | IN PROGRESS | Agreement follows audit, never precedes it `[AE-36]` |
+| M7-016b | Detect and record a disagreement | IN PROGRESS | A conflict is 0/0 for both and must be visible `[AE-35]` |
+| M7-016c | Refuse to report an unagreed result | IN PROGRESS | Reporting a disputed outcome invites the conflict sanction |
 | M7-017 | Implement series-level score aggregation evidence | PENDING | The cumulative figure is reproducible from the artifact set |
 | M7-017a | Recompute the series total from stored artifacts | PENDING | No in-memory-only total is trusted |
 | M7-017b | Apply the diversity reward for a new opponent | PENDING | `[AF-t18]`; a repeat opponent adds nothing |
