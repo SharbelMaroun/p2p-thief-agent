@@ -8,12 +8,14 @@ Companion Cop repository:
 
 ## Milestone status
 
-M0, M2, and M3 are `DONE`, and the simulator-conformant protocol layer (commit-reveal,
+M2, M4, and M6 are complete, and the simulator-conformant protocol layer (commit-reveal,
 canonical hashing, wire messages, signed-terms handshake) is implemented. M1 is
 `IN PROGRESS`: the wire profile is authored and adopted, but no acceptance verdict is
-recorded and the contract checker stays fail-closed. M4–M9 are `PENDING` and proceed
-sequentially; unresolved choices are raised explicitly rather than classified as
-blockers.
+recorded and the contract checker stays fail-closed. M5 and M7 are substantially built
+(71/80 and 34/86 rows). **M8 and M9 have not started** — 58 and 78 open rows — and M8
+contains rule 20's replay application, whose sanction is a threshold condition for
+submission, so it is the highest-consequence gap in this repository. Unresolved choices
+are raised explicitly rather than classified as blockers.
 
 Version `1.00` began as an M0–M1 documentation and package scaffold. The inspected
 baseline (`119fa911d5b1a5aecdaa9531d0912e5c6f9ab32f`) contained no Python package,
@@ -894,15 +896,28 @@ gains the curves rather than a placeholder chart.
 
 ### 5. Live belief map and "Verified OK" replay screenshots
 
-**Still blocked, but for a narrower reason than before.** A bounded sub-game now runs
-end to end and its audit is delivered: every turn and the final reveal cross a real
-socket into a separate operating-system process, which validates each one — and a
-*tampered* audit is rejected there, so rule 19 is enforced over a real carrier rather
-than asserted locally.
+**Still blocked, and the reason is now precisely known rather than approximate.** A bounded
+sub-game runs end to end and its audit is delivered: every turn and the final reveal cross
+a real socket into a separate operating-system process, which validates each one — and a
+*tampered* audit is rejected there, so rule 19 is enforced over a real carrier rather than
+asserted locally.
 
-What is missing for a screenshot is a **second peer that plays back**. The Cop's
-replies in those runs come from a local script, so there is no live belief map to
-photograph yet, and there is no GUI.
+Two things are missing. The first is a **second peer that plays back**: the Cop's replies
+in those runs come from a local script, so there is no live belief map to photograph yet.
+The second is the **replay application itself** (`M8-002`), which this repository has not
+started.
+
+The requirements for it are no longer open questions. Rule 20's sanction is a "threshold
+condition for confirmation of logs and submission of the project" (p. 129/272) — the
+project is not accepted without it, which makes this the highest-consequence row left here.
+Rule 36's "comprehensive mutual log audit" (p. 131/276) means the viewer must verify the
+**opponent's** log, not only ours. And `C-016` — which recorded the chapter 7 and chapter 5
+hash constructions as an unresolved conflict — is now reclassified `RESOLVED`, because
+`:1757` footnotes the chapter 7 sketch in the book's own voice as a simplification that
+names chapter 5 as normative. Nothing is escalated; `docs/PRD_replay.md` carries the full
+acceptance criteria, including the one that a digest check alone does not cover: a record
+whose visible `move` contradicts its sealed payload is `TAMPERED` even when the hash
+matches.
 
 ### 6. Companion repository
 
