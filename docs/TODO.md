@@ -721,13 +721,13 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M9-004 | Run all gates from a clean frozen environment and complete security/provenance review | PENDING | Final validation record |
 | M9-004a | Verify no secret exists anywhere in Git history | PENDING | `[AE-39]`; a secret committed once requires rotation |
 | M9-005 | Create the reviewed annotated `v1.0-submission` release tag | PENDING | Tag points to accepted submission commit `[AE-41]` |
-| M9-006 | Complete parameter research and sensitivity analysis | PENDING | Guidelines §9.1: systematic one-at-a-time experiments across the negotiable parameters, with the measured effect of each on match outcomes documented in tables |
-| M9-006a | Sweep the negotiable board and movement parameters | PENDING | Grid size, barrier quota, step limit, survival threshold |
-| M9-006b | Sweep the scent parameters within their fixed bounds | PENDING | Sensitivity to `ρ` and field size, noting both are `Fixed` for play |
-| M9-006c | Record each parameter's measured effect on outcome | PENDING | Experiment tables with run counts, not anecdotes |
-| M9-007 | Publish the results-analysis notebook and result visualisations | PENDING | Guidelines §9.2/§9.3: a notebook compares strategies and configurations, uses LaTeX for equations, cites academic references, and emits labelled high-resolution charts |
-| M9-007a | Compare the baseline against belief-driven evasion | PENDING | Survival rate and mean survived turns over repeated runs |
-| M9-007b | Emit labelled, accessible, high-resolution charts | PENDING | Clear axes, legend, caption `[G§9.3]` |
+| M9-006 | Complete parameter research and sensitivity analysis | IN PROGRESS | Guidelines §9.1: systematic one-at-a-time experiments across the negotiable parameters, with the measured effect of each on match outcomes documented in tables |
+| M9-006a | Sweep the negotiable board and movement parameters | IN PROGRESS | Grid size, barrier quota, step limit, survival threshold |
+| M9-006b | Sweep the scent parameters within their fixed bounds | IN PROGRESS | Sensitivity to `ρ` and field size, noting both are `Fixed` for play |
+| M9-006c | Record each parameter's measured effect on outcome | IN PROGRESS | Experiment tables with run counts, not anecdotes |
+| M9-007 | Publish the results-analysis notebook and result visualisations | IN PROGRESS | Guidelines §9.2/§9.3: a notebook compares strategies and configurations, uses LaTeX for equations, cites academic references, and emits labelled high-resolution charts |
+| M9-007a | Compare the baseline against belief-driven evasion | IN PROGRESS | Survival rate and mean survived turns over repeated runs |
+| M9-007b | Emit labelled, accessible, high-resolution charts | IN PROGRESS | Clear axes, legend, caption `[G§9.3]` |
 | M9-007c | Cite academic references and format equations in LaTeX | PENDING | `[G§9.2]` |
 | M9-008 | Evidence ISO/IEC 25010, extension points, and concurrency safety | PENDING | Guidelines §12/§13/§15 (grouped as "Extension and Standards" in their §17.6): the eight quality characteristics are evidenced, extension seams are documented, and any threading or multiprocessing carries a thread-safety justification |
 | M9-008a | Map the eight ISO/IEC 25010 characteristics to evidence | PENDING | One evidence pointer per characteristic `[G§13.1]` |
