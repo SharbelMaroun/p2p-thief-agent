@@ -4,6 +4,13 @@
 `docs/JSON_ARTIFACT_SCHEMAS.md`, authorised pending a `U-019` ruling. It carries the
 step-by-step commit-reveal records — each with its `payload`, `nonce`, and `commit` — so a
 third party can recompute every commitment (`M7-022`).
+
+**Why the end time is checked before anything is assembled** (`M7-022b`). Every record here
+carries its nonce, and rule 18 keeps nonces secret until the end of the game — sanction
+"disqualification due to the possibility of a dictionary attack". A finished log is
+byte-identical whether it was written at the end or leaked at step one, so no later check
+can tell the difference. Refusing to *build* the artifact while the summary has no
+`ended_at` is the only place the rule can be enforced at all.
 """
 
 from __future__ import annotations
@@ -31,6 +38,11 @@ def build_log(
 ) -> dict:
     """Assemble the per-sub-game log artifact (`M7-002c`)."""
     _require(summary, _SUMMARY_KEYS, "log summary")
+    if not summary.get("ended_at"):
+        raise ArtifactError(
+            "a log summary with no end time describes a game still in play, and every "
+            "record here carries its nonce; rule 18 keeps nonces secret until the end of "
+            "the game, so this artifact must not be built yet [AE-18]")
     if not records:
         raise ArtifactError("a game log must carry at least one step record")
     for record in records:

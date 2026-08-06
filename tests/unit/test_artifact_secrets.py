@@ -67,10 +67,10 @@ FINAL = {"total_score": 25, "sub_games_won": 3, "ties": 0, "winner_group": "shar
 # The reveal-audit block both the log and the result carry. Named so the two artifacts
 # cannot drift apart in this fixture the way they could in a hand-written one.
 AGREEMENT = {"confirmed": True, "opponent_group_id": "opp", "sha256": "f" * 64}
-SUMMARY = dict.fromkeys(
+SUMMARY = {**dict.fromkeys(
     ("sub_game_number", "group_id", "role", "opponent_group_id", "result", "winner_role",
-     "steps", "timezone", "started_at", "ended_at", "duration_seconds", "tokens_total",
-     "audit"), 0)
+     "steps", "timezone", "started_at", "duration_seconds", "tokens_total", "audit"), 0),
+    "ended_at": "t1"}  # `M7-022b`: a log with no end time is a game still in play [AE-18]
 
 
 def _artifacts() -> dict[str, object]:
@@ -78,7 +78,7 @@ def _artifacts() -> dict[str, object]:
     return {
         "declaration": build_declaration(identity=ID, groups=GROUPS, num_sub_games=6,
                                          max_tokens_per_game=1000, timezone="UTC",
-                                         started_at="t0", ended_at="t1", links={}),
+                                         started_at="t0", ended_at="t1", links={}, github_commit="a" * 40),
         "config": build_config(identity=ID, sub_game_number=1,
                                agreed_between=["sharNamr", "opp"], sections=SECTIONS,
                                links={}, config_name="config_secret-scan_g01.json"),
