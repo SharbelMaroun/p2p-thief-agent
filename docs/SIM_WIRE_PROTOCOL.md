@@ -68,15 +68,28 @@ roster is each peer's own choice, never a cross-peer schema. The same `canonical
 hashes the agreed config and audits. Our sealed step payload roster lives in
 `protocol/sealing.py` (`sealed_step_payload`).
 
+### The `exchange_audit` confusion, twice now
+
+A reference-code notebook asserted on 2026-08-06 that `submit_audit` was "an error" and
+that `exchange_audit` "is the only registered MCP tool name". It is wrong, and it said so
+while admitting the `@mcp.tool()` lines were "truncated in the excerpts" — it was reading
+`infra/mcp_client.py`, the **client**.
+
+`OPTION_B_INTEROP_DECISION.md` settled this already: `submit_audit` is the exposed server
+tool; `exchange_audit` is only the reference's client-side method that calls it. The Cop
+repository records the same conclusion in `ADR-001` and `OB-003`. Left here because the
+confusion has now surfaced twice, and the next person to ask will be told the same wrong
+thing with the same confidence.
+
 ## Messages (`protocol/wire.py`)
 
 - **TurnMessage**: `step, sender, hint, smell_grid, commit, timestamp` (+ optional
   `barrier_placed, capture_claim, claim_response, win_claim`). `smell_grid` is a dict
-  `{"r,c": intensity}`. Rejects unknown fields.
+  `{"r,c": intensity}`. **Ignores unknown fields** — corrected 2026-08-06: the code has used `_known_only` since the `X-02` fix, and this line still said "rejects". A classmate implementing to the old wording would have expected a refusal we no longer give.
 - **ControlMessage**: `kind, sender` (+ `sub_game_number, status, step_budget, payload`).
   Ignores unknown keys (matching the sim).
 - **AuditPayload**: `sender, records[{payload,nonce,commit}], result_claim` where
-  `result_claim ∈ {capture, survival, timeout}`. Rejects unknown fields.
+  `result_claim ∈ {capture, survival, timeout}`. **Ignores unknown fields** (same `X-02` correction).
 
 ## Handshake (`protocol/handshake.py`)
 

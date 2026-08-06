@@ -614,6 +614,56 @@ of interoperability is a `Verified OK` replay of a real match, and Appendix E ru
 permits warm-up games for exactly that purpose — which is the standard `M1-015`–`M1-017`
 are working toward, and a stronger one than copying files could ever provide.
 
+#### An opponent that shares none of our code (`M1-015`, `M1-016`, `M1-017`, 2026-08-06)
+
+Every interoperability test in this repository until now drove our client against our own
+server. That proves less than it looks: both sides share the constant a typo would live
+in, so the typo cancels out and the suite stays green. `tests/conformance/` fixes that.
+
+`neutral_peer.py` imports **nothing** from `p2p_thief_agent` — standard library only —
+and re-derives canonicalization and the commit construction from `SIM_WIRE_PROTOCOL.md`
+rather than calling ours. When our sealed message verifies over there, two
+implementations agree.
+
+**Demonstrated rather than asserted.** Changing the commit separator in
+`protocol/crypto.py` from `|` to `:` — one character — fails four conformance tests and
+nothing else in the suite. It reproduces our digest on a float (`31.8`) and a non-ASCII
+payload (`café`), the two cross-language hazards a Python-only test cannot surface.
+
+The wire half matters separately. `test_conformance_wire.py` drives the production
+`FastMCPClient` against the stub behind a real FastMCP server, and discovers the tools
+the way a stranger does — over the wire, with a plain MCP client, not by reading our own
+constants. If our client called a tool a peer registered under another name, every rule in
+the project could be right and the two agents would still never exchange a message. The
+rules-level suite would stay green throughout, because it never uses a name.
+
+**Where the sources stop, and where we say so.** `M1-017`'s seven categories each map to
+a numbered Appendix E rule — participant/config to rule 11 (Mandatory, "disqualification
+due to lack of symmetry"), hash to rule 19 (Mandatory, iron rule, score 0), private
+leakage to rule 2 (Prohibited, immediate disqualification), replay to rule 29. Two do
+not. A *version* refuses through rule 11 because it is a signed term, not because a rule
+governs versions. And **ordering has no rule at all**: asked directly, the reference does
+not gate ingestion on step sequence — it queues a duplicate for the peer loop. So the
+stub accepts one by default and refuses only under `strict_ordering`, which is ours. A
+stub stricter than every real opponent would have us "fix" behaviour that was never
+wrong.
+
+**A limit this suite does not overcome.** The stub and the agent it tests were written by
+the same team in the same session. "Independently authored" holds at the level of source
+files, imports, and re-derived constants — it does not reach the strongest form, a
+different author entirely. The book's own standard for interoperability evidence is a
+`Verified OK` replay of a real match, and Appendix E rule 52 permits warm-up games for
+exactly that. This is a floor, not that ceiling.
+
+*Two defects found on the way.* The profile still said `TurnMessage` and `AuditPayload`
+"reject unknown fields"; the code has ignored them since the `X-02` fix, so a classmate
+implementing to our published wording would have expected a refusal we no longer give.
+And a notebook asserted that `submit_audit` was "an error" and `exchange_audit` "the only
+registered tool name" — while admitting the `@mcp.tool()` lines were truncated and it was
+reading the *client*. `OPTION_B_INTEROP_DECISION.md` had already settled it: the reference's
+`exchange_audit` is a client-side method that calls the server's `submit_audit`. That
+confusion has now surfaced twice, so the profile records it for whoever asks next.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
