@@ -643,10 +643,10 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-001c | Lock input while the banner is grey | PENDING | Out-of-turn input is ignored |
 | M8-001d | Prove the objective board is never renderable | PENDING | `[AE-8]` `[AE-9]` |
 | M8-002 | Build replay UI on the accepted verifier | PENDING | Valid/malformed/reordered/tampered replay tests |
-| M8-002a | Load a saved match log and step forward/back | PENDING | `[AE-20]` mandatory `[PRD-replay]` |
-| M8-002b | Recompute every step's hash and compare | PENDING | Uses the M4 construction |
-| M8-002c | Void the whole match on the first mismatch | PENDING | A single tampered step yields `TAMPERED` |
-| M8-002d | Record why the book's chapter-7 verifier is not used | PENDING | Book p. 74 computes `SHA256("{nonce}|{move}")`, which cannot verify a chapter-5 commitment |
+| M8-002a | Load a saved match log and step forward/back | IN PROGRESS | `[AE-20]` mandatory `[PRD-replay]` |
+| M8-002b | Recompute every step's hash and compare | IN PROGRESS | Uses the M4 construction |
+| M8-002c | Void the whole match on the first mismatch | IN PROGRESS | A single tampered step yields `TAMPERED` |
+| M8-002d | Record why the book's chapter-7 verifier is not used | IN PROGRESS | Book p. 74 computes `SHA256("{nonce}|{move}")`, which cannot verify a chapter-5 commitment |
 | M8-002e | Document the replay UI workflow and states | PENDING | Screens, controls, and both verdict states described `[G§10.2]` |
 | M8-003 | Run bidirectional games against a neutral compliant-opponent harness | PENDING | Unknown-opponent E2E evidence |
 | M8-003a | Rehearse against a stub that shares no source with this repo | PENDING | Independently authored; imports no project module |
@@ -666,11 +666,11 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-007a | Render known barriers only | PENDING | A barrier appears only once disclosed `[AE-15]` |
 | M8-007b | Render received hints as text | PENDING | The verbal channel is visible to the operator |
 | M8-007c | Show the current score and step count | PENDING | Operator can see progress toward the threshold |
-| M8-008 | Implement replay navigation | PENDING | Step forward, step back, and jump to a step |
-| M8-008a | Recompute verification on every navigation | PENDING | The verdict is derived, never cached from load time |
+| M8-008 | Implement replay navigation | IN PROGRESS | Step forward, step back, and jump to a step |
+| M8-008a | Recompute verification on every navigation | IN PROGRESS | The verdict is derived, never cached from load time |
 | M8-008b | Show the per-step verdict alongside the board | PENDING | Operator sees where a match failed |
-| M8-008c | Load a malformed log without crashing | PENDING | Corrupt input yields a clear error, not a stack trace |
-| M8-008d | Detect a reordered log | PENDING | Step sequence is validated, not assumed |
+| M8-008c | Load a malformed log without crashing | IN PROGRESS | Corrupt input yields a clear error, not a stack trace |
+| M8-008d | Detect a reordered log | IN PROGRESS | Step sequence is validated, not assumed |
 | M8-009 | Run the security review | PENDING | Secrets, identity, input validation, and dependencies all reviewed |
 | M8-009a | Confirm no secret is readable from any artifact | PENDING | Artifacts are shared; secrets must not travel in them `[AE-39]` |
 | M8-009b | Confirm no private field crosses the wire | PENDING | Leakage vector per private field class |
@@ -682,9 +682,9 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-011 | Document both interfaces | PENDING | Screens, states, and workflows described `[G§10.2]` |
 | M8-011a | Document the live GUI workflow | PENDING | Turn banner states and what each means |
 | M8-011b | Document accessibility considerations | PENDING | Colour is not the only signal `[G§10.2]` |
-| M8-012 | Prove the replay app on a foreign log | PENDING | It verifies a log this peer did not write |
-| M8-012a | Verify an opponent-produced log | PENDING | The audit is mutual; both logs must verify `[AE-36]` |
-| M8-012b | Detect a foreign log that was tampered | PENDING | The detection path is not self-only |
+| M8-012 | Prove the replay app on a foreign log | IN PROGRESS | It verifies a log this peer did not write |
+| M8-012a | Verify an opponent-produced log | IN PROGRESS | The audit is mutual; both logs must verify `[AE-36]` |
+| M8-012b | Detect a foreign log that was tampered | IN PROGRESS | The detection path is not self-only |
 | M8-013 | Rehearse the full failure matrix end to end | PENDING | Every fault class has an observed outcome, not a predicted one |
 | M8-013a | Rehearse an opponent crash mid-series | PENDING | The series still produces artifacts |
 | M8-013b | Rehearse a tunnel drop mid-turn | PENDING | Terminal outcome is defined, not a hang |
