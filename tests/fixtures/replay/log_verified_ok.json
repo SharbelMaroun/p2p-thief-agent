@@ -1,0 +1,126 @@
+{
+  "_schema": "game-log",
+  "schema_version": "1.2",
+  "game_id": "demo-vs-rival",
+  "game_uid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "sub_game_number": 2,
+  "summary": {
+    "outcome": "survival",
+    "turns": 8,
+    "thief_score": 10
+  },
+  "records": [
+    {
+      "step": 1,
+      "sender": "thief",
+      "commit": "21286031ff2c771f812bae8e611502baabe239dbc53f8e467cd47e13a56b90bd",
+      "move": "E",
+      "hint": "slipping past the market",
+      "intent": true,
+      "payload": {
+        "step": 1,
+        "move": "E",
+        "intent": true
+      },
+      "nonce": "b3d68b6d77b369ecaa224698d2840d33"
+    },
+    {
+      "step": 2,
+      "sender": "police",
+      "commit": "9a408b8eac4e3df852c4901951a5474aebec605f4cae0424ba89285b33027bc5",
+      "move": "E",
+      "hint": "slipping past the market",
+      "intent": true,
+      "payload": {
+        "step": 2,
+        "move": "E",
+        "intent": true
+      },
+      "nonce": "1b5c10edabc1ae2b53b4bdbd62b577d1"
+    },
+    {
+      "step": 3,
+      "sender": "thief",
+      "commit": "688407a25ea82193bc7898d15806ae757028e06a89acc996ed47dffbebd862ca",
+      "move": "S",
+      "hint": "slipping past the market",
+      "intent": false,
+      "payload": {
+        "step": 3,
+        "move": "S",
+        "intent": false
+      },
+      "nonce": "4f6a8adf4cad0187298535f386258f3d"
+    },
+    {
+      "step": 4,
+      "sender": "police",
+      "commit": "5c94648e51a233d97c4a23647c70eae250dc1e131dfa992b5ccfdab2a6b3728e",
+      "move": "E",
+      "hint": "slipping past the market",
+      "intent": true,
+      "payload": {
+        "step": 4,
+        "move": "E",
+        "intent": true
+      },
+      "nonce": "36dc9c09b6df063c55bb11a74f18ef2c"
+    },
+    {
+      "step": 5,
+      "sender": "thief",
+      "commit": "1aea45f7c486706971715c1f34657af4b67e28825bc68ffb46c7e43acfe5266b",
+      "move": "N",
+      "hint": "slipping past the market",
+      "intent": true,
+      "payload": {
+        "step": 5,
+        "move": "N",
+        "intent": true
+      },
+      "nonce": "2a2e65cbbc81764a904d9d55fe947da8"
+    },
+    {
+      "step": 6,
+      "sender": "police",
+      "commit": "a4ae71ec94d4c64c69b7d5e5eba872f2b78de7f09d3c8b39b28334182c27504a",
+      "move": "E",
+      "hint": "slipping past the market",
+      "intent": false,
+      "payload": {
+        "step": 6,
+        "move": "E",
+        "intent": false
+      },
+      "nonce": "ed7af82ed78ab76c0e42b42a80763578"
+    },
+    {
+      "step": 7,
+      "sender": "thief",
+      "commit": "7073d9b8030cab971d839470eb3af7fc9de49b20a5ddf4db3c0160190db98213",
+      "move": "S",
+      "hint": "slipping past the market",
+      "intent": true,
+      "payload": {
+        "step": 7,
+        "move": "S",
+        "intent": true
+      },
+      "nonce": "8b7bb5d0715b33a8211bc3ebdb0e39b2"
+    },
+    {
+      "step": 8,
+      "sender": "police",
+      "commit": "dc10ddd4292978f35f985d01c0ab6dc450f6f2c0d428b69f9e75305a19257330",
+      "move": "W",
+      "hint": "slipping past the market",
+      "intent": true,
+      "payload": {
+        "step": 8,
+        "move": "W",
+        "intent": true
+      },
+      "nonce": "54f1a043ad25fd472f8ccc4a26efa43a"
+    }
+  ]
+}

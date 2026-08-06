@@ -56,6 +56,11 @@ pythonpath = ["."]
 [tool.coverage.run]
 branch = true
 source = ["src"]
+# `M8-006c`: the widget layer is excluded, per the submission guidelines' coverage config.
+# A Tk window cannot be asserted about in CI, and a test that merely constructs one proves
+# only that Tk imports. What the screen *claims* lives in `replay/view_model.py`, which is
+# covered -- see `tests/unit/test_replay_view_model.py`.
+omit = ["src/*/ui/*"]
 
 [tool.coverage.report]
 fail_under = 85

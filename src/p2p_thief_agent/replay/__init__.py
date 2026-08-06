@@ -13,6 +13,8 @@ Four pieces, deliberately separate:
   verdict, never folded into it, because rule 19 covers the digest and structural damage
   answers to rules 5 and 35 with a different sanction.
 * `cursor` — step forward, back and jump, recomputing the verdict on every move.
+* `view_model` — the screen as frozen, display-ready data, so the widget layer touches no
+  domain object (`M8-006`) and the screenshot's claims can be asserted in CI.
 
 Re-authored against this repository's own `protocol.crypto`, never copied from the
 companion repository (`THIEF-002`). Its `verify` raises where the companion's returns a
@@ -33,16 +35,26 @@ from p2p_thief_agent.replay.verify import (
     verify_record,
     verify_records,
 )
+from p2p_thief_agent.replay.view_model import (
+    ReplayFrame,
+    StepRow,
+    frame_of,
+    stamp_is_green,
+)
 
 __all__ = [
     "LogNotReplayableError",
     "MatchVerdict",
     "RecordCheck",
     "Replay",
+    "ReplayFrame",
     "ReplayLog",
     "SequenceFinding",
     "SequenceReport",
+    "StepRow",
     "Verdict",
+    "frame_of",
+    "stamp_is_green",
     "inspect_sequence",
     "load_log",
     "parse_log",

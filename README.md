@@ -941,6 +941,52 @@ What remains for the screenshot is the **view**, plus the belief map from a live
 run. The `Verified OK` capture belongs "within the README.md academic report" (p. 81/189,
 "absolute mandatory"); the exact filename and directory are **not specified**.
 
+### The replay viewer
+
+![Replay viewer showing a green Verified OK stamp over an eight-step log](assets/replay-verified-ok.png)
+
+*`assets/replay-verified-ok.png` — the mandatory submission capture (`:1769`; "absolute
+mandatory" at p.81/189). Every commitment in `log_verified_ok.json` was recomputed from the
+file's own bytes at the moment the picture was taken.*
+
+The screen shows what the book asks a replay viewer to show: for each entry the `nonce`,
+the `move` and the original `commit` (p.56/142); a verdict indicator — a green
+`Verified OK` stamp or a red `TAMPERED` banner; and controls to move "back and forth in
+time" (p.56/141). It does **not** draw the board, because the board is not a requirement
+and the belief map belongs to the live GUI, where the book puts it.
+
+![Replay viewer showing a red TAMPERED banner with step 5 highlighted](assets/replay-tampered.png)
+
+*`assets/replay-tampered.png` — the detection path. Not a mandatory submission item; asked
+directly, only `Verified OK` is. It is captured anyway because a viewer shown only passing
+is a viewer that might not be checking anything.*
+
+Both images are regenerated from committed fixtures rather than kept as session artefacts,
+which is `M8-015d`'s condition — "a grader can regenerate them":
+
+```text
+uv run python scripts/capture_replay_screenshots.py
+```
+
+They are real screen captures of the real widget tree, photographed through the Windows
+GDI. Drawing a picture of what the app *would* look like would be a fabricated exhibit,
+which is the one thing a verification screenshot must never be.
+
+**The widgets contain no logic.** `M8-006` requires that "no widget touches domain or
+protocol code directly", so `replay/view_model.py` turns a cursor into frozen,
+display-ready values and `ui/replay_app.py` reads nothing else. That boundary is what makes
+the screenshot testable: a Tk window cannot be asserted about in CI, but the frame behind
+it can, so the stamp text and colour in these pictures are pinned by
+`test_replay_view_model.py` rather than by someone having looked once. The reference
+simulator draws the same boundary — its widgets are dumb components handed ready-made
+strings.
+
+Two things about the capture were not free. The first attempt came out shifted, with a
+strip of desktop down one edge and the title bar along the top, because Tk reports logical
+pixels while the GDI works in physical ones — on a scaled display every window coordinate
+is wrong by the scale factor. Declaring the process DPI-aware is what makes the output a
+function of the fixture rather than of the machine's display settings.
+
 ### 6. Companion repository
 
 <https://github.com/SharbelMaroun/p2p-cop-agent> — the Cop-side peer. Under
