@@ -8,11 +8,14 @@ Companion Cop repository:
 
 ## Milestone status
 
-M0, M2, and M3 are `DONE`, and the simulator-conformant protocol layer (commit-reveal,
+M2, M4, and M6 are complete, and the simulator-conformant protocol layer (commit-reveal,
 canonical hashing, wire messages, signed-terms handshake) is implemented. M1 is
 `IN PROGRESS`: the wire profile is authored and adopted, but no acceptance verdict is
-recorded and the contract checker stays fail-closed. M4–M9 are `PENDING` and proceed
-sequentially; unresolved choices are raised explicitly rather than classified as
+recorded and the contract checker stays fail-closed. M5 and M7 are substantially built
+(71/80 and 34/86 rows). **M8 has begun** — its replay verifier is built and at 11/58 rows —
+because rule 20's sanction is a threshold condition for confirmation of logs and submission
+of the project, making it the highest-consequence row in this repository. **M9 has not
+started** (78 open rows). Unresolved choices are raised explicitly rather than classified as
 blockers.
 
 Version `1.00` began as an M0–M1 documentation and package scaffold. The inspected
@@ -41,10 +44,18 @@ The turn loop now exists too: a bounded sub-game runs end to end through a decla
 phase machine and reveals its audit, with both crossing a real socket into a separate
 operating-system process.
 
-The repository still deliberately implements no public tunnel, scent field, belief
-map, LLM, Gmail, GUI, or replay behavior — and, decisively, **no second peer that
-plays back**. The opponent's moves in every run so far come from a local script, so
-**no game has been played against a real opponent**.
+Since then the M6 perception layer (scent field and belief map), the verbal/LLM layer, the
+M7 artifact and email-report pipeline, and the M8 **replay verifier** have all been built.
+The verifier reaches `Verified OK` or `TAMPERED` on a saved log — including one this
+repository did not write — and reports structural damage separately from the cryptographic
+verdict.
+
+The repository still deliberately implements no public tunnel and **no GUI** (`ui/` is an
+empty package), so the replay banner cannot yet be photographed for the mandatory
+submission screenshot. Gmail credentials are deliberately absent (rules 39–40), so the
+sender is built but unexercised. And, decisively, there is still **no second peer that
+plays back**: the opponent's moves in every run so far come from a local script, so **no
+game has been played against a real opponent**.
 
 Earlier Cop-bundle reviews are retained as historical audit evidence only. No
 peer-owned file was integrated, and those bundles are not inputs to the current
@@ -748,6 +759,107 @@ Checking `inst/` showed the book *does* fix `sort_keys=True, separators=(",", ":
 but at `:1212`, inside a **code listing**, not a ruled sanction. The label became
 `book-confirmed`. Without the test that would have shipped as a rule that does not exist.
 
+#### Mirroring the Cop's M7 work — by re-authoring, not copying (`M7-011`, `M7-016`, 2026-08-06)
+
+The companion Cop repository built its artifact, gate, reporting and settlement layers
+today. Bringing the same capability here does **not** mean copying it: `THIEF-002` forbids
+this repository any access to that one, and `M1-015` already set the discipline for the
+conformance stub. The design travels; the bytes do not. Both modules below are built on
+*this* repository's own primitives — `protocol.crypto.audit_records` for the audit,
+`reporting.naming` for filenames.
+
+**The assessment came first, and narrowed the job.** This repository already had more than
+the open-row count suggested: all four artifact builders, `email_report`, a gatekeeper
+*and* a token bucket. What was genuinely absent was atomic persistence, schema validation,
+the settlement layer and the six-sub-game schedule.
+
+**`M7-011` closes a silent failure.** A crash mid-write leaves a file that *looks*
+present. Rule 19's audit phase then reads a truncated artifact as a technical mismatch —
+sanction "score of 0 for the falsifying group" — and nothing in the file distinguishes
+truncation from deliberate forgery. The write goes to a temporary file in the **same
+directory** and swaps in with `os.replace`; same-directory matters, because `os.replace`
+is atomic only within a filesystem.
+
+**`M7-016` encodes a distinction that costs money to get wrong.** Rule 19 scores 0 for
+*the falsifying group*; rule 35 scores 0 for *both teams*. So catching an opponent's
+forgery is not a reason to race them to the lecturer with our own number — that converts
+their loss into a shared one. Failed audit and disagreed outcome are separate states with
+separate remedies, and a test asserts the three refusals never collapse into one.
+
+*Not claimed:* `M7-012`, validating artifacts against their schemas. This repository has
+no artifact schemas, so that is a contract-shaped job — authoring them — rather than a
+code one, and claiming it would have meant calling something validated that nothing checks.
+
+#### Three gaps the mirror found, that copying would have hidden (`M7-006`, `M7-014b`, `M7-015c`, 2026-08-06)
+
+The second slice of mirroring the Cop's M7 work, and the assessment mattered more than the
+code. This repository already had a correct token bucket and an `email_report` module with
+the right `AF-020` address — so the job was never "add the missing files". It was finding
+what was **wrong**.
+
+**One gate of three.** `:2096` requires Quota Manager → Token Bucket → DOS Detector before
+any Gmail call. Only the bucket existed here, so a report could reach the API having
+passed a third of its protection. The other two are now in `services/send_gates.py`.
+
+**A deterministic subject that could not be assigned.** The subject named the game —
+`UOH26 Final Result — <game_id>` — and carried no team code. Rule 45 (Mandatory) ties
+**automatic report assignment** to the eight-character code, sanction "organizational
+failure that will prevent automatic report assignment to the team". Deterministic and
+unassignable are not the same property.
+
+**`send_report` could be called twice for one game.** Rule 35 scores a conflicting report
+0 for *both* teams, and a duplicate is the easiest way to produce one by accident. Now
+keyed on `game_id`.
+
+**And an API difference that copying would have carried straight past.** This repository's
+`TokenBucket.allow` *consumes* a token; the companion repo's is a pure query. A gate
+pipeline written against the wrong assumption would have burned a token on every request a
+*later* gate refused — throttling us gradually for sends that never happened, and
+reporting nothing. `attempt` inspects with `available`; only `send` calls `allow`. A test
+pins it.
+
+*One deliberate change to working code:* the 429 backoff went from constant to doubling.
+Both honour Appendix F table 19's `Minimum` of 5 seconds, so the original was not a bug —
+the test records the change and the reason rather than quietly rewriting the expectation.
+
+#### What the Cop repository built on 2026-08-06, and what it means here
+
+**Recorded late.** Eight M7 batches ran in the companion repository that day — the four
+artifacts, the three Gmail gates, the reporting path, the settlement layer and the
+six-sub-game series — and none of them updated this ledger at the time. The eight-step
+method requires both repositories on every batch; I skipped it on the grounds that the
+work was "Cop-only", which is not an exemption the rule offers. Two of those batches later
+had to rediscover this repository's state from scratch during the mirror, which is exactly
+the cost the rule exists to avoid. Written down here rather than quietly backfilled.
+
+What matters for this repository, batch by batch:
+
+* **The pre-game declaration** (`M7-22`) must carry the MCP addresses and the hardware and
+  model declaration — `:2229` lists both, and rule 24 is Mandatory with the sanction
+  "denial of eligibility for computational bonuses". A URL carrying a credential is
+  refused there, since the declaration is committed *and* emailed and rule 39 forbids
+  pushing secrets. Our `M7-020` will need the same two fields and the same guard.
+* **The config artifact** (`M7-23`) carries **two** locks, not one: the agreed-config hash
+  (rule 11) and the scent-model hash (rule 23, "deviation from the formula cancels the
+  game"). Our `reporting/config_artifact` should be checked against that.
+* **A schema defect** (`X-04`): the Cop's `per-subgame-config` schema pinned a filename
+  with the literal pattern `g<NN>`, so it validated only a *template* and refused every
+  real artifact. If we ever author artifact schemas for `M7-012`, that is the trap.
+* **The log artifact** (`M7-24`) keeps nonces out of the in-play file entirely — rule 18's
+  secrecy is about *when a byte exists*, and the finished log is byte-identical either
+  way, so it can only be enforced by refusing to build the intermediate state.
+* **The result artifact** (`M7-03b`) refuses an unagreed result at build time, and
+  validation sits **between building and writing** rather than in a test suite (`M7-14`).
+* **The three gates** (`M7-04`, `M7-08`) — mirrored here as `M7-006`, where the assessment
+  found this repository had only one of the three.
+* **Reporting** (`M7-05`, `M7-16`, `M7-17`) — mirrored here as `M7-014`/`M7-015`, where it
+  found the subject carried no team code and a game could be reported twice.
+* **Settlement** (`M7-06`, `M7-18`) — mirrored here as `M7-016`.
+* **The series** (`M7-01b`, `M7-07`): six sub-games, 1/3/5 natural and 2/4/6 swapped per
+  `U-025`. Appendix F prints **two rows** labelled `[Number of Agents]` (`:3484` = 2
+  players, `:3540` = 6 per series) and the template says `num_games: 1` — three plausible
+  numbers, recorded as `X-05` there. Our own series work will meet the same three.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
@@ -793,15 +905,41 @@ gains the curves rather than a placeholder chart.
 
 ### 5. Live belief map and "Verified OK" replay screenshots
 
-**Still blocked, but for a narrower reason than before.** A bounded sub-game now runs
-end to end and its audit is delivered: every turn and the final reveal cross a real
-socket into a separate operating-system process, which validates each one — and a
-*tampered* audit is rejected there, so rule 19 is enforced over a real carrier rather
-than asserted locally.
+**The verifier behind the `Verified OK` stamp now exists in this repository; the screen that
+shows it does not yet.** Rule 20's sanction is a "threshold condition for confirmation of
+logs and submission of the project" (p.129/272), so this was the largest remaining gap here
+— M8 stood at zero.
 
-What is missing for a screenshot is a **second peer that plays back**. The Cop's
-replies in those runs come from a local script, so there is no live belief map to
-photograph yet, and there is no GUI.
+`src/p2p_thief_agent/replay/` loads a saved log, recomputes every commitment from the file's
+own bytes, and reaches one of exactly two verdicts; one altered record voids the whole match
+(`:1753`). The cursor steps forward, back, jumps to a step and jumps to the first
+divergence, and the verdict is **recomputed on every one of those moves** — it is a property
+with nowhere to cache, because a stamp computed once at load and painted thereafter is a
+claim about the past tense rather than evidence.
+
+It was re-authored against this repository's own `protocol.crypto`, never copied from the
+companion (`THIEF-002`). That rule earned its keep again: our `verify` **raises** where the
+companion's returns a flag, and our commit is built from a canonical *string* rather than
+concatenated bytes. A copy would have swallowed both differences silently.
+
+**It verifies logs we did not write.** Rule 36 mandates a "comprehensive mutual log audit"
+as a necessary condition for agreement (p.131/276); p.39/102: "each side reconstructs the
+opponent's data through the revealed nonces". The fixtures are therefore built by a writer
+importing nothing from this package, emitting a deliberately foreign shape.
+
+**One check has no counterpart in the companion repository.** Every commitment covers a
+single record, so shuffling records, deleting one, or duplicating one leaves every digest
+valid — a hash-only verifier stamps all three `Verified OK`. `sequence.py` detects them and
+deliberately reports rather than banners them: rule 19 is "any mismatch in the digest", while
+a gap is contradictory reports under rule 35 — zero for **both** teams — and an illegal state
+jump under rule 5. Neither the book nor the reference checks ordering, so red-bannering an
+opponent over it would be a false accusation carrying no appeal (`:1769`). The finding names
+its rule and goes to settlement. Recorded as `U-026`; the same gap was then closed in the
+companion repository, which had shipped without it.
+
+What remains for the screenshot is the **view**, plus the belief map from a live two-peer
+run. The `Verified OK` capture belongs "within the README.md academic report" (p. 81/189,
+"absolute mandatory"); the exact filename and directory are **not specified**.
 
 ### 6. Companion repository
 

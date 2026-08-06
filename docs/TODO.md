@@ -572,10 +572,10 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-005e | Back off on HTTP 429 | DONE | `send_report` catches `RateLimitError` (429), sleeps the backoff, and retries to the limit, then fails loudly; `test_a_429_is_backed_off_and_retried` `[book §12]` |
 | M7-005f | Run the full mutual audit before agreeing a result | PENDING | Result agreement follows the mutual audit — owned by `M7-016` `[AE-36]` |
 | M7-005g | Send independently of the opponent | DONE | `send_report` takes no opponent and never waits on one — a side that does not send scores nothing `[AE-32]` `[AE-35]` |
-| M7-006 | Implement the Quota Manager and DOS Detector gates | PENDING | Appendix E rules 28/29 and chapter 9 require **three** gates in series before any Gmail call: a daily Quota Manager, the token bucket (`M7-003`), and a DOS detector that locks the pipeline on runaway-send patterns. Fail-fast at the first rejecting gate; the lock is observable |
-| M7-006a | Implement the daily quota counter | PENDING | Exhausted quota stops all further sends |
-| M7-006b | Implement the DOS detector and pipeline lock | PENDING | Runaway-send patterns lock the pipeline `[AE-29]` |
-| M7-006c | Prove fail-fast ordering across the three gates | PENDING | Quota → bucket → detector |
+| M7-006 | Implement the Quota Manager and DOS Detector gates | DONE | `services/send_gates.py`. `:2096` requires **three** gates before Gmail -- Quota Manager, Token Bucket, DOS Detector -- and only the middle one existed here, so a report could reach the API having passed **one gate of three** |
+| M7-006a | Implement the daily quota counter | DONE | `QuotaManager`, a per-day counter that rolls over. `:2083`: "the **final line before account blocking**: if the quota is exhausted, no further requests are sent" |
+| M7-006b | Implement the DOS detector and pipeline lock | DONE | `DosDetector` locks on a burst and **stays locked**. `:2087` says what it guards: "a bug or an infinite loop **in the agent's code**" -- our own runaway, not a hostile peer -- so a lock that cleared after a quiet spell would let the same loop resume |
+| M7-006c | Prove fail-fast ordering across the three gates | DONE | Fail-fast, first refusal short-circuiting. **An API difference caught here that copying would have missed**: this repository's `TokenBucket.allow` *consumes* a token, so `attempt` inspects with `available` and only `send` calls `allow`. A naive check would have burned a token on every request a later gate refused -- a silent, gradual throttle for sends that never happened |
 | M7-007 | Declare games already played against each opponent | PENDING | Appendix E rules 37/38: every game start carries an accurate count of prior counted games against that opponent, derived from emitted result artifacts rather than hand-entered. A false declaration is absolute disqualification, so the count must be reproducible from the artifact set |
 | M7-007a | Derive the count from emitted result artifacts | PENDING | No hand-entered figure enters the declaration |
 | M7-007b | Exclude warm-up games from the counted total | PENDING | `[AE-52]`; warm-ups are permitted but uncounted |
@@ -584,7 +584,7 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-008b | Prove any past game's config is retrievable from the repo | PENDING | A retrieval test walks the committed set |
 | M7-009 | Account for LLM tokens across a series | PENDING | Per-game and per-series totals counted, sealed at Step-0, and reported `[AE-54]` |
 | M7-010 | Emit warm-up games as uncounted | PENDING | A warm-up produces artifacts but never enters the counted total `[AE-52]` |
-| M7-011 | Persist artifacts atomically | PENDING | A crash mid-write cannot leave a half-written artifact that later fails audit |
+| M7-011 | Persist artifacts atomically | DONE | `reporting/emit.write_artifact` writes to a temporary file **in the same directory** then `os.replace`, so the visible file is either the old one or the complete new one, never a prefix. Same-directory is load-bearing: `os.replace` is atomic only within a filesystem. The failure this closes is **silent** -- a truncated artifact looks present, and rule 19's audit reads it as a technical mismatch ("score of 0 for the falsifying group") with nothing distinguishing it from a deliberate forgery |
 | M7-012 | Validate every emitted artifact against its schema | PENDING | An artifact that fails its own schema is never sent |
 | M7-012a | Validate the declaration artifact | PENDING | Required identity, hardware, and timing fields present |
 | M7-012b | Validate the config artifact | PENDING | Every Appendix F parameter present with a legal value |
@@ -594,20 +594,20 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-013 | Implement the OAuth setup path | PENDING | First run creates a token; later runs refresh without human action |
 | M7-013a | Run the consent flow once and store the token locally | PENDING | `token.json` created, never committed `[book App. A]` |
 | M7-013b | Refresh the access token automatically | PENDING | The refresh token gives months of autonomy |
-| M7-013c | Fail closed when no credential is present | PENDING | No silent skip of a mandatory report |
+| M7-013c | Fail closed when no credential is present | DONE | `send_report` refuses when the credential path is absent. A skipped report is indistinguishable from a successful one in a log that only records errors |
 | M7-013d | Document the five setup steps for a fresh machine | PENDING | Reproducible by a teammate `[G§2.1]` |
 | M7-014 | Compose the report email | PENDING | MIME message with a JSON attachment and a machine-stable subject |
 | M7-014a | Attach the result artifact as a file | PENDING | Attachment only; body text is never the report `[AE-34]` |
-| M7-014b | Use a deterministic subject naming the game | PENDING | Auto-assignment depends on it `[AE-45]` |
+| M7-014b | Use a deterministic subject naming the game | DONE | **The subject was deterministic but unassignable.** It named the game (`UOH26 Final Result — <game_id>`) and carried no team code, while rule 45 (Mandatory) ties **automatic report assignment** to the 8-character code, sanction "organizational failure that will prevent automatic report assignment". Now `[<team_code>] UOH26 Final Result <game_id>`, with a non-8-character code refused |
 | M7-014c | Base64url-encode and send through the API | PENDING | `users().messages().send` with `userId="me"` |
-| M7-015 | Prove reporting under failure | PENDING | No failure mode silently loses a report |
-| M7-015a | Retry after a 429 with backoff | PENDING | Respect the throttle rather than hammering `[book §12]` |
-| M7-015b | Surface a permanently failed send loudly | PENDING | An unsent report costs the game's points `[AE-32]` |
-| M7-015c | Never send twice for one game | PENDING | Duplicate reports risk a conflict verdict `[AE-35]` |
-| M7-016 | Implement result agreement with the opponent | PENDING | Both sides converge on one result before either reports |
-| M7-016a | Exchange the computed outcome after the audit | PENDING | Agreement follows audit, never precedes it `[AE-36]` |
-| M7-016b | Detect and record a disagreement | PENDING | A conflict is 0/0 for both and must be visible `[AE-35]` |
-| M7-016c | Refuse to report an unagreed result | PENDING | Reporting a disputed outcome invites the conflict sanction |
+| M7-015 | Prove reporting under failure | DONE | All three failure modes covered by `send_report` |
+| M7-015a | Retry after a 429 with backoff | DONE | Backoff on 429, **changed from constant to doubling**. Both honour Appendix F table 19's `Minimum` of 5s, so the original was not wrong -- this is a deliberate strengthening, recorded as such in the test. A fixed delay against a provider still throttling spends every retry at the rate it already refused |
+| M7-015b | Surface a permanently failed send loudly | DONE | `ReportSendError` after the retries, naming the last error |
+| M7-015c | Never send twice for one game | DONE | **A real gap: `send_report` could be called twice for one game.** Now keyed on `game_id` against a caller-held set. Rule 35 scores a conflicting report 0 for **both** teams, and a duplicate is the easiest way to produce one by accident |
+| M7-016 | Implement result agreement with the opponent | DONE | `orchestration/settlement.py`, built on this repo's own `protocol.crypto.audit_records`. Four states with four remedies: `AGREED`, `CONFLICT` (rule 35, 0/0 both), `AUDIT_FAILED` (rule 19, 0 for the falsifying group) and `UNANSWERED` |
+| M7-016a | Exchange the computed outcome after the audit | DONE | `agree(audit, ours, theirs)` **takes the audit first**, so agreement is unreachable without one. Rule 36 makes the audit "a mandatory condition before agreement on the JSON result" -- a precondition a caller can forget is not a precondition. An empty series does not pass |
+| M7-016b | Detect and record a disagreement | DONE | A conflict keeps **both** claims in `settlement_record`. Adopting their number to keep the peace files a result we do not believe and destroys the evidence an auditor needs. **Silence is its own state**, not consent -- otherwise a crashed peer decides our report |
+| M7-016c | Refuse to report an unagreed result | DONE | `require_reportable` gates reporting, and the audit-failure message differs deliberately: their forgery is *their* rule 19 loss, and sending our own contradicting report would convert it into a **shared** rule 35 loss. A test asserts the three refusals carry three distinct messages |
 | M7-017 | Implement series-level score aggregation evidence | PENDING | The cumulative figure is reproducible from the artifact set |
 | M7-017a | Recompute the series total from stored artifacts | PENDING | No in-memory-only total is trusted |
 | M7-017b | Apply the diversity reward for a new opponent | PENDING | `[AF-t18]`; a repeat opponent adds nothing |
@@ -643,10 +643,10 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-001c | Lock input while the banner is grey | PENDING | Out-of-turn input is ignored |
 | M8-001d | Prove the objective board is never renderable | PENDING | `[AE-8]` `[AE-9]` |
 | M8-002 | Build replay UI on the accepted verifier | PENDING | Valid/malformed/reordered/tampered replay tests |
-| M8-002a | Load a saved match log and step forward/back | PENDING | `[AE-20]` mandatory `[PRD-replay]` |
-| M8-002b | Recompute every step's hash and compare | PENDING | Uses the M4 construction |
-| M8-002c | Void the whole match on the first mismatch | PENDING | A single tampered step yields `TAMPERED` |
-| M8-002d | Record why the book's chapter-7 verifier is not used | PENDING | Book p. 74 computes `SHA256("{nonce}|{move}")`, which cannot verify a chapter-5 commitment |
+| M8-002a | Load a saved match log and step forward/back | DONE | `[AE-20]` mandatory `[PRD-replay]` |
+| M8-002b | Recompute every step's hash and compare | DONE | Uses the M4 construction |
+| M8-002c | Void the whole match on the first mismatch | DONE | A single tampered step yields `TAMPERED` |
+| M8-002d | Record why the book's chapter-7 verifier is not used | DONE | Book p. 74 computes `SHA256("{nonce}|{move}")`, which cannot verify a chapter-5 commitment |
 | M8-002e | Document the replay UI workflow and states | PENDING | Screens, controls, and both verdict states described `[G§10.2]` |
 | M8-003 | Run bidirectional games against a neutral compliant-opponent harness | PENDING | Unknown-opponent E2E evidence |
 | M8-003a | Rehearse against a stub that shares no source with this repo | PENDING | Independently authored; imports no project module |
@@ -666,11 +666,11 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-007a | Render known barriers only | PENDING | A barrier appears only once disclosed `[AE-15]` |
 | M8-007b | Render received hints as text | PENDING | The verbal channel is visible to the operator |
 | M8-007c | Show the current score and step count | PENDING | Operator can see progress toward the threshold |
-| M8-008 | Implement replay navigation | PENDING | Step forward, step back, and jump to a step |
-| M8-008a | Recompute verification on every navigation | PENDING | The verdict is derived, never cached from load time |
+| M8-008 | Implement replay navigation | DONE | Step forward, step back, and jump to a step |
+| M8-008a | Recompute verification on every navigation | DONE | The verdict is derived, never cached from load time |
 | M8-008b | Show the per-step verdict alongside the board | PENDING | Operator sees where a match failed |
-| M8-008c | Load a malformed log without crashing | PENDING | Corrupt input yields a clear error, not a stack trace |
-| M8-008d | Detect a reordered log | PENDING | Step sequence is validated, not assumed |
+| M8-008c | Load a malformed log without crashing | DONE | Corrupt input yields a clear error, not a stack trace |
+| M8-008d | Detect a reordered log | DONE | Step sequence is validated, not assumed |
 | M8-009 | Run the security review | PENDING | Secrets, identity, input validation, and dependencies all reviewed |
 | M8-009a | Confirm no secret is readable from any artifact | PENDING | Artifacts are shared; secrets must not travel in them `[AE-39]` |
 | M8-009b | Confirm no private field crosses the wire | PENDING | Leakage vector per private field class |
@@ -682,9 +682,9 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-011 | Document both interfaces | PENDING | Screens, states, and workflows described `[G§10.2]` |
 | M8-011a | Document the live GUI workflow | PENDING | Turn banner states and what each means |
 | M8-011b | Document accessibility considerations | PENDING | Colour is not the only signal `[G§10.2]` |
-| M8-012 | Prove the replay app on a foreign log | PENDING | It verifies a log this peer did not write |
-| M8-012a | Verify an opponent-produced log | PENDING | The audit is mutual; both logs must verify `[AE-36]` |
-| M8-012b | Detect a foreign log that was tampered | PENDING | The detection path is not self-only |
+| M8-012 | Prove the replay app on a foreign log | DONE | It verifies a log this peer did not write |
+| M8-012a | Verify an opponent-produced log | DONE | The audit is mutual; both logs must verify `[AE-36]` |
+| M8-012b | Detect a foreign log that was tampered | DONE | The detection path is not self-only |
 | M8-013 | Rehearse the full failure matrix end to end | PENDING | Every fault class has an observed outcome, not a predicted one |
 | M8-013a | Rehearse an opponent crash mid-series | PENDING | The series still produces artifacts |
 | M8-013b | Rehearse a tunnel drop mid-turn | PENDING | Terminal outcome is defined, not a hang |
