@@ -143,3 +143,24 @@ over legal moves (averaged across five fixed seeds, `M6-019a`) in the same pursu
 The baseline earns its keep over chance, and belief more than doubles it again — a clean
 hierarchy random < baseline < belief-driven. Gated by `test_random_control.py`; feeds
 `M9-007a` (`M6-019b`).
+
+## A note on how our evasion evidence compares (`M6-019`)
+
+`M6-019` records that the deterministic evader survives 52 turns against a random legal
+walk's 39.6, meaned over five seeds. That is a real result and it stands.
+
+It is worth recording that the Cop repository's equivalent row (`M6-20`, measured
+2026-08-06) uses a stronger design, so a reader comparing the two reports should not read
+equal confidence into both:
+
+* **Paired, not averaged.** Its opponent does not react to the pursuer, so on a given
+  seed every arm meets the *identical* trajectory and outcomes are compared seed by seed.
+  Five unpaired means cannot say whether a win came from the policy or the draw.
+* **A ceiling arm.** It includes an `oracle` that reads the true position — not a legal
+  agent — so the headline number is expressed as a share of the *available* gap rather
+  than only as "better than random".
+* **Thirty seeds, with a stability check** at 100 and 300.
+
+Applying the same design here is a candidate follow-up, logged on the `M6-019` row. It is
+not done in this batch: the row is closed, and re-opening a teammate's finished work
+mid-batch is a decision for the team rather than a side effect of ours.

@@ -539,6 +539,215 @@ reference. Both parsers accept both forms — verified by round-tripping each en
 through the other's parser — because an absent cell and a zero cell mean the same thing.
 The divergence is stylistic, so it is recorded rather than churned.
 
+#### Pinning why the physical evidence wins (`M6-010b` companion, 2026-08-06)
+
+`M6-010b` already proved the outcome the book requires: scent says top-left, a hint lies
+bottom-right, and the Thief flees the scent. What that test could not say is *which*
+mechanism produced the outcome — and measuring it showed the answer is not the one a
+reader would assume.
+
+The protection is structural, not a trust effect. A located scent peak concentrates
+likelihood on a single cell while a directional claim spreads it across half the board,
+so even a `0.04` trace — the faintest value in the book's emission table — outweighs a
+contradicting hint held at **complete** trust. The existing outcome test would therefore
+have passed with the trust machinery disabled.
+
+So `test_evidence_priority.py` now pins the ordering itself, in both directions: scent
+decides wherever it can, and a claim decides only what scent leaves open — given two
+equal peaks, scent cannot choose and the hint breaks the tie. A hint that could never
+change any decision would be dead code; one that could overrule scent would make the
+book's lie detector pointless. The ordering is lexicographic, matching the weight-free
+policies in `M6-004h`.
+
+**This was written because the Cop repository reaches the identical ordering from a
+different data structure** — a mapping of cells there against this grid of rows. Two
+implementations agreeing by construction is worth locking down on both sides: belief
+never crosses the wire (`M6-016`), so no handshake could ever detect the two drifting
+apart. Only a test in each repository can.
+
+The sources require less than this. `inst/police_thief_p2p_Summary.md:508` requires only
+that a contradicted hint lower trust *and* update the map; `:1020` gives the behaviour —
+the pursuer "**ignores** the verbal claim and **continues** to track the actual scent
+source". No trust floor or "ignore a liar after N turns" rule is defined anywhere, so the
+decay schedule and the `[0, 1]` clamp are engineering, and are labelled as such.
+
+#### Where our evasion evidence is weaker than the Cop's (`M6-019` note, 2026-08-06)
+
+`M6-019` records that the deterministic evader survives 52 turns against a random legal
+walk's 39.6, meaned over five seeds. That result stands and is not withdrawn.
+
+But the Cop repository measured its equivalent claim the same day with a stronger design,
+and a reader comparing the two reports should not read equal confidence into both. Ours
+is the weaker evidence, on three counts:
+
+* **Unpaired.** Five separate means cannot say whether a win came from the policy or from
+  the draw. The Cop's opponent does not react to the pursuer, so on a given seed every
+  arm meets the *identical* trajectory and outcomes compare seed by seed — it reports
+  21–0 on matched pairs, which five averages cannot express.
+* **No ceiling.** The Cop includes an `oracle` arm that reads the true position (not a
+  legal agent), so its headline is a share of the *available* gap rather than only
+  "better than random". Beating a random walk is a low bar and ours is stated against it.
+* **Five seeds, no stability check.** The Cop used thirty, re-checked at 100 and 300.
+
+Recording this rather than quietly leaving two differently-rigorous numbers side by side
+is the point. Applying the same design here is logged as a candidate follow-up on the
+`M6-019` row; it was not done in this batch, because that row is closed and re-opening a
+teammate's finished work mid-batch is a call for the team, not a side effect of ours.
+
+#### The Cop's bundle no longer contradicts this repository (`X-03` cross-check, 2026-08-06)
+
+`CONTRACT_HANDOFF_CHECKLIST.md` has said since 2026-07-28 that the copy model is retired
+under `THIEF-002` and "must not be revived". The Cop repository agreed in principle but
+not in text: its shared bundle still opened by telling readers it "can be copied into the
+Thief repository byte-for-byte", and its verifier header said the same. Two deliverables,
+two different instructions.
+
+That is now fixed on the Cop side (`X-03`, bundle `0.2.7-proposed`), and the correction
+sharpens something worth recording here too. The retirement is **not** a general rule
+against sharing. Chapter 6 recommends publishing the scent model so both sides run
+identical logic — which is why `M6-018` deliberately keeps `perception/scent.py`
+dependency-free and offerable verbatim. Appendix E rule 2 prohibits sharing *memory or
+variables* ("immediate disqualification due to data leakage"), not specifications.
+
+What the retirement actually rejects is **byte-parity as evidence**. The book's evidence
+of interoperability is a `Verified OK` replay of a real match, and Appendix E rule 52
+permits warm-up games for exactly that purpose — which is the standard `M1-015`–`M1-017`
+are working toward, and a stronger one than copying files could ever provide.
+
+#### An opponent that shares none of our code (`M1-015`, `M1-016`, `M1-017`, 2026-08-06)
+
+Every interoperability test in this repository until now drove our client against our own
+server. That proves less than it looks: both sides share the constant a typo would live
+in, so the typo cancels out and the suite stays green. `tests/conformance/` fixes that.
+
+`neutral_peer.py` imports **nothing** from `p2p_thief_agent` — standard library only —
+and re-derives canonicalization and the commit construction from `SIM_WIRE_PROTOCOL.md`
+rather than calling ours. When our sealed message verifies over there, two
+implementations agree.
+
+**Demonstrated rather than asserted.** Changing the commit separator in
+`protocol/crypto.py` from `|` to `:` — one character — fails four conformance tests and
+nothing else in the suite. It reproduces our digest on a float (`31.8`) and a non-ASCII
+payload (`café`), the two cross-language hazards a Python-only test cannot surface.
+
+The wire half matters separately. `test_conformance_wire.py` drives the production
+`FastMCPClient` against the stub behind a real FastMCP server, and discovers the tools
+the way a stranger does — over the wire, with a plain MCP client, not by reading our own
+constants. If our client called a tool a peer registered under another name, every rule in
+the project could be right and the two agents would still never exchange a message. The
+rules-level suite would stay green throughout, because it never uses a name.
+
+**Where the sources stop, and where we say so.** `M1-017`'s seven categories each map to
+a numbered Appendix E rule — participant/config to rule 11 (Mandatory, "disqualification
+due to lack of symmetry"), hash to rule 19 (Mandatory, iron rule, score 0), private
+leakage to rule 2 (Prohibited, immediate disqualification), replay to rule 29. Two do
+not. A *version* refuses through rule 11 because it is a signed term, not because a rule
+governs versions. And **ordering has no rule at all**: asked directly, the reference does
+not gate ingestion on step sequence — it queues a duplicate for the peer loop. So the
+stub accepts one by default and refuses only under `strict_ordering`, which is ours. A
+stub stricter than every real opponent would have us "fix" behaviour that was never
+wrong.
+
+**A limit this suite does not overcome.** The stub and the agent it tests were written by
+the same team in the same session. "Independently authored" holds at the level of source
+files, imports, and re-derived constants — it does not reach the strongest form, a
+different author entirely. The book's own standard for interoperability evidence is a
+`Verified OK` replay of a real match, and Appendix E rule 52 permits warm-up games for
+exactly that. This is a floor, not that ceiling.
+
+*Two defects found on the way.* The profile still said `TurnMessage` and `AuditPayload`
+"reject unknown fields"; the code has ignored them since the `X-02` fix, so a classmate
+implementing to our published wording would have expected a refusal we no longer give.
+And a notebook asserted that `submit_audit` was "an error" and `exchange_audit` "the only
+registered tool name" — while admitting the `@mcp.tool()` lines were truncated and it was
+reading the *client*. `OPTION_B_INTEROP_DECISION.md` had already settled it: the reference's
+`exchange_audit` is a client-side method that calls the server's `submit_audit`. That
+confusion has now surfaced twice, so the profile records it for whoever asks next.
+
+#### Two ways a config is wrong that value checks never see (`M1-017b`, `M1-017c`, 2026-08-06)
+
+`check_appendix_f` already refused an altered `FIXED` value and a weakened `MINIMUM` one.
+Both inspect *values*. The two vectors left open inspect the document's **shape** and its
+**membership**, and neither had any guard at all.
+
+**Duplicate keys.** `json.loads('{"a":1,"a":2}')` returns `{"a": 2}`. Nothing raises. The
+collision is resolved and forgotten before any of our code sees the object, so no check on
+the parsed dict could ever find it — the refusal has to happen in `object_pairs_hook`,
+the one place the duplicate still exists. Appendix E rule 11 is the citation and it is
+Mandatory: the configuration must be "identical, bit-for-bit, on both sides", sanction
+"disqualification of the game due to lack of symmetry". A document with a repeated key
+cannot satisfy that, and a signature computed over the raw bytes would be verifying a
+different object than the one we parsed.
+
+**Private fields in the shared config.** The book splits configuration by format for
+exactly this reason (`:2901`): the private `config/game.toml` holds "network port, choice
+of strategy models, language mode, LLM settings, email, and group identity", while the
+shared JSON carries the agreed match conditions; `:3001` adds that the private file is
+"not subject to negotiation". So a private key in the negotiated object either leaks how
+we play — the strategy selection is the graded contribution — or drags an unnegotiable
+local value into a document both sides must hold identically. Six classes, one refusal
+each, taken from that sentence rather than imagined. The refusal names every offending
+key, because rule 11's purpose is that both sides converge on one document and a refusal
+that names one mistake at a time takes as many rounds as there are mistakes.
+
+**A bug caught while writing the version guard.** The first version refused anything but
+`1.2`. Our own `reporting/declaration.SCHEMA_VERSION` is `1.1` — the artifacts version
+independently of the match config, so a single global set would have made the guard
+refuse our own declaration artifact. The supported set is now a parameter, and a test
+pins that the two spaces are deliberately separate.
+
+**Where this is honest about its own limits.** Nothing in this repository reads a JSON
+config or artifact back yet — we only emit. So both guards are proven and reachable
+through `sdk.protocol`, but they are not yet on a live path. Their use site is `M7-14`
+(validate every emitted artifact) and `M7-23` (bind the config artifact to the negotiated
+match), and the rows say so rather than implying protection that is not switched on.
+
+*And an error of mine, corrected.* `M1-017` was marked DONE earlier the same day while
+`a`, `b` and `c` were still open, and the suite that closed it covered none of them. The
+parent was reopened rather than left standing as evidence it was not. `M1-015a` closed
+alongside, proven by injection: renaming the stub's `submit_audit` fails three tests
+including a real transport error, and passes again on revert.
+
+#### Labelling the wire, and the one place we leave the book (`M1-013`, `M1-013a`, 2026-08-06)
+
+Stage A of the conformance checklist had every box ticked. It certified
+`WIRE_CONFORMANCE_PROFILE.md`, `protocol/canonical.py`, `commitment.py` and
+`negotiation.py` — **every one archived or deleted by the simulator realign**. A ticked
+box citing a deleted file is worse than an empty one, because it reads as evidence.
+
+`SIM_WIRE_PROTOCOL.md` now carries an authority table covering every item, in four
+strengths, because conflating them lets a code listing borrow a rule's sanction:
+**book-mandatory** (a numbered Appendix E rule *with* a sanction), **book-confirmed**
+(the book states it, no sanction), **book-minimum** (an Appendix F floor that may be
+raised), and **simulator-derived** / **Option-B** / **project choice** for everything the
+book does not speak to. Which is most of the wire: neither `submit_audit` nor any other
+tool name appears in the book at all.
+
+**The one place we knowingly leave the book.** `:1107` states
+`H_commit = SHA256(State || Move || Intent || Nonce)` — the nonce **inside** the hashed
+string. We hash `canonical_json(payload) + "|" + nonce`, with the nonce outside, matching
+the reference. `test_reference_vector.py` reproduces the digest `78a31c51…` from a real
+reference match log; the book's literal construction yields a **different** digest on the
+same record. Following the book here would fail every cross-peer audit against any
+classmate who used the simulator — which is all of them.
+
+Rule 17 still holds. It mandates *"a commitment and disclosure protocol based on
+SHA-256"*, which this is. What the book fixes is the mechanism; what it also prints is
+one byte layout, and only the mechanism carries a sanction. That is precisely the
+distinction the labels exist to keep visible, so the row is labelled
+*simulator-derived — deviates from the book, deliberately* rather than allowed to borrow
+rule 17's authority.
+
+None of this is a prose promise. `test_profile_authority.py` asserts that no item is
+unlabelled, that no simulator-derived item is marked mandatory, that every book claim
+cites a rule, table or line, and that the profile no longer names an archived file.
+
+**The citation test earned its keep immediately.** Canonical JSON went into the table as
+`book-mandatory` on a notebook's say-so and the test rejected it for having no citation.
+Checking `inst/` showed the book *does* fix `sort_keys=True, separators=(",", ":")` —
+but at `:1212`, inside a **code listing**, not a ruled sanction. The label became
+`book-confirmed`. Without the test that would have shipped as a rule that does not exist.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a

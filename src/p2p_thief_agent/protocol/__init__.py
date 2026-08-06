@@ -22,6 +22,13 @@ from p2p_thief_agent.protocol.attestation import (
     is_attestation,
     require_pregame_attestation,
 )
+from p2p_thief_agent.protocol.config_integrity import (
+    ConfigIntegrityError,
+    check_config_schema_version,
+    check_no_private_fields,
+    loads_no_duplicates,
+    private_fields_in,
+)
 from p2p_thief_agent.protocol.crypto import (
     NONCE_BYTES,
     CryptoError,
@@ -61,6 +68,11 @@ from p2p_thief_agent.protocol.wire import (
 )
 
 __all__ = [
+    "ConfigIntegrityError",
+    "check_config_schema_version",
+    "check_no_private_fields",
+    "loads_no_duplicates",
+    "private_fields_in",
     "AGREEMENT_TERMS",
     "AgreementError",
     "AttestationError",
