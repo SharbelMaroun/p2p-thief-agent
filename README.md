@@ -811,6 +811,44 @@ pins it.
 Both honour Appendix F table 19's `Minimum` of 5 seconds, so the original was not a bug —
 the test records the change and the reason rather than quietly rewriting the expectation.
 
+#### What the Cop repository built on 2026-08-06, and what it means here
+
+**Recorded late.** Eight M7 batches ran in the companion repository that day — the four
+artifacts, the three Gmail gates, the reporting path, the settlement layer and the
+six-sub-game series — and none of them updated this ledger at the time. The eight-step
+method requires both repositories on every batch; I skipped it on the grounds that the
+work was "Cop-only", which is not an exemption the rule offers. Two of those batches later
+had to rediscover this repository's state from scratch during the mirror, which is exactly
+the cost the rule exists to avoid. Written down here rather than quietly backfilled.
+
+What matters for this repository, batch by batch:
+
+* **The pre-game declaration** (`M7-22`) must carry the MCP addresses and the hardware and
+  model declaration — `:2229` lists both, and rule 24 is Mandatory with the sanction
+  "denial of eligibility for computational bonuses". A URL carrying a credential is
+  refused there, since the declaration is committed *and* emailed and rule 39 forbids
+  pushing secrets. Our `M7-020` will need the same two fields and the same guard.
+* **The config artifact** (`M7-23`) carries **two** locks, not one: the agreed-config hash
+  (rule 11) and the scent-model hash (rule 23, "deviation from the formula cancels the
+  game"). Our `reporting/config_artifact` should be checked against that.
+* **A schema defect** (`X-04`): the Cop's `per-subgame-config` schema pinned a filename
+  with the literal pattern `g<NN>`, so it validated only a *template* and refused every
+  real artifact. If we ever author artifact schemas for `M7-012`, that is the trap.
+* **The log artifact** (`M7-24`) keeps nonces out of the in-play file entirely — rule 18's
+  secrecy is about *when a byte exists*, and the finished log is byte-identical either
+  way, so it can only be enforced by refusing to build the intermediate state.
+* **The result artifact** (`M7-03b`) refuses an unagreed result at build time, and
+  validation sits **between building and writing** rather than in a test suite (`M7-14`).
+* **The three gates** (`M7-04`, `M7-08`) — mirrored here as `M7-006`, where the assessment
+  found this repository had only one of the three.
+* **Reporting** (`M7-05`, `M7-16`, `M7-17`) — mirrored here as `M7-014`/`M7-015`, where it
+  found the subject carried no team code and a game could be reported twice.
+* **Settlement** (`M7-06`, `M7-18`) — mirrored here as `M7-016`.
+* **The series** (`M7-01b`, `M7-07`): six sub-games, 1/3/5 natural and 2/4/6 swapped per
+  `U-025`. Appendix F prints **two rows** labelled `[Number of Agents]` (`:3484` = 2
+  players, `:3540` = 6 per series) and the template says `num_games: 1` — three plausible
+  numbers, recorded as `X-05` there. Our own series work will meet the same three.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
