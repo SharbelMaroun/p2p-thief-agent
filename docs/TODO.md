@@ -584,7 +584,7 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-008b | Prove any past game's config is retrievable from the repo | PENDING | A retrieval test walks the committed set |
 | M7-009 | Account for LLM tokens across a series | PENDING | Per-game and per-series totals counted, sealed at Step-0, and reported `[AE-54]` |
 | M7-010 | Emit warm-up games as uncounted | PENDING | A warm-up produces artifacts but never enters the counted total `[AE-52]` |
-| M7-011 | Persist artifacts atomically | IN PROGRESS | A crash mid-write cannot leave a half-written artifact that later fails audit |
+| M7-011 | Persist artifacts atomically | DONE | `reporting/emit.write_artifact` writes to a temporary file **in the same directory** then `os.replace`, so the visible file is either the old one or the complete new one, never a prefix. Same-directory is load-bearing: `os.replace` is atomic only within a filesystem. The failure this closes is **silent** -- a truncated artifact looks present, and rule 19's audit reads it as a technical mismatch ("score of 0 for the falsifying group") with nothing distinguishing it from a deliberate forgery |
 | M7-012 | Validate every emitted artifact against its schema | PENDING | An artifact that fails its own schema is never sent |
 | M7-012a | Validate the declaration artifact | PENDING | Required identity, hardware, and timing fields present |
 | M7-012b | Validate the config artifact | PENDING | Every Appendix F parameter present with a legal value |
@@ -604,10 +604,10 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-015a | Retry after a 429 with backoff | PENDING | Respect the throttle rather than hammering `[book §12]` |
 | M7-015b | Surface a permanently failed send loudly | PENDING | An unsent report costs the game's points `[AE-32]` |
 | M7-015c | Never send twice for one game | PENDING | Duplicate reports risk a conflict verdict `[AE-35]` |
-| M7-016 | Implement result agreement with the opponent | IN PROGRESS | Both sides converge on one result before either reports |
-| M7-016a | Exchange the computed outcome after the audit | IN PROGRESS | Agreement follows audit, never precedes it `[AE-36]` |
-| M7-016b | Detect and record a disagreement | IN PROGRESS | A conflict is 0/0 for both and must be visible `[AE-35]` |
-| M7-016c | Refuse to report an unagreed result | IN PROGRESS | Reporting a disputed outcome invites the conflict sanction |
+| M7-016 | Implement result agreement with the opponent | DONE | `orchestration/settlement.py`, built on this repo's own `protocol.crypto.audit_records`. Four states with four remedies: `AGREED`, `CONFLICT` (rule 35, 0/0 both), `AUDIT_FAILED` (rule 19, 0 for the falsifying group) and `UNANSWERED` |
+| M7-016a | Exchange the computed outcome after the audit | DONE | `agree(audit, ours, theirs)` **takes the audit first**, so agreement is unreachable without one. Rule 36 makes the audit "a mandatory condition before agreement on the JSON result" -- a precondition a caller can forget is not a precondition. An empty series does not pass |
+| M7-016b | Detect and record a disagreement | DONE | A conflict keeps **both** claims in `settlement_record`. Adopting their number to keep the peace files a result we do not believe and destroys the evidence an auditor needs. **Silence is its own state**, not consent -- otherwise a crashed peer decides our report |
+| M7-016c | Refuse to report an unagreed result | DONE | `require_reportable` gates reporting, and the audit-failure message differs deliberately: their forgery is *their* rule 19 loss, and sending our own contradicting report would convert it into a **shared** rule 35 loss. A test asserts the three refusals carry three distinct messages |
 | M7-017 | Implement series-level score aggregation evidence | PENDING | The cumulative figure is reproducible from the artifact set |
 | M7-017a | Recompute the series total from stored artifacts | PENDING | No in-memory-only total is trusted |
 | M7-017b | Apply the diversity reward for a new opponent | PENDING | `[AF-t18]`; a repeat opponent adds nothing |

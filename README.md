@@ -748,6 +748,37 @@ Checking `inst/` showed the book *does* fix `sort_keys=True, separators=(",", ":
 but at `:1212`, inside a **code listing**, not a ruled sanction. The label became
 `book-confirmed`. Without the test that would have shipped as a rule that does not exist.
 
+#### Mirroring the Cop's M7 work — by re-authoring, not copying (`M7-011`, `M7-016`, 2026-08-06)
+
+The companion Cop repository built its artifact, gate, reporting and settlement layers
+today. Bringing the same capability here does **not** mean copying it: `THIEF-002` forbids
+this repository any access to that one, and `M1-015` already set the discipline for the
+conformance stub. The design travels; the bytes do not. Both modules below are built on
+*this* repository's own primitives — `protocol.crypto.audit_records` for the audit,
+`reporting.naming` for filenames.
+
+**The assessment came first, and narrowed the job.** This repository already had more than
+the open-row count suggested: all four artifact builders, `email_report`, a gatekeeper
+*and* a token bucket. What was genuinely absent was atomic persistence, schema validation,
+the settlement layer and the six-sub-game schedule.
+
+**`M7-011` closes a silent failure.** A crash mid-write leaves a file that *looks*
+present. Rule 19's audit phase then reads a truncated artifact as a technical mismatch —
+sanction "score of 0 for the falsifying group" — and nothing in the file distinguishes
+truncation from deliberate forgery. The write goes to a temporary file in the **same
+directory** and swaps in with `os.replace`; same-directory matters, because `os.replace`
+is atomic only within a filesystem.
+
+**`M7-016` encodes a distinction that costs money to get wrong.** Rule 19 scores 0 for
+*the falsifying group*; rule 35 scores 0 for *both teams*. So catching an opponent's
+forgery is not a reason to race them to the lecturer with our own number — that converts
+their loss into a shared one. Failed audit and disagreed outcome are separate states with
+separate remedies, and a test asserts the three refusals never collapse into one.
+
+*Not claimed:* `M7-012`, validating artifacts against their schemas. This repository has
+no artifact schemas, so that is a contract-shaped job — authoring them — rather than a
+code one, and claiming it would have meant calling something validated that nothing checks.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
