@@ -56,23 +56,32 @@ An item with no authority label is not part of the profile.
 
 ## Stage A — profile definition
 
-- [x] Author a Thief-owned conformance profile listing every tool name, argument name,
-      message shape, and acknowledgement form. — `WIRE_CONFORMANCE_PROFILE.md`
-- [x] Label every item book-confirmed, Option-B project choice, or `UNKNOWN`.
-- [x] Define canonicalization exactly, with reproducible vectors covering nested
-      objects, numbers, non-ASCII text, **and escaping** (quotes, backslashes, control
-      characters, non-BMP codepoints). — `protocol/canonical.py`; `test_canonical*.py`
-- [x] Define the commitment construction and nonce profile, keeping the nonce outside
-      the payload. — `protocol/commitment.py` (book construction, `token_hex(16)`)
-- [x] Separate the hash domains: move commitment, agreed-configuration hash, and
-      configuration source-byte hash are three different values. — `commitment_sha256`,
-      `agreed_configuration_sha256`, `source_sha256`
-- [x] State the version and capability negotiation mechanism, or record its absence as
-      an explicit `UNKNOWN` with the interoperability risk named. — `protocol/negotiation.py`
-- [x] Define behaviour on encountering an unknown field, an unknown version, and a
-      missing optional tool. — `UNKNOWN_FIELD` / `UNSUPPORTED_PROFILE` / optional-capability handling
-- [x] Author the profile in this repository. Do not copy, transcribe, or reconstruct any
-      peer's controlled file (`THIEF-002`).
+**Re-authored 2026-08-06 against the live artifacts.** The previous checkboxes were
+ticked against `WIRE_CONFORMANCE_PROFILE.md`, `protocol/canonical.py`,
+`protocol/commitment.py` and `protocol/negotiation.py` — every one of which the
+simulator realign archived or deleted. A ticked box citing a deleted file is worse than
+an empty one: it reads as evidence.
+
+- [x] A Thief-owned profile lists every tool name, argument name, message shape and
+      acknowledgement form. — `SIM_WIRE_PROTOCOL.md` (status `ACTIVE`)
+- [x] **Every item is labelled** book-mandatory / book-confirmed / book-minimum /
+      simulator-derived / Option-B / project choice, with its evidence. — the authority
+      table in `SIM_WIRE_PROTOCOL.md`, enforced by `test_profile_authority.py`
+- [x] **No simulator behaviour is promoted to mandatory.** — asserted, not promised:
+      `test_no_simulator_derived_item_is_promoted_to_mandatory`
+- [x] Canonicalization defined with reproducible vectors covering nested objects,
+      numbers, non-ASCII and escaping (quotes, backslashes, control characters, non-BMP).
+      — `protocol/crypto.canonical_json`; `test_canonical_vectors.py` (`M1-014`)
+- [x] Commitment construction and nonce profile defined, nonce outside the payload. —
+      `protocol/crypto.commit_of`; **and the deviation from the book's `:1107` formula is
+      stated explicitly** with the reproduced real-match digest as its evidence
+- [x] Hash domains separated: move commitment vs agreed-configuration hash. —
+      `test_commitment_and_config_hash_domains_do_not_collide` (`M1-014d`)
+- [x] Behaviour on an unknown field, an unknown version and a missing optional tool is
+      defined. — unknown fields **ignored** (`_known_only`, matching the reference, `X-02`);
+      unknown version refused (`check_config_schema_version`, `M1-017b`); `receive_control`
+      is optional by profile
+- [x] Authored in this repository; no peer's controlled file copied (`THIEF-002`).
 
 ## Stage B — conformance evidence against an unknown opponent
 

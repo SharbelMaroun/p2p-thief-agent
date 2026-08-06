@@ -708,6 +708,46 @@ parent was reopened rather than left standing as evidence it was not. `M1-015a` 
 alongside, proven by injection: renaming the stub's `submit_audit` fails three tests
 including a real transport error, and passes again on revert.
 
+#### Labelling the wire, and the one place we leave the book (`M1-013`, `M1-013a`, 2026-08-06)
+
+Stage A of the conformance checklist had every box ticked. It certified
+`WIRE_CONFORMANCE_PROFILE.md`, `protocol/canonical.py`, `commitment.py` and
+`negotiation.py` — **every one archived or deleted by the simulator realign**. A ticked
+box citing a deleted file is worse than an empty one, because it reads as evidence.
+
+`SIM_WIRE_PROTOCOL.md` now carries an authority table covering every item, in four
+strengths, because conflating them lets a code listing borrow a rule's sanction:
+**book-mandatory** (a numbered Appendix E rule *with* a sanction), **book-confirmed**
+(the book states it, no sanction), **book-minimum** (an Appendix F floor that may be
+raised), and **simulator-derived** / **Option-B** / **project choice** for everything the
+book does not speak to. Which is most of the wire: neither `submit_audit` nor any other
+tool name appears in the book at all.
+
+**The one place we knowingly leave the book.** `:1107` states
+`H_commit = SHA256(State || Move || Intent || Nonce)` — the nonce **inside** the hashed
+string. We hash `canonical_json(payload) + "|" + nonce`, with the nonce outside, matching
+the reference. `test_reference_vector.py` reproduces the digest `78a31c51…` from a real
+reference match log; the book's literal construction yields a **different** digest on the
+same record. Following the book here would fail every cross-peer audit against any
+classmate who used the simulator — which is all of them.
+
+Rule 17 still holds. It mandates *"a commitment and disclosure protocol based on
+SHA-256"*, which this is. What the book fixes is the mechanism; what it also prints is
+one byte layout, and only the mechanism carries a sanction. That is precisely the
+distinction the labels exist to keep visible, so the row is labelled
+*simulator-derived — deviates from the book, deliberately* rather than allowed to borrow
+rule 17's authority.
+
+None of this is a prose promise. `test_profile_authority.py` asserts that no item is
+unlabelled, that no simulator-derived item is marked mandatory, that every book claim
+cites a rule, table or line, and that the profile no longer names an archived file.
+
+**The citation test earned its keep immediately.** Canonical JSON went into the table as
+`book-mandatory` on a notebook's say-so and the test rejected it for having no citation.
+Checking `inst/` showed the book *does* fix `sort_keys=True, separators=(",", ":")` —
+but at `:1212`, inside a **code listing**, not a ruled sanction. The label became
+`book-confirmed`. Without the test that would have shipped as a rule that does not exist.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
