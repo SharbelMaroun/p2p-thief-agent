@@ -550,14 +550,14 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-001b | Implement the confirmed six-sub-game role schedule | DONE | The schedule is **injected** — `THIEF_SUBGAMES_NATURAL = (1,3,5)` / `THIEF_SUBGAMES_SWAPPED = (2,4,6)` (`U-021`), passed to `run_thief_series`, so a later correction is a one-line change; `test_the_swapped_schedule_is_injected_not_hard_coded` (`C-012`) |
 | M7-001c | Aggregate cumulative series score | DONE | Per-sub-game Thief scores (Appendix F table 17) sum to `SeriesResult.cumulative_score`; `test_a_natural_series_runs_its_thief_sub_games_under_one_identity` (10+10+5 = 25) |
 | M7-001d | Apply the tie award on a cumulative tie | DONE | A tied sub-game already pays the table's `TIE_SCORE` via `thief_score(Outcome.TIE)`; `is_cumulative_tie(a, b)` detects a level series total, which reporting settles (`M7-017`); `test_a_cumulative_tie_is_detected` `[AF-t17]` |
-| M7-002 | Build accepted declaration, config, log, and result artifacts | DONE (U-019-provisional) | `reporting/` builders for all four artifacts (each module 100% branch; `test_artifacts.py`, `test_artifact_naming.py`). **Schemas follow the documented, unauthenticated template — the coordinator authorised building against it 2026-08-05 pending a `U-019` ruling**, so the exact field set may still change. Naming/identity are book-confirmed. All sub-tasks below |
-| M7-002a | Emit `declaration_<game_id>.json` | DONE (U-019-prov.) | `reporting/declaration.build_declaration`: `_schema`/`schema_version`/`declaration_type`/identity/`links`/`timezone`/times/`num_sub_games`/`max_tokens_per_game`/`groups`, each group carrying members, both repos, `mcp_servers`, `llm_model`, `hardware_spec`, `signature`; validates the group and hardware key sets |
-| M7-002b | Emit `config_<game_id>_g<NN>.json` | DONE (U-019-prov.) | `reporting/config_artifact.build_config`: the seven documented sections plus `agreed_between`, identity, `sub_game_number`, and the `config_sha256` lock over the quantitative content |
-| M7-002c | Emit `log_<game_id>_g<NN>.json` | DONE (U-019-prov.) | `reporting/log_artifact.build_log`: `summary` + the step-by-step commit-reveal `records` (each `payload`/`nonce`/`commit`) + `mutual_agreement`, sufficient to recompute every commitment |
-| M7-002d | Emit `result_<game_id>.json` | DONE (U-019-prov.) | `reporting/result_artifact.build_result`: per-group blocks, per-sub-game lines, and the cumulative `final_result`; this is the emailed report |
+| M7-002 | Build accepted declaration, config, log, and result artifacts | DONE | `reporting/` builders for all four artifacts (each module 100% branch; `test_artifacts.py`, `test_artifact_naming.py`). **Schemas follow the documented, unauthenticated template — the coordinator authorised building against it 2026-08-05 pending a `U-019` ruling**, so the exact field set may still change. Naming/identity are book-confirmed. All sub-tasks below Status qualifier: (U-019-provisional). |
+| M7-002a | Emit `declaration_<game_id>.json` | DONE | `reporting/declaration.build_declaration`: `_schema`/`schema_version`/`declaration_type`/identity/`links`/`timezone`/times/`num_sub_games`/`max_tokens_per_game`/`groups`, each group carrying members, both repos, `mcp_servers`, `llm_model`, `hardware_spec`, `signature`; validates the group and hardware key sets Status qualifier: (U-019-prov.). |
+| M7-002b | Emit `config_<game_id>_g<NN>.json` | DONE | `reporting/config_artifact.build_config`: the seven documented sections plus `agreed_between`, identity, `sub_game_number`, and the `config_sha256` lock over the quantitative content Status qualifier: (U-019-prov.). |
+| M7-002c | Emit `log_<game_id>_g<NN>.json` | DONE | `reporting/log_artifact.build_log`: `summary` + the step-by-step commit-reveal `records` (each `payload`/`nonce`/`commit`) + `mutual_agreement`, sufficient to recompute every commitment Status qualifier: (U-019-prov.). |
+| M7-002d | Emit `result_<game_id>.json` | DONE | `reporting/result_artifact.build_result`: per-group blocks, per-sub-game lines, and the cumulative `final_result`; this is the emailed report Status qualifier: (U-019-prov.). |
 | M7-002e | Share one `game_uid` across all four artifacts | DONE | `MatchIdentity(game_id, game_uid)` is the one identity, `match_filenames` derives all four filenames from the single `game_id` (`AF-021`), and every builder now stamps the shared `game_uid`/`game_id` inside its artifact from that identity (`AR-001` / `AF-§3`) |
-| M7-002f | Carry four repository links in the result artifact | DONE (U-019-prov.) | `build_result` collects the four links (two per group, from each group's `repos`) into `links.repositories` and refuses anything other than four; `test_the_result_carries_four_repo_links_and_per_game_commit_and_tokens` `[AE-49]` |
-| M7-002g | Carry the per-game commit hash and total tokens | DONE (U-019-prov.) | Each result sub-game requires `github_commit` and `tokens`; a missing commit is refused (`test_a_result_missing_the_per_game_commit_is_rejected`) `[AE-53]` `[AE-54]` |
+| M7-002f | Carry four repository links in the result artifact | DONE | `build_result` collects the four links (two per group, from each group's `repos`) into `links.repositories` and refuses anything other than four; `test_the_result_carries_four_repo_links_and_per_game_commit_and_tokens` `[AE-49]` Status qualifier: (U-019-prov.). |
+| M7-002g | Carry the per-game commit hash and total tokens | DONE | Each result sub-game requires `github_commit` and `tokens`; a missing commit is refused (`test_a_result_missing_the_per_game_commit_is_rejected`) `[AE-53]` `[AE-54]` Status qualifier: (U-019-prov.). |
 | M7-003 | Implement the centralized external-call gatekeeper | DONE | `services/gatekeeper.py` (now token-bucket-based) + `services/token_bucket.py`; `test_gatekeeper.py`, `test_token_bucket.py`, `test_external_gatekeeper.py`. All four sub-tasks below |
 | M7-003a | Route every external call through one gatekeeper | DONE | `test_external_gatekeeper.py` walks `src/` and fails on any direct import of a Gmail/LLM API (googleapiclient, smtplib, openai, anthropic, …), so the Gmail (`M7-005`) and verbal (`M7-004`) paths must route through the one gatekeeper `[G§5.1]` |
 | M7-003b | Implement the token bucket | DONE | `services/token_bucket.TokenBucket` implements `AE-28` exactly — `tokens ← min(C, tokens + r·Δt)`, admit iff `tokens ≥ 1`, consume on admit — wired into the gatekeeper's rate decision (`requests_per_minute` tokens refilling at `rpm/60`/s); `test_token_bucket.py` (100% branch) `[AE-28]` |
@@ -565,7 +565,7 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-003d | Read every limit from configuration | DONE | `Gatekeeper.from_match` reads `requests_per_minute`/`concurrent_requests`/`queue_depth` from the signed match object's `rate_limiter_gatekeeper` (Appendix F table 19 `Minimum`s); no hard-coded rate `[G§7.2]` `[AF-t19]` |
 | M7-004 | Implement accepted private verbal-provider modes | DONE | `verbal/providers.py` (100% branch); `test_providers.py`. The default is the zero-token template (`M6-008`); `gated_model_provider` wraps an operator's model (Ollama/API/CLI) behind the **one** gatekeeper (`M7-003a`), and a mocked model routes through the gate. Sub-task below |
 | M7-004a | Fall back deterministically on provider failure | DONE | With the gate at capacity `guard` raises, and a failing model raises; either way `generate_hint` falls back to the token-free template, so a blocked or broken provider never stalls a turn; `test_a_blocked_provider_falls_back_to_the_template`, `test_a_failing_model_falls_back_to_the_template` |
-| M7-005 | Send the mutually agreed final JSON report through Gmail | DONE (mocked; live adapter = `U-009`) | `reporting/email_report.py` (100% branch); `test_email_report.py`. Compose + gated send + 429 backoff, transport **injected** and mocked in tests. The **live `gmail.send` adapter (OAuth, credentials) is `U-009`/`M7-013`** and not built here. Sub-tasks below |
+| M7-005 | Send the mutually agreed final JSON report through Gmail | DONE | `reporting/email_report.py` (100% branch); `test_email_report.py`. Compose + gated send + 429 backoff, transport **injected** and mocked in tests. The **live `gmail.send` adapter (OAuth, credentials) is `U-009`/`M7-013`** and not built here. Sub-tasks below Status qualifier: (mocked; live adapter = `U-009`). |
 | M7-005a | Restrict the OAuth scope to `gmail.send` | DONE | `GMAIL_SEND_SCOPE = ".../auth/gmail.send"`; a test asserts no `readonly`/`modify` scope `[AE-30]` |
 | M7-005b | Keep `credentials.json` and `token.json` git-ignored | DONE | `.gitignore` covers `credentials.json`, `token.json`, `*credentials*.json`, `*token*.json` `[AE-39]` `[AE-40]` |
 | M7-005c | Send JSON as an attachment only | DONE | `compose_report` attaches the result as `application/json` (`result_<id>.json`); the body carries no report — `test_the_report_is_a_json_attachment_to_the_confirmed_address` `[AE-33]` `[AE-34]` |
@@ -657,8 +657,8 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-004a | Validate every inbound field before use | PENDING | Malformed peer input cannot reach domain code `[G§6.3]` |
 | M8-004b | Bound memory and queue growth under sustained load | PENDING | No unbounded queue or leak over a long series |
 | M8-004c | Apply Nielsen usability heuristics to both UIs | PENDING | Visibility of status, error prevention, recovery `[G§10.1]` |
-| M8-005 | Exercise crash, timeout, mismatch, and tamper recovery end to end | PENDING | Failure-injection evidence |
-| M8-005a | Inject crash, timeout, mismatch, and tamper faults | PENDING | Each produces a defined, logged outcome |
+| M8-005 | Exercise crash, timeout, mismatch, and tamper recovery end to end | IN PROGRESS | Failure-injection evidence |
+| M8-005a | Inject crash, timeout, mismatch, and tamper faults | IN PROGRESS | Each produces a defined, logged outcome |
 | M8-006 | Build the GUI view-model behind the SDK | DONE | No widget touches domain or protocol code directly `[G§4.1]` |
 | M8-006a | Expose a read-only snapshot for rendering | DONE | The view cannot mutate game state |
 | M8-006b | Update the view on state change rather than polling | DONE | Redraw follows the state machine |
@@ -672,11 +672,11 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-008b | Show the per-step verdict alongside the board | DONE | Operator sees where a match failed |
 | M8-008c | Load a malformed log without crashing | DONE | Corrupt input yields a clear error, not a stack trace |
 | M8-008d | Detect a reordered log | DONE | Step sequence is validated, not assumed |
-| M8-009 | Run the security review | PENDING | Secrets, identity, input validation, and dependencies all reviewed |
-| M8-009a | Confirm no secret is readable from any artifact | PENDING | Artifacts are shared; secrets must not travel in them `[AE-39]` |
-| M8-009b | Confirm no private field crosses the wire | PENDING | Leakage vector per private field class |
-| M8-009c | Review third-party dependencies and pin them | PENDING | `uv.lock` is authoritative `[G§8.4]` |
-| M8-009d | Confirm the LLM path cannot influence a move | PENDING | Even with a provider enabled `[AE-25]` |
+| M8-009 | Run the security review | IN PROGRESS | Secrets, identity, input validation, and dependencies all reviewed |
+| M8-009a | Confirm no secret is readable from any artifact | IN PROGRESS | Artifacts are shared; secrets must not travel in them `[AE-39]` |
+| M8-009b | Confirm no private field crosses the wire | IN PROGRESS | Leakage vector per private field class |
+| M8-009c | Review third-party dependencies and pin them | IN PROGRESS | `uv.lock` is authoritative `[G§8.4]` |
+| M8-009d | Confirm the LLM path cannot influence a move | IN PROGRESS | Even with a provider enabled `[AE-25]` |
 | M8-010 | Run the resource and endurance pass | PENDING | A full six-sub-game series runs without degradation |
 | M8-010a | Run a long series and watch memory | PENDING | No unbounded growth across sub-games |
 | M8-010b | Confirm clean shutdown releases every resource | PENDING | Sockets, files, and threads all closed |
@@ -686,10 +686,10 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-012 | Prove the replay app on a foreign log | DONE | It verifies a log this peer did not write |
 | M8-012a | Verify an opponent-produced log | DONE | The audit is mutual; both logs must verify `[AE-36]` |
 | M8-012b | Detect a foreign log that was tampered | DONE | The detection path is not self-only |
-| M8-013 | Rehearse the full failure matrix end to end | PENDING | Every fault class has an observed outcome, not a predicted one |
-| M8-013a | Rehearse an opponent crash mid-series | PENDING | The series still produces artifacts |
-| M8-013b | Rehearse a tunnel drop mid-turn | PENDING | Terminal outcome is defined, not a hang |
-| M8-013c | Rehearse a config mismatch at negotiation | PENDING | The match is refused before play `[AE-11]` |
+| M8-013 | Rehearse the full failure matrix end to end | IN PROGRESS | Every fault class has an observed outcome, not a predicted one |
+| M8-013a | Rehearse an opponent crash mid-series | IN PROGRESS | The series still produces artifacts |
+| M8-013b | Rehearse a tunnel drop mid-turn | IN PROGRESS | Terminal outcome is defined, not a hang |
+| M8-013c | Rehearse a config mismatch at negotiation | IN PROGRESS | The match is refused before play `[AE-11]` |
 | M8-014 | Freeze the wire profile before the counted league | PENDING | No wire change after the first counted game without a coordinator decision |
 | M8-015 | Capture the required submission screenshots | DONE | Belief-map GUI and replay `Verified OK` `[AE-42]` |
 | M8-015a | Capture the belief-map GUI screenshot | DONE | Required README content |
