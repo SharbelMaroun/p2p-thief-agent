@@ -637,11 +637,11 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M8-001 | Build a live Thief local-truth GUI through the SDK | PENDING | View-model truth-boundary tests |
-| M8-001a | Render the belief heatmap | PENDING | Deeper colour means higher probability `[PRD-gui]` `[ADR-0009]` |
-| M8-001b | Render the turn banner | PENDING | Green `YOUR TURN`, grey `LOCKED` after commit |
-| M8-001c | Lock input while the banner is grey | PENDING | Out-of-turn input is ignored |
-| M8-001d | Prove the objective board is never renderable | PENDING | `[AE-8]` `[AE-9]` |
+| M8-001 | Build a live Thief local-truth GUI through the SDK | IN PROGRESS | View-model truth-boundary tests |
+| M8-001a | Render the belief heatmap | IN PROGRESS | Deeper colour means higher probability `[PRD-gui]` `[ADR-0009]` |
+| M8-001b | Render the turn banner | IN PROGRESS | Green `YOUR TURN`, grey `LOCKED` after commit |
+| M8-001c | Lock input while the banner is grey | IN PROGRESS | Out-of-turn input is ignored |
+| M8-001d | Prove the objective board is never renderable | IN PROGRESS | `[AE-8]` `[AE-9]` |
 | M8-002 | Build replay UI on the accepted verifier | DONE | Valid/malformed/reordered/tampered replay tests |
 | M8-002a | Load a saved match log and step forward/back | DONE | `[AE-20]` mandatory `[PRD-replay]` |
 | M8-002b | Recompute every step's hash and compare | DONE | Uses the M4 construction |
@@ -660,12 +660,12 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-005a | Inject crash, timeout, mismatch, and tamper faults | PENDING | Each produces a defined, logged outcome |
 | M8-006 | Build the GUI view-model behind the SDK | DONE | No widget touches domain or protocol code directly `[G§4.1]` |
 | M8-006a | Expose a read-only snapshot for rendering | DONE | The view cannot mutate game state |
-| M8-006b | Update the view on state change rather than polling | PENDING | Redraw follows the state machine |
+| M8-006b | Update the view on state change rather than polling | IN PROGRESS | Redraw follows the state machine |
 | M8-006c | Keep the GUI out of coverage requirements | DONE | Omitted per the guidelines' coverage config `[G§6.2]` |
-| M8-007 | Render the board and own position | PENDING | Own cell, known barriers, and turn number are visible |
-| M8-007a | Render known barriers only | PENDING | A barrier appears only once disclosed `[AE-15]` |
-| M8-007b | Render received hints as text | PENDING | The verbal channel is visible to the operator |
-| M8-007c | Show the current score and step count | PENDING | Operator can see progress toward the threshold |
+| M8-007 | Render the board and own position | IN PROGRESS | Own cell, known barriers, and turn number are visible |
+| M8-007a | Render known barriers only | IN PROGRESS | A barrier appears only once disclosed `[AE-15]` |
+| M8-007b | Render received hints as text | IN PROGRESS | The verbal channel is visible to the operator |
+| M8-007c | Show the current score and step count | IN PROGRESS | Operator can see progress toward the threshold |
 | M8-008 | Implement replay navigation | DONE | Step forward, step back, and jump to a step |
 | M8-008a | Recompute verification on every navigation | DONE | The verdict is derived, never cached from load time |
 | M8-008b | Show the per-step verdict alongside the board | DONE | Operator sees where a match failed |
@@ -679,9 +679,9 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-010 | Run the resource and endurance pass | PENDING | A full six-sub-game series runs without degradation |
 | M8-010a | Run a long series and watch memory | PENDING | No unbounded growth across sub-games |
 | M8-010b | Confirm clean shutdown releases every resource | PENDING | Sockets, files, and threads all closed |
-| M8-011 | Document both interfaces | PENDING | Screens, states, and workflows described `[G§10.2]` |
-| M8-011a | Document the live GUI workflow | PENDING | Turn banner states and what each means |
-| M8-011b | Document accessibility considerations | PENDING | Colour is not the only signal `[G§10.2]` |
+| M8-011 | Document both interfaces | IN PROGRESS | Screens, states, and workflows described `[G§10.2]` |
+| M8-011a | Document the live GUI workflow | IN PROGRESS | Turn banner states and what each means |
+| M8-011b | Document accessibility considerations | IN PROGRESS | Colour is not the only signal `[G§10.2]` |
 | M8-012 | Prove the replay app on a foreign log | DONE | It verifies a log this peer did not write |
 | M8-012a | Verify an opponent-produced log | DONE | The audit is mutual; both logs must verify `[AE-36]` |
 | M8-012b | Detect a foreign log that was tampered | DONE | The detection path is not self-only |
@@ -691,7 +691,7 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-013c | Rehearse a config mismatch at negotiation | PENDING | The match is refused before play `[AE-11]` |
 | M8-014 | Freeze the wire profile before the counted league | PENDING | No wire change after the first counted game without a coordinator decision |
 | M8-015 | Capture the required submission screenshots | DONE | Belief-map GUI and replay `Verified OK` `[AE-42]` |
-| M8-015a | Capture the belief-map GUI screenshot | PENDING | Required README content |
+| M8-015a | Capture the belief-map GUI screenshot | IN PROGRESS | Required README content |
 | M8-015b | Capture the replay `Verified OK` screenshot | DONE | Required README content |
 | M8-015c | Capture a `TAMPERED` screenshot from a corrupted log | DONE | Demonstrates the detection path |
 | M8-015d | Make every screenshot reproducible from a stored fixture | DONE | A grader can regenerate them |
