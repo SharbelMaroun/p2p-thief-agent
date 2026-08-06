@@ -32,15 +32,54 @@ from p2p_thief_agent.peer.transport import JsonObject
 from p2p_thief_agent.protocol.crypto import CryptoError
 from p2p_thief_agent.protocol.wire import WireError
 
+# Appendix F table 19 sets `queue_depth` to 100 with status **Minimum** — "may be raised by
+# agreement but never lowered". Unbounded is not "raised": a mailbox with no ceiling is one
+# a flood drives out of memory, and rule 29 (Mandatory) requires DOS detectors precisely
+# "to protect network resources".
+#
+# The reference bounds only its *outbound* gatekeeper and leaves the inbound queues
+# unbounded. We bound the inbound side too, because that is the side an opponent controls.
+QUEUE_DEPTH_MINIMUM = 100
+
+
+def _bounded() -> queue.Queue:
+    return queue.Queue(maxsize=QUEUE_DEPTH_MINIMUM)
+
+
+def _enqueue(inbox: queue.Queue, message: object) -> bool:
+    """Enqueue without blocking; report refusal rather than waiting.
+
+    `put_nowait`, not `put`: blocking on a full mailbox would hold the MCP request thread
+    until the runtime drained it, turning a flood into a hang — and rule 6 makes a freeze
+    while awaiting a response a "system deadlock and loss due to timeout". Refusing is
+    visible; hanging is not.
+    """
+    try:
+        inbox.put_nowait(message)
+    except queue.Full:
+        return False
+    return True
+
 
 @dataclass(slots=True)
 class PeerInboxes:
-    """Thread-safe mailboxes filled by the MCP tools and drained by the runtime."""
+    """Thread-safe mailboxes filled by the MCP tools and drained by the runtime.
 
-    agreements: queue.Queue = field(default_factory=queue.Queue)
-    turns: queue.Queue = field(default_factory=queue.Queue)
-    audits: queue.Queue = field(default_factory=queue.Queue)
-    controls: queue.Queue = field(default_factory=queue.Queue)
+    Every mailbox is **bounded** (`M8-004b`). A full mailbox refuses rather than growing:
+    dropping the oldest would silently discard a turn the opponent believes we received,
+    and growing without limit turns a flood into an out-of-memory kill — a technical loss
+    scored 0/0 under Table 2.
+    """
+
+    agreements: queue.Queue = field(default_factory=_bounded)
+    turns: queue.Queue = field(default_factory=_bounded)
+    audits: queue.Queue = field(default_factory=_bounded)
+    controls: queue.Queue = field(default_factory=_bounded)
+
+    def depths(self) -> dict[str, int]:
+        """Current occupancy per mailbox — what an endurance test watches."""
+        return {name: getattr(self, name).qsize()
+                for name in ("agreements", "turns", "audits", "controls")}
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,22 +111,26 @@ def build_server(inboxes: PeerInboxes, name: str = "p2p-thief") -> FastMCP:
 
     @mcp.tool
     def negotiate(message: dict) -> dict:
-        inboxes.agreements.put(message)
+        if not _enqueue(inboxes.agreements, message):
+            return {"ok": False, "reason": "inbox full"}
         return {"ok": True}
 
     @mcp.tool
     def receive_turn(message: dict) -> dict:
-        inboxes.turns.put(message)
+        if not _enqueue(inboxes.turns, message):
+            return {"ok": False, "reason": "inbox full"}
         return {"ok": True}
 
     @mcp.tool
     def submit_audit(payload: dict) -> dict:
-        inboxes.audits.put(payload)
+        if not _enqueue(inboxes.audits, payload):
+            return {"ok": False, "reason": "inbox full"}
         return {"ok": True}
 
     @mcp.tool
     def receive_control(message: dict) -> dict:
-        inboxes.controls.put(message)
+        if not _enqueue(inboxes.controls, message):
+            return {"ok": False, "reason": "inbox full"}
         return {"ok": True}
 
     return mcp
