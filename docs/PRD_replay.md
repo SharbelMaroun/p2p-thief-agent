@@ -1,8 +1,11 @@
 # PRD — Replay and Verification
 
-Status: **requirements settled 2026-08-06; implementation still pending (`M8-002` and its
-family are PENDING).** The blocking questions this document previously listed as open —
-canonicalization authority and which hash construction governs — are now answered.
+Status: **verifier built 2026-08-06 and proven on foreign logs** (`M8-002a`–`d`, `M8-008`,
+`M8-008a`/`c`/`d`, `M8-012`, `M8-012a`/`b` DONE). The replay **UI** (`M8-002`, `M8-002e`,
+`M8-008b`) and the submission screenshots (`M8-015b`/`c`) remain open.
+
+`src/p2p_thief_agent/replay/` — `load.py`, `verify.py`, `sequence.py`, `cursor.py` — at 100%
+branch coverage, re-authored against this repository's own `protocol.crypto` (`THIEF-002`).
 
 Appendix E rule 20 (`AE-020`) requires a replay application that reconstructs and verifies
 a game. Confirmed with the book notebook 2026-08-06, quoting p. 129/272: the sanction is a
@@ -55,7 +58,13 @@ own, and foreign-shape tolerance replaces the need for a settled cross-repo sche
   including in a log this repository did not write (`M8-012b`).
 - A record whose *visible* fields contradict its sealed payload is `TAMPERED` even when the
   digest matches. `:1691` has the viewer re-encode "the Nonce and the move **appearing in
-  the log**", so a rewritten displayed move is a replay of a game nobody played.
+  the log**", so a rewritten displayed move is a replay of a game nobody played. **Built.**
+- **Structural damage is reported, not bannered (`M8-008d`, `U-026`).** Shuffled, deleted and
+  duplicated records survive every digest. `sequence.py` detects them and tags each finding
+  with the rule it answers to — rule 35 for a gap or duplicate, rule 5 for a non-ascending
+  order — while the `Verified OK` / `TAMPERED` stamp stays digest-only. Neither the book nor
+  the reference requires ordering to be checked, so red-bannering an opponent over it would
+  be a false accusation with no appeal (`:1769`), and rule 35 would score zero for both.
 - A mismatch produces the official technical-loss outcome; it is never shown as "verified."
 - The viewer reads through the SDK/verifier and contains no hashing business logic.
 - Normal, malformed, missing, reordered, duplicate, and tampered records are all tested.

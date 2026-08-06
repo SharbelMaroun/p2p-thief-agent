@@ -12,10 +12,11 @@ M2, M4, and M6 are complete, and the simulator-conformant protocol layer (commit
 canonical hashing, wire messages, signed-terms handshake) is implemented. M1 is
 `IN PROGRESS`: the wire profile is authored and adopted, but no acceptance verdict is
 recorded and the contract checker stays fail-closed. M5 and M7 are substantially built
-(71/80 and 34/86 rows). **M8 and M9 have not started** — 58 and 78 open rows — and M8
-contains rule 20's replay application, whose sanction is a threshold condition for
-submission, so it is the highest-consequence gap in this repository. Unresolved choices
-are raised explicitly rather than classified as blockers.
+(71/80 and 34/86 rows). **M8 has begun** — its replay verifier is built and at 11/58 rows —
+because rule 20's sanction is a threshold condition for confirmation of logs and submission
+of the project, making it the highest-consequence row in this repository. **M9 has not
+started** (78 open rows). Unresolved choices are raised explicitly rather than classified as
+blockers.
 
 Version `1.00` began as an M0–M1 documentation and package scaffold. The inspected
 baseline (`119fa911d5b1a5aecdaa9531d0912e5c6f9ab32f`) contained no Python package,
@@ -43,10 +44,18 @@ The turn loop now exists too: a bounded sub-game runs end to end through a decla
 phase machine and reveals its audit, with both crossing a real socket into a separate
 operating-system process.
 
-The repository still deliberately implements no public tunnel, scent field, belief
-map, LLM, Gmail, GUI, or replay behavior — and, decisively, **no second peer that
-plays back**. The opponent's moves in every run so far come from a local script, so
-**no game has been played against a real opponent**.
+Since then the M6 perception layer (scent field and belief map), the verbal/LLM layer, the
+M7 artifact and email-report pipeline, and the M8 **replay verifier** have all been built.
+The verifier reaches `Verified OK` or `TAMPERED` on a saved log — including one this
+repository did not write — and reports structural damage separately from the cryptographic
+verdict.
+
+The repository still deliberately implements no public tunnel and **no GUI** (`ui/` is an
+empty package), so the replay banner cannot yet be photographed for the mandatory
+submission screenshot. Gmail credentials are deliberately absent (rules 39–40), so the
+sender is built but unexercised. And, decisively, there is still **no second peer that
+plays back**: the opponent's moves in every run so far come from a local script, so **no
+game has been played against a real opponent**.
 
 Earlier Cop-bundle reviews are retained as historical audit evidence only. No
 peer-owned file was integrated, and those bundles are not inputs to the current
@@ -896,28 +905,41 @@ gains the curves rather than a placeholder chart.
 
 ### 5. Live belief map and "Verified OK" replay screenshots
 
-**Still blocked, and the reason is now precisely known rather than approximate.** A bounded
-sub-game runs end to end and its audit is delivered: every turn and the final reveal cross
-a real socket into a separate operating-system process, which validates each one — and a
-*tampered* audit is rejected there, so rule 19 is enforced over a real carrier rather than
-asserted locally.
+**The verifier behind the `Verified OK` stamp now exists in this repository; the screen that
+shows it does not yet.** Rule 20's sanction is a "threshold condition for confirmation of
+logs and submission of the project" (p.129/272), so this was the largest remaining gap here
+— M8 stood at zero.
 
-Two things are missing. The first is a **second peer that plays back**: the Cop's replies
-in those runs come from a local script, so there is no live belief map to photograph yet.
-The second is the **replay application itself** (`M8-002`), which this repository has not
-started.
+`src/p2p_thief_agent/replay/` loads a saved log, recomputes every commitment from the file's
+own bytes, and reaches one of exactly two verdicts; one altered record voids the whole match
+(`:1753`). The cursor steps forward, back, jumps to a step and jumps to the first
+divergence, and the verdict is **recomputed on every one of those moves** — it is a property
+with nowhere to cache, because a stamp computed once at load and painted thereafter is a
+claim about the past tense rather than evidence.
 
-The requirements for it are no longer open questions. Rule 20's sanction is a "threshold
-condition for confirmation of logs and submission of the project" (p. 129/272) — the
-project is not accepted without it, which makes this the highest-consequence row left here.
-Rule 36's "comprehensive mutual log audit" (p. 131/276) means the viewer must verify the
-**opponent's** log, not only ours. And `C-016` — which recorded the chapter 7 and chapter 5
-hash constructions as an unresolved conflict — is now reclassified `RESOLVED`, because
-`:1757` footnotes the chapter 7 sketch in the book's own voice as a simplification that
-names chapter 5 as normative. Nothing is escalated; `docs/PRD_replay.md` carries the full
-acceptance criteria, including the one that a digest check alone does not cover: a record
-whose visible `move` contradicts its sealed payload is `TAMPERED` even when the hash
-matches.
+It was re-authored against this repository's own `protocol.crypto`, never copied from the
+companion (`THIEF-002`). That rule earned its keep again: our `verify` **raises** where the
+companion's returns a flag, and our commit is built from a canonical *string* rather than
+concatenated bytes. A copy would have swallowed both differences silently.
+
+**It verifies logs we did not write.** Rule 36 mandates a "comprehensive mutual log audit"
+as a necessary condition for agreement (p.131/276); p.39/102: "each side reconstructs the
+opponent's data through the revealed nonces". The fixtures are therefore built by a writer
+importing nothing from this package, emitting a deliberately foreign shape.
+
+**One check has no counterpart in the companion repository.** Every commitment covers a
+single record, so shuffling records, deleting one, or duplicating one leaves every digest
+valid — a hash-only verifier stamps all three `Verified OK`. `sequence.py` detects them and
+deliberately reports rather than banners them: rule 19 is "any mismatch in the digest", while
+a gap is contradictory reports under rule 35 — zero for **both** teams — and an illegal state
+jump under rule 5. Neither the book nor the reference checks ordering, so red-bannering an
+opponent over it would be a false accusation carrying no appeal (`:1769`). The finding names
+its rule and goes to settlement. Recorded as `U-026`; the same gap was then closed in the
+companion repository, which had shipped without it.
+
+What remains for the screenshot is the **view**, plus the belief map from a live two-peer
+run. The `Verified OK` capture belongs "within the README.md academic report" (p. 81/189,
+"absolute mandatory"); the exact filename and directory are **not specified**.
 
 ### 6. Companion repository
 
