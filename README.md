@@ -571,6 +571,29 @@ the pursuer "**ignores** the verbal claim and **continues** to track the actual 
 source". No trust floor or "ignore a liar after N turns" rule is defined anywhere, so the
 decay schedule and the `[0, 1]` clamp are engineering, and are labelled as such.
 
+#### Where our evasion evidence is weaker than the Cop's (`M6-019` note, 2026-08-06)
+
+`M6-019` records that the deterministic evader survives 52 turns against a random legal
+walk's 39.6, meaned over five seeds. That result stands and is not withdrawn.
+
+But the Cop repository measured its equivalent claim the same day with a stronger design,
+and a reader comparing the two reports should not read equal confidence into both. Ours
+is the weaker evidence, on three counts:
+
+* **Unpaired.** Five separate means cannot say whether a win came from the policy or from
+  the draw. The Cop's opponent does not react to the pursuer, so on a given seed every
+  arm meets the *identical* trajectory and outcomes compare seed by seed — it reports
+  21–0 on matched pairs, which five averages cannot express.
+* **No ceiling.** The Cop includes an `oracle` arm that reads the true position (not a
+  legal agent), so its headline is a share of the *available* gap rather than only
+  "better than random". Beating a random walk is a low bar and ours is stated against it.
+* **Five seeds, no stability check.** The Cop used thirty, re-checked at 100 and 300.
+
+Recording this rather than quietly leaving two differently-rigorous numbers side by side
+is the point. Applying the same design here is logged as a candidate follow-up on the
+`M6-019` row; it was not done in this batch, because that row is closed and re-opening a
+teammate's finished work mid-batch is a call for the team, not a side effect of ours.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
