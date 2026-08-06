@@ -649,16 +649,16 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-002c | Void the whole match on the first mismatch | DONE | A single tampered step yields `TAMPERED` |
 | M8-002d | Record why the book's chapter-7 verifier is not used | DONE | Book p. 74 computes `SHA256("{nonce}|{move}")`, which cannot verify a chapter-5 commitment |
 | M8-002e | Document the replay UI workflow and states | DONE | Screens, controls, and both verdict states described `[G§10.2]` |
-| M8-003 | Run bidirectional games against a neutral compliant-opponent harness | IN PROGRESS | Unknown-opponent E2E evidence |
-| M8-003a | Rehearse against a stub that shares no source with this repo | IN PROGRESS | Independently authored; imports no project module |
-| M8-003b | Prove both proposal and acceptance directions | IN PROGRESS | Neither direction needs a profile file edited |
+| M8-003 | Run bidirectional games against a neutral compliant-opponent harness | DONE | Unknown-opponent E2E evidence |
+| M8-003a | Rehearse against a stub that shares no source with this repo | DONE | Independently authored; imports no project module |
+| M8-003b | Prove both proposal and acceptance directions | DONE | Neither direction needs a profile file edited |
 | M8-003c | Rehearse against a real classmate agent before the counted league | PENDING | Warm-ups are permitted and uncounted `[AE-52]` |
-| M8-004 | Harden secrets, identity, input validation, and dependency boundaries | IN PROGRESS | Security/privacy review and tests |
-| M8-004a | Validate every inbound field before use | IN PROGRESS | Malformed peer input cannot reach domain code `[G§6.3]` |
-| M8-004b | Bound memory and queue growth under sustained load | IN PROGRESS | No unbounded queue or leak over a long series |
-| M8-004c | Apply Nielsen usability heuristics to both UIs | IN PROGRESS | Visibility of status, error prevention, recovery `[G§10.1]` |
-| M8-005 | Exercise crash, timeout, mismatch, and tamper recovery end to end | IN PROGRESS | Failure-injection evidence |
-| M8-005a | Inject crash, timeout, mismatch, and tamper faults | IN PROGRESS | Each produces a defined, logged outcome |
+| M8-004 | Harden secrets, identity, input validation, and dependency boundaries | DONE | Security/privacy review and tests |
+| M8-004a | Validate every inbound field before use | DONE | Malformed peer input cannot reach domain code `[G§6.3]` |
+| M8-004b | Bound memory and queue growth under sustained load | DONE | No unbounded queue or leak over a long series |
+| M8-004c | Apply Nielsen usability heuristics to both UIs | DONE | Visibility of status, error prevention, recovery `[G§10.1]` |
+| M8-005 | Exercise crash, timeout, mismatch, and tamper recovery end to end | DONE | Failure-injection evidence |
+| M8-005a | Inject crash, timeout, mismatch, and tamper faults | DONE | Each produces a defined, logged outcome |
 | M8-006 | Build the GUI view-model behind the SDK | DONE | No widget touches domain or protocol code directly `[G§4.1]` |
 | M8-006a | Expose a read-only snapshot for rendering | DONE | The view cannot mutate game state |
 | M8-006b | Update the view on state change rather than polling | DONE | Redraw follows the state machine |
@@ -677,20 +677,20 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M8-009b | Confirm no private field crosses the wire | DONE | Leakage vector per private field class |
 | M8-009c | Review third-party dependencies and pin them | DONE | `uv.lock` is authoritative `[G§8.4]` |
 | M8-009d | Confirm the LLM path cannot influence a move | DONE | Even with a provider enabled `[AE-25]` |
-| M8-010 | Run the resource and endurance pass | IN PROGRESS | A full six-sub-game series runs without degradation |
-| M8-010a | Run a long series and watch memory | IN PROGRESS | No unbounded growth across sub-games |
-| M8-010b | Confirm clean shutdown releases every resource | IN PROGRESS | Sockets, files, and threads all closed |
+| M8-010 | Run the resource and endurance pass | DONE | A full six-sub-game series runs without degradation |
+| M8-010a | Run a long series and watch memory | DONE | No unbounded growth across sub-games |
+| M8-010b | Confirm clean shutdown releases every resource | DONE | Sockets, files, and threads all closed |
 | M8-011 | Document both interfaces | DONE | Screens, states, and workflows described `[G§10.2]` |
 | M8-011a | Document the live GUI workflow | DONE | Turn banner states and what each means |
 | M8-011b | Document accessibility considerations | DONE | Colour is not the only signal `[G§10.2]` |
 | M8-012 | Prove the replay app on a foreign log | DONE | It verifies a log this peer did not write |
 | M8-012a | Verify an opponent-produced log | DONE | The audit is mutual; both logs must verify `[AE-36]` |
 | M8-012b | Detect a foreign log that was tampered | DONE | The detection path is not self-only |
-| M8-013 | Rehearse the full failure matrix end to end | IN PROGRESS | Every fault class has an observed outcome, not a predicted one |
-| M8-013a | Rehearse an opponent crash mid-series | IN PROGRESS | The series still produces artifacts |
-| M8-013b | Rehearse a tunnel drop mid-turn | IN PROGRESS | Terminal outcome is defined, not a hang |
-| M8-013c | Rehearse a config mismatch at negotiation | IN PROGRESS | The match is refused before play `[AE-11]` |
-| M8-014 | Freeze the wire profile before the counted league | IN PROGRESS | No wire change after the first counted game without a coordinator decision |
+| M8-013 | Rehearse the full failure matrix end to end | DONE | Every fault class has an observed outcome, not a predicted one |
+| M8-013a | Rehearse an opponent crash mid-series | DONE | The series still produces artifacts |
+| M8-013b | Rehearse a tunnel drop mid-turn | DONE | Terminal outcome is defined, not a hang |
+| M8-013c | Rehearse a config mismatch at negotiation | DONE | The match is refused before play `[AE-11]` |
+| M8-014 | Freeze the wire profile before the counted league | DONE | No wire change after the first counted game without a coordinator decision |
 | M8-015 | Capture the required submission screenshots | DONE | Belief-map GUI and replay `Verified OK` `[AE-42]` |
 | M8-015a | Capture the belief-map GUI screenshot | DONE | Required README content |
 | M8-015b | Capture the replay `Verified OK` screenshot | DONE | Required README content |

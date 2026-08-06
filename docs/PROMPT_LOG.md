@@ -128,6 +128,15 @@
 - **Both guards are pinned as correct-for-their-channel**, deliberately: `check_no_private_fields` is right for the shared config and wrong for the declaration, and a test asserts both statements so neither gets "fixed" into agreeing with the other.
 - **Gate findings fixed the designed way.** Ruff wanted the `Error` suffix. The secret scanner flagged the test vectors — correctly, since a key-shaped literal beside `api_key` is exactly what a leak looks like — so they now use the scanner's own placeholder convention instead of an allowlist entry that would weaken it permanently.
 
+- **Date:** 2026-08-07 · **Tool:** Claude Opus 5 (agentic CLI) · **NotebookLM: BOTH notebooks reached** · **29 rows claimed and pushed before starting**
+- **Goal:** finish M8. Seventeen rows here, twelve in the companion, taken as one batch.
+- **Notebooks (step 3):** the **book** established that **rule 53 permits changing the code between games**, so `M8-014`'s freeze is a chosen policy scoped to the observable surface, not a rule; that **Nielsen comes from the guidelines §10.1, not the book**; the validation principle "never trust an unverified move" (p.12/50); and Table 19's five resource rows, all **Minimum** with `queue_depth` 100. The **reference** supplied the defect: its inbound queues are unbounded, bounded only outbound. Verified in `inst/` (step 4).
+- **Output:** bounded mailboxes; `test_resource_endurance.py`; `test_inbound_validation.py`; `test_failure_matrix.py`; `test_profile_freeze.py` + a frozen record; `docs/INTERFACE_REVIEW.md`. 1089 pass, 99.31%. **M8 is 57/58.**
+- **A real defect found by the field sweep: `ControlMessage.kind` was never validated.** `CONTROL_KINDS` was declared and never enforced, so an unrecognised kind reached the phase machine as a string nobody handled — and rule 5 makes an illegal state transition "a logical error leading to loss". `TurnMessage` validated its `sender` from the start; this class simply never got the matching check. A scenario test would not have found it; a systematic sweep of every field did.
+- **The validation tests are re-authored, not mirrored, and the difference is the point.** The companion checks JSON Schema files; this repository uses dataclasses with an `_known_only` filter. That is a **stronger** guarantee and is now pinned as such: a schema can *reject* an unknown member, `_known_only` **drops** it, so a smuggled objective coordinate never reaches a constructor at all.
+- **Both repositories independently froze the same wire digest** — `73c9963f…` — computed from two separately written neutral stubs. Agreement between two implementations is worth more than either freeze alone.
+- **The interface review names three gaps** rather than claiming ten passes: no keyboard path, no error surface in the live GUI, and no undo anywhere — the last deliberate, since a committed move is cryptographically bound.
+
 ## Best practices derived so far
 1. **Binding values live in one table** — quote Appendix F, never paraphrase numbers.
 2. **Decide, then generate** — architecture-defining choices go to the human first.
