@@ -779,6 +779,38 @@ separate remedies, and a test asserts the three refusals never collapse into one
 no artifact schemas, so that is a contract-shaped job — authoring them — rather than a
 code one, and claiming it would have meant calling something validated that nothing checks.
 
+#### Three gaps the mirror found, that copying would have hidden (`M7-006`, `M7-014b`, `M7-015c`, 2026-08-06)
+
+The second slice of mirroring the Cop's M7 work, and the assessment mattered more than the
+code. This repository already had a correct token bucket and an `email_report` module with
+the right `AF-020` address — so the job was never "add the missing files". It was finding
+what was **wrong**.
+
+**One gate of three.** `:2096` requires Quota Manager → Token Bucket → DOS Detector before
+any Gmail call. Only the bucket existed here, so a report could reach the API having
+passed a third of its protection. The other two are now in `services/send_gates.py`.
+
+**A deterministic subject that could not be assigned.** The subject named the game —
+`UOH26 Final Result — <game_id>` — and carried no team code. Rule 45 (Mandatory) ties
+**automatic report assignment** to the eight-character code, sanction "organizational
+failure that will prevent automatic report assignment to the team". Deterministic and
+unassignable are not the same property.
+
+**`send_report` could be called twice for one game.** Rule 35 scores a conflicting report
+0 for *both* teams, and a duplicate is the easiest way to produce one by accident. Now
+keyed on `game_id`.
+
+**And an API difference that copying would have carried straight past.** This repository's
+`TokenBucket.allow` *consumes* a token; the companion repo's is a pure query. A gate
+pipeline written against the wrong assumption would have burned a token on every request a
+*later* gate refused — throttling us gradually for sends that never happened, and
+reporting nothing. `attempt` inspects with `available`; only `send` calls `allow`. A test
+pins it.
+
+*One deliberate change to working code:* the 429 backoff went from constant to doubling.
+Both honour Appendix F table 19's `Minimum` of 5 seconds, so the original was not a bug —
+the test records the change and the reason rather than quietly rewriting the expectation.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a

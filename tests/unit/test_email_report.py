@@ -14,7 +14,8 @@ from p2p_thief_agent.reporting.email_report import (
 )
 from p2p_thief_agent.services.gatekeeper import Gatekeeper, guard
 
-MSG = compose_report(result={"total_score": 25}, sender="me@example.com", game_id="g42")
+MSG = compose_report(result={"total_score": 25}, sender="me@example.com", game_id="g42",
+                     team_code="sharNamr")
 
 
 def test_the_oauth_scope_is_send_only() -> None:
@@ -57,7 +58,11 @@ def test_a_429_is_backed_off_and_retried() -> None:
 
     result = send_report(MSG, transport=transport, submit=lambda call: call(),
                          sleep=sleeps.append, max_retries=3, backoff_seconds=5.0)
-    assert result == "ok" and sleeps == [5.0, 5.0]  # backed off twice, then delivered
+    # Changed 2026-08-06 from a constant [5.0, 5.0] to a doubling [5.0, 10.0]. Both honour
+    # Appendix F table 19's `Minimum` of 5s, so the original was not wrong -- this is a
+    # deliberate strengthening, not a bug fix. A fixed delay against a provider that is
+    # still throttling spends every retry at the same rate it has already refused.
+    assert result == "ok" and sleeps == [5.0, 10.0]  # backed off twice, then delivered
 
 
 def test_the_send_gives_up_loudly_after_the_retries() -> None:
@@ -67,3 +72,66 @@ def test_the_send_gives_up_loudly_after_the_retries() -> None:
     with pytest.raises(ReportSendError, match="after 2 retries"):
         send_report(MSG, transport=always_429, submit=lambda call: call(),
                     sleep=lambda _s: None, max_retries=2)
+
+
+# --- M7-014b / M7-015c / M7-013c: the gaps this repository had ------------------------
+
+
+def test_the_subject_carries_the_eight_character_team_code() -> None:
+    """Rule 45 (Mandatory): "a unique 8-character team identification code without
+    spaces. Sanction: organizational failure that will prevent **automatic report
+    assignment** to the team." The subject was deterministic before this and still
+    unassignable — naming the game is not the same as naming the team."""
+    from p2p_thief_agent.reporting.email_report import report_subject
+
+    assert report_subject("sharNamr", "g42") == "[sharNamr] UOH26 Final Result g42"
+    assert "sharNamr" in MSG["Subject"]
+
+
+@pytest.mark.parametrize("bad", ["short", "waytoolongcode", "has spac", ""])
+def test_a_team_code_that_is_not_eight_characters_is_refused(bad: str) -> None:
+    from p2p_thief_agent.reporting.email_report import ReportSendError, report_subject
+
+    with pytest.raises(ReportSendError, match="exactly 8 characters"):
+        report_subject(bad, "g42")
+
+
+def test_a_second_send_for_one_game_is_refused() -> None:
+    """`M7-015c`. Rule 35: a conflicting report scores 0 for **both** teams, and two sends
+    for one game is the easiest way to produce one by accident."""
+    from p2p_thief_agent.reporting.email_report import ReportSendError, send_report
+
+    sent: set[str] = set()
+    kwargs = {
+        "transport": lambda m: "ok", "submit": lambda call: call(),
+        "sleep": lambda _s: None, "game_id": "g42", "sent_games": sent,
+    }
+    assert send_report(MSG, **kwargs) == "ok"
+    with pytest.raises(ReportSendError, match="0 for BOTH teams"):
+        send_report(MSG, **kwargs)
+
+
+def test_a_missing_credential_fails_closed(tmp_path) -> None:
+    """`M7-013c`. A skipped report is indistinguishable from a successful one in a log
+    that only records errors, which is exactly why this must raise."""
+    from p2p_thief_agent.reporting.email_report import ReportSendError, send_report
+
+    with pytest.raises(ReportSendError, match="refusing to skip"):
+        send_report(MSG, transport=lambda m: "ok", submit=lambda call: call(),
+                    sleep=lambda _s: None, credential_path=tmp_path / "absent.json")
+
+
+def test_the_backoff_doubles_rather_than_repeating() -> None:
+    """A fixed delay against a provider that is still throttling spends every retry at the
+    same rate it already refused."""
+    from p2p_thief_agent.reporting.email_report import RateLimitError, ReportSendError, send_report
+
+    slept: list[float] = []
+
+    def throttled(_m):
+        raise RateLimitError("429")
+
+    with pytest.raises(ReportSendError):
+        send_report(MSG, transport=throttled, submit=lambda call: call(),
+                    sleep=slept.append, max_retries=2, backoff_seconds=5.0)
+    assert slept == [5.0, 10.0, 20.0]

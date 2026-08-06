@@ -14,11 +14,17 @@ backed off, never hammered (book §12, `AE-29` risk of account suspension).
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Callable, Mapping
 from email.message import EmailMessage
+from pathlib import Path
 
 GMAIL_SEND_SCOPE = "https://www.googleapis.com/auth/gmail.send"  # send only, no read/modify
 REPORTING_ADDRESS = "rmisegal+uoh26finalgame@gmail.com"  # AF-020; Table 20 "rimesegal" is a typo
+# Rule 45 (Mandatory): "enter a unique 8-character team identification code without
+# spaces. Sanction: organizational failure that will prevent AUTOMATIC REPORT ASSIGNMENT
+# to the team." A subject without it is deterministic but unassignable.
+_TEAM_CODE = re.compile(r"[A-Za-z0-9]{8}")
 
 # The transport actually delivers the message and returns a provider response, or raises
 # RateLimitError on an HTTP 429. Injected so the live googleapiclient adapter stays out of here.
@@ -33,13 +39,23 @@ class ReportSendError(RuntimeError):
     """Raised when the report could not be delivered after the configured retries."""
 
 
-def compose_report(*, result: Mapping, sender: str, game_id: str,
+def report_subject(team_code: str, game_id: str) -> str:
+    """The machine-read subject. Rule 45 ties automatic assignment to the team code, so a
+    subject that merely names the game is deterministic and still unassignable."""
+    if not isinstance(team_code, str) or _TEAM_CODE.fullmatch(team_code) is None:
+        raise ReportSendError(
+            f"team code {team_code!r} must be exactly 8 characters without spaces [AE-45]"
+        )
+    return f"[{team_code}] UOH26 Final Result {game_id}"
+
+
+def compose_report(*, result: Mapping, sender: str, game_id: str, team_code: str,
                    recipient: str = REPORTING_ADDRESS) -> EmailMessage:
     """Build the report email: the result JSON as an attachment, never as body text."""
     message = EmailMessage()
     message["To"] = recipient
     message["From"] = sender
-    message["Subject"] = f"UOH26 Final Result — {game_id}"  # deterministic subject (M7-014b)
+    message["Subject"] = report_subject(team_code, game_id)  # M7-014b
     message.set_content("Final result attached as JSON; this message carries no report in its body.")
     payload = json.dumps(dict(result), ensure_ascii=False, indent=2).encode("utf-8")
     message.add_attachment(payload, maintype="application", subtype="json",
@@ -55,17 +71,40 @@ def send_report(
     sleep: Callable[[float], None],
     max_retries: int = 3,
     backoff_seconds: float = 5.0,
+    game_id: str | None = None,
+    sent_games: set[str] | None = None,
+    credential_path: Path | None = None,
 ) -> object:
     """Send the report through the gate, backing off on a 429 (`M7-005e`, `M7-005g`).
 
     `submit` routes the call through the gatekeeper (e.g. a partial of `guard`). The send does
     not wait on the opponent — a side that does not send scores nothing, whatever the other does.
     """
+    # `M7-015c`. Rule 35 scores a conflicting report 0 for BOTH teams, and two sends for
+    # one game is the easiest way to produce one by accident.
+    if game_id is not None and sent_games is not None and game_id in sent_games:
+        raise ReportSendError(
+            f"{game_id} was already reported; a second report risks the rule 35 conflict "
+            "verdict, which scores 0 for BOTH teams"
+        )
+    # `M7-013c`. A missing credential must not degrade into "skipped the report": that
+    # failure is indistinguishable from success in a log that only records errors.
+    if credential_path is not None and not Path(credential_path).exists():
+        raise ReportSendError(
+            f"no Gmail credential at {credential_path!r}; refusing to skip a Mandatory "
+            "report [AE-32]. Run the one-time consent flow first"
+        )
     last_error: RateLimitError | None = None
-    for _ in range(max_retries + 1):
+    for attempt in range(max_retries + 1):
         try:
-            return submit(lambda: transport(message))
+            response = submit(lambda: transport(message))
         except RateLimitError as exc:
             last_error = exc
-            sleep(backoff_seconds)
+            # Doubling, not constant: a fixed delay against a provider that is still
+            # throttling just spends every retry at the same rate it already refused.
+            sleep(backoff_seconds * (2 ** attempt))
+            continue
+        if game_id is not None and sent_games is not None:
+            sent_games.add(game_id)
+        return response
     raise ReportSendError(f"report send failed after {max_retries} retries: {last_error}")
