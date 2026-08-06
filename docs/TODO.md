@@ -167,10 +167,10 @@ evidence, not current exit evidence. The active wire specification is
 | M1-014b | Cover quotes, backslashes, and control characters | PENDING | Escape handling is byte-exact |
 | M1-014c | Cover non-ASCII and non-BMP codepoints | PENDING | `ensure_ascii=False` behaviour asserted |
 | M1-014d | Prove the hash domains cannot collide | PENDING | Commitment and config hashes use distinct inputs |
-| M1-015 | Build a neutral stub opponent sharing no source file with any peer repository | PENDING | Stub is independently authored and imports no peer module |
+| M1-015 | Build a neutral stub opponent sharing no source file with any peer repository | IN PROGRESS | **Claimed by Sharbel 2026-08-06.** Stub is independently authored and imports no peer module. Prerequisite `M1-014` (canonicalization vectors the stub must reproduce) verified present before starting |
 | M1-015a | Assert exact tool and argument names against the stub | PENDING | A renamed tool or argument fails the suite |
-| M1-016 | Prove bidirectional conformance and two participant identities against the stub | PENDING | Thief-proposes and Thief-accepts both pass without editing a profile file |
-| M1-017 | Prove fail-closed negative vectors before gameplay | PENDING | Participant, value, version, hash, ordering, replay, and private-leakage vectors all reject |
+| M1-016 | Prove bidirectional conformance and two participant identities against the stub | IN PROGRESS | Thief-proposes and Thief-accepts both pass without editing a profile file |
+| M1-017 | Prove fail-closed negative vectors before gameplay | IN PROGRESS | Participant, value, version, hash, ordering, replay, and private-leakage vectors all reject |
 | M1-017a | Reject altered fixed and below-minimum values | PENDING | `[AE-11]` `[AE-12]` |
 | M1-017b | Reject duplicate JSON keys and unsupported versions | PENDING | Duplicates change canonical bytes `[ADR-0003]` |
 | M1-017c | Reject any private field appearing in shared config | PENDING | One leakage vector per private field class |
