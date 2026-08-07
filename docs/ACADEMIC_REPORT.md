@@ -55,6 +55,33 @@ negative, and a negative prior is not a probability.
 > scent vanishes almost immediately. Saturation is what $\rho \to 0$ approaches. Sensitivity
 > work sweeps in the correct direction.
 
+> **A third contradiction, in the scoring boundary** (`M3-005c`, `C-017`). Appendix F table
+> 15 sets `[Step Limit]` and `[Survival Threshold]` to the **same value**, 35. Two readings
+> follow and the book never chooses: does this agent win by surviving *exactly* 35 steps, or
+> must it exceed them? One turn separates them, and a whole sub-game — 20 points — hangs on
+> it. For the Thief this is not a corner case but the **entire win condition**: surviving is
+> how this agent scores when it is not captured.
+>
+> **Where it is.** In the mandatory parameters table, the document both peers negotiate
+> from — not in a figure. Two agents built from the same appendix can disagree about who won
+> a game they both played correctly.
+>
+> **What we chose.** The **inclusive** horizon — completing step 35 uncaptured is a win.
+>
+> **Why.** Chapter 3 table 2 (PDF p. 38) defines survival as lasting "the limit of valid
+> moves" without capture, and table 15 makes that limit *equal* the threshold. The two
+> tables together settle what either alone leaves open, so no coordinator ruling was needed.
+> `resolve_outcome` already used `steps >= survival_threshold`; what was missing was the
+> record and the boundary test. `test_scoring.py::test_survival_at_threshold` asserts 34/35/36
+> and `test_sub_game.py::test_surviving_the_threshold_wins_inclusively` pins the same horizon
+> in the live loop. `U-022` is closed and `C-017` marked `RESOLVED`.
+>
+> The companion Cop repository records the identical reading, from the same two tables, as
+> `C-024`, and pins it with its own boundary test. Both sides of a match therefore score the
+> final turn the same way — which is the property that actually matters here, since a
+> disagreement about it would produce two logs that each look correct and report different
+> winners.
+
 ### 1.3 The belief map
 
 The belief is the posterior over the opponent's position given everything observed
