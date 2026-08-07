@@ -1,11 +1,21 @@
-"""`M6-015`: belief-driven evasion must beat the blind baseline — measured, or reverted.
+"""`M6-015` / `M6-015c`: belief-driven evasion beats the blind baseline **in league points**.
 
-A deterministic pursuing Cop (fixed policy, fixed start scenarios, `M6-015a`) chases the
-Thief; the Cop deposits scent it cannot help emitting, and the Thief either ignores it
-(blind baseline) or senses it and flees the believed Cop cell (belief-driven). Survival is
-the steps the Thief lasts. If belief-driven ever failed to beat blind, the number would say
-so and the policy would be reverted — a negative result is evidence, not something to hide
-(`M6-015b`). `scripts/strategy_comparison.py` records the figures to `results/`.
+A deterministic pursuing Cop (fixed policy, `M6-015a`) chases the Thief; the Cop deposits
+scent it cannot help emitting, and the Thief either ignores it (blind baseline) or senses it
+and evades. If belief-driven ever failed to beat blind the number would say so and the policy
+would be reverted — a negative result is evidence, not something to hide (`M6-015b`).
+
+**The criterion changed on 2026-08-07, and the old one had been passing while the policy
+lost.** `M6-015` accepted the policy on *total survival steps* over four hand-picked openings
+(125 v 52). Widened to all 24 perimeter openings the steps margin narrowed, and under
+Appendix F — **10 for reaching the threshold, 5 for capture, nothing in between** — the
+ranking reversed outright: belief 140, blind 175. A policy that reliably survives 28 turns of
+35 scores exactly as badly as one caught on turn 2, so steps recommended a strategy the rules
+do not reward.
+
+Both metrics are asserted now, and the points one is the binding one. It is measured over the
+full opening set rather than four chosen scenarios, because the four were where the old
+policy looked best.
 """
 
 from p2p_thief_agent.domain.board import Board
@@ -68,6 +78,33 @@ def run_comparison(board: Board | None = None, steps: int = 35) -> dict:
             "scenarios": len(SCENARIOS), "max_steps": steps}
 
 
-def test_belief_driven_evasion_beats_the_blind_baseline() -> None:
+def test_belief_driven_evasion_beats_the_blind_baseline_in_league_points() -> None:
+    """**The binding criterion** (`M6-015c`). Points are what a sub-game pays; steps are
+    not. This is asserted over every perimeter opening, not the four the old criterion
+    used, because a policy chosen on four scenarios is a policy fitted to four scenarios."""
+    from scripts.run_experiments import arms_comparison  # noqa: PLC0415
+
+    report = arms_comparison()
+    points = report["league_points"]
+    assert points["belief"] > points["blind"], (
+        f"belief scores {points['belief']} against blind's {points['blind']}. `M6-015b` "
+        "says a policy that does not beat the baseline is reverted, and league points are "
+        "the measure that decides a sub-game")
+
+
+def test_belief_driven_evasion_also_survives_longer() -> None:
+    """The original criterion, kept because it is still true and still informative — it
+    just cannot be the acceptance test on its own. Steps and points disagreed once and
+    would have again."""
     result = run_comparison()
     assert result["belief_total_survival"] > result["blind_total_survival"]
+
+
+def test_the_two_metrics_are_measured_separately() -> None:
+    """A guard against the failure that produced `M6-015c`: if points were derived from
+    steps rather than from the outcome, they could never disagree, and the disagreement is
+    the finding."""
+    from scripts.run_experiments import arms_comparison  # noqa: PLC0415
+
+    report = arms_comparison()
+    assert report["survived_full_horizon"]["belief"] > report["survived_full_horizon"]["blind"]

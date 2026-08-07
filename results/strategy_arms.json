@@ -1,13 +1,13 @@
 {
   "belief": {
     "max": 35.0,
-    "mean": 27.5417,
-    "median": 28.5,
-    "min": 6.0,
-    "q1": 26.0,
-    "q3": 33.25,
+    "mean": 33.75,
+    "median": 35.0,
+    "min": 5.0,
+    "q1": 35.0,
+    "q3": 35.0,
     "runs": 24,
-    "stdev": 7.6328
+    "stdev": 6.1237
   },
   "blind": {
     "max": 35.0,
@@ -21,25 +21,25 @@
   },
   "board_size": 7,
   "league_points": {
-    "belief": 140,
+    "belief": 235,
     "blind": 175
   },
   "max_steps": 35,
-  "metric_disagreement": true,
+  "metric_disagreement": false,
   "paired_belief_vs_blind": {
-    "losses": 11,
+    "losses": 0,
     "pairs": 24,
-    "ties": 0,
-    "win_share_of_decisive": 0.5417,
+    "ties": 11,
+    "win_share_of_decisive": 1.0,
     "wins": 13
   },
   "scenarios": 24,
   "survived_full_horizon": {
-    "belief": 4,
+    "belief": 23,
     "blind": 11
   },
   "total_steps": {
-    "belief": 661.0,
+    "belief": 810.0,
     "blind": 437.0
   }
 }

@@ -124,15 +124,27 @@ needs no API key and cannot fail because a provider was slow.
 an LLM-driven strategy. The book permits either (chapter 6); we chose the one whose behaviour
 an auditor can re-derive.
 
-### 2.2 A myopic policy, and $\gamma$ left unused
+### 2.2 A myopic policy, $\gamma$ left unused — and where lexicographic ranking failed
 
-The policy ranks candidate actions **lexicographically** rather than by a weighted score.
+The baseline ranks candidate actions **lexicographically**. The argument was that a strict
+criterion order is auditable, that no calibration data justified weights, and that tuned
+coefficients nobody can defend are worse than an ordering anybody can read.
 
-**Gained:** a strict criterion order is auditable — a reader can say why a move was chosen.
-**Cost:** no lookahead. $\gamma$ appears in the formalism and does nothing in the code, and
-we say so rather than inventing a discount to look complete. No calibration data exists that
-would justify weights, and tuned coefficients nobody can defend are worse than an ordering
-anybody can read.
+**That argument was right about weights and wrong about ordering, and §3.1 is what it cost.**
+Lexicographic ranking does not merely prefer the first criterion; it makes every later one a
+tie-break. Evasion ranked threat distance first, so room to move could not influence a choice
+between a far corner and a near open cell — and the far corner wins every time until it is
+the last cell you have. Measured in league points, the result was worse than a random walk.
+
+The evasion policy now **sums** distance and mobility. That is not a retreat into tuned
+coefficients: the weights are 1 and 1, there is nothing to fit, and the change is a claim
+about the objective rather than about calibration — a sub-game pays for reaching the horizon,
+not for postponing capture, so the two terms belong on the same footing.
+
+**Gained:** an ordering is still auditable where the criteria genuinely rank (the baseline),
+and the objective is now the one the scoring table pays for.
+**Cost:** still no lookahead. $\gamma$ appears in the formalism and does nothing in the code,
+and we say so rather than inventing a discount to look complete.
 
 ### 2.3 Artifact validation is a table, not a JSON Schema
 
@@ -200,33 +212,48 @@ was never sent, and only the second is the peer's silence.
 Measurements, not claims. Protocol, sample sizes and threats to validity are in
 `docs/RESEARCH-REPORT-Performance-Analysis.md`; this is what the numbers say.
 
-### 3.1 The result that does not flatter us
+### 3.1 The result that stopped not flattering us
 
 Across **24 scenarios** — every perimeter opening, Cop and Thief starting on opposite cells:
 
 | Metric | Blind baseline | Belief policy | Winner |
 | --- | ---: | ---: | --- |
-| Total survival steps | 437 | **661** | belief (1.51×) |
-| Scenarios reaching the horizon | **11** | 4 | blind |
-| **League points** (10 survive / 5 captured) | **175** | 140 | **blind** |
+| Total survival steps | 437 | **810** | belief (1.85×) |
+| Scenarios reaching the horizon | 11 | **23** | belief |
+| **League points** (10 survive / 5 captured) | 175 | **235** | **belief** |
+| Paired, per scenario | — | **13 wins, 0 losses, 11 ties** | belief |
 
-The belief policy survives **51% longer** and scores **20% fewer points**. Both are true. The
-metrics disagree because Appendix F pays for *reaching the threshold* or *being captured*,
-with nothing in between — so 40 extra steps that end in capture are worth exactly as much as
-1 extra step that ends in capture.
+**This table read the other way until 2026-08-07, and that is the more interesting result.**
+The policy then scored **140 against blind's 175** — worse than a random walk at the only
+thing a sub-game pays for — while winning comfortably on survival steps (661 v 437). Both
+numbers were true. Appendix F pays for *reaching the threshold* or *being captured* with
+nothing in between, so 40 extra steps ending in capture are worth exactly what 1 extra step
+ending in capture is worth.
 
-We report the league column as the one that counts, because it is the one the league counts.
-`M6-015c` is open against this: our own evasion metric measures the quantity that reverses
-the ranking. It is not patched, because patching a metric after seeing which arm it favours
-is how a result stops meaning anything.
+The cause was one line of ranking. `choose_evasive_action` delegated to a policy whose
+criteria are **lexicographic with threat distance first**, so room to move only ever
+separated equally-distant moves. Maximising distance on a bounded board against a pursuer
+walks into a corner: distance large, exits zero. The fix scores distance **plus** mobility
+instead of ordering by distance then mobility, which is a different objective —
+P(reach the horizon) rather than E[steps].
+
+Re-checked on board sizes 5–9, on randomised openings rather than the tuned set, on barrier
+layouts, and on horizons 15–50. The advantage holds throughout and **grows with the
+horizon**, which is the tell: the old policy had a ceiling near 28 steps that is invisible
+whenever the threshold sits below it. At the negotiated 35 it is decisive.
+
+What this cost is worth stating plainly. `M6-015` accepted the policy on four hand-picked
+openings using total steps, and that criterion kept passing for as long as the policy was
+losing. The criterion is now league points over the full opening set (`M6-015c`), and
+`metric_disagreement` in `results/strategy_arms.json` — a flag that exists to catch exactly
+this — now reads `false`.
 
 ### 3.2 Parameter sensitivity
 
-A larger board helps both arms and helps the blind baseline at least as much — more room does
-not rescue the disagreement. Raising the survival threshold makes belief **worse**, not
-better: a longer game gives a deterministic pursuer more time to close, and a
-consistent-but-not-escaping policy converts fewer scenarios into points the further out the
-threshold moves.
+A larger board helps both arms. Raising the survival threshold no longer makes belief worse:
+that was a symptom of the corner-seeking defect, since a longer game gave a deterministic
+pursuer more time to close on a policy that had stopped increasing its options. The sweeps
+were regenerated after the fix.
 
 ### 3.3 Decision cost
 

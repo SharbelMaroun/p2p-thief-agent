@@ -29,9 +29,16 @@ Appendix F actually scores them:
 
 | Metric | blind | belief | Winner |
 |---|---|---|---|
-| Total survival steps | 437 | **661** | belief (1.51×) |
-| Scenarios reaching the horizon | **11** | 4 | blind |
-| **League points** (10 survive / 5 captured) | **175** | 140 | **blind** |
+| Total survival steps | 437 | **810** | belief (1.85×) |
+| Scenarios reaching the horizon | 11 | **23** | belief |
+| **League points** (10 survive / 5 captured) | 175 | **235** | **belief** |
+
+> **Corrected 2026-08-07.** This table previously read `175` for blind against
+> `140` for belief — our policy losing to a random walk on the only metric a
+> sub-game pays. The cause was lexicographic ranking putting threat distance
+> first, which walks a Thief into a corner; `choose_evasive_action` now sums
+> distance and mobility. Re-checked on board sizes 5-9, randomised openings,
+> barrier layouts and horizons 15-50. See `M6-015c` and the academic report §3.1.
 
 Appendix F pays the Thief **10 for reaching the survival threshold** and **5 for being
 captured**, both `Fixed`. There is nothing in between. A policy that reliably survives 28 of
