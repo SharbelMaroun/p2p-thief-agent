@@ -38,10 +38,21 @@ def build_declaration(
     started_at: str,
     ended_at: str,
     links: Mapping,
+    github_commit: str,
 ) -> dict:
-    """Assemble the pre-game declaration (`M7-002a`), sharing the match's `game_uid`."""
+    """Assemble the pre-game declaration (`M7-002a`), sharing the match's `game_uid`.
+
+    `github_commit` is **mandatory, not optional** (`M7-020`). Rule 53: "Record the commit
+    hash in the declaration; it is permitted to change code between games, but for every
+    game, you must update the commit hash." The field was missing entirely until
+    2026-08-07 — the declaration named who was playing and on what hardware, but not
+    *which code*, which is the one thing that makes a later audit reproducible.
+    """
     if not groups:
         raise ArtifactError("a declaration must name at least one group")
+    if not isinstance(github_commit, str) or len(github_commit) < 7:
+        raise ArtifactError(
+            "declaration needs the commit hash of the code that played this game [AE-53]")
     for group in groups:
         _require(group, _GROUP_KEYS, "declaration group")
         _require(group["hardware_spec"], _HARDWARE_KEYS, "hardware_spec")
@@ -57,5 +68,6 @@ def build_declaration(
         "game_ended_at": ended_at,
         "num_sub_games": num_sub_games,
         "max_tokens_per_game": max_tokens_per_game,
+        "github_commit": github_commit,
         "groups": [dict(group) for group in groups],
     }

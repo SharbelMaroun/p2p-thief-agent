@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" width="720" height="400" role="img">
+<title>Mean survival against board size</title><desc>Appendix F status Minimum, minimum 7 — swept upward only, because a Minimum may be raised and never lowered. 24+ openings per point.</desc>
+<rect width="720" height="400" fill="#ffffff"/>
+<text x="360.0" y="24.0" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#263238" text-anchor="middle" font-weight="bold">Mean survival against board size</text>
+<text x="360.0" y="42.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">Appendix F status Minimum, minimum 7 — swept upward only, because a Minimum may be raised and never lowered. 24+ openings per point.</text>
+<text x="360.0" y="392.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#607d8b" text-anchor="middle" font-weight="normal">board_and_agents.grid_size</text>
+<g transform="translate(16,200.0) rotate(-90)"><text x="0.0" y="0.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#607d8b" text-anchor="middle" font-weight="normal">mean steps survived</text></g>
+<line x1="70" y1="336.0" x2="690" y2="336.0" stroke="#e0e0e0" stroke-width="1"/>
+<text x="62.0" y="340.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">0</text>
+<line x1="70" y1="279.6" x2="690" y2="279.6" stroke="#e0e0e0" stroke-width="1"/>
+<text x="62.0" y="283.6" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">6.8909</text>
+<line x1="70" y1="223.2" x2="690" y2="223.2" stroke="#e0e0e0" stroke-width="1"/>
+<text x="62.0" y="227.2" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">13.7818</text>
+<line x1="70" y1="166.8" x2="690" y2="166.8" stroke="#e0e0e0" stroke-width="1"/>
+<text x="62.0" y="170.8" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">20.6727</text>
+<line x1="70" y1="110.4" x2="690" y2="110.4" stroke="#e0e0e0" stroke-width="1"/>
+<text x="62.0" y="114.4" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">27.5636</text>
+<line x1="70" y1="54.0" x2="690" y2="54.0" stroke="#e0e0e0" stroke-width="1"/>
+<text x="62.0" y="58.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">34.4545</text>
+<text x="70.0" y="352.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">7</text>
+<text x="194.0" y="352.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">8</text>
+<text x="318.0" y="352.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">9</text>
+<text x="442.0" y="352.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">10</text>
+<text x="566.0" y="352.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">11</text>
+<text x="690.0" y="352.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">12</text>
+<circle cx="70.0" cy="187.0" r="3" fill="#2980b9"/>
+<circle cx="194.0" cy="173.2" r="3" fill="#2980b9"/>
+<circle cx="318.0" cy="183.3" r="3" fill="#2980b9"/>
+<circle cx="442.0" cy="172.8" r="3" fill="#2980b9"/>
+<circle cx="566.0" cy="160.2" r="3" fill="#2980b9"/>
+<circle cx="690.0" cy="161.3" r="3" fill="#2980b9"/>
+<polyline points="70.0,187.0 194.0,173.2 318.0,183.3 442.0,172.8 566.0,160.2 690.0,161.3" fill="none" stroke="#2980b9" stroke-width="2"/>
+<circle cx="70.0" cy="110.6" r="3" fill="#e67e22"/>
+<circle cx="194.0" cy="74.4" r="3" fill="#e67e22"/>
+<circle cx="318.0" cy="69.2" r="3" fill="#e67e22"/>
+<circle cx="442.0" cy="59.1" r="3" fill="#e67e22"/>
+<circle cx="566.0" cy="60.8" r="3" fill="#e67e22"/>
+<circle cx="690.0" cy="54.0" r="3" fill="#e67e22"/>
+<polyline points="70.0,110.6 194.0,74.4 318.0,69.2 442.0,59.1 566.0,60.8 690.0,54.0" fill="none" stroke="#e67e22" stroke-width="2"/>
+<rect x="70" y="366" width="11" height="11" fill="#2980b9"/>
+<text x="86.0" y="375.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#263238" text-anchor="start" font-weight="normal">blind</text>
+<rect x="220" y="366" width="11" height="11" fill="#e67e22"/>
+<text x="236.0" y="375.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#263238" text-anchor="start" font-weight="normal">belief</text>
+</svg>

@@ -8,15 +8,17 @@ Companion Cop repository:
 
 ## Milestone status
 
-M2, M4, and M6 are complete, and the simulator-conformant protocol layer (commit-reveal,
-canonical hashing, wire messages, signed-terms handshake) is implemented. M1 is
-`IN PROGRESS`: the wire profile is authored and adopted, but no acceptance verdict is
-recorded and the contract checker stays fail-closed. M5 and M7 are substantially built
-(71/80 and 34/86 rows). **M8 has begun** — its replay verifier is built and at 11/58 rows —
-because rule 20's sanction is a threshold condition for confirmation of logs and submission
-of the project, making it the highest-consequence row in this repository. **M9 has not
-started** (78 open rows). Unresolved choices are raised explicitly rather than classified as
-blockers.
+M2 and M4 are complete; M6 is at 80/81 and **M7 at 84/86** — the two open M7 rows are the
+OAuth consent flow (`M7-013`, `M7-013a`), left deliberately unclaimed because running consent
+is the operator's action on their own machine, not an agent's. The simulator-conformant
+protocol layer (commit-reveal, canonical hashing, wire messages, signed-terms handshake) is
+implemented. M1 is at 39/46 with five rows superseded: the wire profile is authored and
+adopted, but no acceptance verdict is recorded and the contract checker stays fail-closed.
+M5 is at 71/80. **M8 is at 57/58** — its replay verifier is built, and its one open row
+(`M8-003c`, rehearsing against a real classmate agent) needs a counterpart we do not have;
+the local rehearsal that *is* possible was built instead as `M7-018`. **M9 has not started**
+(8/78). M0's six open rows are the book's internal contradictions the report must disclose.
+Unresolved choices are raised explicitly rather than classified as blockers.
 
 Version `1.00` began as an M0–M1 documentation and package scaffold. The inspected
 baseline (`119fa911d5b1a5aecdaa9531d0912e5c6f9ab32f`) contained no Python package,
@@ -860,6 +862,153 @@ What matters for this repository, batch by batch:
   players, `:3540` = 6 per series) and the template says `num_games: 1` — three plausible
   numbers, recorded as `X-05` there. Our own series work will meet the same three.
 
+#### Finishing M7: the four gaps only a whole phase reveals (`M7`, 2026-08-07)
+
+Forty-two rows in three waves, and the interesting part is not the count — it is that four
+defects were **invisible at the row level** and only appeared once the phase was taken as a
+whole.
+
+**Rule 53's commit hash did not exist.** The declaration named who played, on what hardware,
+with which model, against whom, and never *which code*. Every row about the declaration
+passed; the field nothing asked for was the one that makes a later audit reproducible.
+`build_declaration` now requires it, and a truncated hash is refused too — a value short
+enough to be ambiguous across the repository satisfies the rule's letter while defeating it.
+
+**We were violating Appendix F obligation 4.** It requires every game's configuration to be
+committed. `.gitignore` excludes `logs/`, `reports/generated/` and `results/generated/`, so a
+config written under any of them lived on one laptop and nowhere the obligation could see —
+silently, because the write succeeds and the file is there. `reporting/retention.py` now
+stores under `games/` and **refuses** a destination under an ignored path; a test reads the
+real `.gitignore` and fails if `games/` is ever added to it, since the way this regresses is
+somebody tidying the working tree. The first draft of that guard was wrong in both
+directions: it refused all of `results/` when only `results/generated/` is ignored, and its
+agreement test passed on a substring.
+
+**`compose_report` took a bare result mapping.** `settlement.agree(audit, ours, theirs)`
+already took its audit first so the ordering could not be forgotten — but nothing stopped a
+caller skipping settlement entirely and emailing a number the opponent had never confirmed.
+Rule 36 puts the audit before agreement; rule 35 scores a conflicting report 0 for *both*
+teams. The composer now requires the settlement record and refuses anything short of
+`agreed` with `audit_passed is True` — `is not True`, not truthiness, because a JSON round
+trip turning the flag into the string `"True"` would otherwise pass.
+
+**The secret scanner had no tests of its own.** It has caught two real problems in this
+repository, and its detection rules were unexercised because `findings()` read a file and
+formatted a repository-relative path in one pass — so it could only be tested through a file
+*inside* the repository. Splitting `line_findings` out fixed that. The new tests are mostly
+positives: a scanner quietly widened is worse than no scanner, because the repository goes on
+passing. Its own test file then failed the scan, correctly, and the probes were rebuilt as
+runtime-joined fragments rather than allowlisted — an exemption for the one file where a real
+key would look completely at home is the worst possible exemption.
+
+**Two decisions were made by declining the obvious answer.** `M7-024` asks that a schema
+change be visible, not silent; the obvious reading is to bump `SCHEMA_VERSION`, and that was
+rejected. Every inspected template shows `1.1` and `U-019` leaves that provenance unresolved,
+so emitting an unobserved number invites a peer matching on `1.1` to refuse our declaration —
+a real cost paid against an open question. Visibility is enforced by pinning a digest of the
+required field set instead, with a proof test showing the digest moves. And validation is a
+**table, not a JSON Schema**, for the same reason: a schema generated from those templates
+would demand keys no source demands and then refuse a conformant opponent, failing rule 36's
+mutual audit over a difference nothing forbids.
+
+**The rehearsal is what makes the rest checkable.** `tests/integration/rehearsal.py` plays a
+whole series through the real builders, audit, settlement, ledgers and retention store —
+only the transport is a double, because a rehearsal against test doubles rehearses the
+doubles. Three files drive it: a clean run, one with a deliberately lost sub-game, and one
+with a revealed move rewritten *after* its commitment was taken. The last is the one worth
+reading. A technical loss must produce **exactly the same file set** as a clean series, not
+merely "some artifacts" — and a detected forgery must produce artifacts and send **nothing**,
+because racing them to the lecturer converts their rule 19 loss into a shared rule 35 loss.
+
+*Left unclaimed:* `M7-013` and `M7-013a`, the OAuth consent flow. The consent screen is where
+a human decides what a program may do with their mailbox, so it is the operator's to run;
+`docs/RUNBOOK_reporting_setup.md` says so plainly rather than documenting an `authorize`
+command that does not exist. Everything downstream of it — the refresh policy with its
+300-second skew margin, the base64url envelope, the send gates — is built and tested against
+injected doubles, which is what let the rest of M7 finish with no credential in existence.
+
+#### Starting M9: what a history scan and a provenance check found (`M9-018`, `M9-010b`, 2026-08-07)
+
+Four findings, and the pattern in them is the same: a guard that was correct and unreached.
+
+**`running_git_commit` was called only from its own tests.** It has existed since `M4-006a`,
+fail-closes properly on anything but a clean 40-hex SHA, and no production path ever invoked
+it. Rule 53 is Mandatory, so a declaration that names the group, the hardware and the model
+but not the code is unreproducible — and the failure is silent, because the artifact
+validates and the key is present. The reference implementation has the same defect in a
+louder form: it hard-codes `github_commit` to the string `"unknown"` for both sides.
+`reporting/provenance.py` resolves it for real and refuses a placeholder.
+
+**A resolved hash can still be the wrong answer.** `git rev-parse HEAD` replies happily with
+uncommitted changes on disk, so the recorded commit does not contain the code that played.
+`describe_provenance` reports both facts and `require_reproducible` refuses a dirty tree
+before a *counted* game — fine while rehearsing, a broken audit trail once it counts.
+
+**The working-tree secret scan answers the wrong question at submission.** Rule 39 forbids
+secrets being *in the repository*, and a credential deleted three commits ago is in every
+clone. `scripts/scan_git_history.py` walks every blob reachable from **any** ref, so a secret
+on a merged-and-deleted branch is still seen, and checks paths as well as contents — a file
+can be a credential without containing anything that matches a pattern. **This repository's
+history is clean: 1709 objects, 0 findings.** That is precisely when a scanner's own tests
+matter, since nothing would notice if it quietly stopped looking.
+
+**The book contradicts itself about sending the report, and the contradiction is now
+disclosed.** Rule 51 and §9.3.3 require the JSON report to be *sent*, and `inst/:2224` is
+explicit that a side whose report is not received scores nothing "even if they won". But the
+shipped config example sets `[email] mode = "draft"` (`inst/:3041`, `DEV-SPEC.md:228`) and the
+book's own overview says "a JSON report sent via Gmail drafts" (`:3206`). Chapter 110 grants
+the freedom to choose, provided the report states where the contradiction was found, what was
+chosen and why. **We send.** A draft never sent scores zero under the rule with the explicit
+sanction; sending costs nothing if the draft reading was intended. `draft` stays available as
+a rehearsal mode.
+
+Submission contents are checked rather than assumed: `scripts/check_submission_contents.py`
+holds §9.4.1's list, §9.4.2's six README components, and the guidelines' per-mechanism PRD
+requirement, reporting every gap at once. It checks **presence, never quality** — whether the
+Dec-POMDP section is any good is a human judgement; whether it survived the last refactor is
+not, and that is the question worth asking automatically.
+
+#### The evidence bundle, and a correction the notebooks forced (`M9-010`, `M9-023`, 2026-08-07)
+
+**A claim in `games/README.md` was wrong, and the book says so plainly.** That file justified
+not committing game logs on the grounds that doing so would publish nonces, "and git history
+has no end". Rule 18 (`inst/:3354`) keeps a nonce secret **until the end of the game**, and
+the book defines Step 4 as the Final Reveal: "Only at the end of the game are all values,
+including the Nonce, revealed for a full mutual audit" (`inst/:1136`, `:1155`). The
+obligation *expires*. Revealed nonces are exactly what lets a third party recompute every
+commitment — publishing them is the point. Corrected there, and the real reason recorded:
+logs are not committed wholesale because no rule asks for it, not because doing so would leak.
+
+That also narrowed `M9-023`. "Verify every emitted artifact is committed" reads as all four;
+the book's obligations differ per artifact. The **config** is mandatory (Appendix F obligation
+4, p.140/288). The **log** has no explicit commit duty but is needed to run the Replay app,
+which rule 20 makes a threshold condition. The **result**'s duty is to be emailed (rule 51).
+A checker that demanded all four would have failed the submission for satisfying the rules.
+
+**"Proof the report was sent" cannot mean what it sounds like.** The book's decisive layer is
+receipt at the lecturer's address (p.78/183) — "if a report is not received from one of the
+sides, that side will not be credited for the game" — and a sender cannot observe receipt.
+Only the recipient can. So the class is `SendReceipt`, not `ProofOfDelivery`, and every
+record it writes carries `evidences: API acceptance, not receipt by the lecturer`. Overstating
+this in an artifact would be a claim the lecturer's own inbox could contradict. The reference
+implementation records nothing at all here: its sender returns `{status, reason}` for a CLI
+line that never reaches the four artifacts.
+
+**The clean-clone runner earned its keep on its first run.** Every gate passed in the working
+tree; `verify_clean_clone.py` clones `HEAD`, installs from the lockfile with `uv sync
+--frozen`, and re-runs them there — and immediately failed on two file-length violations. The
+value is not cleverness, it is that a clone contains only what was committed, so a gate
+script living untracked in a working tree cannot hide. Eight gates now pass on a fresh
+checkout. It is deliberately **not** `M9-013a`: a local clone shares the OS, the Python build
+and the uv cache, so it catches missing files and lockfile drift, never platform breakage.
+
+**The replay row closes the loop a grader closes.** Every other replay test builds records in
+memory. `test_replay_of_stored_match.py` plays a series, writes it as JSON, reloads it **by
+path alone**, and re-verifies to `Verified OK` — then changes a byte in the file and confirms
+`TAMPERED`. `json.dumps`/`loads` is not identity, and the commitment is over canonical bytes,
+so a verifier that only ever sees in-memory dicts can pass forever while every stored log
+fails. The first person to notice would have been whoever opened the submission.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
@@ -899,9 +1048,46 @@ doubles survival — **125 vs 52** steps over four fixed pursuit scenarios
 
 ### 4. Learning curves
 
-**Not applicable.** No reinforcement learning is used; the policy is deterministic by
-design, so there is no training run and no curve. If RL is adopted, this section
-gains the curves rather than a placeholder chart.
+The book requires learning curves **"if RL was used"** (p.81/189). This policy is
+deterministic and weight-free, so there is no convergence to plot, and the book is silent on
+a substitute. [`docs/RESEARCH-REPORT-Performance-Analysis.md`](docs/RESEARCH-REPORT-Performance-Analysis.md)
+answers the same question by measurement — and the answer is uncomfortable.
+
+![The two metrics rank the strategies in opposite directions](assets/chart-metric-disagreement.svg)
+
+**`M6-015`'s acceptance criterion measures a quantity the game does not score.** It asserts
+that belief-driven evasion beats the blind baseline on *total survival steps*, over four
+fixed openings, and it does: 125 to 52. Widening to all 24 perimeter openings and scoring
+the runs the way Appendix F scores them:
+
+| Metric | blind | belief | Winner |
+|---|---|---|---|
+| Total survival steps | 437 | **661** | belief (1.51×) |
+| Scenarios reaching the horizon | **11** | 4 | blind |
+| **League points** (10 survive / 5 captured, both `Fixed`) | **175** | 140 | **blind** |
+
+There is nothing between 5 and 10: a policy that reliably survives 28 of 35 turns scores
+exactly what one caught on turn 2 scores.
+
+![Survival steps by evasion arm](assets/chart-survival-distribution.svg)
+
+The blind baseline is **bimodal** — 11 outright escapes, the rest caught in 2–7 turns.
+Belief is **consistent** — median 29, standard deviation halved from 15.8 to 7.6 — but
+converts far fewer scenarios into the only outcome that pays. Paired, belief wins 13 and
+loses 11.
+
+This is not proof that blind is the better strategy: it is one deterministic Cop on one
+board, and a pursuer that anticipated evasion could reverse it. It *is* evidence that the
+criterion behind `M6-015` does not track the scoring rules, and that four scenarios were too
+few to notice. Opened as **`M6-015c`** rather than silently patched — changing the strategy
+is a larger decision than a measurement batch.
+
+Six charts, all SVG, all regenerable:
+
+```text
+uv run python scripts/run_experiments.py
+uv run python scripts/render_charts.py
+```
 
 ### 5. Live belief map and "Verified OK" replay screenshots
 
@@ -940,6 +1126,104 @@ companion repository, which had shipped without it.
 What remains for the screenshot is the **view**, plus the belief map from a live two-peer
 run. The `Verified OK` capture belongs "within the README.md academic report" (p. 81/189,
 "absolute mandatory"); the exact filename and directory are **not specified**.
+
+### The replay viewer
+
+![Replay viewer showing a green Verified OK stamp over an eight-step log](assets/replay-verified-ok.png)
+
+*`assets/replay-verified-ok.png` — the mandatory submission capture (`:1769`; "absolute
+mandatory" at p.81/189). Every commitment in `log_verified_ok.json` was recomputed from the
+file's own bytes at the moment the picture was taken.*
+
+The screen shows what the book asks a replay viewer to show: for each entry the `nonce`,
+the `move` and the original `commit` (p.56/142); a verdict indicator — a green
+`Verified OK` stamp or a red `TAMPERED` banner; and controls to move "back and forth in
+time" (p.56/141). It does **not** draw the board, because the board is not a requirement
+and the belief map belongs to the live GUI, where the book puts it.
+
+![Replay viewer showing a red TAMPERED banner with step 5 highlighted](assets/replay-tampered.png)
+
+*`assets/replay-tampered.png` — the detection path. Not a mandatory submission item; asked
+directly, only `Verified OK` is. It is captured anyway because a viewer shown only passing
+is a viewer that might not be checking anything.*
+
+Both images are regenerated from committed fixtures rather than kept as session artefacts,
+which is `M8-015d`'s condition — "a grader can regenerate them":
+
+```text
+uv run python scripts/capture_replay_screenshots.py
+```
+
+They are real screen captures of the real widget tree, photographed through the Windows
+GDI. Drawing a picture of what the app *would* look like would be a fabricated exhibit,
+which is the one thing a verification screenshot must never be.
+
+**The widgets contain no logic.** `M8-006` requires that "no widget touches domain or
+protocol code directly", so `replay/view_model.py` turns a cursor into frozen,
+display-ready values and `ui/replay_app.py` reads nothing else. That boundary is what makes
+the screenshot testable: a Tk window cannot be asserted about in CI, but the frame behind
+it can, so the stamp text and colour in these pictures are pinned by
+`test_replay_view_model.py` rather than by someone having looked once. The reference
+simulator draws the same boundary — its widgets are dumb components handed ready-made
+strings.
+
+Two things about the capture were not free. The first attempt came out shifted, with a
+strip of desktop down one edge and the title bar along the top, because Tk reports logical
+pixels while the GDI works in physical ones — on a scaled display every window coordinate
+is wrong by the scale factor. Declaring the process DPI-aware is what makes the output a
+function of the fixture rather than of the machine's display settings.
+
+### The live GUI
+
+![Live GUI showing a belief heatmap with a green YOUR TURN banner](assets/live-gui-belief-map.png)
+
+*`assets/live-gui-belief-map.png` — the second mandatory submission capture (p.81/189,
+"absolute mandatory"). Taken during a live match: a second operating-system process was
+started, turns crossed a real socket, and the heat map is whatever this agent believed at
+step 2. Asked directly, a reconstructed state would not satisfy the requirement — that is
+the replay viewer's separate exhibit.*
+
+**The opponent is a scripted local peer, not a classmate.** A second agent that plays back
+is still open work, so this is a live match against a stub and is described as such rather
+than implied to be a league game.
+
+**What the screen can never contain.** Rule 8 (Mandatory) — "display true local information
+only", sanction "disqualification due to data breach". Rule 9 (Prohibited) — "do not display
+the full objective board state", sanction **project disqualification**. That is the whole
+project, not a game, so it is enforced structurally rather than by discipline: `LocalTruth`
+has a closed field set with nowhere to hold the opponent's real position, and
+`test_local_truth_boundary.py` fails if anyone adds a field or if the live package imports
+anything that knows one. The reference does the same — its snapshot fixes what crosses to
+the GUI, so its window "is incapable of drawing" the opponent.
+
+The `C?` mark is not a leak. It is *our inference* from scent, which is what a trust map is
+for; `:1647` forbids showing the objective board, not showing a guess.
+
+**This is the Thief's screen, and the roles are inverted.** Our own cell is `T`; the
+inference we draw is about the police, marked `C?`. Taking the companion repository's
+version would have produced a window that labels its own cell `C` and guesses at a thief —
+backwards in a way that reads as correct at a glance. `THIEF-002` forbids reading that
+repository anyway, and this is the kind of thing the rule is for.
+
+**Colour is not the only signal.** Every believed cell also prints its probability, and the
+most likely one is marked in text, so a greyscale print or a red-green deficiency loses
+nothing.
+
+Two findings came out of producing this picture rather than out of building the widget.
+The first capture rendered sixty-three cells as `0%` and one as `100%`: belief converges
+fast because scent evidence is strong and consistent — measured at peak 0.28 after one
+update, 0.32 after two, 0.86 after three and 0.99 by the fourth. Capturing "later in the
+match" is not more impressive, only less informative, so the script captures at step 2 where
+the inference is still visibly an inference. The second is that rounding a diffuse belief to
+`0%` prints a board claiming the opponent is nowhere, which is the opposite of what the
+number is for; below one percent the label now reads `<1%`.
+
+Both images regenerate from committed inputs:
+
+```text
+uv run python scripts/capture_replay_screenshots.py
+uv run python scripts/capture_live_gui_screenshot.py
+```
 
 ### 6. Companion repository
 

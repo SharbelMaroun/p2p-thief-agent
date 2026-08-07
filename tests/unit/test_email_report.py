@@ -14,8 +14,13 @@ from p2p_thief_agent.reporting.email_report import (
 )
 from p2p_thief_agent.services.gatekeeper import Gatekeeper, guard
 
-MSG = compose_report(result={"total_score": 25}, sender="me@example.com", game_id="g42",
-                     team_code="sharNamr")
+# `M7-005f`: the audited-and-agreed settlement is now a required argument, not a caller's
+# discipline. This is the shape `orchestration.settlement.settlement_record` produces.
+AGREED = {"state": "agreed", "our_outcome": "survival", "their_outcome": "survival",
+          "audit_passed": True, "audit_failed_at": None}
+
+MSG = compose_report(result={"total_score": 25}, settlement=AGREED,
+                     sender="me@example.com", game_id="g42", team_code="sharNamr")
 
 
 def test_the_oauth_scope_is_send_only() -> None:

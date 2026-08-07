@@ -49,9 +49,37 @@ def report_subject(team_code: str, game_id: str) -> str:
     return f"[{team_code}] UOH26 Final Result {game_id}"
 
 
-def compose_report(*, result: Mapping, sender: str, game_id: str, team_code: str,
-                   recipient: str = REPORTING_ADDRESS) -> EmailMessage:
-    """Build the report email: the result JSON as an attachment, never as body text."""
+def _require_agreed(settlement: Mapping) -> None:
+    """Refuse to compose a report for a result that was not audited and then agreed.
+
+    Rule 36 makes the comprehensive mutual audit "a mandatory condition before agreement on
+    the JSON result", and rule 35 scores a conflicting report 0 for **both** teams. Until
+    now `compose_report` took a bare result mapping, so the ordering lived entirely in the
+    caller — and a precondition a caller can forget is not a precondition, which is the
+    argument `orchestration/settlement.agree` already makes by taking its audit first.
+
+    The `settlement_record` mapping crosses this boundary, not the module: `reporting/`
+    stays free of `orchestration/`, so a disconnected game can still emit its artifacts
+    (`M7-023`).
+    """
+    if not isinstance(settlement, Mapping):
+        raise ReportSendError("compose_report needs the settlement record [AE-36]")
+    if settlement.get("state") != "agreed" or settlement.get("audit_passed") is not True:
+        raise ReportSendError(
+            f"refusing to compose a report for a settlement in state "
+            f"{settlement.get('state')!r} with audit_passed="
+            f"{settlement.get('audit_passed')!r}; rule 36 makes the mutual audit a "
+            "mandatory condition before agreement, and rule 35 scores a conflicting "
+            "report 0 for BOTH teams [AE-35] [AE-36]")
+
+
+def compose_report(*, result: Mapping, settlement: Mapping, sender: str, game_id: str,
+                   team_code: str, recipient: str = REPORTING_ADDRESS) -> EmailMessage:
+    """Build the report email: the result JSON as an attachment, never as body text.
+
+    `settlement` is the `settlement_record` from `orchestration/settlement.py` (`M7-005f`).
+    """
+    _require_agreed(settlement)
     message = EmailMessage()
     message["To"] = recipient
     message["From"] = sender

@@ -1,0 +1,22 @@
+{
+  "frozen": [
+    "tool names",
+    "argument names"
+  ],
+  "scope": "Only the observable wire surface is frozen. Rule 53 permits changing, updating and improving the code between games, and that stays permitted: implementation, strategy and performance are not pinned here.",
+  "sha256": "73c9963fcc5fd7ef0e2abae3e6ba72f2a9dad798a346a70128deb4e20b31e916",
+  "surface": {
+    "negotiate": [
+      "message"
+    ],
+    "receive_control": [
+      "message"
+    ],
+    "receive_turn": [
+      "message"
+    ],
+    "submit_audit": [
+      "payload"
+    ]
+  }
+}

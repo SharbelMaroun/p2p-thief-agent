@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" width="720" height="400" role="img">
+<title>League points against the survival threshold</title><desc>Appendix F status Minimum, minimum 35. A longer game is more time to be caught, and the gap widens against belief rather than closing.</desc>
+<rect width="720" height="400" fill="#ffffff"/>
+<text x="360.0" y="24.0" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#263238" text-anchor="middle" font-weight="bold">League points against the survival threshold</text>
+<text x="360.0" y="42.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">Appendix F status Minimum, minimum 35. A longer game is more time to be caught, and the gap widens against belief rather than closing.</text>
+<text x="360.0" y="392.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#607d8b" text-anchor="middle" font-weight="normal">movement_and_barriers.survival_threshold</text>
+<g transform="translate(16,200.0) rotate(-90)"><text x="0.0" y="0.0" font-family="Segoe UI,Arial,sans-serif" font-size="11" fill="#607d8b" text-anchor="middle" font-weight="normal">league points</text></g>
+<line x1="70" y1="336.0" x2="690" y2="336.0" stroke="#e0e0e0" stroke-width="1"/>
+<text x="62.0" y="340.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">0</text>
+<line x1="70" y1="279.6" x2="690" y2="279.6" stroke="#e0e0e0" stroke-width="1"/>
+<text x="62.0" y="283.6" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">35</text>
+<line x1="70" y1="223.2" x2="690" y2="223.2" stroke="#e0e0e0" stroke-width="1"/>
+<text x="62.0" y="227.2" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">70</text>
+<line x1="70" y1="166.8" x2="690" y2="166.8" stroke="#e0e0e0" stroke-width="1"/>
+<text x="62.0" y="170.8" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">105</text>
+<line x1="70" y1="110.4" x2="690" y2="110.4" stroke="#e0e0e0" stroke-width="1"/>
+<text x="62.0" y="114.4" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">140</text>
+<line x1="70" y1="54.0" x2="690" y2="54.0" stroke="#e0e0e0" stroke-width="1"/>
+<text x="62.0" y="58.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">175</text>
+<text x="70.0" y="352.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">35</text>
+<text x="225.0" y="352.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">45</text>
+<text x="380.0" y="352.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">55</text>
+<text x="535.0" y="352.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">65</text>
+<text x="690.0" y="352.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">75</text>
+<circle cx="70.0" cy="54.0" r="3" fill="#2980b9"/>
+<circle cx="225.0" cy="54.0" r="3" fill="#2980b9"/>
+<circle cx="380.0" cy="54.0" r="3" fill="#2980b9"/>
+<circle cx="535.0" cy="54.0" r="3" fill="#2980b9"/>
+<circle cx="690.0" cy="54.0" r="3" fill="#2980b9"/>
+<polyline points="70.0,54.0 225.0,54.0 380.0,54.0 535.0,54.0 690.0,54.0" fill="none" stroke="#2980b9" stroke-width="2"/>
+<circle cx="70.0" cy="110.4" r="3" fill="#e67e22"/>
+<circle cx="225.0" cy="142.6" r="3" fill="#e67e22"/>
+<circle cx="380.0" cy="142.6" r="3" fill="#e67e22"/>
+<circle cx="535.0" cy="142.6" r="3" fill="#e67e22"/>
+<circle cx="690.0" cy="142.6" r="3" fill="#e67e22"/>
+<polyline points="70.0,110.4 225.0,142.6 380.0,142.6 535.0,142.6 690.0,142.6" fill="none" stroke="#e67e22" stroke-width="2"/>
+<rect x="70" y="366" width="11" height="11" fill="#2980b9"/>
+<text x="86.0" y="375.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#263238" text-anchor="start" font-weight="normal">blind</text>
+<rect x="220" y="366" width="11" height="11" fill="#e67e22"/>
+<text x="236.0" y="375.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#263238" text-anchor="start" font-weight="normal">belief</text>
+</svg>

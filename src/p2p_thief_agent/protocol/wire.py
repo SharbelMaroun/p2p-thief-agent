@@ -106,6 +106,14 @@ class ControlMessage:
     def __post_init__(self) -> None:
         if self.sender not in ROLES:
             raise WireError("ControlMessage.sender must be 'thief' or 'police'")
+        # `CONTROL_KINDS` was declared and never enforced — found 2026-08-07 by `M8-004a`'s
+        # field sweep. An unrecognised kind reached the phase machine as a string nobody
+        # handled, and rule 5 (Mandatory) makes an illegal state transition "a logical
+        # error leading to loss". `TurnMessage` validated its `sender` from the start; this
+        # class simply never got the matching check.
+        if self.kind not in CONTROL_KINDS:
+            raise WireError(
+                f"ControlMessage.kind must be one of {CONTROL_KINDS}, got {self.kind!r}")
 
     def to_dict(self) -> dict:
         return asdict(self)

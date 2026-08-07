@@ -28,17 +28,16 @@ SUBGAME = {"sub_game_number": 1, "roles": {}, "started_at": "t0", "ended_at": "t
            "github_commit": "a" * 40, "tokens": 0, "score": 10, "log_files": [], "audit": {}}
 FINAL = {"total_score": 25, "sub_games_won": 3, "ties": 0, "winner_group": "sharNamr",
          "series_tie": False, "tokens_total_series": 0}
-SUMMARY = dict.fromkeys(
+SUMMARY = {**dict.fromkeys(
     ("sub_game_number", "group_id", "role", "opponent_group_id", "result", "winner_role",
-     "steps", "timezone", "started_at", "ended_at", "duration_seconds", "tokens_total", "audit"),
-    0,
-)
+     "steps", "timezone", "started_at", "duration_seconds", "tokens_total", "audit"), 0),
+    "ended_at": "t1"}  # `M7-022b`: a log with no end time is a game still in play [AE-18]
 RECORD = {"payload": {"step": 1}, "nonce": "n", "commit": "c"}
 
 
 def test_the_declaration_carries_the_documented_top_level_and_shared_uid() -> None:
     art = build_declaration(identity=ID, groups=GROUPS, num_sub_games=6, max_tokens_per_game=1000,
-                            timezone="UTC", started_at="t0", ended_at="t1", links={})
+                            timezone="UTC", started_at="t0", ended_at="t1", links={}, github_commit="a" * 40)
     assert art["_schema"] == "declaration" and art["game_uid"] == "uid-9"
     assert set(art["groups"][0]) >= {"hardware_spec", "signature", "repos"}
 
@@ -47,7 +46,7 @@ def test_a_declaration_group_missing_hardware_is_rejected() -> None:
     broken = [{**GROUPS[0], "hardware_spec": {"cpu_type": "x"}}, GROUPS[1]]
     with pytest.raises(ArtifactError, match="hardware_spec missing"):
         build_declaration(identity=ID, groups=broken, num_sub_games=6, max_tokens_per_game=1,
-                          timezone="UTC", started_at="t0", ended_at="t1", links={})
+                          timezone="UTC", started_at="t0", ended_at="t1", links={}, github_commit="a" * 40)
 
 
 def test_the_config_locks_its_content_with_a_sha256() -> None:
@@ -81,9 +80,18 @@ def test_a_result_missing_the_per_game_commit_is_rejected() -> None:
 def test_an_empty_declaration_or_log_is_rejected() -> None:
     with pytest.raises(ArtifactError, match="at least one group"):
         build_declaration(identity=ID, groups=[], num_sub_games=6, max_tokens_per_game=1,
-                          timezone="UTC", started_at="t0", ended_at="t1", links={})
+                          timezone="UTC", started_at="t0", ended_at="t1", links={}, github_commit="a" * 40)
     with pytest.raises(ArtifactError, match="at least one step"):
         build_log(identity=ID, summary=SUMMARY, records=[],
+                  mutual_agreement={"opponent_group_id": "opp", "sha256": "s", "confirmed": True},
+                  links={})
+
+
+def test_a_log_is_refused_while_the_game_is_still_running() -> None:
+    """`M7-022b`. Every record carries its nonce, so building the log mid-game publishes
+    them — rule 18's sanction is disqualification for enabling a dictionary attack."""
+    with pytest.raises(ArtifactError, match="AE-18"):
+        build_log(identity=ID, summary={**SUMMARY, "ended_at": ""}, records=[RECORD],
                   mutual_agreement={"opponent_group_id": "opp", "sha256": "s", "confirmed": True},
                   links={})
 

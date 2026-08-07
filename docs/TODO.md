@@ -522,6 +522,7 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M6-015 | Measure strategy quality against the baseline | DONE | `test_strategy_comparison.py` + `scripts/strategy_comparison.py`: belief-driven evasion survives **125** vs the blind baseline's **52** total steps (4 scenarios × 35), more than doubling survival, so it earns its place. Both sub-tasks below |
 | M6-015a | Define the comparison protocol | DONE | A deterministic greedy pursuing Cop, four fixed start scenarios on the 7×7 grid, survival measured to a fixed step horizon — no randomness, so runs are reproducible |
 | M6-015b | Record the result either way | DONE | `scripts/strategy_comparison.py` writes `results/strategy_comparison.json` and `PRD_strategy.md` records the table; the test asserts belief `>` blind, so a regression that lost the advantage would fail rather than hide. Feeds `M9-007a` |
+| M6-015c | Re-state the evasion acceptance criterion in league points, not survival steps | PENDING | **Found 2026-08-07 by `M9-006`'s widened sweep.** `M6-015` asserts belief-driven evasion beats the blind baseline on *total survival steps*, and over its four fixed openings it does (125 v 52). Over all 24 perimeter openings the steps advantage narrows to 1.51x — and under Appendix F's actual scoring, which pays 10 for reaching the threshold and 5 for capture with nothing in between, the ranking **reverses**: blind 175, belief 140. The blind arm is bimodal (11 outright escapes, the rest caught in 2-7 turns); belief is consistent (median 29, stdev halved) but escapes only 4 times. Paired, belief wins 13 and loses 11. Not patched here because changing the strategy is a larger decision than a measurement batch; see `docs/RESEARCH-REPORT-Performance-Analysis.md` and `results/strategy_arms.json` (`metric_disagreement: true`) | `AF-002`/`AF-004` (both Fixed); `M9-006`; `M9-007a` |
 | M6-016 | Prove belief and scent never leak beyond the agreed wire fields | DONE | `test_belief_and_scent_privacy.py`: the `TurnMessage` roster is pinned (only `step`/`sender`/`hint`/`smell_grid`/`commit`/`timestamp` + the optional claim fields — no belief/certainty/trust member), and a guard walks `protocol/` and `adapters/` proving the wire layer never imports the private inference modules (belief, consume, trust, hint, belief_policy), so belief cannot reach a message even indirectly |
 | M6-017 | Record the belief model in the academic report | DONE | `README.md` §Report records the belief model: §1 (Dec-POMDP) now names the scent observation and the Bayesian belief that never holds the Cop's cell; §3 (implemented strategy) gives the **Bayes update** (`posterior ∝ b × likelihood`, zero-evidence → uniform), the scent and hint likelihoods, the **trust factor** (`L_eff = t·L + (1−t)·uniform`, trust falls on contradiction), and the **distance objective** (flee the most likely Cop cell), with the measured 125-vs-52 result `[AE-42]` |
 | M6-018 | Offer the scent implementation to the opponent for parity | DONE | `perception/scent.py` depends on nothing in this project (only `from __future__`), so it is a self-contained reference unit offerable to an opponent verbatim — `test_scent_shareable.py` pins that. A peer that adopts it or reproduces the documented model produces byte-identical fields, which the `M6-005` lock verifies at negotiation. `PRD_scent_belief.md` §"Offering the scent implementation for parity" records the one-directional offer under `THIEF-002` `[book §6]` |
@@ -549,14 +550,14 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-001b | Implement the confirmed six-sub-game role schedule | DONE | The schedule is **injected** — `THIEF_SUBGAMES_NATURAL = (1,3,5)` / `THIEF_SUBGAMES_SWAPPED = (2,4,6)` (`U-021`), passed to `run_thief_series`, so a later correction is a one-line change; `test_the_swapped_schedule_is_injected_not_hard_coded` (`C-012`) |
 | M7-001c | Aggregate cumulative series score | DONE | Per-sub-game Thief scores (Appendix F table 17) sum to `SeriesResult.cumulative_score`; `test_a_natural_series_runs_its_thief_sub_games_under_one_identity` (10+10+5 = 25) |
 | M7-001d | Apply the tie award on a cumulative tie | DONE | A tied sub-game already pays the table's `TIE_SCORE` via `thief_score(Outcome.TIE)`; `is_cumulative_tie(a, b)` detects a level series total, which reporting settles (`M7-017`); `test_a_cumulative_tie_is_detected` `[AF-t17]` |
-| M7-002 | Build accepted declaration, config, log, and result artifacts | DONE (U-019-provisional) | `reporting/` builders for all four artifacts (each module 100% branch; `test_artifacts.py`, `test_artifact_naming.py`). **Schemas follow the documented, unauthenticated template — the coordinator authorised building against it 2026-08-05 pending a `U-019` ruling**, so the exact field set may still change. Naming/identity are book-confirmed. All sub-tasks below |
-| M7-002a | Emit `declaration_<game_id>.json` | DONE (U-019-prov.) | `reporting/declaration.build_declaration`: `_schema`/`schema_version`/`declaration_type`/identity/`links`/`timezone`/times/`num_sub_games`/`max_tokens_per_game`/`groups`, each group carrying members, both repos, `mcp_servers`, `llm_model`, `hardware_spec`, `signature`; validates the group and hardware key sets |
-| M7-002b | Emit `config_<game_id>_g<NN>.json` | DONE (U-019-prov.) | `reporting/config_artifact.build_config`: the seven documented sections plus `agreed_between`, identity, `sub_game_number`, and the `config_sha256` lock over the quantitative content |
-| M7-002c | Emit `log_<game_id>_g<NN>.json` | DONE (U-019-prov.) | `reporting/log_artifact.build_log`: `summary` + the step-by-step commit-reveal `records` (each `payload`/`nonce`/`commit`) + `mutual_agreement`, sufficient to recompute every commitment |
-| M7-002d | Emit `result_<game_id>.json` | DONE (U-019-prov.) | `reporting/result_artifact.build_result`: per-group blocks, per-sub-game lines, and the cumulative `final_result`; this is the emailed report |
+| M7-002 | Build accepted declaration, config, log, and result artifacts | DONE | `reporting/` builders for all four artifacts (each module 100% branch; `test_artifacts.py`, `test_artifact_naming.py`). **Schemas follow the documented, unauthenticated template — the coordinator authorised building against it 2026-08-05 pending a `U-019` ruling**, so the exact field set may still change. Naming/identity are book-confirmed. All sub-tasks below Status qualifier: (U-019-provisional). |
+| M7-002a | Emit `declaration_<game_id>.json` | DONE | `reporting/declaration.build_declaration`: `_schema`/`schema_version`/`declaration_type`/identity/`links`/`timezone`/times/`num_sub_games`/`max_tokens_per_game`/`groups`, each group carrying members, both repos, `mcp_servers`, `llm_model`, `hardware_spec`, `signature`; validates the group and hardware key sets Status qualifier: (U-019-prov.). |
+| M7-002b | Emit `config_<game_id>_g<NN>.json` | DONE | `reporting/config_artifact.build_config`: the seven documented sections plus `agreed_between`, identity, `sub_game_number`, and the `config_sha256` lock over the quantitative content Status qualifier: (U-019-prov.). |
+| M7-002c | Emit `log_<game_id>_g<NN>.json` | DONE | `reporting/log_artifact.build_log`: `summary` + the step-by-step commit-reveal `records` (each `payload`/`nonce`/`commit`) + `mutual_agreement`, sufficient to recompute every commitment Status qualifier: (U-019-prov.). |
+| M7-002d | Emit `result_<game_id>.json` | DONE | `reporting/result_artifact.build_result`: per-group blocks, per-sub-game lines, and the cumulative `final_result`; this is the emailed report Status qualifier: (U-019-prov.). |
 | M7-002e | Share one `game_uid` across all four artifacts | DONE | `MatchIdentity(game_id, game_uid)` is the one identity, `match_filenames` derives all four filenames from the single `game_id` (`AF-021`), and every builder now stamps the shared `game_uid`/`game_id` inside its artifact from that identity (`AR-001` / `AF-§3`) |
-| M7-002f | Carry four repository links in the result artifact | DONE (U-019-prov.) | `build_result` collects the four links (two per group, from each group's `repos`) into `links.repositories` and refuses anything other than four; `test_the_result_carries_four_repo_links_and_per_game_commit_and_tokens` `[AE-49]` |
-| M7-002g | Carry the per-game commit hash and total tokens | DONE (U-019-prov.) | Each result sub-game requires `github_commit` and `tokens`; a missing commit is refused (`test_a_result_missing_the_per_game_commit_is_rejected`) `[AE-53]` `[AE-54]` |
+| M7-002f | Carry four repository links in the result artifact | DONE | `build_result` collects the four links (two per group, from each group's `repos`) into `links.repositories` and refuses anything other than four; `test_the_result_carries_four_repo_links_and_per_game_commit_and_tokens` `[AE-49]` Status qualifier: (U-019-prov.). |
+| M7-002g | Carry the per-game commit hash and total tokens | DONE | Each result sub-game requires `github_commit` and `tokens`; a missing commit is refused (`test_a_result_missing_the_per_game_commit_is_rejected`) `[AE-53]` `[AE-54]` Status qualifier: (U-019-prov.). |
 | M7-003 | Implement the centralized external-call gatekeeper | DONE | `services/gatekeeper.py` (now token-bucket-based) + `services/token_bucket.py`; `test_gatekeeper.py`, `test_token_bucket.py`, `test_external_gatekeeper.py`. All four sub-tasks below |
 | M7-003a | Route every external call through one gatekeeper | DONE | `test_external_gatekeeper.py` walks `src/` and fails on any direct import of a Gmail/LLM API (googleapiclient, smtplib, openai, anthropic, …), so the Gmail (`M7-005`) and verbal (`M7-004`) paths must route through the one gatekeeper `[G§5.1]` |
 | M7-003b | Implement the token bucket | DONE | `services/token_bucket.TokenBucket` implements `AE-28` exactly — `tokens ← min(C, tokens + r·Δt)`, admit iff `tokens ≥ 1`, consume on admit — wired into the gatekeeper's rate decision (`requests_per_minute` tokens refilling at `rpm/60`/s); `test_token_bucket.py` (100% branch) `[AE-28]` |
@@ -564,42 +565,42 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-003d | Read every limit from configuration | DONE | `Gatekeeper.from_match` reads `requests_per_minute`/`concurrent_requests`/`queue_depth` from the signed match object's `rate_limiter_gatekeeper` (Appendix F table 19 `Minimum`s); no hard-coded rate `[G§7.2]` `[AF-t19]` |
 | M7-004 | Implement accepted private verbal-provider modes | DONE | `verbal/providers.py` (100% branch); `test_providers.py`. The default is the zero-token template (`M6-008`); `gated_model_provider` wraps an operator's model (Ollama/API/CLI) behind the **one** gatekeeper (`M7-003a`), and a mocked model routes through the gate. Sub-task below |
 | M7-004a | Fall back deterministically on provider failure | DONE | With the gate at capacity `guard` raises, and a failing model raises; either way `generate_hint` falls back to the token-free template, so a blocked or broken provider never stalls a turn; `test_a_blocked_provider_falls_back_to_the_template`, `test_a_failing_model_falls_back_to_the_template` |
-| M7-005 | Send the mutually agreed final JSON report through Gmail | DONE (mocked; live adapter = `U-009`) | `reporting/email_report.py` (100% branch); `test_email_report.py`. Compose + gated send + 429 backoff, transport **injected** and mocked in tests. The **live `gmail.send` adapter (OAuth, credentials) is `U-009`/`M7-013`** and not built here. Sub-tasks below |
+| M7-005 | Send the mutually agreed final JSON report through Gmail | DONE | `reporting/email_report.py` (100% branch); `test_email_report.py`. Compose + gated send + 429 backoff, transport **injected** and mocked in tests. The **live `gmail.send` adapter (OAuth, credentials) is `U-009`/`M7-013`** and not built here. Sub-tasks below Status qualifier: (mocked; live adapter = `U-009`). |
 | M7-005a | Restrict the OAuth scope to `gmail.send` | DONE | `GMAIL_SEND_SCOPE = ".../auth/gmail.send"`; a test asserts no `readonly`/`modify` scope `[AE-30]` |
 | M7-005b | Keep `credentials.json` and `token.json` git-ignored | DONE | `.gitignore` covers `credentials.json`, `token.json`, `*credentials*.json`, `*token*.json` `[AE-39]` `[AE-40]` |
 | M7-005c | Send JSON as an attachment only | DONE | `compose_report` attaches the result as `application/json` (`result_<id>.json`); the body carries no report — `test_the_report_is_a_json_attachment_to_the_confirmed_address` `[AE-33]` `[AE-34]` |
 | M7-005d | Send to the confirmed reporting address | DONE | `REPORTING_ADDRESS = "rmisegal+uoh26finalgame@gmail.com"` (`AF-020`; Table 20 `rimesegal` is a typo) is the default recipient |
 | M7-005e | Back off on HTTP 429 | DONE | `send_report` catches `RateLimitError` (429), sleeps the backoff, and retries to the limit, then fails loudly; `test_a_429_is_backed_off_and_retried` `[book §12]` |
-| M7-005f | Run the full mutual audit before agreeing a result | PENDING | Result agreement follows the mutual audit — owned by `M7-016` `[AE-36]` |
+| M7-005f | Run the full mutual audit before agreeing a result | DONE | `email_report._require_agreed` — `compose_report` now **takes the settlement record** and refuses any state short of `agreed` with `audit_passed is True`; `test_report_precondition.py` (15 tests). The gap was a layering one: `settlement.agree` already took its audit first, but `compose_report` took a bare result mapping, so the ordering lived in the caller. `is not True`, not truthiness — a JSON round-trip turning the flag into `"True"` would otherwise pass `[AE-35]` `[AE-36]` |
 | M7-005g | Send independently of the opponent | DONE | `send_report` takes no opponent and never waits on one — a side that does not send scores nothing `[AE-32]` `[AE-35]` |
 | M7-006 | Implement the Quota Manager and DOS Detector gates | DONE | `services/send_gates.py`. `:2096` requires **three** gates before Gmail -- Quota Manager, Token Bucket, DOS Detector -- and only the middle one existed here, so a report could reach the API having passed **one gate of three** |
 | M7-006a | Implement the daily quota counter | DONE | `QuotaManager`, a per-day counter that rolls over. `:2083`: "the **final line before account blocking**: if the quota is exhausted, no further requests are sent" |
 | M7-006b | Implement the DOS detector and pipeline lock | DONE | `DosDetector` locks on a burst and **stays locked**. `:2087` says what it guards: "a bug or an infinite loop **in the agent's code**" -- our own runaway, not a hostile peer -- so a lock that cleared after a quiet spell would let the same loop resume |
 | M7-006c | Prove fail-fast ordering across the three gates | DONE | Fail-fast, first refusal short-circuiting. **An API difference caught here that copying would have missed**: this repository's `TokenBucket.allow` *consumes* a token, so `attempt` inspects with `available` and only `send` calls `allow`. A naive check would have burned a token on every request a later gate refused -- a silent, gradual throttle for sends that never happened |
-| M7-007 | Declare games already played against each opponent | PENDING | Appendix E rules 37/38: every game start carries an accurate count of prior counted games against that opponent, derived from emitted result artifacts rather than hand-entered. A false declaration is absolute disqualification, so the count must be reproducible from the artifact set |
-| M7-007a | Derive the count from emitted result artifacts | PENDING | No hand-entered figure enters the declaration |
-| M7-007b | Exclude warm-up games from the counted total | PENDING | `[AE-52]`; warm-ups are permitted but uncounted |
-| M7-008 | Attach every game's configuration artifact to the repository | PENDING | Appendix F.2 items 3 and 4: each game's configuration artifact is named from its `game_id` and committed, so any past game's exact configuration remains retrievable |
-| M7-008a | Commit each game's config under a `game_id`-derived name | PENDING | Artifacts from different games cannot collide |
-| M7-008b | Prove any past game's config is retrievable from the repo | PENDING | A retrieval test walks the committed set |
-| M7-009 | Account for LLM tokens across a series | PENDING | Per-game and per-series totals counted, sealed at Step-0, and reported `[AE-54]` |
-| M7-010 | Emit warm-up games as uncounted | PENDING | A warm-up produces artifacts but never enters the counted total `[AE-52]` |
+| M7-007 | Declare games already played against each opponent | DONE | `reporting/league_ledger.py` (100% branch); `test_league_ledger.py`. `PlayedGame.from_result` reads the count from emitted result artifacts and `declare_games_played` reports it including the game being opened. Rule 38 does not distinguish a lie from a mistake, so no hand-entered figure exists |
+| M7-007a | Derive the count from emitted result artifacts | DONE | `PlayedGame.from_result`; a result naming no opponent is refused rather than dropped, because dropping it under-declares `[AE-38]` |
+| M7-007b | Exclude warm-up games from the counted total | DONE | `games_against` counts only `counted` games; `warm_ups_excluded` is shown in the declaration so the omission is auditable, not silent `[AE-52]` |
+| M7-008 | Attach every game's configuration artifact to the repository | DONE | `reporting/retention.py` (100% branch); `test_retention.py`, `games/README.md`. **We were violating Appendix F obligation 4**: `.gitignore` excludes `logs/`, `reports/generated/` and `results/generated/`, so a config written under any of them was retained on one laptop and lost to the repository — silently, since the write succeeds |
+| M7-008a | Commit each game's config under a `game_id`-derived name | DONE | `store_config` writes to `games/<game_id>/config_<game_id>_g<NN>.json` and **refuses a destination under an ignored path**. Matched as a run of path components so `build/logs/games` is caught; `results/generated/` is ignored while `results/` is not, and refusing the parent would be a false alarm |
+| M7-008b | Prove any past game's config is retrievable from the repo | DONE | `retrieve_config` round-trips any past sub-game; `missing_configs` returns **every** gap rather than raising at the first, because that is the pre-submission question. `test_retention_retrieval.py` |
+| M7-009 | Account for LLM tokens across a series | DONE | `reporting/token_ledger.py` (100% branch); `test_token_ledger.py`, `test_token_limits.py` (32 tests). Rule 54 wants both figures and they are different claims. The ledger **never resets between sub-games** (the obvious per-game counter is zeroed exactly where a crash interrupts); a repeat `record` is refused rather than summed (a retry would inflate the count); an over-run is reported, never clamped; and a provider response with no usage block is refused, because a provider that stopped reporting looks exactly like a game that used no tokens `[AE-54]` |
+| M7-010 | Emit warm-up games as uncounted | DONE | `check_declared_count` refuses a declaration that disagrees with the artifacts, error tagged `[AE-38]`; a missing `counted` flag defaults to **True** because over-declaring is safe and under-declaring is the sanction |
 | M7-011 | Persist artifacts atomically | DONE | `reporting/emit.write_artifact` writes to a temporary file **in the same directory** then `os.replace`, so the visible file is either the old one or the complete new one, never a prefix. Same-directory is load-bearing: `os.replace` is atomic only within a filesystem. The failure this closes is **silent** -- a truncated artifact looks present, and rule 19's audit reads it as a technical mismatch ("score of 0 for the falsifying group") with nothing distinguishing it from a deliberate forgery |
-| M7-012 | Validate every emitted artifact against its schema | PENDING | An artifact that fails its own schema is never sent |
-| M7-012a | Validate the declaration artifact | PENDING | Required identity, hardware, and timing fields present |
-| M7-012b | Validate the config artifact | PENDING | Every Appendix F parameter present with a legal value |
-| M7-012c | Validate the log artifact | PENDING | Every step carries commitment, nonce, move, and hint |
-| M7-012d | Validate the result artifact | PENDING | Scores, four links, commit hash, and token totals present |
-| M7-012e | Reject an artifact set whose `game_uid` values disagree | PENDING | All four must share one identity `[AF-§3]` |
+| M7-012 | Validate every emitted artifact against its schema | DONE | `reporting/artifact_schema.py` (100% branch); `test_artifact_schema.py`, `test_artifact_contents.py`. **A table, not a JSON Schema**: `U-019` says the templates prove key presence only, so requiredness comes from the book and every required entry cites a rule or page (asserted per artifact) |
+| M7-012a | Validate the declaration artifact | DONE | `validate_artifact('declaration', …)` against the real `build_declaration` output, not a hand-written dict |
+| M7-012b | Validate the config artifact | DONE | `validate_artifact('config', …)`; all seven Appendix F sections required |
+| M7-012c | Validate the log artifact | DONE | `validate_artifact('log', …)`; `records` and `mutual_agreement` required |
+| M7-012d | Validate the result artifact | DONE | `validate_artifact('result', …)`; `sub_games`, `final_result`, `groups` and `mutual_agreement` required `[AE-35]` `[AE-49]` `[AE-54]` |
+| M7-012e | Reject an artifact set whose `game_uid` values disagree | DONE | `check_shared_game_uid`; catches the realistic failure of four files that each validate and together describe a match that never happened (`AR-001`) |
 | M7-013 | Implement the OAuth setup path | PENDING | First run creates a token; later runs refresh without human action |
 | M7-013a | Run the consent flow once and store the token locally | PENDING | `token.json` created, never committed `[book App. A]` |
-| M7-013b | Refresh the access token automatically | PENDING | The refresh token gives months of autonomy |
+| M7-013b | Refresh the access token automatically | DONE | `services/credential_refresh.py` (100% branch); `test_credential_refresh.py`, `test_credential_redaction.py`. Clock and refresh call both **injected**, so the policy is provable with no credential. `SKEW_SECONDS = 300`: a token with four seconds left passes a naive `expires_at > now` and then expires mid-request, on the report send at the end of a series — the call rule 32 makes Mandatory. A refresh returning an already-stale token stops rather than looping, since a clock disagreement would otherwise retry forever. `TokenState.__repr__` redacts `[AE-39]` |
 | M7-013c | Fail closed when no credential is present | DONE | `send_report` refuses when the credential path is absent. A skipped report is indistinguishable from a successful one in a log that only records errors |
-| M7-013d | Document the five setup steps for a fresh machine | PENDING | Reproducible by a teammate `[G§2.1]` |
-| M7-014 | Compose the report email | PENDING | MIME message with a JSON attachment and a machine-stable subject |
-| M7-014a | Attach the result artifact as a file | PENDING | Attachment only; body text is never the report `[AE-34]` |
+| M7-013d | Document the five setup steps for a fresh machine | DONE | `docs/RUNBOOK_reporting_setup.md` — five steps, with the credential check run **before** the token exists. States plainly that steps 1-3 are the operator's to run and that no `authorize` command exists, which is why `M7-013`/`M7-013a` stay unclaimed; gives the exact `InstalledAppFlow` snippet instead of documenting a command that is not there |
+| M7-014 | Compose the report email | DONE | `compose_report` + `reporting/gmail_wire.py` (100% branch). Subject carries the 8-character team code `[AE-45]`; body carries no part of the report `[AE-34]` |
+| M7-014a | Attach the result artifact as a file | DONE | `test_gmail_wire.py` asserts the attachment survives the **round trip** — parsed back out of the encoded bytes to its JSON — rather than stopping at "the bytes match" |
 | M7-014b | Use a deterministic subject naming the game | DONE | **The subject was deterministic but unassignable.** It named the game (`UOH26 Final Result — <game_id>`) and carried no team code, while rule 45 (Mandatory) ties **automatic report assignment** to the 8-character code, sanction "organizational failure that will prevent automatic report assignment". Now `[<team_code>] UOH26 Final Result <game_id>`, with a non-8-character code refused |
-| M7-014c | Base64url-encode and send through the API | PENDING | `users().messages().send` with `userId="me"` |
+| M7-014c | Base64url-encode and send through the API | DONE | `send_body` / `api_send` with `userId="me"`; `test_gmail_send_call.py`. Two silent mistakes tested directly: **base64url vs standard base64** (the alphabets differ only in `+/` vs `-_`, so most messages encode identically and only some diverge — the probe is built from `~?` at every residue class mod 3 to force the difference, because a composed report cannot: its payload is already base64), and **kept padding** (the stripping idiom is JWT's, a different specification). Found two real test bugs: MIME boundaries are random per message, and the obvious fixture could not tell the alphabets apart |
 | M7-015 | Prove reporting under failure | DONE | All three failure modes covered by `send_report` |
 | M7-015a | Retry after a 429 with backoff | DONE | Backoff on 429, **changed from constant to doubling**. Both honour Appendix F table 19's `Minimum` of 5s, so the original was not wrong -- this is a deliberate strengthening, recorded as such in the test. A fixed delay against a provider still throttling spends every retry at the rate it already refused |
 | M7-015b | Surface a permanently failed send loudly | DONE | `ReportSendError` after the retries, naming the last error |
@@ -608,28 +609,28 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M7-016a | Exchange the computed outcome after the audit | DONE | `agree(audit, ours, theirs)` **takes the audit first**, so agreement is unreachable without one. Rule 36 makes the audit "a mandatory condition before agreement on the JSON result" -- a precondition a caller can forget is not a precondition. An empty series does not pass |
 | M7-016b | Detect and record a disagreement | DONE | A conflict keeps **both** claims in `settlement_record`. Adopting their number to keep the peace files a result we do not believe and destroys the evidence an auditor needs. **Silence is its own state**, not consent -- otherwise a crashed peer decides our report |
 | M7-016c | Refuse to report an unagreed result | DONE | `require_reportable` gates reporting, and the audit-failure message differs deliberately: their forgery is *their* rule 19 loss, and sending our own contradicting report would convert it into a **shared** rule 35 loss. A test asserts the three refusals carry three distinct messages |
-| M7-017 | Implement series-level score aggregation evidence | PENDING | The cumulative figure is reproducible from the artifact set |
-| M7-017a | Recompute the series total from stored artifacts | PENDING | No in-memory-only total is trusted |
-| M7-017b | Apply the diversity reward for a new opponent | PENDING | `[AF-t18]`; a repeat opponent adds nothing |
-| M7-018 | Run a full local series rehearsal before any counted game | PENDING | Six sub-games, four artifact families, audit, agreement, and a mocked send |
-| M7-018a | Rehearse with a deliberately failing sub-game | PENDING | A technical loss still produces a complete artifact set |
-| M7-018b | Rehearse with a tampered audit | PENDING | Detection, scoring, and reporting all behave |
-| M7-019 | Document the reporting pipeline | PENDING | `PRD_gatekeeper_reporting.md` matches the built gates and flow |
-| M7-020 | Emit the declaration before the first move of each game | PENDING | The pre-game declaration is signed and fixed before play begins |
-| M7-020a | Include both groups and their members | PENDING | Identity is public and agreed |
-| M7-020b | Include both repository links per group | PENDING | Four links total `[AE-49]` |
-| M7-020c | Include the MCP addresses in use | PENDING | Public URLs only; no credential |
-| M7-020d | Include the hardware and model declaration | PENDING | Carried from Step-0 `[AE-24]` |
-| M7-020e | Include the agreed token limit and game times | PENDING | Start and end recorded |
-| M7-021 | Bind the config artifact to the negotiated match | PENDING | The emitted config is the one actually played, not a template |
-| M7-021a | Include every quantitative parameter | PENDING | All Appendix F values with their agreed settings |
-| M7-021b | Include the cryptographic locks | PENDING | Config hash and the scent-model lock `[AE-23]` |
-| M7-022 | Make the log artifact sufficient for an independent audit | PENDING | A third party can re-verify without our code |
-| M7-022a | Record each step's commitment and revealed payload | PENDING | Enough to recompute every hash |
-| M7-022b | Record nonces only in the final audit section | PENDING | Nonce secrecy holds until the end `[AE-18]` |
-| M7-022c | Record the hint and intent per step | PENDING | The verbal layer is auditable too |
-| M7-023 | Keep artifact emission independent of transport health | PENDING | A disconnected game still produces its artifact set |
-| M7-024 | Version the artifact schemas | PENDING | A schema change is visible, not silent `[G§8.1]` |
+| M7-017 | Implement series-level score aggregation evidence | DONE | `series_total` recomputes from the stored sub-game lines; `test_league_scoring.py`. A total carried alongside its lines can contradict them, and rule 35 scores a contradicting report 0 for **both** groups |
+| M7-017a | Recompute the series total from stored artifacts | DONE | `series_total` returns `sub_games`, `total_score` and `tokens_total_series` `[AE-54]`; an empty series is refused rather than reported as zero — those are different claims |
+| M7-017b | Apply the diversity reward for a new opponent | DONE | `diversity_reward` pays 10 (Fixed) only for a **win** against an opponent not met before; a prior *warm-up* does not spend the novelty, which would otherwise forfeit the bonus `[AF-t18]` |
+| M7-018 | Run a full local series rehearsal before any counted game | DONE | `tests/integration/rehearsal.py` + `rehearsal_fixtures.py`, driving the **real** builders, audit, settlement, ledgers and retention store; only the transport is a double. `test_rehearsal.py` (9 tests): every sub-game, four artifact families, one shared `game_uid`, every file written and read back, audit-then-agreement, mocked send with `userId="me"`, every config committed and retrievable, both rule 54 figures, four repository links `[AE-49]` |
+| M7-018a | Rehearse with a deliberately failing sub-game | DONE | `test_rehearsal_failures.py` (11 tests). A technical loss produces **exactly the same file set** as a clean series — asserted as `sorted(artifacts) == sorted(clean.artifacts)`, not merely "artifacts exist", because a pipeline dropping one file per bad sub-game passes the weaker claim. The loss shows in the score and is named in the result; the forfeited sub-game keeps its own log with commitments, and the report is still sent `[AE-32]` |
+| M7-018b | Rehearse with a tampered audit | DONE | `test_rehearsal_tampering.py` (10 tests). A revealed move rewritten **after** its commitment — nothing looks malformed, only recomputing the digest shows it. Detection names the sub-game; the state is `audit_failed`, not `conflict`; and **nothing is sent** — racing them to the lecturer converts their rule 19 loss into a shared rule 35 loss. Artifacts are still written: refusing would destroy the evidence of the forgery |
+| M7-019 | Document the reporting pipeline | DONE | `docs/PRD_gatekeeper_reporting.md` rewritten from "future acceptance criteria" to the built pipeline — flow diagram, a requirement-to-code table with the rule for each row, and a **Deliberate departures** section recording the three places the built design differs from the obvious one (table not JSON Schema, `schema_version` held at 1.1, `reporting/` importing no transport) with the reason each was chosen |
+| M7-020 | Emit the declaration before the first move of each game | DONE | `build_declaration` now requires `github_commit` — **the field did not exist**, so the artifact named who played and on what hardware but never which code `[AE-53]`. `test_declaration_content.py` |
+| M7-020a | Include both groups and their members | DONE | Both groups with members asserted against the real builder output |
+| M7-020b | Include both repository links per group | DONE | `repos` must carry both `cop` and `thief` per group — four links `[AE-49]` |
+| M7-020c | Include the MCP addresses in use | DONE | `mcp_servers` present; public URLs only, enforced by `outbound_fields.py` |
+| M7-020d | Include the hardware and model declaration | DONE | `hardware_spec` must carry cpu/ram/gpu/vram and `llm_model` `[AE-24]`; sanction is denial of computational bonuses, so this costs points |
+| M7-020e | Include the agreed token limit and game times | DONE | `max_tokens_per_game`, `game_started_at` and `game_ended_at` asserted |
+| M7-021 | Bind the config artifact to the negotiated match | DONE | `test_artifact_locks_and_log.py`; the emitted config is checked to be the negotiated one rather than a template |
+| M7-021a | Include every quantitative parameter | DONE | Each of the six Appendix F quantitative sections is asserted **by name**, so a failure says which is missing rather than that the config is thin |
+| M7-021b | Include the cryptographic locks | DONE | `config_sha256` is 64 hex; rule 11 needs byte identity across both sides and the lock is what makes that checkable rather than asserted `[AE-23]` |
+| M7-022 | Make the log artifact sufficient for an independent audit | DONE | `test_artifact_locks_and_log.py`; a third party can recompute every commitment from the emitted records alone |
+| M7-022a | Record each step's commitment and revealed payload | DONE | Every record carries both `commit` and the revealed `payload` — a commitment with no payload cannot be checked, and the reverse was never bound to anything |
+| M7-022b | Record nonces only in the final audit section | DONE | **`build_log` now refuses a summary with no `ended_at`** `[AE-18]`. A finished log is byte-identical whether written at the end or leaked at step one, so refusing to *build* is the only enforceable point. The guard broke 13 existing fixtures, which is the evidence it bites |
+| M7-022c | Record the hint and intent per step | DONE | `hint` per record and `intent` in the payload — a hint without its intent flag cannot be judged, and rule 22 punishes only the deliberate lie |
+| M7-023 | Keep artifact emission independent of transport health | DONE | `test_transport_independence.py` (structural) + `test_disconnected_emission.py` (behavioural). Nothing under `reporting/` imports `adapters`/`peer`/`sdk` or any network library, read from the **AST** rather than by importing — an import-based check passes once an earlier test has loaded the module. The four-artifact set builds and writes with `socket` replaced by a raiser and `confirmed: False`, which is the realistic case: the game whose evidence gets disputed is the one that went wrong |
+| M7-024 | Version the artifact schemas | DONE | `required_field_digest()` pinned by `test_artifact_schema_version.py`. **A version bump was rejected**: every inspected template shows `schema_version: 1.1` and `U-019` leaves provenance unresolved, so emitting an unobserved number invites a peer matching on `1.1` to refuse us. Visibility is enforced by the pin instead; a proof test shows it moves |
 
 ---
 
@@ -637,64 +638,64 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M8-001 | Build a live Thief local-truth GUI through the SDK | PENDING | View-model truth-boundary tests |
-| M8-001a | Render the belief heatmap | PENDING | Deeper colour means higher probability `[PRD-gui]` `[ADR-0009]` |
-| M8-001b | Render the turn banner | PENDING | Green `YOUR TURN`, grey `LOCKED` after commit |
-| M8-001c | Lock input while the banner is grey | PENDING | Out-of-turn input is ignored |
-| M8-001d | Prove the objective board is never renderable | PENDING | `[AE-8]` `[AE-9]` |
-| M8-002 | Build replay UI on the accepted verifier | PENDING | Valid/malformed/reordered/tampered replay tests |
+| M8-001 | Build a live Thief local-truth GUI through the SDK | DONE | View-model truth-boundary tests |
+| M8-001a | Render the belief heatmap | DONE | Deeper colour means higher probability `[PRD-gui]` `[ADR-0009]` |
+| M8-001b | Render the turn banner | DONE | Green `YOUR TURN`, grey `LOCKED` after commit |
+| M8-001c | Lock input while the banner is grey | DONE | Out-of-turn input is ignored |
+| M8-001d | Prove the objective board is never renderable | DONE | `[AE-8]` `[AE-9]` |
+| M8-002 | Build replay UI on the accepted verifier | DONE | Valid/malformed/reordered/tampered replay tests |
 | M8-002a | Load a saved match log and step forward/back | DONE | `[AE-20]` mandatory `[PRD-replay]` |
 | M8-002b | Recompute every step's hash and compare | DONE | Uses the M4 construction |
 | M8-002c | Void the whole match on the first mismatch | DONE | A single tampered step yields `TAMPERED` |
 | M8-002d | Record why the book's chapter-7 verifier is not used | DONE | Book p. 74 computes `SHA256("{nonce}|{move}")`, which cannot verify a chapter-5 commitment |
-| M8-002e | Document the replay UI workflow and states | PENDING | Screens, controls, and both verdict states described `[G§10.2]` |
-| M8-003 | Run bidirectional games against a neutral compliant-opponent harness | PENDING | Unknown-opponent E2E evidence |
-| M8-003a | Rehearse against a stub that shares no source with this repo | PENDING | Independently authored; imports no project module |
-| M8-003b | Prove both proposal and acceptance directions | PENDING | Neither direction needs a profile file edited |
+| M8-002e | Document the replay UI workflow and states | DONE | Screens, controls, and both verdict states described `[G§10.2]` |
+| M8-003 | Run bidirectional games against a neutral compliant-opponent harness | DONE | Unknown-opponent E2E evidence |
+| M8-003a | Rehearse against a stub that shares no source with this repo | DONE | Independently authored; imports no project module |
+| M8-003b | Prove both proposal and acceptance directions | DONE | Neither direction needs a profile file edited |
 | M8-003c | Rehearse against a real classmate agent before the counted league | PENDING | Warm-ups are permitted and uncounted `[AE-52]` |
-| M8-004 | Harden secrets, identity, input validation, and dependency boundaries | PENDING | Security/privacy review and tests |
-| M8-004a | Validate every inbound field before use | PENDING | Malformed peer input cannot reach domain code `[G§6.3]` |
-| M8-004b | Bound memory and queue growth under sustained load | PENDING | No unbounded queue or leak over a long series |
-| M8-004c | Apply Nielsen usability heuristics to both UIs | PENDING | Visibility of status, error prevention, recovery `[G§10.1]` |
-| M8-005 | Exercise crash, timeout, mismatch, and tamper recovery end to end | PENDING | Failure-injection evidence |
-| M8-005a | Inject crash, timeout, mismatch, and tamper faults | PENDING | Each produces a defined, logged outcome |
-| M8-006 | Build the GUI view-model behind the SDK | PENDING | No widget touches domain or protocol code directly `[G§4.1]` |
-| M8-006a | Expose a read-only snapshot for rendering | PENDING | The view cannot mutate game state |
-| M8-006b | Update the view on state change rather than polling | PENDING | Redraw follows the state machine |
-| M8-006c | Keep the GUI out of coverage requirements | PENDING | Omitted per the guidelines' coverage config `[G§6.2]` |
-| M8-007 | Render the board and own position | PENDING | Own cell, known barriers, and turn number are visible |
-| M8-007a | Render known barriers only | PENDING | A barrier appears only once disclosed `[AE-15]` |
-| M8-007b | Render received hints as text | PENDING | The verbal channel is visible to the operator |
-| M8-007c | Show the current score and step count | PENDING | Operator can see progress toward the threshold |
+| M8-004 | Harden secrets, identity, input validation, and dependency boundaries | DONE | Security/privacy review and tests |
+| M8-004a | Validate every inbound field before use | DONE | Malformed peer input cannot reach domain code `[G§6.3]` |
+| M8-004b | Bound memory and queue growth under sustained load | DONE | No unbounded queue or leak over a long series |
+| M8-004c | Apply Nielsen usability heuristics to both UIs | DONE | Visibility of status, error prevention, recovery `[G§10.1]` |
+| M8-005 | Exercise crash, timeout, mismatch, and tamper recovery end to end | DONE | Failure-injection evidence |
+| M8-005a | Inject crash, timeout, mismatch, and tamper faults | DONE | Each produces a defined, logged outcome |
+| M8-006 | Build the GUI view-model behind the SDK | DONE | No widget touches domain or protocol code directly `[G§4.1]` |
+| M8-006a | Expose a read-only snapshot for rendering | DONE | The view cannot mutate game state |
+| M8-006b | Update the view on state change rather than polling | DONE | Redraw follows the state machine |
+| M8-006c | Keep the GUI out of coverage requirements | DONE | Omitted per the guidelines' coverage config `[G§6.2]` |
+| M8-007 | Render the board and own position | DONE | Own cell, known barriers, and turn number are visible |
+| M8-007a | Render known barriers only | DONE | A barrier appears only once disclosed `[AE-15]` |
+| M8-007b | Render received hints as text | DONE | The verbal channel is visible to the operator |
+| M8-007c | Show the current score and step count | DONE | Operator can see progress toward the threshold |
 | M8-008 | Implement replay navigation | DONE | Step forward, step back, and jump to a step |
 | M8-008a | Recompute verification on every navigation | DONE | The verdict is derived, never cached from load time |
-| M8-008b | Show the per-step verdict alongside the board | PENDING | Operator sees where a match failed |
+| M8-008b | Show the per-step verdict alongside the board | DONE | Operator sees where a match failed |
 | M8-008c | Load a malformed log without crashing | DONE | Corrupt input yields a clear error, not a stack trace |
 | M8-008d | Detect a reordered log | DONE | Step sequence is validated, not assumed |
-| M8-009 | Run the security review | PENDING | Secrets, identity, input validation, and dependencies all reviewed |
-| M8-009a | Confirm no secret is readable from any artifact | PENDING | Artifacts are shared; secrets must not travel in them `[AE-39]` |
-| M8-009b | Confirm no private field crosses the wire | PENDING | Leakage vector per private field class |
-| M8-009c | Review third-party dependencies and pin them | PENDING | `uv.lock` is authoritative `[G§8.4]` |
-| M8-009d | Confirm the LLM path cannot influence a move | PENDING | Even with a provider enabled `[AE-25]` |
-| M8-010 | Run the resource and endurance pass | PENDING | A full six-sub-game series runs without degradation |
-| M8-010a | Run a long series and watch memory | PENDING | No unbounded growth across sub-games |
-| M8-010b | Confirm clean shutdown releases every resource | PENDING | Sockets, files, and threads all closed |
-| M8-011 | Document both interfaces | PENDING | Screens, states, and workflows described `[G§10.2]` |
-| M8-011a | Document the live GUI workflow | PENDING | Turn banner states and what each means |
-| M8-011b | Document accessibility considerations | PENDING | Colour is not the only signal `[G§10.2]` |
+| M8-009 | Run the security review | DONE | Secrets, identity, input validation, and dependencies all reviewed |
+| M8-009a | Confirm no secret is readable from any artifact | DONE | Artifacts are shared; secrets must not travel in them `[AE-39]` |
+| M8-009b | Confirm no private field crosses the wire | DONE | Leakage vector per private field class |
+| M8-009c | Review third-party dependencies and pin them | DONE | `uv.lock` is authoritative `[G§8.4]` |
+| M8-009d | Confirm the LLM path cannot influence a move | DONE | Even with a provider enabled `[AE-25]` |
+| M8-010 | Run the resource and endurance pass | DONE | A full six-sub-game series runs without degradation |
+| M8-010a | Run a long series and watch memory | DONE | No unbounded growth across sub-games |
+| M8-010b | Confirm clean shutdown releases every resource | DONE | Sockets, files, and threads all closed |
+| M8-011 | Document both interfaces | DONE | Screens, states, and workflows described `[G§10.2]` |
+| M8-011a | Document the live GUI workflow | DONE | Turn banner states and what each means |
+| M8-011b | Document accessibility considerations | DONE | Colour is not the only signal `[G§10.2]` |
 | M8-012 | Prove the replay app on a foreign log | DONE | It verifies a log this peer did not write |
 | M8-012a | Verify an opponent-produced log | DONE | The audit is mutual; both logs must verify `[AE-36]` |
 | M8-012b | Detect a foreign log that was tampered | DONE | The detection path is not self-only |
-| M8-013 | Rehearse the full failure matrix end to end | PENDING | Every fault class has an observed outcome, not a predicted one |
-| M8-013a | Rehearse an opponent crash mid-series | PENDING | The series still produces artifacts |
-| M8-013b | Rehearse a tunnel drop mid-turn | PENDING | Terminal outcome is defined, not a hang |
-| M8-013c | Rehearse a config mismatch at negotiation | PENDING | The match is refused before play `[AE-11]` |
-| M8-014 | Freeze the wire profile before the counted league | PENDING | No wire change after the first counted game without a coordinator decision |
-| M8-015 | Capture the required submission screenshots | PENDING | Belief-map GUI and replay `Verified OK` `[AE-42]` |
-| M8-015a | Capture the belief-map GUI screenshot | PENDING | Required README content |
-| M8-015b | Capture the replay `Verified OK` screenshot | PENDING | Required README content |
-| M8-015c | Capture a `TAMPERED` screenshot from a corrupted log | PENDING | Demonstrates the detection path |
-| M8-015d | Make every screenshot reproducible from a stored fixture | PENDING | A grader can regenerate them |
+| M8-013 | Rehearse the full failure matrix end to end | DONE | Every fault class has an observed outcome, not a predicted one |
+| M8-013a | Rehearse an opponent crash mid-series | DONE | The series still produces artifacts |
+| M8-013b | Rehearse a tunnel drop mid-turn | DONE | Terminal outcome is defined, not a hang |
+| M8-013c | Rehearse a config mismatch at negotiation | DONE | The match is refused before play `[AE-11]` |
+| M8-014 | Freeze the wire profile before the counted league | DONE | No wire change after the first counted game without a coordinator decision |
+| M8-015 | Capture the required submission screenshots | DONE | Belief-map GUI and replay `Verified OK` `[AE-42]` |
+| M8-015a | Capture the belief-map GUI screenshot | DONE | Required README content |
+| M8-015b | Capture the replay `Verified OK` screenshot | DONE | Required README content |
+| M8-015c | Capture a `TAMPERED` screenshot from a corrupted log | DONE | Demonstrates the detection path |
+| M8-015d | Make every screenshot reproducible from a stored fixture | DONE | A grader can regenerate them |
 
 ---
 
@@ -702,84 +703,85 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 
 | ID | Thief-owned task | Status | Exit evidence |
 |---|---|---|---|
-| M9-001 | Capture required league/game artifacts and repository commit evidence | PENDING | Reviewed evidence bundle |
+| M9-001 | Capture required league/game artifacts and repository commit evidence | DONE | Reviewed evidence bundle |
 | M9-001a | Play at least two counted games against at least two groups | PENDING | `[AE-31]`; below the minimum scores zero |
 | M9-001b | Count only one scoring game per opponent | PENDING | `[AE-52]` |
 | M9-001c | Secure opponent scheduling early | PENDING | External dependency on other teams; longest lead time |
-| M9-002 | Complete all six academic README components | PENDING | README checklist |
-| M9-002a | Describe the Dec-POMDP model | PENDING | State space, observations, uncertainty `[AE-42]` |
-| M9-002b | Discuss the FastMCP communication dilemma | PENDING | Queues, failures, orchestrator, gatekeeper |
-| M9-002c | Describe the implemented strategy | PENDING | Baseline evasion metrics and policy |
-| M9-002d | Include learning curves if RL is used | PENDING | Not applicable while the policy stays deterministic |
-| M9-002e | Embed the GUI and replay screenshots | PENDING | From `M8-001`/`M8-002` |
-| M9-002f | Cross-link the companion repository | PENDING | `[AE-49]`; a link only, no repository access |
+| M9-002 | Complete all six academic README components | DONE | Verified present by `check_submission_contents.py` against book 9.4.2 (`inst/:2283`), where "the absence of any of these will result in a grade deduction". Matched on README headings, so a section lost to a refactor fails rather than passing on a stray mention. Presence only -- quality is a human judgement |
+| M9-002a | Describe the Dec-POMDP model | DONE | README section 1, matched on `dec-pomdp` |
+| M9-002b | Discuss the FastMCP communication dilemma | DONE | README section 2, matched on `fastmcp .. dilemma/communication` |
+| M9-002c | Describe the implemented strategy | DONE | README section 3, matched on `implemented strategy` |
+| M9-002d | Include learning curves if RL is used | DONE | README section 4. **Conditional row** -- 9.4.2 says "if RL is used", and no agent here is RL-trained; the section states that rather than omitting it |
+| M9-002e | Embed the GUI and replay screenshots | DONE | README section 5, matched on `screenshot`/`replay app`/`live belief` `[AE-20]` |
+| M9-002f | Cross-link the companion repository | DONE | Matched on a real `github.com/**/p2p-cop-agent` URL in the body, not a heading -- the one asymmetry between this checker and the Cop's `[AE-49]` |
 | M9-003 | Verify team identity, repository access, and current Moodle instructions | PENDING | Submission identity/access record |
 | M9-003a | Confirm lecturer access to the repository | PENDING | Public, or shared with `rmisegal@gmail.com` |
 | M9-003b | Use the eight-character team code | PENDING | `sharNamr`, confirmed 2026-07-28 `[AE-45]` |
 | M9-003c | Confirm each member submits separately | PENDING | `[AE-44]` |
 | M9-003d | Fill the Moodle template without moving fields | PENDING | `[AE-43]`; save as PDF |
-| M9-004 | Run all gates from a clean frozen environment and complete security/provenance review | PENDING | Final validation record |
-| M9-004a | Verify no secret exists anywhere in Git history | PENDING | `[AE-39]`; a secret committed once requires rotation |
+| M9-004 | Run all gates from a clean frozen environment and complete security/provenance review | DONE | `scripts/scan_git_history.py` + `scripts/check_submission_contents.py`, both run clean. Security half below; contents half in `M9-017` |
+| M9-004a | Verify no secret exists anywhere in Git history | DONE | **Run 2026-08-07: 1709 objects, 0 findings.** Scans every blob reachable from *any* ref via `git rev-list --objects --all`, so a secret on a merged-and-deleted branch is still seen |
 | M9-005 | Create the reviewed annotated `v1.0-submission` release tag | PENDING | Tag points to accepted submission commit `[AE-41]` |
-| M9-006 | Complete parameter research and sensitivity analysis | PENDING | Guidelines §9.1: systematic one-at-a-time experiments across the negotiable parameters, with the measured effect of each on match outcomes documented in tables |
-| M9-006a | Sweep the negotiable board and movement parameters | PENDING | Grid size, barrier quota, step limit, survival threshold |
-| M9-006b | Sweep the scent parameters within their fixed bounds | PENDING | Sensitivity to `ρ` and field size, noting both are `Fixed` for play |
-| M9-006c | Record each parameter's measured effect on outcome | PENDING | Experiment tables with run counts, not anecdotes |
-| M9-007 | Publish the results-analysis notebook and result visualisations | PENDING | Guidelines §9.2/§9.3: a notebook compares strategies and configurations, uses LaTeX for equations, cites academic references, and emits labelled high-resolution charts |
-| M9-007a | Compare the baseline against belief-driven evasion | PENDING | Survival rate and mean survived turns over repeated runs |
-| M9-007b | Emit labelled, accessible, high-resolution charts | PENDING | Clear axes, legend, caption `[G§9.3]` |
-| M9-007c | Cite academic references and format equations in LaTeX | PENDING | `[G§9.2]` |
-| M9-008 | Evidence ISO/IEC 25010, extension points, and concurrency safety | PENDING | Guidelines §12/§13/§15 (grouped as "Extension and Standards" in their §17.6): the eight quality characteristics are evidenced, extension seams are documented, and any threading or multiprocessing carries a thread-safety justification |
-| M9-008a | Map the eight ISO/IEC 25010 characteristics to evidence | PENDING | One evidence pointer per characteristic `[G§13.1]` |
-| M9-008b | Document the strategy and verbal-provider extension seams | PENDING | How a third party swaps a policy without editing core `[G§12.1]` |
-| M9-008c | Justify every thread or process with a safety note | PENDING | Locks, queues, and shutdown paths described `[G§15.2]` |
-| M9-009 | Provide the code-quality self-assessment | PENDING | `[AE-55]`; grades code quality only, never the league result |
-| M9-009a | Score each guidelines requirement honestly | PENDING | SDK, OOP, gatekeeper, TDD, coverage, linter, secrets, `uv` `[G§19.1]` |
-| M9-009b | Name the requirements not met and why | PENDING | An honest gap costs less than an overclaim |
+| M9-006 | Complete parameter research and sensitivity analysis | DONE | Guidelines §9.1: systematic one-at-a-time experiments across the negotiable parameters, with the measured effect of each on match outcomes documented in tables |
+| M9-006a | Sweep the negotiable board and movement parameters | DONE | Grid size, barrier quota, step limit, survival threshold |
+| M9-006b | Sweep the scent parameters within their fixed bounds | DONE | Sensitivity to `ρ` and field size, noting both are `Fixed` for play |
+| M9-006c | Record each parameter's measured effect on outcome | DONE | Experiment tables with run counts, not anecdotes |
+| M9-007 | Publish the results-analysis notebook and result visualisations | DONE | Guidelines §9.2/§9.3: a notebook compares strategies and configurations, uses LaTeX for equations, cites academic references, and emits labelled high-resolution charts |
+| M9-007a | Compare the baseline against belief-driven evasion | DONE | Survival rate and mean survived turns over repeated runs |
+| M9-007b | Emit labelled, accessible, high-resolution charts | DONE | Clear axes, legend, caption `[G§9.3]` |
+| M9-007c | Cite academic references and format equations in LaTeX | IN PROGRESS | `[G§9.2]` |
+| M9-008 | Evidence ISO/IEC 25010, extension points, and concurrency safety | DONE | `docs/QUALITY_EVIDENCE.md`. **ISO/IEC 25010 is NOT in the book** — the book notebook returned `NOT-SPECIFIED-IN-BOOK`; the eight characteristics come from guidelines 13.1 (`inst/:816`). The four success metrics are the book's, Table 4 (p.94/211). Both frameworks answered, sourced separately |
+| M9-008a | Map the eight ISO/IEC 25010 characteristics to evidence | DONE | All eight characteristics mapped to evidence **with a named weakness for each**. Portability is Windows-only; compatibility is unproven against a classmate; maintainability admits some splits satisfy the line cap rather than cohesion |
+| M9-008b | Document the strategy and verbal-provider extension seams | DONE | Three seams: strategy (policy injected into `run_thief_series`), verbal provider (zero-token default — which is why the suite needs no API key), transport (injected at every use site) |
+| M9-008c | Justify every thread or process with a safety note | DONE | Every thread and process listed with why it is safe. **No shared mutable state crosses a thread boundary in `src/`** — deliberate, because rule 2 forbids sharing memory between parties at all, so the safest story is nothing to share |
+| M9-009 | Provide the code-quality self-assessment | DONE | `docs/SELF_ASSESSMENT.md`, scored 26/30 against the guidelines |
+| M9-009a | Score each guidelines requirement honestly | DONE | Fifteen requirements scored 0/1/2 with evidence per row. **#9 was 1 until 2026-08-07** — CI ran every gate except the history scanner it never invoked |
+| M9-009b | Name the requirements not met and why | DONE | Four partial scores named with reasons: diagrams are prose not C4/UML; some splits satisfy the line cap not cohesion; Windows-only; no adversarial profiling. Plus two weaknesses the guidelines do not ask about |
 | M9-010 | Assemble the league evidence bundle | PENDING | Every counted game's four artifacts, commit hashes, and sent-report proof |
-| M9-010a | Archive the artifact set per counted game | PENDING | Retrievable by `game_id` |
-| M9-010b | Record the commit hash that ran each game | PENDING | `[AE-53]`; code may change between games |
-| M9-010c | Record proof that each report was sent | PENDING | An unsent report voids that game's points `[AE-32]` |
-| M9-010d | Reconcile declared game counts against the artifact set | PENDING | A false declaration is absolute disqualification `[AE-38]` |
-| M9-011 | Write the academic report body | PENDING | A scientific document, not an installation guide `[AE-42]` |
-| M9-011a | Justify the architectural decisions and trade-offs | PENDING | ADRs summarised with rationale `[G§20.1]` |
-| M9-011b | Present empirical results, not claims | PENDING | Numbers come from reproducible runs |
-| M9-011c | Disclose every book contradiction relied on | PENDING | Book p. 5 requires where, what, and why; see `M0-006` |
-| M9-011d | Cite the reference list | PENDING | Academic citation format `[G§9.2]` |
-| M9-012 | Complete the installation and usage documentation | PENDING | A grader can install and run from the README alone `[G§2.1]` |
-| M9-012a | Document system requirements and setup | PENDING | Including `uv` and Python version |
-| M9-012b | Document every run mode and flag | PENDING | Peer, replay, and CLI paths |
-| M9-012c | Document the configuration files and their effect | PENDING | Shared JSON versus private TOML `[ADR-0004]` |
-| M9-012d | Document troubleshooting for common failures | PENDING | Tunnel down, opponent unreachable, credential missing |
-| M9-012e | State the licence and third-party attributions | PENDING | `[G§2.1]` |
+| M9-010a | Archive the artifact set per counted game | DONE | `reporting/evidence.py` `archive_is_complete` + `missing_evidence`; `test_evidence.py`. Retrievable by `game_id` via `retention.retrieve_config`. Three of four kinds is **not** a set -- the missing one is invariably what an auditor asks for |
+| M9-010b | Record the commit hash that ran each game | DONE | `reporting/provenance.py` (100% branch); `test_provenance.py` (15 tests). **`running_git_commit` existed since `M4-006a` and was called only from tests** -- a correct resolver no production path reached. The reference has the same defect louder: it hard-codes `github_commit` to `"unknown"`. Also reports a **dirty working tree**: `git rev-parse HEAD` answers happily with uncommitted changes, so a resolved hash can be a truthful answer to the wrong question `[AE-53]` |
+| M9-010c | Record proof that each report was sent | DONE | `reporting/send_receipt.py` (100% branch); `test_send_receipt.py`. **The book's decisive layer is receipt at the lecturer's address (p.78/183) and we cannot observe it -- only the recipient can.** So the class is `SendReceipt`, not `ProofOfDelivery`, and `as_record()` writes `evidences: API acceptance, not receipt by the lecturer` into the artifact. A response with no message id is refused: afterwards a failed send and an unreceipted send look identical, and only one costs the points. **The reference stores nothing at all** -- its sender returns `{status, reason}` for a CLI line that never reaches the artifacts `[AE-32]` |
+| M9-010d | Reconcile declared game counts against the artifact set | DONE | `EvidenceBundle.reconcile` checks **every** opponent before raising -- rule 38's sanction is absolute disqualification of the project, not something to find one opponent at a time `[AE-38]` |
+| M9-011 | Write the academic report body | IN PROGRESS | A scientific document, not an installation guide `[AE-42]` |
+| M9-011a | Justify the architectural decisions and trade-offs | IN PROGRESS | ADRs summarised with rationale `[G§20.1]` |
+| M9-011b | Present empirical results, not claims | IN PROGRESS | Numbers come from reproducible runs |
+| M9-011c | Disclose every book contradiction relied on | DONE | **Four book contradictions disclosed** under chapter 110's clause: draft-vs-send, the duplicated `[Number of Agents]` row, `schema_version`, and which artifacts must be committed — each with where, what was chosen, and why |
+| M9-011d | Cite the reference list | IN PROGRESS | Academic citation format `[G§9.2]` |
+| M9-012 | Complete the installation and usage documentation | DONE | `docs/USAGE.md` |
+| M9-012a | Document system requirements and setup | DONE | Python >=3.11, uv, Windows-only stated plainly, git required (both scanners shell out to it) |
+| M9-012b | Document every run mode and flag | DONE | **The honest answer is that there are none.** `p2p-thief` exposes `--help`/`--version` only and its own description says "no peer runtime is implemented". Documented what does run — gates, evidence scripts, integration harnesses — and opened `M9-025` for the missing runtime rather than writing around it |
+| M9-012c | Document the configuration files and their effect | DONE | Every config path with its effect and whether it is committed, including why `games/` is committed and `config/game.toml` is not |
+| M9-012d | Document troubleshooting for common failures | DONE | Nine failure modes with cause and fix, each traced to the rule that makes it matter |
+| M9-012e | State the licence and third-party attributions | DONE | MIT, four runtime dependencies with roles, no vendored third-party code, `inst/` cited as fair academic use |
 | M9-013 | Run the pre-submission dry run | PENDING | Clone fresh, install frozen, run every gate, run a game, produce artifacts |
 | M9-013a | Verify from a clean clone on a second machine | PENDING | Nothing depends on an untracked local file |
-| M9-013b | Verify every gate passes from that clean clone | PENDING | `G-001`…`G-009` |
-| M9-013c | Verify the replay app validates a real stored match | PENDING | `[AE-20]` |
-| M9-014 | Verify the four success metrics are demonstrable | PENDING | Coordination, adaptation, integrity, architecture — each with evidence `[book §11.4]` |
-| M9-014a | Evidence coordination | PENDING | Turn management and P2P synchronisation without a judge |
-| M9-014b | Evidence adaptation | PENDING | Belief updating under partial observation |
-| M9-014c | Evidence integrity | PENDING | Commit-reveal plus a passing mutual audit |
-| M9-014d | Evidence architecture | PENDING | Orchestrator and gatekeeper patterns under load |
+| M9-013b | Verify every gate passes from that clean clone | DONE | `scripts/verify_clean_clone.py`, **run 2026-08-07: 8 gates pass on a fresh checkout.** Clones `HEAD` locally, `uv sync --frozen`, then runs G-002/003/004/005/007 plus the two new M9 checks in the clone. **It immediately earned its keep** -- caught two file-length violations that the working tree had not been re-checked for. G-008/G-009 are excluded (a prompt log is reviewed, CI runs on push). Explicitly **not** `M9-013a`: a local clone shares the OS, Python build and uv cache |
+| M9-013c | Verify the replay app validates a real stored match | DONE | `tests/integration/test_replay_of_stored_match.py` (6 tests). A rehearsed series is written as JSON, reloaded **by path alone** (`load_log`, rule 36's mutual-audit posture -- an opponent hands over a file, not an object), and re-verified to `Verified OK`. Every other replay test builds records in memory; `json.dumps`/`loads` is not identity, so a verifier that only sees in-memory dicts can pass forever while every stored log fails. A byte changed **in the file** is detected `[AE-20]` |
+| M9-014 | Verify the four success metrics are demonstrable | DONE | `docs/QUALITY_EVIDENCE.md`, the book's Table 4 (p.94/211) quoted per metric |
+| M9-014a | Evidence coordination | DONE | Coordination: two peers with no referee, phase machine, two real OS processes, bounded inbox refusing rather than growing |
+| M9-014b | Evidence adaptation | DONE | Adaptation: belief by Bayes from observation only, hash-locked scent, hints judged. **Discloses `M6-015c`** — our evasion metric reverses the Appendix F ranking over 24 perimeter openings (blind 175, belief 140), open not patched |
+| M9-014c | Evidence integrity | DONE | Integrity: commit-reveal over canonical bytes, audit-before-agreement structural, nonces refused pre-`ended_at`, stored match re-verifies off disk, 1744 history objects clean |
+| M9-014d | Evidence architecture | DONE | Architecture: one gatekeeper, orchestrator owns the series, reporting imports no transport (proved from the AST), a disconnected game still emits four artifacts |
 | M9-015 | Confirm the addresses and links one final time | PENDING | `rmisegal@gmail.com` and `rmisegal+uoh26finalgame@gmail.com`; the book's Table 20 spelling is a typo |
 | M9-015a | Confirm the repository is reachable by the grader | PENDING | Public, or shared `[AE-49]` |
-| M9-015b | Confirm the cross-link to the companion repository resolves | PENDING | A link only; no repository access `[AE-49]` |
+| M9-015b | Confirm the cross-link to the companion repository resolves | IN PROGRESS | A link only; no repository access `[AE-49]` |
 | M9-016 | Archive the final submission state | PENDING | The tagged commit, artifacts, and evidence bundle retained together |
-| M9-017 | Verify the repository meets the minimum contents rule | PENDING | README, `/config`, PRD files, PLAN, and TODO all present `[AE-50]` |
-| M9-017a | Confirm every mechanism has its own PRD | PENDING | `[G§2.3]`; one per algorithm or central mechanism |
-| M9-017b | Confirm the docs folder matches the guidelines' structure | PENDING | `[G§2.2]` |
-| M9-018 | Verify no secret exists anywhere in Git history | PENDING | `[AE-39]`; a secret committed once requires rotation |
-| M9-018a | Scan the full history, not just the working tree | PENDING | A deleted secret remains in earlier commits |
-| M9-018b | Confirm `.gitignore` covers every credential path | PENDING | `[AE-40]` |
-| M9-019 | Verify the annotated tag points at the reviewed commit | PENDING | Not at a later commit written after the deadline `[AE-41]` |
-| M9-020 | Prepare the handover note for the coordinator | PENDING | Current state, open unknowns, and next action in one page |
-| M9-020a | List every task still open at submission | PENDING | Honest, not aspirational |
-| M9-020b | List every unknown still unresolved | PENDING | With the reading chosen and why |
+| M9-017 | Verify the repository meets the minimum contents rule | DONE | `scripts/check_submission_contents.py`, passing. Checks book 9.4.1, 9.4.2 and guidelines 2.3 together and reports **every** gap at once |
+| M9-017a | Confirm every mechanism has its own PRD | DONE | Guidelines 2.3: every central mechanism needs its own PRD. Read from `docs/PRD_*.md` rather than a hand-kept list, so a mechanism added without one surfaces here instead of in a reviewer's memory. All seven present |
+| M9-017b | Confirm the docs folder matches the guidelines' structure | DONE | Book 9.4.1 (`inst/:2267`): README, config, PLAN, TODO, PRD, source -- all present. **Recorded discrepancy:** 9.4.1's own text conflates `/config` with the PRDs; the guidelines list them separately. Both readings are checked, since satisfying both costs nothing |
+| M9-018 | Verify no secret exists anywhere in Git history | DONE | `scripts/scan_git_history.py`; `test_history_scan.py` (20 tests). The working-tree gate answers the wrong question at submission: rule 39 forbids secrets being **in the repository**, and a credential deleted three commits ago is in every clone |
+| M9-018a | Scan the full history, not just the working tree | DONE | `--all`, not `HEAD`. Tests target the ways a structural scan goes quietly vacuous -- a scan that inspected 3 objects still prints OK. One test proves history contains paths absent from disk, so the scanner cannot be a duplicate of the tree gate |
+| M9-018b | Confirm `.gitignore` covers every credential path | DONE | `forbidden_path` flags `credentials.json`, `token.json`, `.env*`, `*.key`, `*.pem`, `*.p12` **by name** -- a file can be a credential without containing a matching pattern. A test asserts every refused name is also gitignored `[AE-40]` |
+| M9-019 | Verify the annotated tag points at the reviewed commit | IN PROGRESS | Not at a later commit written after the deadline `[AE-41]` |
+| M9-020 | Prepare the handover note for the coordinator | DONE | `docs/HANDOVER.md` |
+| M9-020a | List every task still open at submission | DONE | Open rows split into needs-a-person and needs-code-and-is-scoped, with why each cannot be automated |
+| M9-020b | List every unknown still unresolved | DONE | `U-019`, `U-009`, `U-021`/`U-025`, `U-033`/`U-034` with how we proceeded under each |
 | M9-021 | Confirm the league minimums are actually met | PENDING | Two counted games against two different groups, both reported `[AE-31]` |
 | M9-021a | Reconcile our count against each opponent's report | PENDING | Conflicting reports are 0/0 for both `[AE-35]` |
-| M9-022 | Record the final self-assessed code-quality score | PENDING | Against the guidelines' quick-reference card `[G§19.1]` |
-| M9-023 | Verify every emitted artifact is committed | PENDING | Appendix F.2 item 4; nothing exists only on a local disk |
-| M9-024 | Close out the prompt-engineering log | PENDING | Final entry records the submission pass `[G§8.3]` |
+| M9-022 | Record the final self-assessed code-quality score | DONE | **26/30 (87%).** Four partial, none zero |
+| M9-023 | Verify every emitted artifact is committed | DONE | `scripts/check_artifacts_committed.py`, asking **Git** rather than the filesystem -- a file on disk and untracked is precisely the state Appendix F obligation 4 prevents, and invisible to `Path.exists()`. **The obligation is narrower than 'commit all four':** config is mandatory (obligation 4, p.140/288), the log has no explicit commit duty but is needed for the Replay threshold (p.129/272), and the result's duty is email (rule 51) |
+| M9-024 | Close out the prompt-engineering log | IN PROGRESS | Final entry records the submission pass `[G§8.3]` |
+| M9-025 | Give the agent a command-line runtime | OPEN | **Found 2026-08-07 while writing `docs/USAGE.md`.** `p2p-thief` exposes only `--help` and `--version`, and its own description says "no peer runtime is implemented". The game logic is complete and exercised -- a six-sub-game series runs in `tests/integration/`, two OS processes play over localhost, the replay verifier re-checks a stored match -- but **a grader who clones this repository cannot start a game from a terminal**. The reference exposes `peer --role --config --stub-llm --no-gui` and `replay --log`. What is missing is the thin layer wiring `orchestration/` and `replay/` to `cli.py`, not the behaviour underneath. Recorded rather than written around: `M9-012b` asks to document every run mode, and the honest answer is that there are none |
 
 ---
 

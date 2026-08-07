@@ -17,6 +17,13 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
+        with:
+          # Full history. `scan_git_history.py` reads every blob reachable from any ref, and
+          # the default `fetch-depth: 1` leaves it one commit to read — it would print
+          # "0 findings" having looked at the tip alone, which is indistinguishable from a
+          # clean repository. The scanner now refuses a shallow clone rather than passing
+          # quietly, so this is required for the gate to run at all.
+          fetch-depth: 0
 
       - name: Install uv and Python
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
@@ -38,6 +45,9 @@ jobs:
 
       - name: Scan for secrets
         run: uv run python scripts/check_secrets.py
+
+      - name: Scan Git history for secrets
+        run: uv run python scripts/scan_git_history.py
 
       - name: Smoke-test CLI
         run: |
