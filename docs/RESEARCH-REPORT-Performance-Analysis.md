@@ -212,3 +212,44 @@ gap above (8/24, ceiling 24/24) remains this policy's one measured weakness, and
 open: the same grid confirms the five failed attempts were not underpowered variants of a
 working idea — reactive play does not beat one-step prediction from either side of the
 board. The next attempt should model the pursuer from observed moves.
+
+## Addendum 2026-08-08 (ii) — the sixth attempt, and where the gap actually lives
+
+The stronger-pursuer table above must be read with a correction. Its herding and
+anticipating rows were measured with session-scratch pursuers that were never
+committed; `M6-029` commits the three archetypes (`strategy/pursuer_models.py`), and
+the committed herding and anticipating are **stronger**. Reproducible numbers
+(`scripts/experiment_pursuers.py`, `results/pursuer_grid.json`, same 24 paired
+perimeter openings):
+
+| arm | greedy | herding | anticipating |
+| --- | ---: | ---: | ---: |
+| shipped `distance + mobility` | 23/24 (235) | **8/24 (160)** | **5/24 (145)** |
+| sixth attempt, argmax-fed | 23/24 (235) | 4/24 (140) | 4/24 (140) |
+| sixth attempt, top-2 uncertainty set | 23/24 | 2/24 | 4/24 |
+| **sixth attempt, truth-fed (instrument)** | **24/24** | **24/24** | **24/24** |
+
+Robustness agrees (anticipating at 9×9: shipped 10/32 v adaptive 8/32; at horizon 50:
+5/24 v 4/24). So the sixth attempt — classify the pursuer online from the believed
+trajectory, best-respond with exact escape sets — **fails like the five before it and
+is not wired**, per the `M6-015b` reversion rule.
+
+**What it bought is the diagnosis.** Truth-fed, the identical machinery reaches the
+theoretical ceiling against every archetype: the classifier works, the solver is
+exact, and the entire collapse from 24/24 to 4/24 is the estimator's ~1-cell argmax
+error, which turns an exact escape line into a walk into the real pursuer. This
+refutes this report's own earlier claim that the belief is "wrong enough to punish a
+ten-ply plan, not wrong enough to explain an 8/24" — it is exactly wrong enough, and
+now that is measured rather than argued. Planning against a top-2 uncertainty set
+makes things worse (the true cell escapes the set often enough that intersection only
+empties it), which rules out cheap robustness at the planning layer.
+
+**Attempt #7 therefore targets perception, not policy.** The emission physics are
+agreed, hash-locked, and deterministic; the current likelihood weights cells by raw
+observed intensity, discarding everything the model knows about how a trail decays
+and stacks. A model-matched estimator — score candidate pursuer cells by how well the
+*whole observed window* matches the field the model predicts for them — should
+localise the emitter to near-truth, and the truth-fed row above is the measured prize
+if it does: **24/24 against every committed archetype, 240 league points.** The grid
+re-run is one command because, unlike attempts one through five, the sixth attempt's
+machinery is committed.

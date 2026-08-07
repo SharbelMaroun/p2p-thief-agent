@@ -1070,6 +1070,33 @@ shows the same phenomenon from the other side: its truth-aimed barrier stack can
 distance-plus-mobility evader either. The next attempt should model the pursuer from observed
 moves; nothing tried so far has beaten shipping `distance + mobility`.
 
+#### The sixth attempt fails, and finally says why all six did (`M6-029`, `M6-030`, 2026-08-08)
+
+The "model the pursuer from observed moves" attempt was built and measured the same day it was
+proposed: the three pursuer archetypes are now committed code (`strategy/pursuer_models.py` —
+the report's stronger-Cop rows previously existed only as numbers from scratch code), an exact
+escape solver answers "can the horizon still be reached from here?" perfectly against any of
+them (`strategy/escape_search.py`), and an adaptive policy classifies the pursuer online from
+the believed trajectory and plays the best-fit model's escape set. Committing the models
+corrected the record first: the committed herding and anticipating are stronger than the
+scratch versions, so the shipped policy's honest row is **23/24 greedy, 8/24 herding, 5/24
+anticipating** — not the 23/23/8 published before.
+
+The attempt itself is a measured negative and is **not wired**: argmax-fed it scores 23/4/4
+against shipped's 23/8/5, a top-2 uncertainty set is worse still, and robustness on a larger
+board and a longer horizon agrees. But the diagnostic bought the thing five failures never
+found: **truth-fed, the identical machinery escapes 24/24 against every archetype.** The
+classifier works, the solver is exact, and the whole collapse is the estimator's ~1-cell
+argmax error — an exact escape line re-planned from a wrong cell walks into the real pursuer.
+This refutes the report's own earlier claim that belief was "not wrong enough to explain an
+8/24"; it is exactly wrong enough, and now that is measured rather than argued. Attempt #7
+therefore targets perception, not policy: the emission physics are hash-locked and
+deterministic, so a model-matched likelihood — score candidate cells by how well the whole
+observed window matches the field the model predicts — should localise the emitter to
+near-truth, and the truth-fed row is the measured prize: 240 league points against every
+committed archetype. Unlike attempts one through five, this failure stays reproducible: the
+re-run is one command.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a

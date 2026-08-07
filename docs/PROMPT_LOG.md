@@ -628,3 +628,25 @@ as a contradiction. One measured reversal: Bayes-recursive belief calcifies on t
 (the companion's grid lost a tracked target 40/40 → 0/40 on that change alone), so the live
 loop rebuilds belief fresh per observation — which is exactly what the `M6-015` harness arm
 measures, keeping the live policy and the published numbers the same object.
+
+## 2026-08-08 (ii) — the sixth attempt: a negative result that finally localises the gap
+
+Continuation of the "make them win" batch. Method first: both notebooks again, different
+questions — the code notebook confirmed the reference never predicts or adapts ("deliberately
+simple", students "expected to upgrade the strategy"), the book notebook confirmed adaptation
+during play is permitted and *graded* (a success metric, p. 94/211) and that the audit
+"verifies only that an agent kept its commitment... without limiting strategic freedom"
+(pp. 38/101, 59/148). That cleared the design legally before a line was written.
+
+The measurement discipline paid three times. Committing the pursuer archetypes (previously
+scratch code) immediately corrected the published record — the committed herding/anticipating
+are stronger, so shipped's honest row is 23/8/5, not 23/23/8. The grid then killed the sixth
+attempt honestly (23/4/4 argmax-fed; worse with an uncertainty set; worse on robustness
+configs). And the one probe worth all of it: truth-fed, the same machinery escapes **24/24
+against every archetype** — so the planner is provably correct and the entire six-attempt
+graveyard has a single measured cause, the estimator's ~1-cell error. Attempt #7 is therefore
+perception (model-matched scent inversion), with a known measured prize.
+
+Lesson recorded: **when an attempt fails, feed it truth before burying it.** Five previous
+failures were buried with their mechanism unmeasured; the truth-fed probe cost two minutes and
+converted failure #6 from "another dead heuristic" into the diagnosis that redirects #7.

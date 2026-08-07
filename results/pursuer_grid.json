@@ -1,0 +1,90 @@
+{
+  "arms": {
+    "adaptive": {
+      "anticipating": {
+        "escapes": 4,
+        "league_points": 140,
+        "scenarios": 24,
+        "total_steps": 377
+      },
+      "greedy": {
+        "escapes": 23,
+        "league_points": 235,
+        "scenarios": 24,
+        "total_steps": 810
+      },
+      "herding": {
+        "escapes": 4,
+        "league_points": 140,
+        "scenarios": 24,
+        "total_steps": 350
+      }
+    },
+    "shipped": {
+      "anticipating": {
+        "escapes": 5,
+        "league_points": 145,
+        "scenarios": 24,
+        "total_steps": 400
+      },
+      "greedy": {
+        "escapes": 23,
+        "league_points": 235,
+        "scenarios": 24,
+        "total_steps": 810
+      },
+      "herding": {
+        "escapes": 8,
+        "league_points": 160,
+        "scenarios": 24,
+        "total_steps": 426
+      }
+    }
+  },
+  "board": 7,
+  "horizon": 35,
+  "robustness": {
+    "anticipating_7x7_h50": {
+      "adaptive": {
+        "escapes": 4,
+        "league_points": 140,
+        "scenarios": 24,
+        "total_steps": 437
+      },
+      "shipped": {
+        "escapes": 5,
+        "league_points": 145,
+        "scenarios": 24,
+        "total_steps": 475
+      }
+    },
+    "anticipating_9x9_h35": {
+      "adaptive": {
+        "escapes": 8,
+        "league_points": 200,
+        "scenarios": 32,
+        "total_steps": 748
+      },
+      "shipped": {
+        "escapes": 10,
+        "league_points": 210,
+        "scenarios": 32,
+        "total_steps": 786
+      }
+    }
+  },
+  "truth_fed_adaptive": {
+    "anticipating": {
+      "escapes": 24,
+      "scenarios": 24
+    },
+    "greedy": {
+      "escapes": 24,
+      "scenarios": 24
+    },
+    "herding": {
+      "escapes": 24,
+      "scenarios": 24
+    }
+  }
+}
