@@ -608,3 +608,23 @@ elaborate instruction would have caught it; a direct challenge to a claim did.
 **What I would tell the next person.** Ask the sources before writing, verify the answer
 against the primary text before trusting it, and check the thing that reports success
 actually looked at anything. Local green is not green.
+
+## 2026-08-08 — "make them win": the live loop plays the measured policy at last
+
+The prompt was "analyze how my cop and thief plays, and make them win in every game." The
+analysis found the live adapter playing the **blind baseline** — no belief, no barriers,
+empty `smell_grid`, `incoming` ignored — while every published number described a policy the
+wire never ran. Worse were the two audit-fatal defects around capture claims: a default
+`answer_claim` that denied every correct claim (a standing lie rule `[AE-021]` scores as a
+forgery), and a timing hole where even an honest answerer would compare the claim against
+the cell we had already fled to. Both are now closed from one shared closure, answered from
+the pre-move cell, with `claim_response` on the wire the same turn.
+
+Method note: the notebooks were asked *different* questions again (code: how the reference's
+live brains choose moves; book: turn order, scoring rows, strategy restrictions), and the
+book answer — simultaneous commit-reveal — reconciled with the lecturer's "Thief moves
+first" as message order versus move resolution, recorded as `C-025` instead of being treated
+as a contradiction. One measured reversal: Bayes-recursive belief calcifies on trail history
+(the companion's grid lost a tracked target 40/40 → 0/40 on that change alone), so the live
+loop rebuilds belief fresh per observation — which is exactly what the `M6-015` harness arm
+measures, keeping the live policy and the published numbers the same object.

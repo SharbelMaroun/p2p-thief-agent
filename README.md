@@ -1034,6 +1034,42 @@ the list it derives from, silently, while the row that depends on it reads DONE.
 The `M0-006` family closed in the same pass: those rows exist to move the register into the
 report, and closing a disclosure row without touching them was how the gap survived.
 
+#### The live Thief was blind, and would have lied when caught (`M9-026a`, `M9-026b`, 2026-08-08)
+
+Asked to make both agents win, the finding here was worse than a weak strategy: the wire
+adapter `M9-026` wired was the **blind baseline wearing the live loop's clothes**. It called
+`baseline.choose_action` with no threats and no barriers, ignored the Cop's message entirely,
+sent a hard-coded empty `smell_grid` — the exact rule-23 deviation the companion peer fixed on
+its own side on 2026-08-06 — and a constant hint. Every M6 result existed only in the harness
+while the wire played the arm that measures **worse than a random walk** in league points
+(`M6-015c`). `make_decide` now absorbs the Cop's declared barriers and its scent into the
+belief, evades with `choose_evasive_action`, emits the involuntary 5×5 own-trail window, seals
+the real move and position, and claims survival on the threshold step so the opponent
+terminates on our win instead of timing out into a disputed artifact.
+
+Two of the problems hit were audit-fatal rather than strategic. `serve_match` defaulted
+`answer_claim` to `lambda _cell: False` — a standing denial of every correct capture claim,
+which the end-game audit proves from our own sealed positions and rule `[AE-021]` scores as a
+forgery, zero for both sides, where an honest loss still pays 5. And the timing was wrong even
+for an honest answerer: the sub-game loop asks *after* the turn's move is applied, so the claim
+would be tested against the cell we fled to. Claims are now answered from the **pre-move** cell
+by an answerer sharing `decide`'s own closure (an absent answerer refuses to play rather than
+quietly lying), a confirmed capture pins the move to `STAY` so the sealed record shows the cell
+we were caught on, and `claim_response` goes out the same turn, closing the loop that would
+otherwise have left the Cop timing out on a game we recorded as its clean capture.
+
+One measured reversal is recorded on the belief itself: a Bayes-recursive prior (carried and
+multiplied every turn) calcifies on trail history — the companion's opponent grid lost a target
+it tracks perfectly when rebuilt fresh, 40/40 → 0/40 on that change alone. The live loop
+therefore rebuilds belief fresh per observation and carries the prior only across silent turns,
+which is also exactly what the `M6-015` harness arm measures, so the live Thief plays the
+policy the published numbers are about. Still open, deliberately: the anticipating-Cop gap
+(8/24 escapes against a one-step-ahead pursuer, solver ceiling 24/24) — the five failed
+attempts are in `docs/RESEARCH-REPORT-Performance-Analysis.md`, and the companion's new grid
+shows the same phenomenon from the other side: its truth-aimed barrier stack cannot corner a
+distance-plus-mobility evader either. The next attempt should model the pursuer from observed
+moves; nothing tried so far has beaten shipping `distance + mobility`.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a

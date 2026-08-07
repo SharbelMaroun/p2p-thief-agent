@@ -193,3 +193,22 @@ answers, and in this case it answers it uncomfortably.
    may be sensitive to them.
 4. **Determinism cuts both ways.** No sampling noise, so each scenario's result is exact —
    but 24 scenarios is still 24, and "no effect detected" is not "no effect".
+
+## Addendum 2026-08-08 — the live loop now plays the measured arm
+
+Until 2026-08-08 every number above described a policy the wire never ran: the live
+`decide` adapter played the blind baseline with an empty `smell_grid`. `M9-026a` closes
+that — the served Thief now runs exactly the `_belief` arm this report measures
+(fresh-per-observation belief, `choose_evasive_action`, involuntary emission), so the
+figures here are claims about the deployed agent, not about a harness-only artifact.
+
+Two cross-repository results bear on threat 1 ("one Cop"). The companion's new opponent
+grid (`p2p-cop-agent`, `M9-30`) measures its arms against a **distance+mobility evader —
+this repository's own shipped shape** — and cannot capture it with any arm, including a
+barrier stack aimed with referee truth: 0/40 across the board. Read from this side, that
+is evidence the shipped evasion is strong against the entire pursuit-plus-barriers class
+its companion could build, not only against the greedy harness Cop. The anticipating-Cop
+gap above (8/24, ceiling 24/24) remains this policy's one measured weakness, and remains
+open: the same grid confirms the five failed attempts were not underpowered variants of a
+working idea — reactive play does not beat one-step prediction from either side of the
+board. The next attempt should model the pursuer from observed moves.
