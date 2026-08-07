@@ -49,6 +49,12 @@ def build_parser() -> argparse.ArgumentParser:
     serve.add_argument("--host", default="127.0.0.1",
                        help="bind address; defaults to loopback rather than 0.0.0.0")
     serve.add_argument("--name", default="p2p-thief", help="server name reported to the peer")
+    serve.add_argument("--peer", help="the opponent's mailbox URL. With it, this peer "
+                       "PLAYS a match; without it, it only listens")
+    serve.add_argument("--threshold", type=int, default=35,
+                       help="survival threshold: steps the Thief must last (Appendix F)")
+    serve.add_argument("--artifacts", type=Path,
+                       help="directory to write the finished log into")
 
     for name, help_text in (("replay", "re-verify a stored log and print its banner"),
                             ("verify", "re-verify a stored log; exit non-zero if tampered")):
@@ -113,6 +119,11 @@ def _serve(args: argparse.Namespace) -> int:
     would race an opponent still binding its own port. `services/readiness` exists for that
     handshake; until an opponent address is negotiated there is nothing to open against.
     """
+    # Delegated **before** binding: `serve_match` opens its own mailbox, and binding here
+    # first would leave the port taken and the match refused by our own `ensure_port_free`.
+    if args.peer:
+        return _play(args)
+
     from p2p_thief_agent.adapters.fastmcp_server import PeerInboxes  # noqa: PLC0415
     from p2p_thief_agent.adapters.serving import ServingError, serve_in_background  # noqa: PLC0415
 
@@ -130,6 +141,35 @@ def _serve(args: argparse.Namespace) -> int:
         _block_until_interrupted()
     except KeyboardInterrupt:
         print("\nstopped")
+    return 0
+
+
+def _play(args: argparse.Namespace) -> int:
+    """Play one match against the opponent named by `--peer`.
+
+    Separated from listening because they are different intentions, not different flags on
+    one. A peer that always played would race an opponent still binding its port; one that
+    never played is what this CLI was until now.
+    """
+    from p2p_thief_agent.adapters.serve import (  # noqa: PLC0415
+        ServeError,
+        make_decide,  # noqa: PLC0415
+        serve_match,
+    )
+
+    print(f"Thief on http://{args.host}:{args.port}, waiting for {args.peer} ...")
+    try:
+        result = serve_match(
+            peer_url=args.peer, port=args.port, host=args.host,
+            survival_threshold=args.threshold, decide=make_decide(),
+            artifacts_dir=args.artifacts,
+        )
+    except ServeError as exc:
+        print(f"match did not start: {exc}")
+        return 2
+    print(f"match finished: {result.outcome} after {result.steps} step(s)")
+    if args.artifacts:
+        print(f"log written to {args.artifacts}")
     return 0
 
 
