@@ -53,18 +53,19 @@ def serve_match(
     ready_timeout: float = 30.0,
     sleep: Callable[[float], None] = time.sleep,
     artifacts_dir: Path | None = None,
+    game_config: Mapping[str, object] | None = None,
+    identity: Mapping[str, object] | None = None,
 ) -> MatchOutcome:
     """Bind, wait for the opponent, then play one sub-game to a decision.
 
-    `ready_timeout` exists because the two peers are started by two people who cannot press
-    a key at the same instant. Waiting is the normal case, not the error case; only running
-    out of patience is an error, and it says which address never answered.
+    `ready_timeout` exists because two peers are started by two people who cannot press
+    a key at the same instant: waiting is the normal case, and only running out of
+    patience is an error.
 
-    `answer_claim` may be omitted only when `decide` carries its own honest answerer, as
-    `make_decide`'s does, sharing one position closure. It used to default to
-    `lambda _cell: False` — a standing false denial of every correct capture, which the
-    audit proves from our own sealed positions and scores as a forgery `[AE-021]`. No
-    honest default exists without the position, so an absent answerer refuses to play.
+    `answer_claim` may be omitted only when `decide` carries its own honest answerer
+    (`make_decide` attaches one). The old `lambda _cell: False` default was a standing
+    false denial of every correct capture — an audit-provable forgery `[AE-021]` — and
+    no honest default exists without the position, so an absent answerer refuses to play.
     """
     if answer_claim is None:
         answer_claim = getattr(decide, "answer_claim", None)
@@ -96,19 +97,53 @@ def serve_match(
             "must be running: start theirs, or check the address and port")
 
     client = FastMCPClient(peer_url)
+    threshold = survival_threshold
+    if game_config is not None:
+        # `M5-014f` on the playable path: agree before the first move. The companion
+        # Cop refuses an unnegotiated game, and so does the book.
+        from p2p_thief_agent.adapters.negotiated import (  # noqa: PLC0415
+            NegotiatedServeError,
+            negotiated_threshold,
+        )
+
+        if not identity:
+            raise ServeError("negotiation needs this peer's identity; pass --private")
+        try:
+            threshold = negotiated_threshold(
+                client=client, inboxes=inboxes, game_config=game_config,
+                identity=identity, fallback_timeout=ready_timeout, sleep=sleep,
+            )
+        except NegotiatedServeError as exc:
+            raise ServeError(str(exc)) from exc
+
+    # `receive` owns the bounded waiting; the raw non-blocking take made the loop
+    # check the inbox once, microseconds after its own send, and declare a live
+    # opponent silent — the first two-process rehearsal died at step 1 on this.
+    from p2p_thief_agent.orchestration.polling import poll_for_turn  # noqa: PLC0415
+
     records: list[dict] = []
     result = run_sub_game_over_wire(
         machine=PhaseMachine(),
         transport=client,
-        receive=lambda: _take(inboxes),
+        receive=lambda: poll_for_turn(
+            lambda: _take(inboxes), clock=time.monotonic, sleep=sleep,
+            timeout=_turn_timeout(game_config, ready_timeout)),
         decide=decide,
         answer_claim=answer_claim,
-        survival_threshold=survival_threshold,
+        survival_threshold=threshold,
         records=records,
     )
     if artifacts_dir is not None:
         _write_log(artifacts_dir, records, result)
     return MatchOutcome(outcome=result.outcome, steps=result.steps, records=records)
+
+
+def _turn_timeout(game_config: Mapping[str, object] | None, fallback: float) -> float:
+    """The per-turn wait budget: the shared file's response timeout, or the fallback."""
+    league = (game_config or {}).get("network_and_league")
+    if isinstance(league, Mapping):
+        return float(league.get("response_timeout_sec", fallback))
+    return float(fallback)
 
 
 def _take(inboxes: object) -> Mapping[str, object] | None:  # noqa: D401
@@ -125,61 +160,14 @@ def _take(inboxes: object) -> Mapping[str, object] | None:  # noqa: D401
 
 
 def _write_log(directory: Path, records: list[dict], result: object) -> Path:
-    """Write the finished sub-game log, with the end time rule 18's guard requires."""
-    from datetime import datetime, timezone  # noqa: PLC0415
+    """Write the finished log; the body lives in `adapters/match_log.py` (length gate)."""
+    from p2p_thief_agent.adapters.match_log import write_match_log  # noqa: PLC0415
 
-    from p2p_thief_agent.reporting.emit import write_artifact  # noqa: PLC0415
-    from p2p_thief_agent.reporting.log_artifact import build_log  # noqa: PLC0415
-    from p2p_thief_agent.reporting.naming import MatchIdentity, log_filename  # noqa: PLC0415
-
-    ended = datetime.now(timezone.utc).isoformat()
-    identity = MatchIdentity(game_id="local-match", game_uid="local-match-uid")
-    summary = {
-        "sub_game_number": 1, "group_id": "sharNamr", "role": "thief",
-        "opponent_group_id": "opponent", "result": getattr(getattr(result, "outcome", None), "value", "unknown"),
-        "winner_role": "thief", "steps": getattr(result, "steps", 0),
-        "timezone": "UTC", "started_at": ended, "ended_at": ended,
-        "duration_seconds": 0, "tokens_total": 0, "audit": {},
-    }
-    artifact = build_log(
-        identity=identity, summary=summary, links={},
-        mutual_agreement={"opponent_group_id": "opponent", "sha256": "0" * 64,
-                          "confirmed": False},
-        records=records,
-    )
-    return write_artifact(Path(directory), log_filename(identity.game_id, 1), artifact)
+    return write_match_log(directory, records, result)
 
 
 def resolve_peer(peer: str | None, private: Path | None) -> str:
-    """Decide which address to dial, from a flag or the private config (`M5-005`).
+    """Decide which address to dial; the body lives in `play_command` (length gate)."""
+    from p2p_thief_agent.adapters.play_command import resolve_peer_address  # noqa: PLC0415
 
-    Two sources on purpose. A flag is right while developing on one machine; a private TOML
-    is right for league play, where the address is a tunnel URL and the token that created
-    it must stay out of every shared file (book §2.4, `[AE-10]`).
-
-    An explicit `--peer` wins over the file: the operator typing an address at 2 a.m. means
-    that address, and silently preferring a stale config value would be the least helpful
-    possible interpretation.
-    """
-    if peer:
-        return peer
-    if private is None:
-        raise ValueError(
-            "no opponent address: pass --peer URL, or --private pointing at a game.toml "
-            "whose [network].opponent_url names one")
-    from p2p_thief_agent.shared.private_config import (  # noqa: PLC0415
-        PrivateConfigError,
-        load_private_config,
-        opponent_url,
-    )
-    from p2p_thief_agent.shared.tunnel import public_url  # noqa: PLC0415
-
-    try:
-        config = load_private_config(private)
-        dialling = opponent_url(config)
-        # Reading our own advertised address here is not decoration: it fails loudly now if
-        # it is missing or loopback, rather than after both sides have signed the terms.
-        public_url(config)
-    except PrivateConfigError as exc:
-        raise ValueError(str(exc)) from exc
-    return dialling
+    return resolve_peer_address(peer, private)

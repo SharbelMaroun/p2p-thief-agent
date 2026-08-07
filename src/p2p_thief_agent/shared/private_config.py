@@ -101,6 +101,36 @@ def load_opponent_url(path: str | Path) -> str:
     return opponent_url(load_private_config(path))
 
 
+def identity_from_private(config: Mapping, own_url: str, peer_url: str) -> dict:
+    """Assemble the book-mandated pre-game identity from the private TOML (`M5-014f`).
+
+    Rule 24 mandates the exchange carry the group, its members, both repositories,
+    the MCP addresses, the model, and the hardware spec — refusing to build a short
+    identity here is what keeps our own offer from being the one that costs the
+    computational-fairness bonus. `mcp_servers` is synthesised from the live
+    addresses because the wire is the one place both are actually known.
+    """
+    game = config.get("game")
+    llm = config.get("llm")
+    hardware = config.get("hardware")
+    if not isinstance(game, Mapping) or not isinstance(llm, Mapping):
+        raise PrivateConfigError("private config needs [game] and [llm] for negotiation")
+    identity = {
+        "group_id": game.get("group_id"),
+        "group_name": game.get("group_name"),
+        "members": game.get("members"),
+        "repos": game.get("repos"),
+        "mcp_servers": {"thief": own_url, "cop": peer_url},
+        "llm_model": llm.get("model"),
+        "spec": dict(hardware) if isinstance(hardware, Mapping) else {},
+    }
+    missing = sorted(name for name, value in identity.items() if not value)
+    if missing:
+        raise PrivateConfigError(
+            f"private config cannot build the mandated identity; missing: {', '.join(missing)}")
+    return identity
+
+
 def thief_config_path(config_root: str | Path) -> Path:
     """Return this peer's own private-config path: `<config_root>/thief/game.toml`.
 

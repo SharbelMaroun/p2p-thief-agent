@@ -97,6 +97,41 @@ def negotiate_match(
     return AgreedMatch(terms=agreed, peer_identity=dict(handshake.peer_identity))
 
 
+def negotiate_for_serve(
+    *,
+    client: object,
+    inboxes: object,
+    terms: Mapping[str, object],
+    identity: Mapping[str, object],
+    timeout: float,
+    clock: Clock,
+    sleep: Sleep,
+) -> AgreedMatch:
+    """Run the pre-game handshake over the live mailbox pair for the serve path.
+
+    `M5-019f` built this sequencing and only the tests ever called it — the CLI's
+    match path went straight to the turn loop, which composes with nothing: the
+    companion Cop (and the book — play starts "only after both verifications pass")
+    refuses to play unnegotiated. Found 2026-08-08 preparing the first two-process
+    rehearsal of the real policies; this is the missing thirty lines.
+    """
+    from p2p_thief_agent.protocol.handshake import Handshake  # noqa: PLC0415
+
+    def take_offer():
+        import queue  # noqa: PLC0415
+
+        try:
+            return inboxes.agreements.get_nowait()
+        except queue.Empty:
+            return None
+
+    handshake = Handshake(terms=dict(terms), identity=dict(identity))
+    return negotiate_match(
+        handshake=handshake, my_terms=dict(terms), send_offer=client.negotiate,
+        take_offer=take_offer, clock=clock, sleep=sleep, timeout=timeout,
+    )
+
+
 def run_autonomous_match(
     *,
     handshake: Handshake,

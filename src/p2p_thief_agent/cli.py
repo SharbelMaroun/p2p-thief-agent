@@ -58,6 +58,10 @@ def build_parser() -> argparse.ArgumentParser:
                        help="private game.toml holding [network].public_url and "
                        "opponent_url. With it, addresses come from config rather than "
                        "flags, and the tunnel token never reaches a shared file")
+    serve.add_argument("--game", type=Path,
+                       help="the shared byte-identical match JSON. With it, the match "
+                       "is NEGOTIATED before play (signed terms, identity, rule 11); "
+                       "requires --private for this peer's identity")
 
     for name, text in (("replay", "re-verify a stored log and print its banner"),
                        ("verify", "re-verify a stored log; exit non-zero if tampered")):
@@ -147,47 +151,10 @@ def _serve(args: argparse.Namespace) -> int:
 
 
 def _play(args: argparse.Namespace) -> int:
-    """Play one match against the opponent named by `--peer`.
+    """Play one match; the body lives in `adapters/play_command.py` (length gate)."""
+    from p2p_thief_agent.adapters.play_command import play  # noqa: PLC0415
 
-    Separate from listening on purpose: a peer that always played would race an opponent
-    still binding its port; one that never played is what this CLI was until now.
-    """
-    from p2p_thief_agent.adapters.serve import (  # noqa: PLC0415
-        ServeError,
-        resolve_peer,
-        serve_match,
-    )
-    from p2p_thief_agent.orchestration.thief_policy import make_decide  # noqa: PLC0415
-
-    try:
-        peer = resolve_peer(args.peer, args.private)
-    except ValueError as exc:
-        print(f"private config problem: {exc}")
-        return 2
-    if not peer:
-        print("no opponent address: pass --peer URL, or --private with "
-              "[network].opponent_url")
-        return 2
-
-    print(f"Thief on http://{args.host}:{args.port}, playing {peer} ...")
-    # The decide callable carries its honest claim-answerer: both close over the same
-    # position, so the answer given on the wire and the answer that ends our loop can
-    # never disagree — the mismatch the audit would score as a forgery `[AE-021]`.
-    decide = make_decide(threshold=args.threshold)
-    try:
-        result = serve_match(
-            peer_url=peer, port=args.port, host=args.host,
-            survival_threshold=args.threshold, decide=decide,
-            answer_claim=decide.answer_claim,
-            artifacts_dir=args.artifacts,
-        )
-    except ServeError as exc:
-        print(f"match did not start: {exc}")
-        return 2
-    print(f"match finished: {result.outcome} after {result.steps} step(s)")
-    if args.artifacts:
-        print(f"log written to {args.artifacts}")
-    return 0
+    return play(args)
 
 
 def _block_until_interrupted() -> None:

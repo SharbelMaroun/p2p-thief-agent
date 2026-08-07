@@ -670,3 +670,26 @@ one diagnostic, one fix.
 Lesson: **the fix for a strategy problem was two layers below the strategy.** Six attempts
 tuned the policy; the winning change never touched it. The diagnostic that redirected the
 work (feed the failed thing truth) cost two minutes; the six policy attempts cost days.
+
+## 2026-08-08 (iv) — "ok go": the first real match, and why rehearsals beat reasoning
+
+The batch was the local two-process rehearsal. Method first: the code notebook supplied the
+reference's exact offer roster (flat terms + identity + signature + nonce, **no config hash
+on the wire**) — which dissolved the U-024-adjacent fear that our two repos' different
+`config_sha256` conventions would refuse each other: neither needs to send one. The book
+notebook drew the evidence boundary before we could over-claim: a localhost match is an
+engineering rehearsal; the league requires "an accessible address, not only localhost"
+(p. 97/215) plus the GUI/replay screenshots (p. 81/189).
+
+Then the rehearsal found four bugs that fifteen hundred green tests had not: the playable
+path skipped negotiation; the serve receive checked the inbox once instead of waiting; the
+companion replied to a decided game (their survival, our technical loss, 0/0 on
+reconciliation); and our local log hard-coded the winner. Every one was invisible to
+single-process tests because each lives precisely in the seam between two processes that
+no single test harness occupies. Static reading caught the first one before any run; the
+other three each cost one run to name themselves.
+
+Lesson: **a rehearsal is a test whose fixture is reality.** The final run — negotiated,
+35 commit-reveal turns, both sides SURVIVAL at 35, `Verified OK — 35 steps re-verified` —
+is worth more than any number this project has produced, because it is the first one an
+opponent's machine helped compute.
