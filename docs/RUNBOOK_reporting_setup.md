@@ -8,6 +8,29 @@ process should be asked to: the consent screen is the point at which a human dec
 program may do with their mailbox. That is why `M7-013` and `M7-013a` are the only M7 rows
 left deliberately unclaimed.
 
+## 0. Do not reuse a token from another project
+
+Checked on 2026-08-07: an existing `C:\cop-thief-secrets	oken.json` from a different course
+assignment carries the scopes **`gmail.modify`** and **`calendar`**. It has a live refresh
+token and would work, which is precisely why it is worth stopping over.
+
+`gmail.modify` can read, alter and delete mail. Rule 30 asks for send-only, and the wider
+problem is not the rule: a game agent holding read-write access to a personal mailbox could,
+through a bug in an unattended series, touch messages that have nothing to do with this
+course. The report is one outbound message; nothing here needs more.
+
+**The OAuth client (`client_secret.json`) is reusable** — an application registration, not a
+user grant, and its `redirect_uris` already include `http://localhost`. **The token is not.**
+Mint a fresh one with `gmail.send` alone, under a different filename so the other project
+keeps working.
+
+Both files stay **outside every repository**. The send path takes the credential location as
+an argument so the secret never lives beside the code, and `.gitignore` now also covers
+`client_secret*.json` and `*.apps.googleusercontent.com.json` — the console's download name
+matched none of the earlier patterns, so the one file a real user receives was the one that
+could be committed. `test_credential_files_ignored.py` asks Git directly rather than reading
+the pattern list, because what protects the repository is Git's answer.
+
 ---
 
 ## 1. Create the OAuth client

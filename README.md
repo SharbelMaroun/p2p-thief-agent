@@ -1034,6 +1034,97 @@ the list it derives from, silently, while the row that depends on it reads DONE.
 The `M0-006` family closed in the same pass: those rows exist to move the register into the
 report, and closing a disclosure row without touching them was how the gap survived.
 
+#### The live Thief was blind, and would have lied when caught (`M9-026a`, `M9-026b`, 2026-08-08)
+
+Asked to make both agents win, the finding here was worse than a weak strategy: the wire
+adapter `M9-026` wired was the **blind baseline wearing the live loop's clothes**. It called
+`baseline.choose_action` with no threats and no barriers, ignored the Cop's message entirely,
+sent a hard-coded empty `smell_grid` — the exact rule-23 deviation the companion peer fixed on
+its own side on 2026-08-06 — and a constant hint. Every M6 result existed only in the harness
+while the wire played the arm that measures **worse than a random walk** in league points
+(`M6-015c`). `make_decide` now absorbs the Cop's declared barriers and its scent into the
+belief, evades with `choose_evasive_action`, emits the involuntary 5×5 own-trail window, seals
+the real move and position, and claims survival on the threshold step so the opponent
+terminates on our win instead of timing out into a disputed artifact.
+
+Two of the problems hit were audit-fatal rather than strategic. `serve_match` defaulted
+`answer_claim` to `lambda _cell: False` — a standing denial of every correct capture claim,
+which the end-game audit proves from our own sealed positions and rule `[AE-021]` scores as a
+forgery, zero for both sides, where an honest loss still pays 5. And the timing was wrong even
+for an honest answerer: the sub-game loop asks *after* the turn's move is applied, so the claim
+would be tested against the cell we fled to. Claims are now answered from the **pre-move** cell
+by an answerer sharing `decide`'s own closure (an absent answerer refuses to play rather than
+quietly lying), a confirmed capture pins the move to `STAY` so the sealed record shows the cell
+we were caught on, and `claim_response` goes out the same turn, closing the loop that would
+otherwise have left the Cop timing out on a game we recorded as its clean capture.
+
+One measured reversal is recorded on the belief itself: a Bayes-recursive prior (carried and
+multiplied every turn) calcifies on trail history — the companion's opponent grid lost a target
+it tracks perfectly when rebuilt fresh, 40/40 → 0/40 on that change alone. The live loop
+therefore rebuilds belief fresh per observation and carries the prior only across silent turns,
+which is also exactly what the `M6-015` harness arm measures, so the live Thief plays the
+policy the published numbers are about. Still open, deliberately: the anticipating-Cop gap
+(8/24 escapes against a one-step-ahead pursuer, solver ceiling 24/24) — the five failed
+attempts are in `docs/RESEARCH-REPORT-Performance-Analysis.md`, and the companion's new grid
+shows the same phenomenon from the other side: its truth-aimed barrier stack cannot corner a
+distance-plus-mobility evader either. The next attempt should model the pursuer from observed
+moves; nothing tried so far has beaten shipping `distance + mobility`.
+
+#### The sixth attempt fails, and finally says why all six did (`M6-029`, `M6-030`, 2026-08-08)
+
+The "model the pursuer from observed moves" attempt was built and measured the same day it was
+proposed: the three pursuer archetypes are now committed code (`strategy/pursuer_models.py` —
+the report's stronger-Cop rows previously existed only as numbers from scratch code), an exact
+escape solver answers "can the horizon still be reached from here?" perfectly against any of
+them (`strategy/escape_search.py`), and an adaptive policy classifies the pursuer online from
+the believed trajectory and plays the best-fit model's escape set. Committing the models
+corrected the record first: the committed herding and anticipating are stronger than the
+scratch versions, so the shipped policy's honest row is **23/24 greedy, 8/24 herding, 5/24
+anticipating** — not the 23/23/8 published before.
+
+The attempt itself is a measured negative and is **not wired**: argmax-fed it scores 23/4/4
+against shipped's 23/8/5, a top-2 uncertainty set is worse still, and robustness on a larger
+board and a longer horizon agrees. But the diagnostic bought the thing five failures never
+found: **truth-fed, the identical machinery escapes 24/24 against every archetype.** The
+classifier works, the solver is exact, and the whole collapse is the estimator's ~1-cell
+argmax error — an exact escape line re-planned from a wrong cell walks into the real pursuer.
+This refutes the report's own earlier claim that belief was "not wrong enough to explain an
+8/24"; it is exactly wrong enough, and now that is measured rather than argued. Attempt #7
+therefore targets perception, not policy: the emission physics are hash-locked and
+deterministic, so a model-matched likelihood — score candidate cells by how well the whole
+observed window matches the field the model predicts — should localise the emitter to
+near-truth, and the truth-fed row is the measured prize: 240 league points against every
+committed archetype. Unlike attempts one through five, this failure stays reproducible: the
+re-run is one command.
+
+#### The seventh attempt closes it: invert the physics, then plan (`M6-031`, 2026-08-08)
+
+The estimator was rebuilt the same day as a **model-matched emitter decoder**. The locked
+scent physics `τ' = (1−ρ)τ + Δτ` has non-negative terms — the clip never bites — so the
+residual between consecutive observations *is* the newest emission stamp, exactly; matching
+it against the agreed 5×5 profile gives the true emitter cell zero mismatch and its best
+rival at least `(0.9−0.62)²`. Authority was checked before a line was written: the book fixes
+the physics and explicitly frees the inference engine ("a free strategic component expected
+of every team", pp. 48/121, 94/211), and the reference's own `BeliefGrid` runs a
+model-matched observation step — this is the prescribed path taken seriously, not a loophole.
+
+The factorial grid answers cleanly. Decoded belief alone lifts the shipped policy from 5/24
+to 18/24 against the anticipating archetype; the adaptive planner alone (raw belief) is worse
+than shipped; **together they score 24/24 against all three archetypes — 240 of 240 league
+points — and hold 32/32 and 24/24 on the robustness configurations**, equalling the truth-fed
+ceiling as a legal agent. The gap that survived six attempts is closed, not narrowed, and
+both halves are now wired into the live loop with partial-window handling (the wire carries
+5×5 windows, so scoring trusts only cells both observations covered) and a deviation guard: a
+field the model cannot explain anywhere yields explicit no-information rather than a
+confident wrong answer — which is also, incidentally, evidence the opponent is deviating from
+the emission model it hash-locked at negotiation.
+
+What remains honestly open: the committed archetypes place no barriers (a walling pursuer is
+a different class — and the companion's grid shows even its truth-aimed barrier stack cannot
+corner a mobility-aware evader, so that risk leans in the Thief's favour), no live opponent
+has been played, and the decoder's exactness assumes the opponent honours the locked physics;
+a deviator degrades us to a uniform-safe belief and itself toward a rule-23 sanction.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a

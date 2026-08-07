@@ -17,8 +17,7 @@ Three subcommands, each a thin adapter over code that already existed:
 **`build_parser` imports no transport.** Every runtime import is inside the function that
 needs it, so `--version` and `--help` work on a machine where FastMCP is not installed and
 cannot fail for a reason that has nothing to do with what was asked. The companion Cop
-repository settled on the same rule independently; it is one of the few places both CLIs
-agree exactly.
+repository settled on the same rule independently.
 """
 
 from __future__ import annotations
@@ -150,9 +149,8 @@ def _serve(args: argparse.Namespace) -> int:
 def _play(args: argparse.Namespace) -> int:
     """Play one match against the opponent named by `--peer`.
 
-    Separated from listening because they are different intentions, not different flags on
-    one. A peer that always played would race an opponent still binding its port; one that
-    never played is what this CLI was until now.
+    Separate from listening on purpose: a peer that always played would race an opponent
+    still binding its port; one that never played is what this CLI was until now.
     """
     from p2p_thief_agent.adapters.serve import (  # noqa: PLC0415
         ServeError,
@@ -172,10 +170,15 @@ def _play(args: argparse.Namespace) -> int:
         return 2
 
     print(f"Thief on http://{args.host}:{args.port}, playing {peer} ...")
+    # The decide callable carries its honest claim-answerer: both close over the same
+    # position, so the answer given on the wire and the answer that ends our loop can
+    # never disagree — the mismatch the audit would score as a forgery `[AE-021]`.
+    decide = make_decide(threshold=args.threshold)
     try:
         result = serve_match(
             peer_url=peer, port=args.port, host=args.host,
-            survival_threshold=args.threshold, decide=make_decide(),
+            survival_threshold=args.threshold, decide=decide,
+            answer_claim=decide.answer_claim,
             artifacts_dir=args.artifacts,
         )
     except ServeError as exc:

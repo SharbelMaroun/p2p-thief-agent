@@ -41,6 +41,36 @@ name = "private-unconfigured"
 model = "private-unconfigured"
 step_deadline_seconds = 30
 
+# Hardware declaration for Step-0 and the pre-game declaration (rule 24, `inst/:1278`).
+# The book requires signing TRUE specs -- forging forfeits the computational-fairness
+# bonus -- so declare these honestly. `inst/:1278` names them one by one: "Operating
+# System (OS), number of processor cores AND their frequency (CPU), RAM capacity,
+# presence of a graphics card and video memory (GPU/VRAM)".
+#
+# Blank or absent => auto-detected where the standard library can answer truthfully.
+# `cpu_freq_mhz` cannot be read portably, so you must supply it. On Windows:
+#   wmic cpu get MaxClockSpeed
+# or read "Base speed" in Task Manager > Performance > CPU (multiply GHz by 1000).
+[hardware]
+os = ""                # blank => platform.platform()
+cpu_type = ""          # blank => platform.processor(); `cpu` still accepted
+cpu_freq_mhz = 3600    # REQUIRED -- your CPU's base clock in MHz
+cpu_cores = 0          # 0 or absent => os.cpu_count()
+ram_gb = 16            # REQUIRED
+gpu_model = "none"     # REQUIRED; `gpu` still accepted. "none" is a valid answer
+vram_gb = 0            # 0 is valid and means no graphics card
+
+# Where the Gmail send-only token lives (`M7-15`). It MUST be outside this repository:
+# `services/credential_location` refuses a path inside the tree, because a credential
+# under the repo root is one `git add -A` from being published and rule 39's sanction
+# is severe security failure and project failure.
+#
+# The token must grant `gmail.send` and nothing more -- `assert_send_only` refuses a
+# broader grant (rule 30). Mint it with the one-time consent flow in
+# `docs/RUNBOOK_reporting_setup.md`; do NOT reuse a token from another project.
+[reporting]
+credential_path = "C:/path/outside/this/repo/token_p2p_send.json"
+
 [email]
 recipient = "private-unconfigured"
 mode = "draft"

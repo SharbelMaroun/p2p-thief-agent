@@ -608,3 +608,65 @@ elaborate instruction would have caught it; a direct challenge to a claim did.
 **What I would tell the next person.** Ask the sources before writing, verify the answer
 against the primary text before trusting it, and check the thing that reports success
 actually looked at anything. Local green is not green.
+
+## 2026-08-08 — "make them win": the live loop plays the measured policy at last
+
+The prompt was "analyze how my cop and thief plays, and make them win in every game." The
+analysis found the live adapter playing the **blind baseline** — no belief, no barriers,
+empty `smell_grid`, `incoming` ignored — while every published number described a policy the
+wire never ran. Worse were the two audit-fatal defects around capture claims: a default
+`answer_claim` that denied every correct claim (a standing lie rule `[AE-021]` scores as a
+forgery), and a timing hole where even an honest answerer would compare the claim against
+the cell we had already fled to. Both are now closed from one shared closure, answered from
+the pre-move cell, with `claim_response` on the wire the same turn.
+
+Method note: the notebooks were asked *different* questions again (code: how the reference's
+live brains choose moves; book: turn order, scoring rows, strategy restrictions), and the
+book answer — simultaneous commit-reveal — reconciled with the lecturer's "Thief moves
+first" as message order versus move resolution, recorded as `C-025` instead of being treated
+as a contradiction. One measured reversal: Bayes-recursive belief calcifies on trail history
+(the companion's grid lost a tracked target 40/40 → 0/40 on that change alone), so the live
+loop rebuilds belief fresh per observation — which is exactly what the `M6-015` harness arm
+measures, keeping the live policy and the published numbers the same object.
+
+## 2026-08-08 (ii) — the sixth attempt: a negative result that finally localises the gap
+
+Continuation of the "make them win" batch. Method first: both notebooks again, different
+questions — the code notebook confirmed the reference never predicts or adapts ("deliberately
+simple", students "expected to upgrade the strategy"), the book notebook confirmed adaptation
+during play is permitted and *graded* (a success metric, p. 94/211) and that the audit
+"verifies only that an agent kept its commitment... without limiting strategic freedom"
+(pp. 38/101, 59/148). That cleared the design legally before a line was written.
+
+The measurement discipline paid three times. Committing the pursuer archetypes (previously
+scratch code) immediately corrected the published record — the committed herding/anticipating
+are stronger, so shipped's honest row is 23/8/5, not 23/23/8. The grid then killed the sixth
+attempt honestly (23/4/4 argmax-fed; worse with an uncertainty set; worse on robustness
+configs). And the one probe worth all of it: truth-fed, the same machinery escapes **24/24
+against every archetype** — so the planner is provably correct and the entire six-attempt
+graveyard has a single measured cause, the estimator's ~1-cell error. Attempt #7 is therefore
+perception (model-matched scent inversion), with a known measured prize.
+
+Lesson recorded: **when an attempt fails, feed it truth before burying it.** Five previous
+failures were buried with their mechanism unmeasured; the truth-fed probe cost two minutes and
+converted failure #6 from "another dead heuristic" into the diagnosis that redirects #7.
+
+## 2026-08-08 (iii) — attempt #7: invert the physics, bank the ceiling
+
+Sharbel: "yes do attempt 7." Method held: both notebooks, different questions. The code
+notebook revealed the reference's `BeliefGrid` runs diffuse-then-observe with a model-matched
+smell step — which also explained *why* my earlier Bayes-recursion failed (I recursed without
+the diffusion motion model). The book notebook confirmed the physics is a signed contract but
+the inference engine is "a free strategic component expected of every team" (pp. 48/121,
+94/211). Design followed authority, not the other way round.
+
+The result is the cleanest of the project: the residual between consecutive observations is
+exactly the newest emission stamp (non-negative terms, the clip never bites), so profile
+matching localises the emitter with zero error for the true cell. Factorial grid: decoder
+alone 18/24 vs anticipating, planner alone 4/24, **together 24/24/24 — 240 league points,
+robustness included, equal to the truth-fed ceiling as a legal agent.** Six failed attempts,
+one diagnostic, one fix.
+
+Lesson: **the fix for a strategy problem was two layers below the strategy.** Six attempts
+tuned the policy; the winning change never touched it. The diagnostic that redirected the
+work (feed the failed thing truth) cost two minutes; the six policy attempts cost days.

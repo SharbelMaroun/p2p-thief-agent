@@ -49,7 +49,7 @@ def serve_match(
     host: str = "127.0.0.1",
     survival_threshold: int,
     decide: Callable[..., object],
-    answer_claim: Callable[[object], bool] = lambda _cell: False,
+    answer_claim: Callable[[object], bool] | None = None,
     ready_timeout: float = 30.0,
     sleep: Callable[[float], None] = time.sleep,
     artifacts_dir: Path | None = None,
@@ -59,7 +59,19 @@ def serve_match(
     `ready_timeout` exists because the two peers are started by two people who cannot press
     a key at the same instant. Waiting is the normal case, not the error case; only running
     out of patience is an error, and it says which address never answered.
+
+    `answer_claim` may be omitted only when `decide` carries its own honest answerer, as
+    `make_decide`'s does, sharing one position closure. It used to default to
+    `lambda _cell: False` — a standing false denial of every correct capture, which the
+    audit proves from our own sealed positions and scores as a forgery `[AE-021]`. No
+    honest default exists without the position, so an absent answerer refuses to play.
     """
+    if answer_claim is None:
+        answer_claim = getattr(decide, "answer_claim", None)
+    if answer_claim is None:
+        raise ServeError(
+            "serve_match needs an honest answer_claim: pass one, or use a decide "
+            "factory that attaches its own (make_decide does)")
     from p2p_thief_agent.adapters.fastmcp_client import FastMCPClient  # noqa: PLC0415
     from p2p_thief_agent.adapters.fastmcp_server import PeerInboxes  # noqa: PLC0415
     from p2p_thief_agent.adapters.serving import (

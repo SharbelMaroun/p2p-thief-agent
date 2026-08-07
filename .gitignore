@@ -37,3 +37,17 @@ results/generated/
 Thumbs.db
 .idea/
 .vscode/
+
+# Google OAuth client files. Rule 39 (Prohibited) forbids pushing secrets "even if it is
+# private and shared only with the lecturer"; the sanction is severe security failure and
+# project failure. `token.json` and `credentials.json` were already covered, but the Google
+# Cloud console downloads the client as
+# `client_secret_<id>.apps.googleusercontent.com.json`, which matches neither pattern --
+# so the one file a user actually receives from Google was the one that would be committed.
+# Found 2026-08-07 while wiring the reporting credential.
+client_secret*.json
+*client_secret*.json
+*.apps.googleusercontent.com.json
+service_account*.json
+*service-account*.json
+*.pem

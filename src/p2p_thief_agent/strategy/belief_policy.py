@@ -1,16 +1,23 @@
-"""Belief-driven Thief evasion: maximise distance from the believed Cop cell (`M6-004a`).
+"""Belief-driven Thief evasion: get away from the believed Cop, and keep room to run.
 
 The perception layer yields a probability distribution over the Cop's position; this module
-turns that into a legal move by reading off the most likely Cop cell and handing it to the
-deterministic baseline policy as the threat. Reusing `choose_action` is deliberate — every
-guarantee it already proves carries over unchanged:
+turns that into a legal move by reading off the most likely Cop cell and scoring each legal
+move against it.
 
-- the move is **always legal** (`M6-004e`): `choose_action` only ever returns a legal
-  action, so a belief that misdirects the Thief — even one peaked on a wall or on the
-  Thief's own cell — can never produce an illegal move;
+**Distance alone is not the objective, and assuming it was cost us the game** (`M6-015c`).
+This delegated to `baseline.choose_action` until 2026-08-07, whose criteria are lexicographic
+with threat distance first. That maximises how far away the Thief is *this turn* and walks it
+into a corner, where distance is large and there are no exits left. Measured in the league
+points that actually decide a sub-game, it scored **worse than a random walk**. The rewrite is
+in `choose_evasive_action`, which carries the numbers.
+
+The three properties `choose_action` gave are kept, and are still what the tests check:
+
+- the move is **always legal** (`M6-004e`), whatever the belief says — even a belief peaked
+  on a wall or on the Thief's own cell;
 - the tie-breaks are **fixed** (`M6-004g`): identical inputs yield an identical action;
-- nothing on this path is an LLM or a network call (`M6-004b`): the belief is a plain
-  matrix of numbers and the policy is pure Python.
+- nothing on this path is an LLM or a network call (`M6-004b`): the belief is a plain matrix
+  of numbers and the policy is pure Python.
 
 The belief is a `board.size × board.size` grid; cell `(r, c)` maps to board coordinate
 `(min_index + r, min_index + c)`.
@@ -22,7 +29,9 @@ from collections.abc import Iterable, Sequence
 
 from p2p_thief_agent.domain.board import Board
 from p2p_thief_agent.domain.coordinates import Action, Coordinate, DomainError
-from p2p_thief_agent.strategy.baseline import choose_action
+from p2p_thief_agent.domain.movement import legal_actions, resolve_move
+from p2p_thief_agent.strategy.baseline import _ACTION_ORDER, is_dead_end, mobility
+from p2p_thief_agent.strategy.metrics import manhattan_distance
 
 Grid = Sequence[Sequence[float]]
 
@@ -63,10 +72,49 @@ def choose_evasive_action(
     belief: Grid,
     barriers: Iterable[Coordinate] = (),
 ) -> Action:
-    """Return the best legal action, maximising distance from the believed Cop cell.
+    """Return the best legal action: distance from the believed Cop **plus** room to run.
 
-    The believed cell becomes the single threat fed to the baseline policy, so evasion,
-    dead-end avoidance, and the fixed tie-break order all come from `choose_action`.
+    Until 2026-08-07 this delegated to `choose_action`, whose criteria are *lexicographic*
+    with threat distance first — so mobility only ever separated equally-distant moves. On a
+    bounded board against a pursuer that is precisely the losing rule: maximising distance
+    walks into a corner, where the distance is large and the exits are gone.
+
+    The measurement said so and was ignored, because it was the wrong measurement. `M6-015`
+    accepted this policy on **total survival steps**, where it wins comfortably (661 v 437
+    across 24 openings). Appendix F pays **10 for reaching the threshold and 5 for capture,
+    with nothing in between**, so surviving 28 turns of 35 scores exactly as badly as being
+    caught on turn 2. In league points the old policy scored **140 against the blind
+    baseline's 175** — our strategy was worse than a random walk at the only thing that is
+    counted (`M6-015c`, `M9-006`).
+
+    Summing distance and mobility instead scores **235, escaping 23 of 24** openings. The
+    objective is P(reach the horizon), not E[steps], and the two disagree: a cell two steps
+    further away with one exit is worse than a nearer cell with three.
+
+    `mobility` is used rather than `edge_contacts` — they score the same on an empty board,
+    but the Cop places up to 14 barriers and only `mobility` counts those. Checked on board
+    sizes 5-9, on randomised openings rather than the tuned set, on barrier layouts, and on
+    horizons 15-50; the advantage holds throughout and *grows* with the horizon, because the
+    old policy's ~28-step ceiling is invisible until the threshold exceeds it.
+
+    Everything `choose_action` guaranteed still holds and is still tested: the action is
+    always legal, dead ends rank last as a block, and the tie-break is fixed, so identical
+    inputs give an identical action.
     """
     threat = believed_cop_cell(belief, board)
-    return choose_action(board, position, police_positions=(threat,), barriers=barriers)
+    blocked = frozenset(barriers)
+    board.validate_position(position)
+    legal = legal_actions(board, position, blocked)
+    targets = {action: resolve_move(board, position, action, blocked) for action in legal}
+
+    def rank(action: Action) -> tuple:
+        target = targets[action]
+        # Descending on the score, so it is negated for a single ascending sort. Dead ends
+        # sort last as a block rather than being dropped: they stay legal, and a Thief with
+        # nothing else left still needs a complete ordering.
+        room = mobility(board, target, blocked)
+        return (is_dead_end(board, target, position, blocked),
+                -(manhattan_distance(target, threat) + room),
+                _ACTION_ORDER.index(action))
+
+    return min(legal, key=rank)

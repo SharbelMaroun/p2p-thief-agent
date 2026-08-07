@@ -1,65 +1,173 @@
 """Turn this repository's policy into the turn loop's `decide` callable (`M9-026`).
 
-The turn loop wants `(incoming, step) -> (public_message, sealed_record)`. Until now that
-adapter existed **only in the tests**, which is why the CLI could not play a game: the policy
-was finished, the loop was finished, and nothing in production joined them.
+**Until 2026-08-07 this was the blind baseline wearing the live loop's clothes** —
+no belief, no barriers, `incoming` ignored, an empty `smell_grid` (the rule-23
+deviation), no claim answers — while every measured result existed only in the
+harness (`M6-015c`).
 
-**Its home was decided by two tests, not by preference.** It seals, so it cannot live in
-`strategy/` — `test_strategy_sdk.py` refuses a strategy module that imports `protocol`. It
-reaches into the decision module, so it cannot live in `adapters/` either —
-`test_orchestrator_boundary.py` refuses one subsystem importing another directly. Wiring
-subsystems together is what `orchestration/` is for, and both tests said so before this file
-existed anywhere else.
+What the live turn now does, in order:
+
+1. **Absorb** the Cop's message: declared barriers accumulate (disclosure is a truth
+   duty), and its `smell_grid` becomes a **model-matched belief** (`M6-031`): the
+   residual against last turn's observation is the newest emission stamp by the
+   locked physics, and matching it against the agreed profile localises the Cop to
+   near-truth — the upgrade that took the pursuer grid from 23/8/5 escapes to
+   **24/24/24 (240 league points)**. The prior survives only silent turns.
+2. **Answer a capture claim from the cell the claim was about** — the pre-move cell.
+   The sub-game loop calls `answer_claim` *after* this turn's move is applied, so
+   answering from live state would compare the claim against the cell we fled to and
+   deny a true capture; the audit would then prove the denial false and rule `[AE-021]`
+   scores a forgery zero for both sides. A confirmed capture also pins this turn's
+   move to `STAY`: the sealed record must show us on the cell we were caught on.
+3. **Evade** via `choose_adaptive_action` (`M6-030`) — classify the pursuer online,
+   play the best-fit archetype's exact escape set, degrade to the shipped ranking
+   when no model offers an escape. Measured dominant *with* the decoded belief and
+   worse without it, which is why the two ship together or not at all.
+4. **Emit involuntarily**: the own-trail field advances every turn and the wire
+   carries the agreed 5×5 window of it.
+5. **Claim survival** on the threshold step (`win_claim`), so the opponent records
+   our survival instead of timing out into a disputed artifact.
+
+It seals, so it cannot live in `strategy/`; it wires subsystems, which is what
+`orchestration/` is for. State is closed over per factory call (rule 2: no shared
+memory between parties).
 """
 
 from __future__ import annotations
 
+from contextlib import suppress
 
-def make_decide(*, grid_size: int = 7, start: tuple[int, int] = (3, 3)):
-    """Build the turn-loop's `decide` callable from this policy (`M9-026`).
+_WINDOW_RADIUS = 2  # the agreed 5×5 smell window reaches two cells from its centre
 
-    The turn loop wants `(incoming, step) -> (public_message, sealed_record)`. Until now that
-    adapter existed **only in the tests**, which is why the CLI could not play: the policy was
-    finished and nothing in production turned it into a turn.
 
-    It lives in `adapters/`, not `strategy/`, because it **seals** — and
-    `test_strategy_sdk.py` refuses a strategy module that imports `protocol`. Putting it
-    beside the policy would have been the obvious place and a layering violation; the
-    test caught it immediately.
+def make_decide(
+    *,
+    grid_size: int = 7,
+    start: tuple[int, int] = (3, 3),
+    cop_start: tuple[int, int] | None = None,
+    threshold: int | None = None,
+):
+    """Build the turn-loop `decide` callable from the measured evasion policy.
 
-    State is closed over rather than global. Two matches in one process must not share a
-    position, and rule 2 forbids sharing memory between parties at all — a module-level
-    position would be the easiest possible way to violate it by accident.
+    The returned function carries its honest claim-answerer as the attribute
+    ``answer_claim`` so `serve_match` can pass both from one shared closure.
+    `cop_start` sharpens the first belief to the public opening cell (`M6-021`);
+    `threshold` is the negotiated horizon, carried into the planner and the
+    survival `win_claim`.
     """
     from p2p_thief_agent.domain.board import Board  # noqa: PLC0415
-    from p2p_thief_agent.domain.coordinates import Coordinate  # noqa: PLC0415
+    from p2p_thief_agent.domain.coordinates import Action, Coordinate  # noqa: PLC0415
     from p2p_thief_agent.domain.movement import resolve_move  # noqa: PLC0415
-    from p2p_thief_agent.protocol.crypto import seal  # noqa: PLC0415
-    from p2p_thief_agent.strategy.baseline import choose_action  # noqa: PLC0415
+    from p2p_thief_agent.perception.belief import apply_evidence, uniform_belief  # noqa: PLC0415
+    from p2p_thief_agent.perception.emitter_decoder import emitter_likelihood  # noqa: PLC0415
+    from p2p_thief_agent.perception.field import blank_field, deposit  # noqa: PLC0415
+    from p2p_thief_agent.perception.observation import (  # noqa: PLC0415
+        ObservationError,
+        encode_smell_grid,
+        parse_smell_grid,
+    )
+    from p2p_thief_agent.protocol.sealing import (  # noqa: PLC0415
+        StepDecision,
+        build_turn_message,
+        sealed_step_record,
+    )
+    from p2p_thief_agent.strategy.adaptive_policy import (  # noqa: PLC0415
+        PursuerTracker,
+        choose_adaptive_action,
+    )
+    from p2p_thief_agent.strategy.belief_policy import initial_belief  # noqa: PLC0415
+    from p2p_thief_agent.verbal.generation import generate_hint  # noqa: PLC0415
 
     board = Board(size=grid_size)
-    here = {"cell": Coordinate(*start)}
+    state = {
+        "cell": Coordinate(*start),
+        "trail": blank_field(board),
+        "barriers": set(),
+        "belief": (initial_belief(board, Coordinate(*cop_start))
+                   if cop_start is not None else uniform_belief(board.size, board.size)),
+        "answered": None,  # (claimed [row, col], caught) for the loop's answer_claim
+        "tracker": PursuerTracker(threshold if threshold is not None else 35),
+        "seen": None,  # (step, observed cells) — the decoder's previous observation
+    }
+
+    def _absorb(incoming: dict, step: int) -> None:
+        placed = incoming.get("barrier_placed")
+        if isinstance(placed, (list, tuple)) and len(placed) == 2:
+            # A malformed disclosure is ignored, not fatal — our moves must stay legal.
+            with suppress(TypeError, ValueError):
+                state["barriers"].add(Coordinate(int(placed[0]), int(placed[1])))
+        try:
+            observed = parse_smell_grid(incoming.get("smell_grid") or {}, board)
+        except ObservationError:
+            observed = {}
+        if observed:
+            # `M6-031`: invert the locked physics rather than weighting raw intensity.
+            # The residual against last turn's observation IS the newest stamp, and the
+            # window is partial, so scoring trusts only cells both windows covered.
+            before = state["seen"][1] if state["seen"] and state["seen"][0] == step - 1 else None
+            trusted = set(observed) & set(before) if before else None
+            state["belief"] = apply_evidence(
+                uniform_belief(board.size, board.size),
+                emitter_likelihood(board, observed, before, trusted))
+            state["seen"] = (step, observed)
+
+    def _claim_cell(incoming: dict | None) -> list | None:
+        claim = incoming.get("capture_claim") if isinstance(incoming, dict) else None
+        if isinstance(claim, (list, tuple)) and len(claim) == 2:
+            with suppress(TypeError, ValueError):
+                return [int(claim[0]), int(claim[1])]
+        return None
+
+    def _window(cell) -> dict:
+        base_r, base_c = cell.row - board.min_index, cell.col - board.min_index
+        return {
+            (board.min_index + r, board.min_index + c): state["trail"][r][c]
+            for r in range(base_r - _WINDOW_RADIUS, base_r + _WINDOW_RADIUS + 1)
+            for c in range(base_c - _WINDOW_RADIUS, base_c + _WINDOW_RADIUS + 1)
+            if 0 <= r < board.size and 0 <= c < board.size
+        }
 
     def decide(incoming: dict | None, step: int) -> tuple[dict, dict]:
-        action = choose_action(board, here["cell"])
-        # `resolve_move` is what turns a direction into a cell, and it is the same
-        # function `rank_actions` used to rank it — so the move played is the move that
-        # was scored, rather than a second interpretation of the same enum.
-        here["cell"] = resolve_move(board, here["cell"], action, frozenset())
-        cell = here["cell"]
-        payload = {
-            "step": step,
-            "state": f"grid={grid_size}x{grid_size};self=[{cell.row}, {cell.col}];barriers=[]",
-            "position": [cell.row, cell.col],
-            "move": f"MOVE:{getattr(action, 'name', 'STAY')}",
-            # Truthful by default. Rule 22 punishes only the deliberate lie, and a bluffing
-            # baseline would make every match harder to reason about for no measured gain.
-            "verdict": "truth",
-            "hint": "still running",
-        }
-        sealed = seal(payload)
-        message = {"step": step, "sender": "thief", "hint": payload["hint"],
-                   "smell_grid": {}, "commit": sealed["commit"], "timestamp": f"t{step}"}
-        return message, {"payload": payload, **sealed}
+        if isinstance(incoming, dict):
+            _absorb(incoming, step)
+        claim = _claim_cell(incoming)
+        caught = claim == [state["cell"].row, state["cell"].col] if claim else False
+        if claim is not None:
+            state["answered"] = (claim, caught)
 
+        blocked = frozenset(state["barriers"])
+        if caught:
+            action = Action.STAY  # the sealed record must show the cell we were caught on
+        else:
+            action = choose_adaptive_action(board, state["cell"], state["belief"],
+                                            state["tracker"], step, blocked)
+        state["cell"] = resolve_move(board, state["cell"], action, blocked)
+        state["trail"] = deposit(state["trail"], board, state["cell"])
+
+        hint = generate_hint(step, intent="truth")
+        record = sealed_step_record(
+            step=step, board_size=grid_size,
+            position=[state["cell"].row, state["cell"].col],
+            barriers=[[c.row, c.col]
+                      for c in sorted(state["barriers"], key=lambda c: (c.row, c.col))],
+            decision=StepDecision(move=f"MOVE:{action.name}", verdict="truth", hint=hint.text),
+        )
+        message = build_turn_message(
+            step=step, sender="thief", hint=hint.text,
+            smell_grid=encode_smell_grid(_window(state["cell"])),
+            commit=record["commit"],
+            claim_response={"claim": claim, "caught": caught} if claim is not None else None,
+            win_claim={"type": "survival"} if threshold is not None and step >= threshold else None,
+        ).to_dict()
+        return message, record
+
+    def answer_claim(claim: object) -> bool:
+        """Answer from the cell the claim was made against, never the cell we fled to."""
+        answered = state["answered"]
+        normalised = list(claim) if isinstance(claim, (list, tuple)) else claim
+        if answered is not None and answered[0] == normalised:
+            return answered[1]
+        return normalised == [state["cell"].row, state["cell"].col]
+
+    decide.answer_claim = answer_claim
     return decide
