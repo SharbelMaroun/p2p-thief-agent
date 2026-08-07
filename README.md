@@ -1097,6 +1097,34 @@ near-truth, and the truth-fed row is the measured prize: 240 league points again
 committed archetype. Unlike attempts one through five, this failure stays reproducible: the
 re-run is one command.
 
+#### The seventh attempt closes it: invert the physics, then plan (`M6-031`, 2026-08-08)
+
+The estimator was rebuilt the same day as a **model-matched emitter decoder**. The locked
+scent physics `τ' = (1−ρ)τ + Δτ` has non-negative terms — the clip never bites — so the
+residual between consecutive observations *is* the newest emission stamp, exactly; matching
+it against the agreed 5×5 profile gives the true emitter cell zero mismatch and its best
+rival at least `(0.9−0.62)²`. Authority was checked before a line was written: the book fixes
+the physics and explicitly frees the inference engine ("a free strategic component expected
+of every team", pp. 48/121, 94/211), and the reference's own `BeliefGrid` runs a
+model-matched observation step — this is the prescribed path taken seriously, not a loophole.
+
+The factorial grid answers cleanly. Decoded belief alone lifts the shipped policy from 5/24
+to 18/24 against the anticipating archetype; the adaptive planner alone (raw belief) is worse
+than shipped; **together they score 24/24 against all three archetypes — 240 of 240 league
+points — and hold 32/32 and 24/24 on the robustness configurations**, equalling the truth-fed
+ceiling as a legal agent. The gap that survived six attempts is closed, not narrowed, and
+both halves are now wired into the live loop with partial-window handling (the wire carries
+5×5 windows, so scoring trusts only cells both observations covered) and a deviation guard: a
+field the model cannot explain anywhere yields explicit no-information rather than a
+confident wrong answer — which is also, incidentally, evidence the opponent is deviating from
+the emission model it hash-locked at negotiation.
+
+What remains honestly open: the committed archetypes place no barriers (a walling pursuer is
+a different class — and the companion's grid shows even its truth-aimed barrier stack cannot
+corner a mobility-aware evader, so that risk leans in the Thief's favour), no live opponent
+has been played, and the decoder's exactness assumes the opponent honours the locked physics;
+a deviator degrades us to a uniform-safe belief and itself toward a rule-23 sanction.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a

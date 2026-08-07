@@ -253,3 +253,47 @@ localise the emitter to near-truth, and the truth-fed row above is the measured 
 if it does: **24/24 against every committed archetype, 240 league points.** The grid
 re-run is one command because, unlike attempts one through five, the sixth attempt's
 machinery is committed.
+
+## Addendum 2026-08-08 (iii) — the seventh attempt closes the gap: 240/240
+
+Addendum (ii) predicted the prize; this one banks it. The estimator was rebuilt as a
+**model-matched emitter decoder** (`perception/emitter_decoder.py`, `M6-031`): the
+locked physics `τ' = (1−ρ)τ + Δτ` has non-negative terms, so the residual between
+consecutive observations is *exactly* the newest emission stamp, and matching that
+residual against the agreed 5×5 profile localises the emitter — the true cell scores
+zero mismatch, the best rival at least `(0.9 − 0.62)²`. The full factorial grid
+(`scripts/experiment_pursuers.py`, 24 paired perimeter openings):
+
+| arm | greedy | herding | anticipating |
+| --- | ---: | ---: | ---: |
+| shipped policy, raw belief | 23/24 (235) | 8/24 (160) | 5/24 (145) |
+| adaptive policy, raw belief | 23/24 (235) | 4/24 (140) | 4/24 (140) |
+| shipped policy, **decoded belief** | 23/24 (235) | 8/24 (160) | 18/24 (210) |
+| **adaptive policy, decoded belief** | **24/24 (240)** | **24/24 (240)** | **24/24 (240)** |
+| truth-fed ceiling (instrument) | 24/24 | 24/24 | 24/24 |
+
+Robustness agrees where every earlier attempt failed hardest: anticipating at 9×9 —
+**32/32**; at horizon 50 — **24/24** (the raw-belief arms manage 8–10/32 and 4–5/24
+there). The legal agent now equals the truth-fed ceiling on every measured cell, so
+the anticipating-Cop gap that survived six attempts — 8/24 at its best — is **closed,
+not narrowed**, and the factorial design shows both halves were necessary: the
+decoder without the adaptive planner reaches 18/24, the planner without the decoder
+4/24, together 24/24.
+
+Both halves are wired into the live loop (`M9-026a` path): the decoder with
+partial-window handling (the wire carries 5×5 windows, so scoring trusts only cells
+both observations covered, and a stale observation falls back to single-stamp
+matching) and a deviation guard (a field the model cannot explain anywhere yields
+explicit no-information rather than a confident wrong answer — and is, incidentally,
+evidence of a rule-23 deviation). Authority verified before building: the book fixes
+the physics and frees the inference engine (pp. 48/121, 94/211), and the reference's
+own `BeliefGrid` runs a model-matched observation step, so this is the prescribed
+path taken seriously.
+
+**Threats to validity, updated.** Threat 1 ("one Cop") is retired — three committed
+archetypes, factorial arms, robustness configs. What remains: the archetypes place no
+barriers (the companion's grid shows a barrier-using pursuer is a different class —
+its own truth-aimed stack still cannot corner a mobility evader, so the direction of
+that risk favours the Thief), no live opponent has been played, and the decoder's
+exactness assumes the opponent honours the hash-locked emission model — a deviator
+degrades us to the uniform-safe belief, and degrades itself to a rule-23 sanction.

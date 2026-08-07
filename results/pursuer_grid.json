@@ -20,6 +20,26 @@
         "total_steps": 350
       }
     },
+    "adaptive_decoded": {
+      "anticipating": {
+        "escapes": 24,
+        "league_points": 240,
+        "scenarios": 24,
+        "total_steps": 840
+      },
+      "greedy": {
+        "escapes": 24,
+        "league_points": 240,
+        "scenarios": 24,
+        "total_steps": 840
+      },
+      "herding": {
+        "escapes": 24,
+        "league_points": 240,
+        "scenarios": 24,
+        "total_steps": 840
+      }
+    },
     "shipped": {
       "anticipating": {
         "escapes": 5,
@@ -39,6 +59,26 @@
         "scenarios": 24,
         "total_steps": 426
       }
+    },
+    "shipped_decoded": {
+      "anticipating": {
+        "escapes": 18,
+        "league_points": 210,
+        "scenarios": 24,
+        "total_steps": 672
+      },
+      "greedy": {
+        "escapes": 23,
+        "league_points": 235,
+        "scenarios": 24,
+        "total_steps": 810
+      },
+      "herding": {
+        "escapes": 8,
+        "league_points": 160,
+        "scenarios": 24,
+        "total_steps": 446
+      }
     }
   },
   "board": 7,
@@ -51,11 +91,23 @@
         "scenarios": 24,
         "total_steps": 437
       },
+      "adaptive_decoded": {
+        "escapes": 24,
+        "league_points": 240,
+        "scenarios": 24,
+        "total_steps": 1200
+      },
       "shipped": {
         "escapes": 5,
         "league_points": 145,
         "scenarios": 24,
         "total_steps": 475
+      },
+      "shipped_decoded": {
+        "escapes": 18,
+        "league_points": 210,
+        "scenarios": 24,
+        "total_steps": 942
       }
     },
     "anticipating_9x9_h35": {
@@ -65,11 +117,23 @@
         "scenarios": 32,
         "total_steps": 748
       },
+      "adaptive_decoded": {
+        "escapes": 32,
+        "league_points": 320,
+        "scenarios": 32,
+        "total_steps": 1120
+      },
       "shipped": {
         "escapes": 10,
         "league_points": 210,
         "scenarios": 32,
         "total_steps": 786
+      },
+      "shipped_decoded": {
+        "escapes": 28,
+        "league_points": 300,
+        "scenarios": 32,
+        "total_steps": 1022
       }
     }
   },

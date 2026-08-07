@@ -650,3 +650,23 @@ perception (model-matched scent inversion), with a known measured prize.
 Lesson recorded: **when an attempt fails, feed it truth before burying it.** Five previous
 failures were buried with their mechanism unmeasured; the truth-fed probe cost two minutes and
 converted failure #6 from "another dead heuristic" into the diagnosis that redirects #7.
+
+## 2026-08-08 (iii) — attempt #7: invert the physics, bank the ceiling
+
+Sharbel: "yes do attempt 7." Method held: both notebooks, different questions. The code
+notebook revealed the reference's `BeliefGrid` runs diffuse-then-observe with a model-matched
+smell step — which also explained *why* my earlier Bayes-recursion failed (I recursed without
+the diffusion motion model). The book notebook confirmed the physics is a signed contract but
+the inference engine is "a free strategic component expected of every team" (pp. 48/121,
+94/211). Design followed authority, not the other way round.
+
+The result is the cleanest of the project: the residual between consecutive observations is
+exactly the newest emission stamp (non-negative terms, the clip never bites), so profile
+matching localises the emitter with zero error for the true cell. Factorial grid: decoder
+alone 18/24 vs anticipating, planner alone 4/24, **together 24/24/24 — 240 league points,
+robustness included, equal to the truth-fed ceiling as a legal agent.** Six failed attempts,
+one diagnostic, one fix.
+
+Lesson: **the fix for a strategy problem was two layers below the strategy.** Six attempts
+tuned the policy; the winning change never touched it. The diagnostic that redirected the
+work (feed the failed thing truth) cost two minutes; the six policy attempts cost days.
