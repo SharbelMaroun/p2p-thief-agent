@@ -61,6 +61,58 @@ This is stated rather than quietly omitted for the same reason the previous tabl
 visible: an evaluation is only as strong as its opponent, and ours is currently a weak one.
 Improving against anticipation is open work, not a claim already banked.
 
+
+### Against an anticipating Cop: a measured ceiling and five failed attempts
+
+`M6-015c` left the evasion policy at **8/24 escapes (160 points)** against a Cop that chases
+the centroid of the Thief's next legal cells, versus 23/24 against a greedy one. The obvious
+next question is whether that is a policy gap or a property of the board.
+
+**It is a policy gap.** The anticipating Cop is deterministic, so optimal Thief play is a
+finite search over `(cop, thief, step)` and can be solved exactly. Solved:
+
+| Cop | optimal | shipped |
+| --- | ---: | ---: |
+| greedy | 24/24 (240) | 23/24 (235) |
+| herding | 24/24 (240) | 23/24 (235) |
+| **anticipating** | **24/24 (240)** | **8/24 (160)** |
+
+Escape is always available. Sixteen scenarios are left on the table. (The solver knows the
+Cop's exact cell *and its policy*, so this is a generous bound and not reachable by a legal
+agent — the same role the companion Cop's `oracle` arm plays.)
+
+**Five attempts to close it, all measured, all worse than shipping `distance + mobility`:**
+
+| Attempt | vs anticipating |
+| --- | ---: |
+| shipped: `distance + mobility` | **160** |
+| one-ply worst case | 160 (no change — see below) |
+| `+ wall_margin` term, weights swept | 120–160 |
+| true minimax, depth 1–5 | 130–140 |
+| territory (cells we reach first), weights swept | 120 |
+| search against a greedy Cop *model*, depth 2–10 | 130–140 |
+
+Three of those failures are informative rather than merely negative:
+
+* **One ply changed nothing** because `mobility` is constant across the Cop's replies, so the
+  minimum was a fixed offset and the ordering never moved. A search whose evaluation does not
+  vary with the opponent's choice is not a search.
+* **Deeper worst-case minimax got monotonically worse.** Against a perfect pursuer the Thief
+  is lost, so every move evaluates as lost, the tie-break decides, and the policy stops
+  playing to survive the opponent it actually has.
+* **Territory collapsed to 120 — never escaping.** Owning more board is not the objective when
+  the objective is to still exist at turn 35; the Thief traded safety for area.
+
+The belief is not the bottleneck either: the believed Cop cell is exact 64% of the time
+against greedy and 37% against anticipating, with mean error 0.46 and 0.77 cells. Wrong
+enough to punish a ten-ply plan, not wrong enough to explain an 8/24.
+
+**Left open, deliberately.** The gap is real and the ceiling is known; what is missing is a
+policy that exploits a *modelled* opponent without inheriting the model's errors — most
+likely opponent modelling learned from observed moves rather than assumed in advance. Shipping
+any of the five would have made the agent worse, and the numbers are here so the next attempt
+starts from what has already been ruled out.
+
 Appendix F pays the Thief **10 for reaching the survival threshold** and **5 for being
 captured**, both `Fixed`. There is nothing in between. A policy that reliably survives 28 of
 35 turns scores *exactly* what one caught on turn 2 scores.
