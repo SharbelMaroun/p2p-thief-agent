@@ -19,7 +19,12 @@ _GROUP_KEYS = (
     "group_id", "group_name", "members", "repos", "mcp_servers", "llm_model",
     "hardware_spec", "signature",
 )
-_HARDWARE_KEYS = ("cpu_type", "cpu_freq_mhz", "cpu_cores", "ram_gb", "gpu_model", "vram_gb")
+# `inst/:1278` lists **Operating System first**: "Operating System (OS), number of processor
+# cores and their frequency (CPU), RAM capacity, presence of a graphics card and video memory
+# (GPU/VRAM)". `os` was missing here until 2026-08-07 — rule 24 is Mandatory and its sanction
+# is denial of eligibility for computational bonuses, so an incomplete spec costs points.
+# Adding it broke 19 fixtures, which is the evidence the field was genuinely never supplied.
+_HARDWARE_KEYS = ("os", "cpu_type", "cpu_freq_mhz", "cpu_cores", "ram_gb", "gpu_model", "vram_gb")
 
 
 def _require(data: Mapping, keys: Sequence[str], label: str) -> None:

@@ -21,7 +21,7 @@ from p2p_thief_agent.reporting.result_artifact import build_result
 
 ID = MatchIdentity(game_id="disconnected", game_uid="d" * 32)
 COMMIT = "a" * 40
-HARDWARE = {"cpu_type": "x86_64", "cpu_freq_mhz": 3000, "cpu_cores": 8,
+HARDWARE = {"os": "Windows 11", "cpu_type": "x86_64", "cpu_freq_mhz": 3000, "cpu_cores": 8,
             "ram_gb": 16, "gpu_model": "none", "vram_gb": 0}
 AGREEMENT = {"confirmed": False, "opponent_group_id": "vanished", "sha256": "f" * 64}
 SECTIONS = {name: {"k": 1} for name in

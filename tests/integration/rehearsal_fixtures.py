@@ -24,7 +24,7 @@ OUR_GROUP = "sharNamr"
 OPPONENT = "rival"
 COMMIT_HASH = "a" * 40
 TOKEN_LIMIT = 200_000
-HARDWARE = {"cpu_type": "x86_64", "cpu_freq_mhz": 3000, "cpu_cores": 8,
+HARDWARE = {"os": "Windows 11", "cpu_type": "x86_64", "cpu_freq_mhz": 3000, "cpu_cores": 8,
             "ram_gb": 16, "gpu_model": "none", "vram_gb": 0}
 SECTIONS = {name: {"agreed": True} for name in
             ("board_and_agents", "world", "movement_and_barriers", "scoring", "pheromones",

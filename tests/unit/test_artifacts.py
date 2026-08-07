@@ -9,7 +9,7 @@ from p2p_thief_agent.reporting.naming import ArtifactError, MatchIdentity
 from p2p_thief_agent.reporting.result_artifact import build_result
 
 ID = MatchIdentity("g42", "uid-9")
-HARDWARE = {"cpu_type": "x", "cpu_freq_mhz": 3000, "cpu_cores": 8,
+HARDWARE = {"os": "Windows 11", "cpu_type": "x", "cpu_freq_mhz": 3000, "cpu_cores": 8,
             "ram_gb": 16, "gpu_model": "none", "vram_gb": 0}
 
 
@@ -43,7 +43,7 @@ def test_the_declaration_carries_the_documented_top_level_and_shared_uid() -> No
 
 
 def test_a_declaration_group_missing_hardware_is_rejected() -> None:
-    broken = [{**GROUPS[0], "hardware_spec": {"cpu_type": "x"}}, GROUPS[1]]
+    broken = [{**GROUPS[0], "hardware_spec": {"os": "Windows 11", "cpu_type": "x"}}, GROUPS[1]]
     with pytest.raises(ArtifactError, match="hardware_spec missing"):
         build_declaration(identity=ID, groups=broken, num_sub_games=6, max_tokens_per_game=1,
                           timezone="UTC", started_at="t0", ended_at="t1", links={}, github_commit="a" * 40)
