@@ -164,6 +164,37 @@ and that is the game whose evidence gets disputed.
 more wiring step to get wrong. `test_report_precondition.py` exists because that step *was*
 got wrong: the composer accepted a bare result mapping until `M7-005f`.
 
+### 2.6 A silent opponent is recorded as silent — `M7-22f`
+
+The pre-game declaration carries each group's hardware and language model inside that
+group's own entry. Rule 24's sanction is denial of eligibility for the **computational
+bonus**, which chapter 5 introduces by asking whether it is fair for an agent on a mobile
+device to race one running heavy models — a comparison between two machines, which one
+machine's spec cannot express.
+
+The case that mattered was an opponent who declared neither. Until 2026-08-07 a `null` spec
+raised `TypeError` here, so a caller facing a silent peer had two options: drop the group
+from the declaration, or invent a spec for them. **Refusing `null` is what manufactures the
+pressure to fabricate**, and the reference implementation shows where that leads — it
+resolves the opponent as `opp = series.peer_identity or own`, an empty peer identity is
+falsy in Python, and it copies its own hardware and model into the opponent's slot. Its
+sample artifacts show two groups sharing one machine, which reads as a match played on one
+laptop rather than as a defect.
+
+`null` is now accepted, and an `undeclared` array must name exactly what was withheld.
+
+**Gained:** the artifact never states a fact nobody supplied. Rule 38 makes a false
+declaration an absolute disqualification, and "they were probably running something like
+this" is a false declaration. The omission also stays attributable, so rule 24's sanction
+lands on whoever failed to declare.
+**Cost:** the declaration can be incomplete through no fault of ours, and a grader sees a
+gap. The gap is the true state of the exchange; the alternative is a tidy document that is
+wrong.
+
+A present-but-partial spec is still refused. Tolerating an omission is not tolerating a
+malformed one — a spec that was sent and is half-filled is a different fact from one that
+was never sent, and only the second is the peer's silence.
+
 ## 3. Empirical results — `M9-011b`
 
 Measurements, not claims. Protocol, sample sizes and threats to validity are in

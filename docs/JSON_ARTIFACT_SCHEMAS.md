@@ -65,6 +65,20 @@ Both were added to the builders on 2026-08-07 and to this document at the same t
 because `tests/unit/test_artifact_schema_doc.py` refused the mismatch; before that test
 existed the document had already been wrong about both for a day and still read as current.
 
+`llm_model` and `hardware_spec` sit **inside each group entry**, not once at the document
+root. Rule 24's sanction is denial of eligibility for the **computational bonus**, and
+`inst/:1276` frames that as judging whether an agent on a mobile device raced one on a
+machine running heavy models — a comparison between two machines, which one machine's spec
+cannot express. The companion Cop emitted them at the root until 2026-08-07 and now matches.
+
+An opponent that declared neither gets `null` for both, plus an `undeclared` array naming
+what was withheld. Emitting `null` was impossible here until 2026-08-07 — it reached the
+key check and raised `TypeError` — which left a caller facing a silent peer with only two
+options: drop the group, or invent a spec. The reference implementation takes the second
+(`opp = series.peer_identity or own`, where an empty peer identity is falsy), so its samples
+show two groups sharing one machine. Rule 38 makes a false declaration an absolute
+disqualification, so the absence is recorded instead (`M7-22f`).
+
 ## `2-agreed-config.json`
 
 Top level: `_schema`, `schema_version`, `_note`, `agreed_between`, `board_and_agents`,
