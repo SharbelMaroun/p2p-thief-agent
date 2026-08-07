@@ -738,10 +738,10 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M9-009a | Score each guidelines requirement honestly | PENDING | SDK, OOP, gatekeeper, TDD, coverage, linter, secrets, `uv` `[G§19.1]` |
 | M9-009b | Name the requirements not met and why | PENDING | An honest gap costs less than an overclaim |
 | M9-010 | Assemble the league evidence bundle | PENDING | Every counted game's four artifacts, commit hashes, and sent-report proof |
-| M9-010a | Archive the artifact set per counted game | PENDING | Retrievable by `game_id` |
+| M9-010a | Archive the artifact set per counted game | DONE | `reporting/evidence.py` `archive_is_complete` + `missing_evidence`; `test_evidence.py`. Retrievable by `game_id` via `retention.retrieve_config`. Three of four kinds is **not** a set -- the missing one is invariably what an auditor asks for |
 | M9-010b | Record the commit hash that ran each game | DONE | `reporting/provenance.py` (100% branch); `test_provenance.py` (15 tests). **`running_git_commit` existed since `M4-006a` and was called only from tests** -- a correct resolver no production path reached. The reference has the same defect louder: it hard-codes `github_commit` to `"unknown"`. Also reports a **dirty working tree**: `git rev-parse HEAD` answers happily with uncommitted changes, so a resolved hash can be a truthful answer to the wrong question `[AE-53]` |
-| M9-010c | Record proof that each report was sent | PENDING | An unsent report voids that game's points `[AE-32]` |
-| M9-010d | Reconcile declared game counts against the artifact set | PENDING | A false declaration is absolute disqualification `[AE-38]` |
+| M9-010c | Record proof that each report was sent | DONE | `reporting/send_receipt.py` (100% branch); `test_send_receipt.py`. **The book's decisive layer is receipt at the lecturer's address (p.78/183) and we cannot observe it -- only the recipient can.** So the class is `SendReceipt`, not `ProofOfDelivery`, and `as_record()` writes `evidences: API acceptance, not receipt by the lecturer` into the artifact. A response with no message id is refused: afterwards a failed send and an unreceipted send look identical, and only one costs the points. **The reference stores nothing at all** -- its sender returns `{status, reason}` for a CLI line that never reaches the artifacts `[AE-32]` |
+| M9-010d | Reconcile declared game counts against the artifact set | DONE | `EvidenceBundle.reconcile` checks **every** opponent before raising -- rule 38's sanction is absolute disqualification of the project, not something to find one opponent at a time `[AE-38]` |
 | M9-011 | Write the academic report body | PENDING | A scientific document, not an installation guide `[AE-42]` |
 | M9-011a | Justify the architectural decisions and trade-offs | PENDING | ADRs summarised with rationale `[G§20.1]` |
 | M9-011b | Present empirical results, not claims | PENDING | Numbers come from reproducible runs |
@@ -755,8 +755,8 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M9-012e | State the licence and third-party attributions | PENDING | `[G§2.1]` |
 | M9-013 | Run the pre-submission dry run | PENDING | Clone fresh, install frozen, run every gate, run a game, produce artifacts |
 | M9-013a | Verify from a clean clone on a second machine | PENDING | Nothing depends on an untracked local file |
-| M9-013b | Verify every gate passes from that clean clone | PENDING | `G-001`…`G-009` |
-| M9-013c | Verify the replay app validates a real stored match | PENDING | `[AE-20]` |
+| M9-013b | Verify every gate passes from that clean clone | DONE | `scripts/verify_clean_clone.py`, **run 2026-08-07: 8 gates pass on a fresh checkout.** Clones `HEAD` locally, `uv sync --frozen`, then runs G-002/003/004/005/007 plus the two new M9 checks in the clone. **It immediately earned its keep** -- caught two file-length violations that the working tree had not been re-checked for. G-008/G-009 are excluded (a prompt log is reviewed, CI runs on push). Explicitly **not** `M9-013a`: a local clone shares the OS, Python build and uv cache |
+| M9-013c | Verify the replay app validates a real stored match | DONE | `tests/integration/test_replay_of_stored_match.py` (6 tests). A rehearsed series is written as JSON, reloaded **by path alone** (`load_log`, rule 36's mutual-audit posture -- an opponent hands over a file, not an object), and re-verified to `Verified OK`. Every other replay test builds records in memory; `json.dumps`/`loads` is not identity, so a verifier that only sees in-memory dicts can pass forever while every stored log fails. A byte changed **in the file** is detected `[AE-20]` |
 | M9-014 | Verify the four success metrics are demonstrable | PENDING | Coordination, adaptation, integrity, architecture — each with evidence `[book §11.4]` |
 | M9-014a | Evidence coordination | PENDING | Turn management and P2P synchronisation without a judge |
 | M9-014b | Evidence adaptation | PENDING | Belief updating under partial observation |
@@ -779,7 +779,7 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M9-021 | Confirm the league minimums are actually met | PENDING | Two counted games against two different groups, both reported `[AE-31]` |
 | M9-021a | Reconcile our count against each opponent's report | PENDING | Conflicting reports are 0/0 for both `[AE-35]` |
 | M9-022 | Record the final self-assessed code-quality score | PENDING | Against the guidelines' quick-reference card `[G§19.1]` |
-| M9-023 | Verify every emitted artifact is committed | PENDING | Appendix F.2 item 4; nothing exists only on a local disk |
+| M9-023 | Verify every emitted artifact is committed | DONE | `scripts/check_artifacts_committed.py`, asking **Git** rather than the filesystem -- a file on disk and untracked is precisely the state Appendix F obligation 4 prevents, and invisible to `Path.exists()`. **The obligation is narrower than 'commit all four':** config is mandatory (obligation 4, p.140/288), the log has no explicit commit duty but is needed for the Replay threshold (p.129/272), and the result's duty is email (rule 51) |
 | M9-024 | Close out the prompt-engineering log | PENDING | Final entry records the submission pass `[G§8.3]` |
 
 ---

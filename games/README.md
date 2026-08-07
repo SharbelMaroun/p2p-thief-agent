@@ -34,8 +34,22 @@ strategy, LLM, language and credential fields out of the shared config in the fi
 matching on **key names rather than values**. The two rules are satisfiable at once only
 because those guards run before anything reaches this directory.
 
-## What is not here
+## What is not here, and a correction
 
-Logs and results stay under `logs/` and `results/generated/`. Only the config carries the
-Appendix F obligation, and committing per-step logs for every game would put nonces into git
-history — rule 18 keeps those secret until the end of the game, and git history has no end.
+Only the **config** carries the Appendix F obligation (obligation 4, p.140/288). The final
+result's obligation is to be *emailed* (rule 51), and the game log has no explicit commit
+requirement in §9.4.1's minimum-contents list — though it is needed to run the Replay app,
+which is itself a threshold condition for submission (p.129/272). So logs and results are
+retained under `logs/` and `results/generated/` unless a specific game's evidence is being
+promoted deliberately.
+
+**An earlier version of this file gave the wrong reason for that.** It said committing logs
+would put nonces into git history, "and git history has no end". That reasoning is wrong.
+Rule 18 (`inst/:3354`) requires the nonce secret **until the end of the game**, and the book
+defines Step 4 as the Final Reveal: "Only at the end of the game are all values, including
+the Nonce, revealed for a full mutual audit" (`inst/:1136`, `:1155`). Once the game ends the
+secrecy obligation *expires* — the revealed nonces are precisely what lets a third party
+recompute every commitment, which is the point of publishing them.
+
+Committing a **finished** log is therefore permitted. What is still forbidden is building or
+sharing a log while the game is in play, which `build_log` refuses by requiring `ended_at`.

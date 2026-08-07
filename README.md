@@ -968,6 +968,47 @@ requirement, reporting every gap at once. It checks **presence, never quality** 
 Dec-POMDP section is any good is a human judgement; whether it survived the last refactor is
 not, and that is the question worth asking automatically.
 
+#### The evidence bundle, and a correction the notebooks forced (`M9-010`, `M9-023`, 2026-08-07)
+
+**A claim in `games/README.md` was wrong, and the book says so plainly.** That file justified
+not committing game logs on the grounds that doing so would publish nonces, "and git history
+has no end". Rule 18 (`inst/:3354`) keeps a nonce secret **until the end of the game**, and
+the book defines Step 4 as the Final Reveal: "Only at the end of the game are all values,
+including the Nonce, revealed for a full mutual audit" (`inst/:1136`, `:1155`). The
+obligation *expires*. Revealed nonces are exactly what lets a third party recompute every
+commitment — publishing them is the point. Corrected there, and the real reason recorded:
+logs are not committed wholesale because no rule asks for it, not because doing so would leak.
+
+That also narrowed `M9-023`. "Verify every emitted artifact is committed" reads as all four;
+the book's obligations differ per artifact. The **config** is mandatory (Appendix F obligation
+4, p.140/288). The **log** has no explicit commit duty but is needed to run the Replay app,
+which rule 20 makes a threshold condition. The **result**'s duty is to be emailed (rule 51).
+A checker that demanded all four would have failed the submission for satisfying the rules.
+
+**"Proof the report was sent" cannot mean what it sounds like.** The book's decisive layer is
+receipt at the lecturer's address (p.78/183) — "if a report is not received from one of the
+sides, that side will not be credited for the game" — and a sender cannot observe receipt.
+Only the recipient can. So the class is `SendReceipt`, not `ProofOfDelivery`, and every
+record it writes carries `evidences: API acceptance, not receipt by the lecturer`. Overstating
+this in an artifact would be a claim the lecturer's own inbox could contradict. The reference
+implementation records nothing at all here: its sender returns `{status, reason}` for a CLI
+line that never reaches the four artifacts.
+
+**The clean-clone runner earned its keep on its first run.** Every gate passed in the working
+tree; `verify_clean_clone.py` clones `HEAD`, installs from the lockfile with `uv sync
+--frozen`, and re-runs them there — and immediately failed on two file-length violations. The
+value is not cleverness, it is that a clone contains only what was committed, so a gate
+script living untracked in a working tree cannot hide. Eight gates now pass on a fresh
+checkout. It is deliberately **not** `M9-013a`: a local clone shares the OS, the Python build
+and the uv cache, so it catches missing files and lockfile drift, never platform breakage.
+
+**The replay row closes the loop a grader closes.** Every other replay test builds records in
+memory. `test_replay_of_stored_match.py` plays a series, writes it as JSON, reloads it **by
+path alone**, and re-verifies to `Verified OK` — then changes a byte in the file and confirms
+`TAMPERED`. `json.dumps`/`loads` is not identity, and the commitment is over canonical bytes,
+so a verifier that only ever sees in-memory dicts can pass forever while every stored log
+fails. The first person to notice would have been whoever opened the submission.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
