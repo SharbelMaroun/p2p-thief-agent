@@ -222,6 +222,12 @@ The gates enforce the standards, so a change that passes CI already meets them:
 The graded report has six sections. Sections needing a completed match are marked
 blocked rather than filled with claims we cannot show.
 
+The full academic report body — the formalism in LaTeX, every architectural decision with
+what it cost, and the measured results — is in [docs/ACADEMIC_REPORT.md](docs/ACADEMIC_REPORT.md).
+Quality evidence against ISO/IEC 25010 and the book’s four success metrics is in
+[docs/QUALITY_EVIDENCE.md](docs/QUALITY_EVIDENCE.md); the honest scoring is in
+[docs/SELF_ASSESSMENT.md](docs/SELF_ASSESSMENT.md).
+
 ### 1. The Dec-POMDP model
 
 The game is a **decentralised, partially observable Markov decision process**.

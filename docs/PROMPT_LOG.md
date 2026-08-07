@@ -572,3 +572,39 @@
 - **Problem hit — the book notebook fabricated the emission table.** It reported that Figure 4 prints all 25 cells, with diagonals `0.42` and the unnamed ring `0.14`, and stated outright that no cell is unspecified. `inst/police_thief_p2p_Summary.md:947-955` contradicts every part: five classes, 17 cells, diagonals `0.20`. It had been asked explicitly not to infer or interpolate. Taking it would have overwritten a correct table in both repositories — and the tests would have been rewritten alongside it, so nothing would have caught it.
 - **What was NOT changed:** `min_center_intensity`. The reference **requires** it and `validate_agreement` fail-fast aborts without it, while this peer still refuses an offer carrying it (`U-023`). That is a real mutual incompatibility with any simulator-built classmate, but it is a separate authority question and bundling it into a scent change would have buried it.
 - **Lesson:** verifying a notebook answer against `inst/` is step 4 for a reason, and the reason is not thoroughness — it is that a wrong answer arrives in exactly the same confident shape as a right one. Beyond that: an unknown no source can answer is not a blocked task but a design input. `U-025` was never waiting on a ruling; the book had already said to negotiate the model and lock it.
+
+---
+
+## Closeout — what prompting actually taught this project (`M9-024`)
+
+Written at the end of M9 rather than as a running note, because the pattern only became
+visible across batches. Four lessons, each paid for.
+
+**1. The eight-step method exists because skipping step 3 is invisible until it is expensive.**
+The costly failures were never wrong code — they were work built on an assumption nobody had
+checked. `M7-014c`'s base64url trap, Appendix F obligation 4, the fact that ISO/IEC 25010 is
+not in the book at all: each came from asking, and none would have surfaced from reading our
+own repository. The batch where I ran steps 3 and 4 once and then wrote three waves on that
+one answer is the batch that shipped the shallow-clone false negative.
+
+**2. A notebook answer is a lead, not a source.** Step 4 exists because the book notebook has
+fabricated at least twice — an emission table that does not exist, and prose that contradicts
+its own formula. The scent decay is the sharpest case: `inst/:930` says $(1-\rho)$ "reduces
+by 90%" while the formula beside it retains 90%. Implementing the prose would have decayed
+ten times too fast. Verifying against `inst/` caught it; trusting the summary would not have.
+
+**3. Asking two notebooks different questions is worth more than asking one twice.** The book
+answers *what is required*; the code notebook answers *what the reference does*. The most
+useful findings came from the gap between them — the reference hard-codes `github_commit` to
+`"unknown"` while rule 53 makes it Mandatory; the reference commits no artifacts while
+Appendix F obligation 4 requires the config. Neither notebook could have told me that alone.
+
+**4. The prompt that produced the most value was the shortest.** "in the commits you done,
+there is a commit at least that faild the github actions." I had reported green twice from
+local runs. That prompt found four red builds and, underneath them, a security gate reporting
+"0 findings" on a shallow clone — 441 objects where a full clone has 1744. No amount of
+elaborate instruction would have caught it; a direct challenge to a claim did.
+
+**What I would tell the next person.** Ask the sources before writing, verify the answer
+against the primary text before trusting it, and check the thing that reports success
+actually looked at anything. Local green is not green.
