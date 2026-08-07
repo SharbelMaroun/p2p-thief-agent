@@ -19,13 +19,60 @@ _GROUP_KEYS = (
     "group_id", "group_name", "members", "repos", "mcp_servers", "llm_model",
     "hardware_spec", "signature",
 )
-_HARDWARE_KEYS = ("cpu_type", "cpu_freq_mhz", "cpu_cores", "ram_gb", "gpu_model", "vram_gb")
+# `inst/:1278` lists **Operating System first**: "Operating System (OS), number of processor
+# cores and their frequency (CPU), RAM capacity, presence of a graphics card and video memory
+# (GPU/VRAM)". `os` was missing here until 2026-08-07 — rule 24 is Mandatory and its sanction
+# is denial of eligibility for computational bonuses, so an incomplete spec costs points.
+# Adding it broke 19 fixtures, which is the evidence the field was genuinely never supplied.
+_HARDWARE_KEYS = ("os", "cpu_type", "cpu_freq_mhz", "cpu_cores", "ram_gb", "gpu_model", "vram_gb")
 
 
 def _require(data: Mapping, keys: Sequence[str], label: str) -> None:
     missing = [key for key in keys if key not in data]
     if missing:
         raise ArtifactError(f"{label} missing fields: {sorted(missing)}")
+
+
+def _check_disclosure(group: Mapping, *, ours: bool) -> None:
+    """Rule 24 for us, `null` permitted for a peer that declared nothing (`M7-22f`).
+
+    **Ours** must carry a complete spec: rule 24 is Mandatory and its sanction is denial of
+    eligibility for the computational bonus, which `inst/:1276` describes as the mechanism
+    for judging whether a phone raced a workstation fairly.
+
+    **Theirs may be `null`**, and until 2026-08-07 it could not be — a `None` spec reached
+    `_require` and died on `TypeError: argument of type 'NoneType' is not iterable`. That
+    left a caller holding a peer that declared nothing with two options: drop the group, or
+    invent a spec. The reference implementation takes the second, resolving it as
+    `opp = series.peer_identity or own` — an empty peer identity is falsy, so it copies its
+    **own** hardware and model into the opponent's slot, and its sample artifacts show two
+    groups sharing one machine.
+
+    That is a false statement in an artifact rule 38 makes an absolute disqualification to
+    falsify. Refusing `null` here is what creates the pressure to make one, so `null` is
+    accepted and `undeclared` names what was withheld — the omission stays theirs, legible,
+    and rule 24's sanction lands where it belongs. The companion Cop reached the same
+    resolution from the same finding.
+    """
+    spec, model = group.get("hardware_spec"), group.get("llm_model")
+    if ours:
+        if not isinstance(spec, Mapping) or not isinstance(model, str) or not model:
+            raise ArtifactError(
+                "our group must declare llm_model and hardware_spec; rule 24 is Mandatory "
+                "and forfeits the computational bonus [AE-24]")
+        _require(spec, _HARDWARE_KEYS, "hardware_spec")
+        return
+    if spec is not None:
+        if not isinstance(spec, Mapping):
+            raise ArtifactError("a peer hardware_spec must be an object or null")
+        _require(spec, _HARDWARE_KEYS, "hardware_spec")
+    withheld = [name for name, value in (("llm_model", model), ("hardware_spec", spec))
+                if value is None]
+    if withheld and sorted(group.get("undeclared") or []) != sorted(withheld):
+        raise ArtifactError(
+            f"group {group['group_id']!r} withheld {sorted(withheld)}, so the entry must "
+            "carry `undeclared` naming exactly those. Recording the absence is what keeps "
+            "us from filling it in [AE-38]")
 
 
 def build_declaration(
@@ -53,9 +100,9 @@ def build_declaration(
     if not isinstance(github_commit, str) or len(github_commit) < 7:
         raise ArtifactError(
             "declaration needs the commit hash of the code that played this game [AE-53]")
-    for group in groups:
+    for index, group in enumerate(groups):
         _require(group, _GROUP_KEYS, "declaration group")
-        _require(group["hardware_spec"], _HARDWARE_KEYS, "hardware_spec")
+        _check_disclosure(group, ours=index == 0)
     return {
         "_schema": "declaration",
         "schema_version": SCHEMA_VERSION,

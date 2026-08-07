@@ -43,7 +43,7 @@ SECRET_SHAPES = (
     (r"(?i)\b(password|passwd|api[_-]?key)\s*[:=]", "an inline password or key"),
 )
 
-HARDWARE = {"cpu_type": "x86_64", "cpu_cores": 8, "cpu_freq_mhz": 3600,
+HARDWARE = {"os": "Windows 11", "cpu_type": "x86_64", "cpu_cores": 8, "cpu_freq_mhz": 3600,
             "ram_gb": 16, "gpu_model": "none", "vram_gb": 0}
 
 

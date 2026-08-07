@@ -41,12 +41,43 @@ Observed SHA-256 values:
 
 Top level: `_schema`, `schema_version`, `declaration_type`, `game_id`, `game_uid`,
 `links`, `timezone`, `game_started_at`, `game_ended_at`, `num_sub_games`,
-`max_tokens_per_game`, `groups`.
+`max_tokens_per_game`, `groups`, `github_commit`.
 
 Each group: `group_id`, `group_name`, `members`, `repos`, `mcp_servers`, `llm_model`,
 `hardware_spec`, `signature`.
 
-Hardware: `cpu_type`, `cpu_freq_mhz`, `cpu_cores`, `ram_gb`, `gpu_model`, `vram_gb`.
+Hardware: `os`, `cpu_type`, `cpu_freq_mhz`, `cpu_cores`, `ram_gb`, `gpu_model`,
+`vram_gb`.
+
+Two of those are **ours, not the template's**, and the difference matters when comparing
+these bytes against an opponent's:
+
+- `github_commit` is required by rule 53 — the commit hash of the code that played the
+  series. The examples do not carry it at declaration level; they carry a per-sub-game
+  `github_commit` in `4-final-result.json`, which answers a different question. A grader
+  reading only the examples would not find the series-level one.
+- `os` leads the specification list at `inst/:1278` — "Operating System (OS), number of
+  processor cores and their frequency (CPU), RAM capacity, presence of a graphics card and
+  video memory (GPU/VRAM)". The examples omit it. Rule 24 is Mandatory and its sanction is
+  denial of eligibility for the computational bonus, so the book wins over the template here.
+
+Both were added to the builders on 2026-08-07 and to this document at the same time only
+because `tests/unit/test_artifact_schema_doc.py` refused the mismatch; before that test
+existed the document had already been wrong about both for a day and still read as current.
+
+`llm_model` and `hardware_spec` sit **inside each group entry**, not once at the document
+root. Rule 24's sanction is denial of eligibility for the **computational bonus**, and
+`inst/:1276` frames that as judging whether an agent on a mobile device raced one on a
+machine running heavy models — a comparison between two machines, which one machine's spec
+cannot express. The companion Cop emitted them at the root until 2026-08-07 and now matches.
+
+An opponent that declared neither gets `null` for both, plus an `undeclared` array naming
+what was withheld. Emitting `null` was impossible here until 2026-08-07 — it reached the
+key check and raised `TypeError` — which left a caller facing a silent peer with only two
+options: drop the group, or invent a spec. The reference implementation takes the second
+(`opp = series.peer_identity or own`, where an empty peer identity is falsy), so its samples
+show two groups sharing one machine. Rule 38 makes a false declaration an absolute
+disqualification, so the absence is recorded instead (`M7-22f`).
 
 ## `2-agreed-config.json`
 

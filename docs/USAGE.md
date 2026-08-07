@@ -2,17 +2,21 @@
 
 Covers `M9-012`, `M9-012a`…`M9-012e`.
 
-## Read this first — what cannot be run yet
+## What runs, and what still does not
 
-**There is no command-line runtime for the agent.** `p2p-thief` exposes `--help` and
-`--version` and nothing else; its own description says "no peer runtime is implemented". A
-grader who clones this repository **cannot start a game from a terminal**.
+`M9-025` closed on 2026-08-07: **the agent now has a command-line runtime.** `p2p-thief
+serve` starts this peer's mailbox, and `p2p-thief replay` / `verify` re-check a stored match
+from a terminal — rule 20's threshold condition, without opening a test file.
 
-The game logic is complete and exercised — a full six-sub-game series runs in
-`tests/integration/`, two real OS processes play each other over localhost, and the replay
-verifier re-checks a match read off disk. What is missing is the thin layer that turns that
-into `p2p-thief peer --role thief`. Recorded as `M9-025`, not written around: everything
-below documents what genuinely runs today.
+**Still not possible from the command line: playing a full counted game.** `serve` binds the
+mailbox and waits; it does not negotiate terms and start a series on its own. That is
+deliberate rather than unfinished — this peer *opens* every turn cycle, since the book gives
+the Thief the first move, so a launcher that began playing the moment it started would race
+an opponent still binding its own port. Terms have to be negotiated before there is an
+address to open against.
+
+Until that handshake is wired, a full series runs through `tests/integration/`, which is
+where it is exercised today.
 
 ## System requirements — `M9-012a`
 
@@ -33,13 +37,40 @@ uv sync --frozen
 `--frozen` is deliberate: it installs exactly `uv.lock` and fails rather than silently
 resolving a newer dependency. A run that resolves freely is not the run the gates passed.
 
-## What you can run today — `M9-012b`
+## Run modes and flags — `M9-012b`
+
+### The peer
+
+```bash
+uv run p2p-thief serve                      # bind 127.0.0.1:8801, wait for an opponent
+uv run p2p-thief serve --port 8802          # a second peer on one machine
+uv run p2p-thief serve --host 0.0.0.0       # reachable off-machine; loopback is the default
+uv run p2p-thief serve --name my-thief      # the name reported to the peer
+```
+
+The bind default is **loopback, not `0.0.0.0`**: exposing a mailbox to the network should be
+something you typed, not something you inherited.
+
+### Verifying a match — rule 20
+
+```bash
+uv run p2p-thief replay --log logs/log_demo_g01.json    # prints the banner
+uv run p2p-thief verify --log logs/log_demo_g01.json    # silent; exit 1 if TAMPERED
+```
+
+`replay` prints the `Verified OK` / `TAMPERED` banner — this is the source of the screenshot
+p.81/189 calls absolute mandatory. `verify` is the same check with an exit code instead of
+output, so it can sit in a pipeline. Both load **by path**, which is rule 36's mutual-audit
+posture: they work unchanged on an opponent's log.
+
+Exit codes are distinct on purpose: `0` verified, `1` tampered, `2` could not be read. An
+operator seeing `1` should reach for the evidence; seeing `2`, for their shell history.
 
 ### The package itself
 
 ```bash
-uv run p2p-thief --help          # scaffold help
-uv run p2p-thief --version       # package version
+uv run p2p-thief --help
+uv run p2p-thief --version       # works with no transport installed
 ```
 
 ### Quality gates

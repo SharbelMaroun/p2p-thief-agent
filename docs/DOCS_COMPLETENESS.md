@@ -1,72 +1,75 @@
 # Documentation Completeness
 
-Status: reviewed 2026-07-28. Supersedes the 2026-07-25 M0–M1 scaffold review, which
-described a repository that no longer exists: it predated the M2 domain, the baseline
-strategy, and three further Cop contract candidates.
+Presence and content maturity are separate. Every document in `docs/` is listed below
+with its current maturity.
 
-Presence and content maturity are separate. A present document may remain gated where
-contract or runtime evidence is unavailable.
+**This table is checked, not maintained by hand.**
+`scripts/check_ledger_consistency.py` (`G-010`) fails if a document exists without a row,
+or a row claims a file that is not in the tree. It found **29 missing rows** on
+2026-08-07: the table was last reviewed 2026-07-28, when the repository was still an M1
+scaffold, and every row still in it was individually accurate — which is why the gap
+survived. That is the argument for the check rather than for another careful pass.
 
-| Artifact | Present | Current maturity | Completion gate |
-|---|---:|---|---|
-| Root `README.md` | Yes | M1 install/status guide | Add runtime usage and academic evidence after implementation |
-| `docs/PRD.md` | Yes | M1 requirements and acceptance criteria | Expand only with confirmed or accepted behavior |
-| `docs/PLAN.md` | Yes | Gated architecture plan and ADR index | Accept contract ADRs before protocol work |
-| `docs/TODO.md` | Yes | Active owned/prioritized task ledger | Update status as gates pass |
-| Contract review and handoff checklist | Yes | Original/revised candidates reviewed; provisional-copy inputs fail closed | Complete Stage A only from an explicit coordinator authorization |
-| Book/template reconciliation | Yes | Book-confirmed rules separated from generated-example observations | Recheck against any authenticated Moodle templates or dated announcements |
-| Proposed gate-resolution review | Yes | Simulator mechanics and supplied constants separated from coordinator acceptance | Update only after a pinned coordinator handoff or authenticated lecturer evidence |
-| Mechanism PRDs | Yes | Confirmed boundaries plus open details | Close each mechanism's named unknowns |
-| `docs/PROMPT_LOG.md` | Yes | Current through P-018; P-012–P-016 are reconstructed, not transcribed | Append significant AI-assisted work as it happens, not in arrears |
-| `docs/ADR_STATUS_REVIEW.md` | Yes | Inventory of the nine live ADRs: 6 `Pending`, 3 `Proposed`, 0 accepted. ADR-0006 was superseded on 2026-07-29 and archived | Decide the locally decidable ADRs; the rest need external input |
-| `docs/TEAM_INFO.md` | Yes | Identity confirmed 2026-07-28; `U-016` closed | Nothing outstanding |
-| `pyproject.toml` / `uv.lock` | Yes | Independently installable M1 scaffold | Keep uv lock and metadata current |
-| `src/` / `tests/` / `scripts/` | Yes | M2 core domain, M3 local state and scoring, the baseline strategy, and the simulator-conformant protocol layer, all behind the SDK; **241 tests at 99.71% branch coverage** (re-measured end of day 2026-07-31) | Add live runtime and transport behavior through TDD after the contract gate |
-| Thief conformance profile | Partly | Copy model superseded 2026-07-28 under `THIEF-002`; four Cop candidates were reviewed and none was ever copied. The profile is now **authored and adopted** as `SIM_WIRE_PROTOCOL.md` (2026-07-29), but the neutral-stub evidence was retired with the old Option-B profile and not rebuilt, so the checker correctly remains `PENDING` | Re-prove the adopted profile against an independent stub (`M1-015`–`M1-017`), then obtain profile acceptance |
-| Active shared/private runtime config | No | Intentionally absent | ADR-0004 plus accepted contract |
-| Runtime, GUI, replay, Gmail evidence | No | Out of M1 scope | Later gated milestones |
+Gate-scoped verification records (`M1_VERIFICATION.md`, `M2_DOMAIN.md`,
+`M3_LOCAL_STATE.md`), the coordinator verdict, the Stage-C acceptance and the gate
+resolution review are deliberately excluded: they record a moment rather than a current
+state, so a "current maturity" for them would have to be re-dated forever.
 
-## Mechanism coverage
+| Artifact | Present | Current maturity |
+|---|---:|---|
+| `README.md` | Yes | The graded entry point: six-section academic report, quick start, gates, companion link |
+| `docs/ACADEMIC_REPORT.md` | Yes | Long-form report — formalism, architecture decisions, measured results, three disclosed source contradictions |
+| `docs/PRD.md` | Yes | Milestone goals, non-goals and acceptance, behaviour-free |
+| `docs/PLAN.md` | Yes | M0-M9 gates with per-gate status, now held to `TODO.md` by `check_ledger_consistency.py` |
+| `docs/TODO.md` | Yes | The single Thief-owned task ledger |
+| `docs/PRD_commit_reveal.md` | Yes | SHA-256 commit-reveal, canonical bytes, and the post-game audit |
+| `docs/PRD_scent_belief.md` | Yes | Scent physics, the public observation, and Thief-local belief |
+| `docs/PRD_strategy.md` | Yes | Evasion policy and the survival baseline |
+| `docs/PRD_p2p_mcp.md` | Yes | FastMCP peer roles and the negotiated wire |
+| `docs/PRD_gatekeeper_reporting.md` | Yes | Rate limiting, report delivery and the JSON attachment |
+| `docs/PRD_gui.md` | Yes | Local-truth GUI boundary |
+| `docs/PRD_replay.md` | Yes | Verified/tampered replay semantics and the mandatory banner |
+| `docs/SIM_WIRE_PROTOCOL.md` | Yes | The reference's actual wire, recorded separately from what the book requires (`C-022`) |
+| `docs/JSON_ARTIFACT_SCHEMAS.md` | Yes | The four artifact shapes as emitted, held to the builders by `tests/unit/test_artifact_schema_doc.py` (`M1-025`) |
+| `docs/ADR-0009-peer-launch.md` | Yes | Peer launch decision (sits beside `adr/` for historical reasons) |
+| `docs/adr/README.md` | Yes | How ADRs are numbered and what each status means |
+| `docs/SOURCE_OF_TRUTH.md` | Yes | The authority order every other document resolves against |
+| `docs/SOURCE_INVENTORY.md` | Yes | What each source is and what it may be used for |
+| `docs/SPECIFICATION_CONFLICTS.md` | Yes | `C-nnn` source contradictions and how each was resolved |
+| `docs/UNKNOWN_REQUIREMENTS.md` | Yes | `U-nnn` open questions and what each blocks; `U-024`, `U-033`, `U-034` registered 2026-08-07 |
+| `docs/REQUIREMENTS_LEDGER.md` | Yes | Requirements with their authority and test impact |
+| `docs/PARAMETERS_BASELINE.md` | Yes | Appendix F values as Fixed / Minimum / Negotiable |
+| `docs/SIMULATOR_BASELINE.md` | Yes | What the reference does, kept separate from what the book requires |
+| `docs/BOOK_TEMPLATE_RECONCILIATION.md` | Yes | Where the book and the example templates disagree |
+| `docs/SHARED_CONTRACT_POLICY.md` | Yes | How the shared bundle may change and who may accept a change |
+| `docs/SHARED_REQUIREMENT_BASELINE.md` | Yes | Requirements both peers must satisfy identically |
+| `docs/CONTRACT_HANDOFF_CHECKLIST.md` | Yes | What a contract handoff must carry before it can be accepted |
+| `docs/CONTRACT_REVIEW.md` | Yes | Review of the candidate contract against the book |
+| `docs/OPTION_B_INTEROP_DECISION.md` | Yes | The Option-B interoperability decision and its cost |
+| `docs/INTERFACE_REVIEW.md` | Yes | The SDK surface and its import boundaries |
+| `docs/VERIFICATION_POLICY.md` | Yes | What counts as evidence, and what may never be claimed without it |
+| `docs/QUALITY_EVIDENCE.md` | Yes | Gate-by-gate evidence: ruff, coverage, file lengths, secrets, history scan |
+| `docs/SELF_ASSESSMENT.md` | Yes | Grade self-assessment against the published rubric |
+| `docs/REPOSITORY_AUDIT.md` | Yes | Structure and content audit against the book's chapter 9 requirements |
+| `docs/SUBMISSION_CHECKLIST.md` | Yes | What must be true before the annotated tag is made (`scripts/check_submission_tag.py` checks the tag itself) |
+| `docs/USAGE.md` | Yes | How to run the peer, the replay verifier and the gates |
+| `docs/HANDOVER.md` | Yes | What a new maintainer needs to know first |
+| `docs/RUNBOOK_reporting_setup.md` | Yes | Reporting setup, with credentials kept out of the repository |
+| `docs/TEAM_INFO.md` | Yes | Group identifier, team code and members |
+| `docs/PROMPT_LOG.md` | Yes | Historical provenance and correction entries |
+| `docs/RESEARCH-REPORT-Performance-Analysis.md` | Yes | Measured performance study |
+| `docs/ADR_STATUS_REVIEW.md` | Yes | A pass over every ADR status; kept because the statuses are deliberately unaccepted |
+| `docs/DOCS_COMPLETENESS.md` | Yes | This table |
+| `docs/adr/0001-mcp-contract.md` | Yes | MCP contract names. Pending |
+| `docs/adr/0002-message-envelope-and-idempotency.md` | Yes | Message envelope and idempotency. Pending |
+| `docs/adr/0003-schema-version-discrepancy.md` | Yes | Schema version `1.1` vs `1.2` (`C-008`). Pending — held rather than normalised |
+| `docs/adr/0004-shared-json-private-toml.md` | Yes | Shared JSON / private TOML boundary. Pending — this is what keeps tunnel tokens out of negotiated files |
+| `docs/adr/0005-scent-model.md` | Yes | Multiplicative scent against the reference's subtractive decay. Pending |
+| `docs/adr/0007-llm-movement-policy.md` | Yes | LLM movement stays disabled, with rule 25's recommendation status preserved. Proposed |
+| `docs/adr/0008-simulator-reuse-and-license.md` | Yes | Simulator reuse and licence. Pending |
+| `docs/adr/0009-gui-truth-model.md` | Yes | GUI truth model. Proposed |
+| `docs/adr/0010-gmail-reporting.md` | Yes | Gmail reporting. Proposed |
 
-Dedicated PRDs exist for FastMCP, commit-reveal, scent/belief, Thief strategy,
-gatekeeper/reporting, live GUI, and replay. Their acceptance criteria distinguish
-confirmed outcomes from undecided payloads, formulas, ordering, providers, and layouts.
-`PRD_strategy.md` is the only one describing implemented behavior; the rest remain
-forward-looking.
-
-## Known documentation debt
-
-Presence is not currency. These are recorded rather than silently carried:
-
-- No ADR is accepted. `PLAN.md` requires several to be settled before M2; M2 proceeded
-  under the contract-independent carve-out instead. See `ADR_STATUS_REVIEW.md`.
-- ADR-0004 and ADR-0005 have stale text — they predate `LS-002`, the `rate_limits`
-  reclassification, and the scent-formula authority conflict recorded as finding N-4.
-- **The ADR set has not caught up with the 2026-07-29 wire re-alignment.** ADR-0006 was
-  superseded and archived, and no ADR records the adopted simulator wire; the only
-  authoritative record is `SIM_WIRE_PROTOCOL.md`. Documents written before that date
-  (`CONTRACT_REVIEW.md`, `CONTRACT_HANDOFF_CHECKLIST.md`, `ADR_STATUS_REVIEW.md`,
-  `GATE_RESOLUTION_REVIEW.md`, `OPTION_B_INTEROP_DECISION.md`, `PROMPT_LOG.md`) still
-  describe the Option-B layer and name modules that were deleted with it.
-- `PROMPT_LOG.md` fell 17 commits behind before being reconstructed on 2026-07-28.
-
-## Historical material
-
-The archived 635-task document is historical coverage, not the active implementation
-plan. Archived configs, translations, summaries, and simulator notes remain navigation
-or provenance material and cannot override current direct evidence.
-
-## Verdict
-
-All local quality gates pass, re-measured end of day 2026-07-31: ruff clean, **241 tests
-at 99.71% branch coverage**, file lengths and secret scan clean, and the contract checker
-correctly fail-closed at `PENDING` with exit 1. The M1 scaffold results remain in
-[M1_VERIFICATION.md](M1_VERIFICATION.md).
-
-The combined M1 gate still awaits provisional copy authorization, parity/conformance
-evidence, and final contract freeze. The repository is not contract-frozen,
-runtime-complete, submission-ready, or evidence complete.
-
-Two documents describe work no longer confined to the M1 scaffold: `M2_DOMAIN.md` for
-the core domain and `PRD_strategy.md` for the baseline policy. Both are
-contract-independent by construction and neither advances the M1 gate.
+ADR statuses are `Pending`/`Proposed` on purpose. An unaccepted decision is recorded as
+unaccepted; none is silently promoted, and `G-014` fails if one discussing supersession
+does not record it. This document makes no cross-repository parity claim.

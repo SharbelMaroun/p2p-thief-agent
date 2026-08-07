@@ -24,7 +24,10 @@ TERMS = {
 
 
 def opponent_offer(terms: dict) -> dict:
-    return Handshake(dict(terms), identity={"group_id": "opp"}).signed()
+    return Handshake(dict(terms), identity={"group_id": "opp", "group_name": "opp", "members": ["s1"],
+                   "repos": {"cop": "https://x/c", "thief": "https://x/t"},
+                   "mcp_servers": {"peer": "https://x/mcp"},
+                   "llm_model": "template-free", "spec": {"os": "Windows 11"}}).signed()
 
 
 def returns_once(offer: dict):
@@ -44,7 +47,10 @@ def counting_clock():
 
 def test_it_sends_our_offer_then_agrees_on_the_opponents() -> None:
     sent: list[dict] = []
-    mine = Handshake(dict(TERMS), identity={"group_id": "us"})
+    mine = Handshake(dict(TERMS), identity={"group_id": "us", "group_name": "us", "members": ["s1"],
+                   "repos": {"cop": "https://x/c", "thief": "https://x/t"},
+                   "mcp_servers": {"peer": "https://x/mcp"},
+                   "llm_model": "template-free", "spec": {"os": "Windows 11"}})
     agreed = negotiate_match(
         handshake=mine, my_terms=TERMS,
         send_offer=lambda offer: sent.append(dict(offer)),
@@ -53,7 +59,7 @@ def test_it_sends_our_offer_then_agrees_on_the_opponents() -> None:
     )
     assert sent and sent[0]["terms"] == TERMS  # our signed offer went out first
     assert agreed.terms == TERMS
-    assert agreed.peer_identity == {"group_id": "opp"}
+    assert agreed.peer_identity["group_id"] == "opp"
 
 
 def test_a_weakened_minimum_is_refused_by_name() -> None:

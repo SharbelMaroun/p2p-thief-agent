@@ -71,6 +71,26 @@ duty is email (rule 51).
 justified this on the grounds that committing logs would publish nonces — **that reasoning was
 wrong** and is corrected there. Rule 18's secrecy expires at end of game (`inst/:1136`).
 
+**5. The scent decay factor (`C-014`).** The book's prose (ch. 4.3, p.43) says $(1-\rho)$ at
+$\rho = 0.10$ means the existing scent "is **reduced by 90%**". The formula printed beside it
+says the opposite: $(1-\rho) = 0.90$ *retains* 90% and reduces by 10%.
+**Chosen: the formula.** Rule 23's lock is taken over the formula, and the prose reading
+decays ten times too fast — erasing the history trail the mechanism exists to leave.
+`test_scent_regression.py` pins $0.9\tau + \Delta\tau$.
+
+**6. The direction of $\rho$ (`C-015`).** The book (ch. 4.4, p.46) says raising $\rho$ toward
+1.0 would leave the board "**saturated** with scent". Reversed: $\rho \to 1.0$ drives
+$(1-\rho) \to 0$, so scent vanishes almost immediately; saturation is what $\rho \to 0$
+approaches.
+**Chosen: the arithmetic.** Sensitivity sweeps run in the correct direction.
+
+> **How this list was wrong, and how to keep it right.** It held four entries until
+> 2026-08-07. `C-014` and `C-015` had been in `docs/SPECIFICATION_CONFLICTS.md` since M6 and
+> were never promoted here, so a row reading "disclose **every** book contradiction relied
+> on" was marked done against an incomplete list. The register is the source; this section is
+> a view of it. **Before closing `M9-011c` again, diff the two** — every `RESOLVED / BOOK
+> ERROR` or `CONFIRMED DISTINCTION` entry the code relies on belongs in both.
+
 ## Things worth knowing that are not rows
 
 * **Local green is not green.** Two M9 batches were reported complete with CI red. The

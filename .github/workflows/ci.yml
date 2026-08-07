@@ -49,6 +49,12 @@ jobs:
       - name: Scan Git history for secrets
         run: uv run python scripts/scan_git_history.py
 
+      # G-010..G-014. These invariants span five documents, so no single file review
+      # can see a violation -- each file stays internally coherent while contradicting
+      # the others. That is how DOCS_COMPLETENESS.md sat 29 rows behind.
+      - name: Check ledger consistency
+        run: uv run python scripts/check_ledger_consistency.py
+
       - name: Smoke-test CLI
         run: |
           uv run p2p-thief --help

@@ -56,6 +56,47 @@ def missing_required_terms(terms: Mapping) -> list[str]:
     return [name for name in REQUIRED_TERMS if terms.get(name) is None]
 
 
+# The seven members the book mandates in the pre-game exchange (`M5-014f`). `inst/:1278`:
+# Step-0 collects the hardware specification and the language model version, and "also
+# documents the code version, the group name, and the game number"; p.39/104 and p.78/183 add
+# group identity with members, the repository URLs and the MCP addresses.
+#
+# Rule 24 is Mandatory and its sanction is denial of eligibility for computational bonuses,
+# so an identity missing one of these is not merely untidy — it costs points, and it costs
+# them *silently*, which is why the check is here rather than in a reviewer's head.
+MANDATED_IDENTITY_MEMBERS = (
+    "group_id", "group_name", "members", "repos", "mcp_servers", "llm_model", "spec",
+)
+
+
+class IdentityError(ValueError):
+    """Raised when a peer identity omits something the book mandates."""
+
+
+def require_identity(block: object, *, whose: str) -> dict:
+    """Refuse an identity block missing a mandated member (`M5-014f`).
+
+    Applied to **incoming** identities, which is where the gap was. `identity_block` already
+    takes all seven as required arguments, so our own cannot be short — but an opponent's
+    arrived as `message.get("identity", {})` and an empty dict was accepted in silence. The
+    first sign would have been a declaration we could not complete, after the terms were
+    signed.
+
+    Refused rather than defaulted. A missing hardware spec and an unstated one are different
+    claims, and only one of them can be put in a signed artifact.
+    """
+    if not isinstance(block, Mapping) or not block:
+        raise IdentityError(
+            f"{whose} identity is absent; the book mandates the pre-game exchange carry team "
+            "identity, members, repository and MCP URLs, hardware and model [AE-24]")
+    missing = [name for name in MANDATED_IDENTITY_MEMBERS if not block.get(name)]
+    if missing:
+        raise IdentityError(
+            f"{whose} identity omits {', '.join(missing)}; the book mandates all of "
+            f"{', '.join(MANDATED_IDENTITY_MEMBERS)} in the pre-game exchange [AE-24]")
+    return dict(block)
+
+
 def identity_block(
     *,
     group_id: str,
@@ -104,4 +145,6 @@ class Handshake:
         if message.get("terms") != self.terms:
             raise CryptoError("agreement terms mismatch between peers")
         verify(message["terms"], message["nonce"], message["signature"])
-        self.peer_identity = dict(message.get("identity", {}))
+        # `M5-014f`: validated, not merely captured. An opponent whose identity is short
+        # cannot produce a complete declaration, and rule 24 charges us for that.
+        self.peer_identity = require_identity(message.get("identity"), whose="the opponent")

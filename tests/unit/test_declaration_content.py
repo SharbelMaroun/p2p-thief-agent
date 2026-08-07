@@ -24,7 +24,7 @@ from p2p_thief_agent.reporting.naming import ArtifactError, MatchIdentity
 
 ID = MatchIdentity(game_id="demo-vs-rival", game_uid="u" * 32)
 COMMIT = "a" * 40
-HARDWARE = {"cpu_type": "x86_64", "cpu_freq_mhz": 3000, "cpu_cores": 8,
+HARDWARE = {"os": "Windows 11", "cpu_type": "x86_64", "cpu_freq_mhz": 3000, "cpu_cores": 8,
             "ram_gb": 16, "gpu_model": "none", "vram_gb": 0}
 
 
