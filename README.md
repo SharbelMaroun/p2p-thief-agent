@@ -1125,6 +1125,35 @@ corner a mobility-aware evader, so that risk leans in the Thief's favour), no li
 has been played, and the decoder's exactness assumes the opponent honours the locked physics;
 a deviator degrades us to a uniform-safe belief and itself toward a rule-23 sanction.
 
+#### The first real match, and the four bugs it was worth (`M5-020`, `M9-027`, 2026-08-08)
+
+The two agents had never actually played each other over the wire — every number was a
+harness number. The first two-process rehearsal (both `serve` CLIs, localhost HTTP, one
+byte-identical shared match JSON, real identities) earned its keep before a single turn ran:
+the playable path **skipped negotiation entirely** — `M5-019f`'s sequencing existed and only
+the tests ever called it, while the companion Cop (and the book) refuse an unnegotiated game.
+`serve --game` now projects the shared file into the reference's flat signed terms, builds
+the rule-24 identity from the private TOML, and plays to the *negotiated* horizon.
+
+Three more findings, one per layer, each fixed and re-rehearsed. The serve path handed the
+turn loop a **non-blocking** receive whose contract says `None` means the deadline passed —
+so the loop checked the inbox once, microseconds after its own send, and both sides recorded
+a technical loss at step 1 against a live opponent; the receive is now `poll_for_turn`
+bounded by the shared file's own response timeout. The companion **replied to a decided
+game**: the Thief completes the inclusive horizon, claims survival, and hangs up, while the
+Cop still owed an undeliverable reply — its survival-at-35 against our technical-loss-at-34
+is exactly the disagreeing-artifacts case that reconciles to 0/0, and its loop now ends on
+the incoming terminal claim before deciding anything. And this repository's local-match log
+**hard-coded `"winner_role": "thief"`** — a false claim in a signed artifact whenever we are
+captured — now derived from the outcome.
+
+The final run is the sentence this project exists to be able to write: negotiation agreed,
+thirty-five commit-reveal turns of real evasion and real hints, **both peers record SURVIVAL
+after 35, and the log replays `Verified OK — 35 steps re-verified`.** Scope stated honestly:
+the league checklist requires an accessible address, "not only localhost", plus the GUI and
+replay screenshots — the tunnel rehearsal remains the operator's step, and what it rehearses
+is now known to work.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
