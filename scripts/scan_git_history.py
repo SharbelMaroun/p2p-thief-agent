@@ -40,10 +40,29 @@ FORBIDDEN_SUFFIXES = (".key", ".pem", ".p12")
 MAX_BLOB_BYTES = 2_000_000  # a blob larger than this is not hand-written configuration
 
 
+class ShallowHistoryError(RuntimeError):
+    """Raised when the clone has no history to scan."""
+
+
 def _git(*args: str) -> str:
     result = subprocess.run(["git", *args], capture_output=True, text=True,
                             errors="replace", check=True)
     return result.stdout
+
+
+def is_shallow() -> bool:
+    """Whether this clone was truncated (`git clone --depth`, `actions/checkout` default).
+
+    **This check is the difference between a security gate and a decoration.** A shallow
+    clone contains only the tip commit, so `rev-list --all` returns the current tree and
+    nothing else — the scan finds no secrets because there is no history to find them in,
+    and prints exactly the same "0 findings" as a genuinely clean repository.
+
+    Discovered on 2026-08-07 from a CI failure: `actions/checkout` defaults to
+    `fetch-depth: 1`, and this scanner reported 441 objects where a full clone has 1709.
+    It was reporting OK on 26% of the repository.
+    """
+    return _git("rev-parse", "--is-shallow-repository").strip() == "true"
 
 
 def every_blob() -> list[tuple[str, str]]:
@@ -108,6 +127,13 @@ def scan() -> list[str]:
 def main() -> int:
     """Scan history and fail when anything that looks like a secret is present."""
     try:
+        if is_shallow():
+            print("REFUSING TO SCAN: this is a shallow clone, so there is no history to "
+                  "read. A scan here would report '0 findings' after looking at the tip "
+                  "commit alone — indistinguishable from a clean repository.\n"
+                  "  CI: set `fetch-depth: 0` on actions/checkout.\n"
+                  "  Locally: `git fetch --unshallow`.")
+            return 2
         blobs = every_blob()
     except (OSError, subprocess.CalledProcessError) as exc:
         print(f"could not read Git history: {exc}")

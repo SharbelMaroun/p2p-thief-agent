@@ -27,22 +27,42 @@ from scripts.scan_git_history import (
     FORBIDDEN_SUFFIXES,
     every_blob,
     forbidden_path,
+    is_shallow,
     scannable,
 )
 
 # --- the ways a history scan goes quietly vacuous ------------------------------------------
 
 
+def test_a_shallow_clone_is_refused_rather_than_scanned() -> None:
+    """**The defect CI found on 2026-08-07, and the reason this file exists.**
+
+    `actions/checkout` defaults to `fetch-depth: 1`. On that clone `rev-list --all` returns
+    the tip tree and nothing else, so the scan reported 441 objects where a full clone has
+    over 1700 — and would have printed "0 findings" for a repository it had barely read.
+    Identical output to a genuinely clean history.
+
+    I did not reason my way to this. Two environment-dependent assertions in this very file
+    failed in CI, which is the only reason it surfaced; the scan itself passed silently.
+    """
+    assert callable(is_shallow)
+    assert is_shallow() is False, (
+        "this checkout is shallow — the scan cannot see history. CI must set "
+        "`fetch-depth: 0`; locally, `git fetch --unshallow`")
+
+
 def test_the_scan_reaches_the_whole_history_rather_than_one_commit() -> None:
-    """**The regression that would not announce itself.** `--all` dropped to `HEAD` still
-    reports "OK"; it just stops seeing the deleted branch where a secret hides."""
+    """`--all` dropped to `HEAD` still reports "OK"; it just stops seeing the deleted branch
+    where a secret hides. The threshold is deliberately far below the real count — it is
+    guarding against *one commit*, not tracking repository size."""
     blobs = every_blob()
     assert len(blobs) > 500, f"only {len(blobs)} objects — is `--all` still passed?"
 
 
 def test_history_contains_paths_that_no_longer_exist_on_disk() -> None:
     """Proof the scan sees more than the working tree. If every historical path still
-    existed, this scanner would be an expensive duplicate of `check_secrets.py`."""
+    existed, this scanner would be an expensive duplicate of `check_secrets.py` — which is
+    exactly what a shallow clone silently turns it into."""
     import pathlib  # noqa: PLC0415
 
     root = pathlib.Path(__file__).resolve().parents[2]
