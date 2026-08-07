@@ -32,6 +32,7 @@ import tomllib
 
 NETWORK_SECTION = "network"
 OPPONENT_URL_KEY = "opponent_url"
+PUBLIC_URL_KEY = "public_url"
 DIALABLE_SCHEMES = ("http://", "https://")
 
 # This peer runs under its own role directory, never the opponent's (`M5-006`).

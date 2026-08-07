@@ -55,12 +55,15 @@ def build_parser() -> argparse.ArgumentParser:
                        help="survival threshold: steps the Thief must last (Appendix F)")
     serve.add_argument("--artifacts", type=Path,
                        help="directory to write the finished log into")
+    serve.add_argument("--private", type=Path,
+                       help="private game.toml holding [network].public_url and "
+                       "opponent_url. With it, addresses come from config rather than "
+                       "flags, and the tunnel token never reaches a shared file")
 
-    for name, help_text in (("replay", "re-verify a stored log and print its banner"),
-                            ("verify", "re-verify a stored log; exit non-zero if tampered")):
-        node = sub.add_parser(name, help=help_text)
-        node.add_argument("--log", required=True, type=Path,
-                          help="path to a log artifact, including an opponent's")
+    for name, text in (("replay", "re-verify a stored log and print its banner"),
+                       ("verify", "re-verify a stored log; exit non-zero if tampered")):
+        node = sub.add_parser(name, help=text)
+        node.add_argument("--log", required=True, type=Path, help="path to a log artifact")
     return parser
 
 
@@ -121,7 +124,8 @@ def _serve(args: argparse.Namespace) -> int:
     """
     # Delegated **before** binding: `serve_match` opens its own mailbox, and binding here
     # first would leave the port taken and the match refused by our own `ensure_port_free`.
-    if args.peer:
+    # `--private` counts as an intention to play: it names an opponent just as `--peer` does.
+    if args.peer or args.private:
         return _play(args)
 
     from p2p_thief_agent.adapters.fastmcp_server import PeerInboxes  # noqa: PLC0415
@@ -134,9 +138,8 @@ def _serve(args: argparse.Namespace) -> int:
         print(f"could not start the mailbox: {exc}")
         return 2
 
-    print(f"Thief mailbox listening on http://{args.host}:{args.port} (Ctrl-C to stop)")
-    print("Waiting for an opponent. Queue depth is bounded — a flooded inbox refuses "
-          "rather than growing [AE-29].")
+    print(f"Thief mailbox listening on http://{args.host}:{args.port} (Ctrl-C to stop). "
+          "Queue depth is bounded — a flooded inbox refuses rather than grows [AE-29].")
     try:
         _block_until_interrupted()
     except KeyboardInterrupt:
@@ -153,14 +156,25 @@ def _play(args: argparse.Namespace) -> int:
     """
     from p2p_thief_agent.adapters.serve import (  # noqa: PLC0415
         ServeError,
-        make_decide,  # noqa: PLC0415
+        resolve_peer,
         serve_match,
     )
+    from p2p_thief_agent.orchestration.thief_policy import make_decide  # noqa: PLC0415
 
-    print(f"Thief on http://{args.host}:{args.port}, waiting for {args.peer} ...")
+    try:
+        peer = resolve_peer(args.peer, args.private)
+    except ValueError as exc:
+        print(f"private config problem: {exc}")
+        return 2
+    if not peer:
+        print("no opponent address: pass --peer URL, or --private with "
+              "[network].opponent_url")
+        return 2
+
+    print(f"Thief on http://{args.host}:{args.port}, playing {peer} ...")
     try:
         result = serve_match(
-            peer_url=args.peer, port=args.port, host=args.host,
+            peer_url=peer, port=args.port, host=args.host,
             survival_threshold=args.threshold, decide=make_decide(),
             artifacts_dir=args.artifacts,
         )

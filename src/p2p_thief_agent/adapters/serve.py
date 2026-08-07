@@ -136,3 +136,38 @@ def _write_log(directory: Path, records: list[dict], result: object) -> Path:
         records=records,
     )
     return write_artifact(Path(directory), log_filename(identity.game_id, 1), artifact)
+
+
+def resolve_peer(peer: str | None, private: Path | None) -> str:
+    """Decide which address to dial, from a flag or the private config (`M5-005`).
+
+    Two sources on purpose. A flag is right while developing on one machine; a private TOML
+    is right for league play, where the address is a tunnel URL and the token that created
+    it must stay out of every shared file (book §2.4, `[AE-10]`).
+
+    An explicit `--peer` wins over the file: the operator typing an address at 2 a.m. means
+    that address, and silently preferring a stale config value would be the least helpful
+    possible interpretation.
+    """
+    if peer:
+        return peer
+    if private is None:
+        raise ValueError(
+            "no opponent address: pass --peer URL, or --private pointing at a game.toml "
+            "whose [network].opponent_url names one")
+    from p2p_thief_agent.shared.private_config import (  # noqa: PLC0415
+        PrivateConfigError,
+        load_private_config,
+        opponent_url,
+    )
+    from p2p_thief_agent.shared.tunnel import public_url  # noqa: PLC0415
+
+    try:
+        config = load_private_config(private)
+        dialling = opponent_url(config)
+        # Reading our own advertised address here is not decoration: it fails loudly now if
+        # it is missing or loopback, rather than after both sides have signed the terms.
+        public_url(config)
+    except PrivateConfigError as exc:
+        raise ValueError(str(exc)) from exc
+    return dialling
