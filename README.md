@@ -8,15 +8,17 @@ Companion Cop repository:
 
 ## Milestone status
 
-M2, M4, and M6 are complete, and the simulator-conformant protocol layer (commit-reveal,
-canonical hashing, wire messages, signed-terms handshake) is implemented. M1 is
-`IN PROGRESS`: the wire profile is authored and adopted, but no acceptance verdict is
-recorded and the contract checker stays fail-closed. M5 and M7 are substantially built
-(71/80 and 34/86 rows). **M8 has begun** — its replay verifier is built and at 11/58 rows —
-because rule 20's sanction is a threshold condition for confirmation of logs and submission
-of the project, making it the highest-consequence row in this repository. **M9 has not
-started** (78 open rows). Unresolved choices are raised explicitly rather than classified as
-blockers.
+M2 and M4 are complete; M6 is at 80/81 and **M7 at 84/86** — the two open M7 rows are the
+OAuth consent flow (`M7-013`, `M7-013a`), left deliberately unclaimed because running consent
+is the operator's action on their own machine, not an agent's. The simulator-conformant
+protocol layer (commit-reveal, canonical hashing, wire messages, signed-terms handshake) is
+implemented. M1 is at 39/46 with five rows superseded: the wire profile is authored and
+adopted, but no acceptance verdict is recorded and the contract checker stays fail-closed.
+M5 is at 71/80. **M8 is at 57/58** — its replay verifier is built, and its one open row
+(`M8-003c`, rehearsing against a real classmate agent) needs a counterpart we do not have;
+the local rehearsal that *is* possible was built instead as `M7-018`. **M9 has not started**
+(8/78). M0's six open rows are the book's internal contradictions the report must disclose.
+Unresolved choices are raised explicitly rather than classified as blockers.
 
 Version `1.00` began as an M0–M1 documentation and package scaffold. The inspected
 baseline (`119fa911d5b1a5aecdaa9531d0912e5c6f9ab32f`) contained no Python package,
@@ -859,6 +861,71 @@ What matters for this repository, batch by batch:
   `U-025`. Appendix F prints **two rows** labelled `[Number of Agents]` (`:3484` = 2
   players, `:3540` = 6 per series) and the template says `num_games: 1` — three plausible
   numbers, recorded as `X-05` there. Our own series work will meet the same three.
+
+#### Finishing M7: the four gaps only a whole phase reveals (`M7`, 2026-08-07)
+
+Forty-two rows in three waves, and the interesting part is not the count — it is that four
+defects were **invisible at the row level** and only appeared once the phase was taken as a
+whole.
+
+**Rule 53's commit hash did not exist.** The declaration named who played, on what hardware,
+with which model, against whom, and never *which code*. Every row about the declaration
+passed; the field nothing asked for was the one that makes a later audit reproducible.
+`build_declaration` now requires it, and a truncated hash is refused too — a value short
+enough to be ambiguous across the repository satisfies the rule's letter while defeating it.
+
+**We were violating Appendix F obligation 4.** It requires every game's configuration to be
+committed. `.gitignore` excludes `logs/`, `reports/generated/` and `results/generated/`, so a
+config written under any of them lived on one laptop and nowhere the obligation could see —
+silently, because the write succeeds and the file is there. `reporting/retention.py` now
+stores under `games/` and **refuses** a destination under an ignored path; a test reads the
+real `.gitignore` and fails if `games/` is ever added to it, since the way this regresses is
+somebody tidying the working tree. The first draft of that guard was wrong in both
+directions: it refused all of `results/` when only `results/generated/` is ignored, and its
+agreement test passed on a substring.
+
+**`compose_report` took a bare result mapping.** `settlement.agree(audit, ours, theirs)`
+already took its audit first so the ordering could not be forgotten — but nothing stopped a
+caller skipping settlement entirely and emailing a number the opponent had never confirmed.
+Rule 36 puts the audit before agreement; rule 35 scores a conflicting report 0 for *both*
+teams. The composer now requires the settlement record and refuses anything short of
+`agreed` with `audit_passed is True` — `is not True`, not truthiness, because a JSON round
+trip turning the flag into the string `"True"` would otherwise pass.
+
+**The secret scanner had no tests of its own.** It has caught two real problems in this
+repository, and its detection rules were unexercised because `findings()` read a file and
+formatted a repository-relative path in one pass — so it could only be tested through a file
+*inside* the repository. Splitting `line_findings` out fixed that. The new tests are mostly
+positives: a scanner quietly widened is worse than no scanner, because the repository goes on
+passing. Its own test file then failed the scan, correctly, and the probes were rebuilt as
+runtime-joined fragments rather than allowlisted — an exemption for the one file where a real
+key would look completely at home is the worst possible exemption.
+
+**Two decisions were made by declining the obvious answer.** `M7-024` asks that a schema
+change be visible, not silent; the obvious reading is to bump `SCHEMA_VERSION`, and that was
+rejected. Every inspected template shows `1.1` and `U-019` leaves that provenance unresolved,
+so emitting an unobserved number invites a peer matching on `1.1` to refuse our declaration —
+a real cost paid against an open question. Visibility is enforced by pinning a digest of the
+required field set instead, with a proof test showing the digest moves. And validation is a
+**table, not a JSON Schema**, for the same reason: a schema generated from those templates
+would demand keys no source demands and then refuse a conformant opponent, failing rule 36's
+mutual audit over a difference nothing forbids.
+
+**The rehearsal is what makes the rest checkable.** `tests/integration/rehearsal.py` plays a
+whole series through the real builders, audit, settlement, ledgers and retention store —
+only the transport is a double, because a rehearsal against test doubles rehearses the
+doubles. Three files drive it: a clean run, one with a deliberately lost sub-game, and one
+with a revealed move rewritten *after* its commitment was taken. The last is the one worth
+reading. A technical loss must produce **exactly the same file set** as a clean series, not
+merely "some artifacts" — and a detected forgery must produce artifacts and send **nothing**,
+because racing them to the lecturer converts their rule 19 loss into a shared rule 35 loss.
+
+*Left unclaimed:* `M7-013` and `M7-013a`, the OAuth consent flow. The consent screen is where
+a human decides what a program may do with their mailbox, so it is the operator's to run;
+`docs/RUNBOOK_reporting_setup.md` says so plainly rather than documenting an `authorize`
+command that does not exist. Everything downstream of it — the refresh policy with its
+300-second skew margin, the base64url envelope, the send gates — is built and tested against
+injected doubles, which is what let the rest of M7 finish with no credential in existence.
 
 ### 3. The implemented strategy
 

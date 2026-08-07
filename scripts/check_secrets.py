@@ -51,6 +51,20 @@ ASSIGNMENT_PATTERN = re.compile(
     """
 )
 
+# A bare Python type annotation — a name, a colon, a type and nothing else — declares that
+# the name exists, never what it holds. The assignment pattern above cannot tell one from a
+# JSON member with the same key, so it is excluded here rather than by weakening that pattern.
+#
+# Deliberately narrow: no `=`, no quotes, no digits, and the whole line must be the
+# annotation. An annotated field *with a value* still fires, and so does every JSON form.
+# This is a precision fix, not an exemption — an allowlist entry for the same line would
+# suppress a real value assigned to it later, which is exactly where a leak hides.
+TYPE_ANNOTATION_PATTERN = re.compile(
+    r"""^\s*[A-Za-z_]\w*\s*:\s*[A-Za-z_][\w.]*(?:\s*\[[\w.,\s|\[\]]+\])?
+        (?:\s*\|\s*[A-Za-z_][\w.]*(?:\s*\[[\w.,\s|\[\]]+\])?)*\s*$""",
+    re.VERBOSE,
+)
+
 
 def candidate_files() -> list[Path]:
     """Return scannable repository text files outside generated directories."""
@@ -78,20 +92,30 @@ def is_dummy(value: str) -> bool:
     )
 
 
+def line_findings(line: str) -> list[str]:
+    """Return the labels one line trips, with no path formatting.
+
+    Separated from `findings` so the detection can be tested against a string. The previous
+    shape read a file and formatted a repository-relative path in the same pass, which meant
+    a test could only exercise it through a file inside this repository — so the rules the
+    whole secret gate rests on had no direct tests at all.
+    """
+    labels = [label for label, pattern in TOKEN_PATTERNS.items() if pattern.search(line)]
+    if TYPE_ANNOTATION_PATTERN.match(line):
+        return labels
+    assignment = ASSIGNMENT_PATTERN.search(line)
+    if assignment and not is_dummy(assignment.group(1)):
+        labels.append("credential assignment")
+    return labels
+
+
 def findings(path: Path) -> list[str]:
-    """Return line-level findings for one text file."""
+    """Return line-level findings for one text file, located for a human to open."""
     text = path.read_text(encoding="utf-8", errors="replace")
-    matches: list[str] = []
-    for line_number, line in enumerate(text.splitlines(), start=1):
-        for label, pattern in TOKEN_PATTERNS.items():
-            if pattern.search(line):
-                matches.append(f"{path.relative_to(PROJECT_ROOT)}:{line_number}: {label}")
-        assignment = ASSIGNMENT_PATTERN.search(line)
-        if assignment and not is_dummy(assignment.group(1)):
-            matches.append(
-                f"{path.relative_to(PROJECT_ROOT)}:{line_number}: credential assignment"
-            )
-    return matches
+    where = path.relative_to(PROJECT_ROOT) if path.is_relative_to(PROJECT_ROOT) else path
+    return [f"{where}:{number}: {label}"
+            for number, line in enumerate(text.splitlines(), start=1)
+            for label in line_findings(line)]
 
 
 def main() -> int:
