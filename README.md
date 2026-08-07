@@ -1015,6 +1015,25 @@ path alone**, and re-verifies to `Verified OK` — then changes a byte in the fi
 so a verifier that only ever sees in-memory dicts can pass forever while every stored log
 fails. The first person to notice would have been whoever opened the submission.
 
+#### A disclosure list that was closed while incomplete (`M9-011c`, 2026-08-07)
+
+`M9-011c` reads "disclose every book contradiction relied on". It was marked done against a
+list of four, and the register held six that the code relies on.
+
+`C-014` and `C-015` had been in `docs/SPECIFICATION_CONFLICTS.md` since M6 — the scent
+factor whose prose says "reduced by 90%" where the formula retains 90%, and the claim that
+raising $ho$ saturates the board when it empties it. Both were resolved correctly in code
+at the time; neither was promoted into the disclosure the report owes a grader. Writing the
+academic report restated `C-014` and I described it as newly found, which it was not.
+
+**The fix is structural rather than an apology.** The register is the source and the handover
+is a view of it, so `docs/HANDOVER.md` now says to diff the two before closing the row again.
+The failure mode here is not missing a contradiction — it is a *derived* list drifting from
+the list it derives from, silently, while the row that depends on it reads DONE.
+
+The `M0-006` family closed in the same pass: those rows exist to move the register into the
+report, and closing a disclosure row without touching them was how the gap survived.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a

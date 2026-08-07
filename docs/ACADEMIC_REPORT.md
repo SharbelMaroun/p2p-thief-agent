@@ -39,12 +39,21 @@ with $\rho = 0.10$ the decay rate and $\Delta\tau_{ij}$ the intensity emitted th
 $\max(0,\cdot)$ matters: without it, floating-point drift can carry a decayed cell slightly
 negative, and a negative prior is not a probability.
 
-> **A contradiction in the source, disclosed under chapter 110.** The book's prose at
-> `inst/:930` says the factor $(1-\rho)$ means "the existing scent is reduced by 90%". Its
-> own formula says the opposite — $(1-\rho) = 0.90$ *retains* 90%, reducing by 10%. We
-> implement the **formula**, because a rule 23 lock is taken over the formula and because
-> reading the prose would give a decay ten times too aggressive, erasing the history trail
-> the mechanism exists to leave. `test_scent_regression.py` pins $0.9\tau + \Delta\tau$.
+> **Two contradictions in the source, disclosed under chapter 110.** Both are recorded in
+> `docs/SPECIFICATION_CONFLICTS.md` as `C-014` and `C-015`; they were identified during M6
+> and are restated here because §1.2's formula relies on the resolution.
+>
+> **`C-014`** — the book's prose (ch. 4.3, p.43; `inst/:930`) says the factor $(1-\rho)$
+> means "the existing scent is **reduced by 90%**". Its own formula says the opposite:
+> $(1-\rho) = 0.90$ *retains* 90%, reducing by 10%. We implement the **formula**, because
+> rule 23's lock is taken over the formula and because the prose reading decays ten times
+> too fast, erasing the history trail the mechanism exists to leave.
+> `test_scent_regression.py` pins $0.9\tau + \Delta\tau$.
+>
+> **`C-015`** — the book (ch. 4.4, p.46) says raising $\rho$ toward 1.0 would leave the
+> board "**saturated** with scent". Reversed: $\rho \to 1.0$ drives $(1-\rho) \to 0$, so
+> scent vanishes almost immediately. Saturation is what $\rho \to 0$ approaches. Sensitivity
+> work sweeps in the correct direction.
 
 ### 1.3 The belief map
 
