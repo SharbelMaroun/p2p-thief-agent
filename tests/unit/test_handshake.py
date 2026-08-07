@@ -39,8 +39,14 @@ def test_missing_required_terms():
 
 
 def test_two_peers_verify_matching_terms():
-    alice = Handshake(terms=terms(), identity={"group_id": "alice"})
-    bob = Handshake(terms=terms(), identity={"group_id": "bob"})
+    alice = Handshake(terms=terms(), identity={"group_id": "alice", "group_name": "alice", "members": ["s1"],
+                   "repos": {"cop": "https://x/c", "thief": "https://x/t"},
+                   "mcp_servers": {"peer": "https://x/mcp"},
+                   "llm_model": "template-free", "spec": {"os": "Windows 11"}})
+    bob = Handshake(terms=terms(), identity={"group_id": "bob", "group_name": "bob", "members": ["s1"],
+                   "repos": {"cop": "https://x/c", "thief": "https://x/t"},
+                   "mcp_servers": {"peer": "https://x/mcp"},
+                   "llm_model": "template-free", "spec": {"os": "Windows 11"}})
     alice.verify_peer(bob.signed())
     bob.verify_peer(alice.signed())
     assert alice.peer_identity["group_id"] == "bob"
@@ -64,9 +70,19 @@ def test_tampered_signature_rejected():
 
 
 def test_identity_is_not_covered_by_the_signature():
-    # Same terms + different identity still verifies: identity is not signed.
+    """Same terms + a different identity still verifies: identity is not signed.
+
+    That is deliberate — roles alternate across sub-games, so identity is per-group and
+    carries no role. The identity must still be *complete* (`M5-014f`), which is a separate
+    requirement from being signed: the book mandates its content, and rule 24 charges for an
+    incomplete one whether or not a signature covers it.
+    """
     alice = Handshake(terms=terms())
-    bob = Handshake(terms=terms(), identity={"group_id": "bob", "group_name": "Bees"})
+    bob = Handshake(terms=terms(), identity={
+        "group_id": "bob", "group_name": "Bees", "members": ["b1"],
+        "repos": {"cop": "https://x/c", "thief": "https://x/t"},
+        "mcp_servers": {"peer": "https://x/mcp"},
+        "llm_model": "template-free", "spec": {"os": "Windows 11"}})
     alice.verify_peer(bob.signed())
     assert alice.peer_identity["group_name"] == "Bees"
 
