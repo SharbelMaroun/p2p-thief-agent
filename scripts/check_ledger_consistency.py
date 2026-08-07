@@ -8,7 +8,8 @@ coherent. The contradiction is only visible from outside, which is why it surviv
 This is the same argument as `scripts/check_file_lengths.py`. A standing invariant that is
 re-checked by hand is not an invariant; it is a hope with a row number.
 
-Five checks, one per row:
+Six checks. Five map to a `G` row; the sixth, unique task IDs, was added after a
+duplicate was found by hand:
 
 * `G-010` every document in `docs/` appears in `DOCS_COMPLETENESS.md` with a status
 * `G-011` a milestone may not read `DONE` in `PLAN.md` while `TODO.md` still has open rows
@@ -109,6 +110,24 @@ def check_plan_matches_todo() -> list[str]:
     return findings
 
 
+def check_task_ids_are_unique() -> list[str]:
+    """`G-011`. Two rows sharing an ID make the ledger unciteable.
+
+    Found 2026-08-07: `M7-22e` named both a closed row and an open one, and the open row
+    had its status and priority columns swapped, so it read as `P1` in the status position.
+    A commit message, a conflict record or another task citing that ID resolves to whichever
+    row the reader happens to find — and the closed one is the one that looks finished.
+    """
+    seen, findings = {}, []
+    for task, state in re.findall(r"^\| ([MGX][\w.-]+) \|[^|]*\| *([^|]*?) *\|",
+                                  read("TODO.md"), flags=re.M):
+        if task in seen:
+            findings.append(f"G-011: task id {task} is used twice "
+                            f"({seen[task]!r} and {state[:20]!r})")
+        seen[task] = state
+    return findings
+
+
 def check_requirements_have_tests() -> list[str]:
     """`G-012`. A row pointing at a test file must point at one that is there."""
     root, findings = DOCS.parent, []
@@ -148,6 +167,7 @@ def check_adrs_have_status() -> list[str]:
 def main() -> int:
     """Run every check and report each finding on its own line."""
     findings = (check_docs_completeness() + check_plan_matches_todo()
+                + check_task_ids_are_unique()
                 + check_requirements_have_tests() + check_unknowns_are_registered()
                 + check_adrs_have_status())
     if findings:

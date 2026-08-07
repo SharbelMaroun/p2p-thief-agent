@@ -18,6 +18,7 @@ from scripts.check_ledger_consistency import (
     check_docs_completeness,
     check_plan_matches_todo,
     check_requirements_have_tests,
+    check_task_ids_are_unique,
     check_unknowns_are_registered,
     main,
     milestone_states,
@@ -69,3 +70,10 @@ def test_every_milestone_in_the_todo_is_found_in_the_plan() -> None:
     in_todo = set(re.findall(r"^\| (M[0-9.]+)-[\w.]+ \|", read("TODO.md"), flags=re.M))
     missing = sorted(in_todo - set(milestone_states()))
     assert not missing, f"PLAN.md states were not parsed for {missing}"
+
+def test_no_task_id_is_used_twice() -> None:
+    """**Found by hand, then made permanent.** `M7-22e` named both a closed row and an open
+    one, and the open row's status and priority columns were swapped so it read `P1` where
+    the status belongs. Anything citing that ID resolved to whichever row the reader found
+    first — and the closed one is the one that looks finished."""
+    assert check_task_ids_are_unique() == []
