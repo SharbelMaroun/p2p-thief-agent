@@ -248,6 +248,14 @@ losing. The criterion is now league points over the full opening set (`M6-015c`)
 `metric_disagreement` in `results/strategy_arms.json` — a flag that exists to catch exactly
 this — now reads `false`.
 
+**The opponent model is part of the result.** All of the above is measured against a Cop
+that minimises distance to our *current* cell — the weakest plausible pursuit. Against a Cop
+that instead chases the centroid of our next legal cells, escapes fall from 23/24 to **8/24**
+(160 points). Belief still beats the blind arm against every pursuer tested, so the fix is
+real; but **23/24 is a greedy-Cop figure, not a league expectation**, and running from where
+the Cop *is* is precisely what an anticipating Cop exploits. Improving against anticipation
+is open work, not a banked claim.
+
 ### 3.2 Parameter sensitivity
 
 A larger board helps both arms. Raising the survival threshold no longer makes belief worse:

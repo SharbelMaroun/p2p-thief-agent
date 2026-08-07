@@ -40,6 +40,27 @@ Appendix F actually scores them:
 > distance and mobility. Re-checked on board sizes 5-9, randomised openings,
 > barrier layouts and horizons 15-50. See `M6-015c` and the academic report §3.1.
 
+
+**The opponent model is part of the result, and ours is the weakest plausible one.** Every
+number above is measured against a Cop that steps to minimise Manhattan distance to the
+Thief's *current* cell. Re-run against two stronger pursuers on the same 24 openings
+(2026-08-07):
+
+| Cop | belief escapes | belief points |
+| --- | ---: | ---: |
+| greedy (the harness Cop) | 23/24 | 235 |
+| herding — closes, and breaks ties to shrink our room | 23/24 | 235 |
+| **anticipating** — chases the centroid of our *next* legal cells | **8/24** | **160** |
+
+Belief beats the blind arm against all three, so the fix in §3.1 is real and not an artifact
+of the opponent. But **23/24 is a greedy-Cop number, not a league expectation.** A classmate
+whose pursuit anticipates one turn ahead cuts our escape rate by roughly two thirds, because
+running from where the Cop *is* is exactly what an anticipating Cop exploits.
+
+This is stated rather than quietly omitted for the same reason the previous table was left
+visible: an evaluation is only as strong as its opponent, and ours is currently a weak one.
+Improving against anticipation is open work, not a claim already banked.
+
 Appendix F pays the Thief **10 for reaching the survival threshold** and **5 for being
 captured**, both `Fixed`. There is nothing in between. A policy that reliably survives 28 of
 35 turns scores *exactly* what one caught on turn 2 scores.
