@@ -71,9 +71,30 @@ proved structurally from the AST rather than behaviourally, so a game abandoned 
 opponent vanished still writes its four files (`M7-023`). That game is the one whose evidence
 gets disputed.
 
+## Resolved 2026-08-07: draft versus send
+
+**Sending is mandatory; `draft` is a control mode, not the end state.** Both notebooks were
+asked, and the sources disagree with each other:
+
+* Rule 51 and book 9.3.3 require the end-of-game JSON report to be **sent** to the lecturer's
+  address, and `inst/police_thief_p2p_Summary.md:2224` makes the consequence explicit: "If a
+  report is not received from one of the sides, that side will not be awarded points for the
+  game -- even if they won."
+* The shipped configuration example sets `[email] mode = "draft"`
+  (`inst/police_thief_p2p_Summary.md:3041`, `DEV-SPEC.md:228`), and the book's own overview
+  describes "a JSON report sent via Gmail drafts" (`:3206`).
+
+Chapter 110 grants "the academic freedom to choose one of the options and proceed
+accordingly, provided that you explicitly state in your report: where you identified the
+contradiction, what you chose, and why."
+
+**Chosen: send.** A draft that is never sent scores zero under the rule whose sanction is
+explicit, while sending costs nothing if the draft reading was the intended one. `draft`
+remains available as a rehearsal mode. Disclosed in the README report per chapter 110.
+
 ## Still open
 
-Gmail draft-versus-send behaviour (`U-002`), the OAuth consent flow itself (`U-009`,
+The OAuth consent flow itself (`U-009`,
 `M7-013`/`M7-013a` — deliberately unclaimed, since running consent is the operator's action
 on their own machine), and template requiredness (`U-019`, ADR-0010).
 

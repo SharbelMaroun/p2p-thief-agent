@@ -707,20 +707,20 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M9-001a | Play at least two counted games against at least two groups | PENDING | `[AE-31]`; below the minimum scores zero |
 | M9-001b | Count only one scoring game per opponent | PENDING | `[AE-52]` |
 | M9-001c | Secure opponent scheduling early | PENDING | External dependency on other teams; longest lead time |
-| M9-002 | Complete all six academic README components | PENDING | README checklist |
-| M9-002a | Describe the Dec-POMDP model | PENDING | State space, observations, uncertainty `[AE-42]` |
-| M9-002b | Discuss the FastMCP communication dilemma | PENDING | Queues, failures, orchestrator, gatekeeper |
-| M9-002c | Describe the implemented strategy | PENDING | Baseline evasion metrics and policy |
-| M9-002d | Include learning curves if RL is used | PENDING | Not applicable while the policy stays deterministic |
-| M9-002e | Embed the GUI and replay screenshots | PENDING | From `M8-001`/`M8-002` |
-| M9-002f | Cross-link the companion repository | PENDING | `[AE-49]`; a link only, no repository access |
+| M9-002 | Complete all six academic README components | DONE | Verified present by `check_submission_contents.py` against book 9.4.2 (`inst/:2283`), where "the absence of any of these will result in a grade deduction". Matched on README headings, so a section lost to a refactor fails rather than passing on a stray mention. Presence only -- quality is a human judgement |
+| M9-002a | Describe the Dec-POMDP model | DONE | README section 1, matched on `dec-pomdp` |
+| M9-002b | Discuss the FastMCP communication dilemma | DONE | README section 2, matched on `fastmcp .. dilemma/communication` |
+| M9-002c | Describe the implemented strategy | DONE | README section 3, matched on `implemented strategy` |
+| M9-002d | Include learning curves if RL is used | DONE | README section 4. **Conditional row** -- 9.4.2 says "if RL is used", and no agent here is RL-trained; the section states that rather than omitting it |
+| M9-002e | Embed the GUI and replay screenshots | DONE | README section 5, matched on `screenshot`/`replay app`/`live belief` `[AE-20]` |
+| M9-002f | Cross-link the companion repository | DONE | Matched on a real `github.com/**/p2p-cop-agent` URL in the body, not a heading -- the one asymmetry between this checker and the Cop's `[AE-49]` |
 | M9-003 | Verify team identity, repository access, and current Moodle instructions | PENDING | Submission identity/access record |
 | M9-003a | Confirm lecturer access to the repository | PENDING | Public, or shared with `rmisegal@gmail.com` |
 | M9-003b | Use the eight-character team code | PENDING | `sharNamr`, confirmed 2026-07-28 `[AE-45]` |
 | M9-003c | Confirm each member submits separately | PENDING | `[AE-44]` |
 | M9-003d | Fill the Moodle template without moving fields | PENDING | `[AE-43]`; save as PDF |
-| M9-004 | Run all gates from a clean frozen environment and complete security/provenance review | PENDING | Final validation record |
-| M9-004a | Verify no secret exists anywhere in Git history | PENDING | `[AE-39]`; a secret committed once requires rotation |
+| M9-004 | Run all gates from a clean frozen environment and complete security/provenance review | DONE | `scripts/scan_git_history.py` + `scripts/check_submission_contents.py`, both run clean. Security half below; contents half in `M9-017` |
+| M9-004a | Verify no secret exists anywhere in Git history | DONE | **Run 2026-08-07: 1709 objects, 0 findings.** Scans every blob reachable from *any* ref via `git rev-list --objects --all`, so a secret on a merged-and-deleted branch is still seen |
 | M9-005 | Create the reviewed annotated `v1.0-submission` release tag | PENDING | Tag points to accepted submission commit `[AE-41]` |
 | M9-006 | Complete parameter research and sensitivity analysis | DONE | Guidelines §9.1: systematic one-at-a-time experiments across the negotiable parameters, with the measured effect of each on match outcomes documented in tables |
 | M9-006a | Sweep the negotiable board and movement parameters | DONE | Grid size, barrier quota, step limit, survival threshold |
@@ -739,7 +739,7 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M9-009b | Name the requirements not met and why | PENDING | An honest gap costs less than an overclaim |
 | M9-010 | Assemble the league evidence bundle | PENDING | Every counted game's four artifacts, commit hashes, and sent-report proof |
 | M9-010a | Archive the artifact set per counted game | PENDING | Retrievable by `game_id` |
-| M9-010b | Record the commit hash that ran each game | PENDING | `[AE-53]`; code may change between games |
+| M9-010b | Record the commit hash that ran each game | DONE | `reporting/provenance.py` (100% branch); `test_provenance.py` (15 tests). **`running_git_commit` existed since `M4-006a` and was called only from tests** -- a correct resolver no production path reached. The reference has the same defect louder: it hard-codes `github_commit` to `"unknown"`. Also reports a **dirty working tree**: `git rev-parse HEAD` answers happily with uncommitted changes, so a resolved hash can be a truthful answer to the wrong question `[AE-53]` |
 | M9-010c | Record proof that each report was sent | PENDING | An unsent report voids that game's points `[AE-32]` |
 | M9-010d | Reconcile declared game counts against the artifact set | PENDING | A false declaration is absolute disqualification `[AE-38]` |
 | M9-011 | Write the academic report body | PENDING | A scientific document, not an installation guide `[AE-42]` |
@@ -766,12 +766,12 @@ byte-stability (`M4-011`), and the transport-free protocol guard (`test_protocol
 | M9-015a | Confirm the repository is reachable by the grader | PENDING | Public, or shared `[AE-49]` |
 | M9-015b | Confirm the cross-link to the companion repository resolves | PENDING | A link only; no repository access `[AE-49]` |
 | M9-016 | Archive the final submission state | PENDING | The tagged commit, artifacts, and evidence bundle retained together |
-| M9-017 | Verify the repository meets the minimum contents rule | PENDING | README, `/config`, PRD files, PLAN, and TODO all present `[AE-50]` |
-| M9-017a | Confirm every mechanism has its own PRD | PENDING | `[G§2.3]`; one per algorithm or central mechanism |
-| M9-017b | Confirm the docs folder matches the guidelines' structure | PENDING | `[G§2.2]` |
-| M9-018 | Verify no secret exists anywhere in Git history | PENDING | `[AE-39]`; a secret committed once requires rotation |
-| M9-018a | Scan the full history, not just the working tree | PENDING | A deleted secret remains in earlier commits |
-| M9-018b | Confirm `.gitignore` covers every credential path | PENDING | `[AE-40]` |
+| M9-017 | Verify the repository meets the minimum contents rule | DONE | `scripts/check_submission_contents.py`, passing. Checks book 9.4.1, 9.4.2 and guidelines 2.3 together and reports **every** gap at once |
+| M9-017a | Confirm every mechanism has its own PRD | DONE | Guidelines 2.3: every central mechanism needs its own PRD. Read from `docs/PRD_*.md` rather than a hand-kept list, so a mechanism added without one surfaces here instead of in a reviewer's memory. All seven present |
+| M9-017b | Confirm the docs folder matches the guidelines' structure | DONE | Book 9.4.1 (`inst/:2267`): README, config, PLAN, TODO, PRD, source -- all present. **Recorded discrepancy:** 9.4.1's own text conflates `/config` with the PRDs; the guidelines list them separately. Both readings are checked, since satisfying both costs nothing |
+| M9-018 | Verify no secret exists anywhere in Git history | DONE | `scripts/scan_git_history.py`; `test_history_scan.py` (20 tests). The working-tree gate answers the wrong question at submission: rule 39 forbids secrets being **in the repository**, and a credential deleted three commits ago is in every clone |
+| M9-018a | Scan the full history, not just the working tree | DONE | `--all`, not `HEAD`. Tests target the ways a structural scan goes quietly vacuous -- a scan that inspected 3 objects still prints OK. One test proves history contains paths absent from disk, so the scanner cannot be a duplicate of the tree gate |
+| M9-018b | Confirm `.gitignore` covers every credential path | DONE | `forbidden_path` flags `credentials.json`, `token.json`, `.env*`, `*.key`, `*.pem`, `*.p12` **by name** -- a file can be a credential without containing a matching pattern. A test asserts every refused name is also gitignored `[AE-40]` |
 | M9-019 | Verify the annotated tag points at the reviewed commit | PENDING | Not at a later commit written after the deadline `[AE-41]` |
 | M9-020 | Prepare the handover note for the coordinator | PENDING | Current state, open unknowns, and next action in one page |
 | M9-020a | List every task still open at submission | PENDING | Honest, not aspirational |

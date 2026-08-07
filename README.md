@@ -927,6 +927,47 @@ command that does not exist. Everything downstream of it — the refresh policy 
 300-second skew margin, the base64url envelope, the send gates — is built and tested against
 injected doubles, which is what let the rest of M7 finish with no credential in existence.
 
+#### Starting M9: what a history scan and a provenance check found (`M9-018`, `M9-010b`, 2026-08-07)
+
+Four findings, and the pattern in them is the same: a guard that was correct and unreached.
+
+**`running_git_commit` was called only from its own tests.** It has existed since `M4-006a`,
+fail-closes properly on anything but a clean 40-hex SHA, and no production path ever invoked
+it. Rule 53 is Mandatory, so a declaration that names the group, the hardware and the model
+but not the code is unreproducible — and the failure is silent, because the artifact
+validates and the key is present. The reference implementation has the same defect in a
+louder form: it hard-codes `github_commit` to the string `"unknown"` for both sides.
+`reporting/provenance.py` resolves it for real and refuses a placeholder.
+
+**A resolved hash can still be the wrong answer.** `git rev-parse HEAD` replies happily with
+uncommitted changes on disk, so the recorded commit does not contain the code that played.
+`describe_provenance` reports both facts and `require_reproducible` refuses a dirty tree
+before a *counted* game — fine while rehearsing, a broken audit trail once it counts.
+
+**The working-tree secret scan answers the wrong question at submission.** Rule 39 forbids
+secrets being *in the repository*, and a credential deleted three commits ago is in every
+clone. `scripts/scan_git_history.py` walks every blob reachable from **any** ref, so a secret
+on a merged-and-deleted branch is still seen, and checks paths as well as contents — a file
+can be a credential without containing anything that matches a pattern. **This repository's
+history is clean: 1709 objects, 0 findings.** That is precisely when a scanner's own tests
+matter, since nothing would notice if it quietly stopped looking.
+
+**The book contradicts itself about sending the report, and the contradiction is now
+disclosed.** Rule 51 and §9.3.3 require the JSON report to be *sent*, and `inst/:2224` is
+explicit that a side whose report is not received scores nothing "even if they won". But the
+shipped config example sets `[email] mode = "draft"` (`inst/:3041`, `DEV-SPEC.md:228`) and the
+book's own overview says "a JSON report sent via Gmail drafts" (`:3206`). Chapter 110 grants
+the freedom to choose, provided the report states where the contradiction was found, what was
+chosen and why. **We send.** A draft never sent scores zero under the rule with the explicit
+sanction; sending costs nothing if the draft reading was intended. `draft` stays available as
+a rehearsal mode.
+
+Submission contents are checked rather than assumed: `scripts/check_submission_contents.py`
+holds §9.4.1's list, §9.4.2's six README components, and the guidelines' per-mechanism PRD
+requirement, reporting every gap at once. It checks **presence, never quality** — whether the
+Dec-POMDP section is any good is a human judgement; whether it survived the last refactor is
+not, and that is the question worth asking automatically.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
