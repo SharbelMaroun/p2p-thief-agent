@@ -41,12 +41,29 @@ Observed SHA-256 values:
 
 Top level: `_schema`, `schema_version`, `declaration_type`, `game_id`, `game_uid`,
 `links`, `timezone`, `game_started_at`, `game_ended_at`, `num_sub_games`,
-`max_tokens_per_game`, `groups`.
+`max_tokens_per_game`, `groups`, `github_commit`.
 
 Each group: `group_id`, `group_name`, `members`, `repos`, `mcp_servers`, `llm_model`,
 `hardware_spec`, `signature`.
 
-Hardware: `cpu_type`, `cpu_freq_mhz`, `cpu_cores`, `ram_gb`, `gpu_model`, `vram_gb`.
+Hardware: `os`, `cpu_type`, `cpu_freq_mhz`, `cpu_cores`, `ram_gb`, `gpu_model`,
+`vram_gb`.
+
+Two of those are **ours, not the template's**, and the difference matters when comparing
+these bytes against an opponent's:
+
+- `github_commit` is required by rule 53 — the commit hash of the code that played the
+  series. The examples do not carry it at declaration level; they carry a per-sub-game
+  `github_commit` in `4-final-result.json`, which answers a different question. A grader
+  reading only the examples would not find the series-level one.
+- `os` leads the specification list at `inst/:1278` — "Operating System (OS), number of
+  processor cores and their frequency (CPU), RAM capacity, presence of a graphics card and
+  video memory (GPU/VRAM)". The examples omit it. Rule 24 is Mandatory and its sanction is
+  denial of eligibility for the computational bonus, so the book wins over the template here.
+
+Both were added to the builders on 2026-08-07 and to this document at the same time only
+because `tests/unit/test_artifact_schema_doc.py` refused the mismatch; before that test
+existed the document had already been wrong about both for a day and still read as current.
 
 ## `2-agreed-config.json`
 
