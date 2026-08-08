@@ -818,3 +818,47 @@ is restated as governing wire *inputs*.
 into a chart title is a claim nothing re-checks* — compute it. (3) *When three documents cover
 one finding, the one without a test is the one that rots.* (4) *State the discipline you
 actually practise*; a stronger claim is not a safer one, because a grader reads what is written.
+
+
+## 2026-08-08 (vi) — the audit's leftovers, and one finding the audit got wrong
+
+**Prompt.** "Fix all the rest" — the smaller findings left open after the first audit pass:
+a submission-tag test that could not fail, the missing §11 cost analysis, the `ast.Import` hole in the rule-8/9 boundary guards, and a `target-version` that disagreed with `requires-python`.
+
+**The notebooks were asked first, and one answer retired a finding instead of closing it.**
+The audit had flagged "no results-analysis notebook in either repository" against guidelines
+§9.2. Asked directly, the book **does not require a Jupyter file**: it names the deliverable
+`RESEARCH-REPORT-Performance-Analysis.md` under `/docs`, which is the file both repositories
+already ship, and the pinned reference contains no notebook either — its analysis is markdown
+plus plain Python. The finding was an **invented requirement**: a real rule read through the
+word "notebook" rather than through what the source says the artifact is. It is now written
+into the research report itself so nobody "fixes" it later by adding a file that satisfies
+nothing. A reviewer who manufactures requirements wastes exactly the time the review cost.
+
+**A test that switches itself off when the risk appears is worse than no test.**
+`test_submission_tag.py` asserted `main() in (0, 1)` — true of any function returning an int
+— and `isinstance(tag_exists(), bool)`. Worse, one case returned early the moment a tag
+existed, so the suite went quiet at exactly the point the "tag names a commit nobody
+reviewed" failure becomes possible. Rewritten to build **real throwaway Git repositories** and
+drive the checker at every branch, including the correctly-tagged case the old suite could
+never reach, plus one unconditional assertion that this repository is tagged and annotated.
+
+**The boundary-guard hole is the most serious thing found today**, and it was in both
+repositories. The walkers enforcing rules 8 and 9 — sanction: disqualification of the
+*project* — matched only `ast.ImportFrom`, so a plain
+`import p2p_thief_agent.orchestration as o` inside `live/` would have passed the one test that
+exists to stop it. A guard that checks one of the two ways to write the same statement is not
+a guard.
+
+**The cost section was missing entirely, and the book wanted a different argument than
+expected.** Rule 54's token figures were emitted, but guidelines §11 asks for a cost analysis
+and there was none. Asked directly, for a zero-token agent the book does not want a fabricated
+dollar table: it wants the **minimal-resources** case, because computational fairness is
+graded — the book asks whether an agent on a phone races a workstation fairly. So §3.5 states
+the zero-token position as a strategy, with what it costs (no rhetorical sophistication, no
+claim to an LLM-driven strategy) rather than only what it saves.
+
+**Fixing the lint target cost more than it looked.** `target-version = "py310"` against
+`requires-python = ">=3.11"` was suppressing 8 real findings. All were fixed rather than
+ignored; consolidating a `datetime` import kept `adapters/serve.py` inside the 150-line cap
+instead of widening the gate to fit the change.

@@ -304,3 +304,19 @@ its own truth-aimed stack still cannot corner a mobility evader, so the directio
 that risk favours the Thief), no live opponent has been played, and the decoder's
 exactness assumes the opponent honours the hash-locked emission model — a deviator
 degrades us to the uniform-safe belief, and degrades itself to a rule-23 sanction.
+
+
+## The results-analysis notebook: checked, and NOT a Jupyter file
+
+**Recorded 2026-08-08 after an audit finding that turned out to be wrong.** An external review
+flagged 'no analysis notebook in either repo' against guidelines section 9.2, which asks for a
+'results analysis notebook'. Asked directly, the book **does not require a Jupyter `.ipynb`**:
+it defines the deliverable as a Markdown research report and names it -
+`RESEARCH-REPORT-Performance-Analysis.md` under `/docs` - which is exactly the file this
+repository already ships. The pinned reference simulator contains no notebook either; its
+analysis is markdown plus plain Python scripts.
+
+The finding was an **invented requirement**: a real rule (section 9.2) read through the word
+'notebook' rather than through what the source says the artifact is. It is written down here so
+the next reader does not 'fix' it by adding a Jupyter file that satisfies nothing, and because
+a review that manufactures requirements is a review that wasted the time it cost.
