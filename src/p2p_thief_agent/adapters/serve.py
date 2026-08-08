@@ -55,6 +55,7 @@ def serve_match(
     artifacts_dir: Path | None = None,
     game_config: Mapping[str, object] | None = None,
     identity: Mapping[str, object] | None = None,
+    sub_game: int = 1,
 ) -> MatchOutcome:
     """Bind, wait for the opponent, then play one sub-game to a decision.
 
@@ -98,23 +99,29 @@ def serve_match(
 
     client = FastMCPClient(peer_url)
     threshold = survival_threshold
+    agreement = None
+    started_at = None
     if game_config is not None:
         # `M5-014f` on the playable path: agree before the first move. The companion
         # Cop refuses an unnegotiated game, and so does the book.
+        from datetime import datetime, timezone  # noqa: PLC0415
+
         from p2p_thief_agent.adapters.negotiated import (  # noqa: PLC0415
             NegotiatedServeError,
-            negotiated_threshold,
+            negotiated_agreement,
         )
 
         if not identity:
             raise ServeError("negotiation needs this peer's identity; pass --private")
         try:
-            threshold = negotiated_threshold(
+            agreement = negotiated_agreement(
                 client=client, inboxes=inboxes, game_config=game_config,
                 identity=identity, fallback_timeout=ready_timeout, sleep=sleep,
             )
         except NegotiatedServeError as exc:
             raise ServeError(str(exc)) from exc
+        threshold = int(agreement.terms["max_steps"])
+        started_at = datetime.now(timezone.utc).isoformat()
 
     # `receive` owns the bounded waiting; the raw non-blocking take made the loop
     # check the inbox once, microseconds after its own send, and declare a live
@@ -134,7 +141,18 @@ def serve_match(
         records=records,
     )
     if artifacts_dir is not None:
-        _write_log(artifacts_dir, records, result)
+        context = None
+        if agreement is not None and game_config is not None and identity is not None:
+            from p2p_thief_agent.protocol.crypto import canonical_sha256  # noqa: PLC0415
+
+            sha = canonical_sha256(dict(game_config))
+            context = {
+                "game_id": f"game-{sha[:12]}", "game_uid": sha[:32], "sub_game": sub_game,
+                "group_id": identity.get("group_id", "unknown"),
+                "opponent_group_id": agreement.peer_identity.get("group_id", "unknown"),
+                "config_sha256": sha, "confirmed": True, "started_at": started_at,
+            }
+        _write_log(artifacts_dir, records, result, context)
     return MatchOutcome(outcome=result.outcome, steps=result.steps, records=records)
 
 
@@ -159,11 +177,12 @@ def _take(inboxes: object) -> Mapping[str, object] | None:  # noqa: D401
     return take_turn(inboxes, InboundPeer())
 
 
-def _write_log(directory: Path, records: list[dict], result: object) -> Path:
+def _write_log(directory: Path, records: list[dict], result: object,
+               context: Mapping[str, object] | None = None) -> Path:
     """Write the finished log; the body lives in `adapters/match_log.py` (length gate)."""
     from p2p_thief_agent.adapters.match_log import write_match_log  # noqa: PLC0415
 
-    return write_match_log(directory, records, result)
+    return write_match_log(directory, records, result, context)
 
 
 def resolve_peer(peer: str | None, private: Path | None) -> str:

@@ -1154,6 +1154,34 @@ the league checklist requires an accessible address, "not only localhost", plus 
 replay screenshots — the tunnel rehearsal remains the operator's step, and what it rehearses
 is now known to work.
 
+#### Eleven real matches in one night (`M9-029`, 2026-08-08)
+
+The full runbook was then exercised eleven times over live HTTP: the complete
+six-sub-game series (`--sub-game 1..6`), an adjacent-start game, a close-start game, a
+9×9 board, a **negotiated 50-step horizon** (both peers agreed `max_moves: 50` from the
+shared file and played exactly 50), and a corner-press opening. **All eleven ended with
+both sides recording the identical outcome, and all twenty-two logs replay
+`Verified OK`.** Ten were Thief survivals — including from one cell away, because the
+Thief moves first and never returns the head start. The eleventh is the one that
+completes the picture: pressed into the corner at start, the Thief was walled in and
+**captured on turn 21**, exercising the entire capture path over the wire — claim,
+honest confirmation, mutual termination, and an artifact naming *police* as winner
+through the very mapping that used to be a hard-coded lie. The live-GUI belief-map
+capture was refreshed from a real socket exchange the same night.
+
+#### Evidence that counts, and the page a classmate can follow (`M9-028`, 2026-08-08)
+
+The wire log now records what negotiation actually established — the real opponent, the
+real config lock, `confirmed: true`, and a game id derived from the shared file's canonical
+hash. The verification that matters: **both repositories derived the same id
+(`game-9934e8338307`) independently**, and the Cop's revealed log replayed `Verified OK`
+under *this* repository's verifier — two separately written implementations checking each
+other's cryptography, which is the audit model doing its job. `docs/MATCH_RUNBOOK.md` is
+the one-page classmate procedure: the byte-identical shared-file handshake, both sides'
+commands, the ruled six-sub-game role schedule, the rule-51/commit/screenshot duties, and a
+troubleshooting list in which every entry is a failure one of our own rehearsal runs paid
+for.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a

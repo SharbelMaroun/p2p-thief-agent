@@ -94,6 +94,7 @@ def play(args: argparse.Namespace) -> int:
             answer_claim=decide.answer_claim,
             artifacts_dir=args.artifacts,
             game_config=game_config, identity=identity,
+            sub_game=getattr(args, "sub_game", 1),
         )
     except ServeError as exc:
         print(f"match did not start: {exc}")
