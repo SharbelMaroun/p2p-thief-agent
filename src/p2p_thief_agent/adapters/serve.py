@@ -77,7 +77,7 @@ def serve_match(
     from p2p_thief_agent.adapters.fastmcp_client import FastMCPClient  # noqa: PLC0415
     from p2p_thief_agent.adapters.fastmcp_server import PeerInboxes  # noqa: PLC0415
     from p2p_thief_agent.adapters.serving import (
-        port_answers,  # noqa: PLC0415
+        peer_answers,  # noqa: PLC0415
         serve_in_background,  # noqa: PLC0415
     )
     from p2p_thief_agent.services.readiness import wait_for_peer  # noqa: PLC0415
@@ -87,9 +87,14 @@ def serve_match(
 
     # `wait_for_peer` takes a probe rather than a URL, so it can be driven by a test
     # without opening a socket — the same injection the deadline and watchdog modules use.
-    peer_host, _, peer_port = peer_url.rsplit("/", 1)[0].rpartition(":")
+    #
+    # **The probe is `peer_answers`, not `port_answers` (corrected 2026-08-09).** The old
+    # form TCP-connected to the host it parsed out of the URL — and defaulted to port 80
+    # when an https URL named none. Through a tunnel that reaches a CDN edge which accepts
+    # regardless of whether the opponent exists, so the wait passed instantly and the first
+    # `negotiate` returned 502. Found in a live match attempt, not by any test.
     answered = wait_for_peer(
-        lambda: port_answers(peer_host.split("//")[-1], int(peer_port or 80)),
+        lambda: peer_answers(peer_url),
         clock=time.monotonic, sleep=sleep, timeout=ready_timeout,
     )
     if not answered:

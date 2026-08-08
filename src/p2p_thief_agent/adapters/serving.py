@@ -28,6 +28,8 @@ from __future__ import annotations
 
 import socket
 import threading
+import urllib.error
+import urllib.request
 
 from p2p_thief_agent.adapters.fastmcp_server import PeerInboxes, build_server
 
@@ -103,4 +105,37 @@ def port_answers(host: str, port: int, timeout: float = 1.0) -> bool:
         with socket.create_connection((host, port), timeout=timeout):
             return True
     except OSError:
+        return False
+
+
+# Gateway statuses meaning "the tunnel is routable but nothing is serving behind it".
+# A peer that answers *anything* else -- including 406, which is what an MCP endpoint
+# returns to a bare GET -- is up, whatever it thinks of the request.
+_NO_ORIGIN = frozenset({502, 503, 504})
+
+
+def peer_answers(url: str, timeout: float = 2.0) -> bool:
+    """Return whether the opponent's endpoint is actually **served**, not merely routable.
+
+    **`port_answers` cannot answer this through a tunnel, and that cost us a match.**
+    A TCP connect to `<name>.trycloudflare.com:443` succeeds against the CDN edge whether
+    or not the peer's process exists, so the readiness wait passed instantly and the first
+    `negotiate` came back `502 Bad Gateway`. The probe was right on localhost -- where the
+    only thing that can accept a connection is the peer itself -- and every rehearsal was
+    on localhost.
+
+    The distinction the TCP probe was protecting still holds: "not up yet" must stay
+    separable from "up and refused the match". That is why only the gateway statuses count
+    as down. A peer that replies `406`, `200` or `400` is present, and whatever it says
+    about the match is negotiation's business, not readiness's.
+    """
+    try:
+        # Built inside the try: an unparseable URL raises from the constructor, and a
+        # readiness probe that raises turns "the opponent is late" into a crash.
+        request = urllib.request.Request(url, method="GET")
+        with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310
+            return response.status not in _NO_ORIGIN
+    except urllib.error.HTTPError as exc:
+        return exc.code not in _NO_ORIGIN
+    except (urllib.error.URLError, OSError, ValueError):
         return False
