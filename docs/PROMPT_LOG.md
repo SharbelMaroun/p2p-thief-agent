@@ -771,3 +771,50 @@ the defect was invisible until a real artifact arrived. Fixed with payload fallb
 the sender column now fills from the log's declared role.
 
 Style addendum, same day: both windows moved onto a dark-navy chrome with glowing pill banners, rounded cells, and neon trails (`ui/style.py`) — pure tkinter, no theme dependency. The verdict colours and the heat ramp were deliberately left alone: reference-matched, test-pinned meaning is not styling. The styled replay window crossed the 150-line cap and split its evidence panels into `ui/replay_panels.py` rather than widening the gate.
+
+
+## 2026-08-08 (v) — an external audit, and the documents that had rotted
+
+**Prompt.** An independent examiner was asked to evaluate both repositories before submission
+with a hostile brief: trust nothing either repo says about itself, reproduce every claim, hunt
+Appendix E sanctions first, and find at least ten real problems. Then: fix them.
+
+**What the gates said.** Everything declared passed: `uv sync --frozen`, `ruff` clean, 1591
+tests at 95.58% branch, file lengths, secret scan over the tree and all 2050 history objects.
+The contract checker correctly stayed fail-closed at `PENDING`. **No disqualification-level
+violation** survived direct attack, and the commit-reveal and scent-lock digests reproduced
+byte-identically against the companion — `416a57e1…` from both repositories independently.
+
+**The reproduction that failed.** `results/strategy_comparison.json` claimed belief survival
+125; re-running `run_comparison()` returned **140**. The code had improved (the `M6-032` wall
+pressure term) and the committed result had not been regenerated — so the README quoted a
+number the repository could no longer produce. Every other result file reproduced exactly,
+which made the one that did not easy to see and easy to have missed.
+
+**The section that argued against its own data.** README §4 still told the story of the metric
+disagreement: belief losing the league on points, 140 against blind's 175, `M6-015c` opened as
+an unresolved finding. That was corrected in the *research report* and the *academic report* on
+2026-08-07 when the ranking fix landed — `results/strategy_arms.json` now carries
+`metric_disagreement: false` and belief winning 235 to 175 — and the README section was simply
+never brought along. Three documents told two different stories and the flag designed to catch
+exactly this was already reading `false`.
+
+**The chart that contradicted its own bars.** `chart-metric-disagreement.svg` was titled "The
+two metrics rank the strategies in opposite directions" while drawing 235 against 175 in the
+same direction. The title and caption were hard-coded strings in `render_charts.py`; they are
+now **derived from the data** the bars come from, so the picture cannot disagree with itself
+again.
+
+**Overclaimed independence, corrected.** `THIEF-002` was written as "developed with no read and
+no write access to the companion Cop repository". The discipline it describes is real and is
+why the protocol and strategy layers genuinely diverge — but both repositories are written by
+the same team and share about thirty support files, one of them byte-identical including its
+dated discovery note. The rule that matters (rules 1 and 2) is about **run-time** separation
+and is structurally enforced; the sentence was claiming something stronger and different.
+`docs/SHARED_MATERIAL_AND_AUTHORSHIP.md` now itemises exactly what is shared, and `THIEF-002`
+is restated as governing wire *inputs*.
+
+**Lessons.** (1) *Regenerating results is not updating the report.* (2) *A conclusion written
+into a chart title is a claim nothing re-checks* — compute it. (3) *When three documents cover
+one finding, the one without a test is the one that rots.* (4) *State the discipline you
+actually practise*; a stronger claim is not a safer one, because a grader reads what is written.

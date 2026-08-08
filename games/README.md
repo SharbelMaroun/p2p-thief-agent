@@ -53,3 +53,27 @@ recompute every commitment, which is the point of publishing them.
 
 Committing a **finished** log is therefore permitted. What is still forbidden is building or
 sharing a log while the game is in play, which `build_log` refuses by requiring `ended_at`.
+
+## What is committed here today
+
+`game-593df753457f/` is a **real two-process match** played on 2026-08-08 between this team's
+Cop and this team's Thief over a socket -- an engineering rehearsal, **not** a counted league
+game against a classmate, and it is never reported as one.
+
+| File | Why it is here |
+|---|---|
+| `config_game-593df753457f_g01.json` | Appendix F obligation 4: the configuration of every game is committed. |
+| `declaration_game-593df753457f.json` | The pre-game declaration, including the commit hash the game ran under (rule 53). |
+| `log_game-593df753457f_g01.json` | This peer's revealed log. **Not obligated** -- the log is absent from the section 9.4.1 minimum-contents list -- but committed deliberately: it is the subject of the mandatory `Verified OK` screenshot, and a screenshot of a file nobody else can open proves nothing. |
+| `log_game-593df753457f_g01.opponent.json` | The opponent's revealed log, so the mutual audit (rule 36) and the replay viewer's two-trail board can both be reproduced from the repository. |
+
+Confirmed against the book before committing: the **config** carries the commit obligation;
+the **log** does not, but nothing forbids committing a finished one. Rule 18 keeps a nonce
+secret *until the end of the game*, and these games are over, so the revealed nonces here are
+exactly what lets a third party recompute every commitment -- which is the point.
+
+Both logs verify under **both** peers' verifiers:
+
+```text
+uv run p2p-thief replay --log games/game-593df753457f/log_game-593df753457f_g01.json
+```

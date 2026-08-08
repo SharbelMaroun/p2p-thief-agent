@@ -77,7 +77,7 @@ uv run p2p-thief --version       # works with no transport installed
 
 ```bash
 uv run ruff check .                              # lint, pinned select set
-uv run python -m pytest -q                       # 1428 tests, 85% branch floor
+uv run python -m pytest -q                       # 1591 tests, 85% branch floor
 uv run python scripts/check_file_lengths.py      # 150-line cap
 uv run python scripts/check_secrets.py           # working tree
 uv run python scripts/scan_git_history.py        # every blob in history

@@ -16,13 +16,15 @@ uv run python scripts/render_charts.py       # writes assets/chart-*.svg
 
 ## The finding that matters
 
-![The two metrics rank the strategies in opposite directions](../assets/chart-metric-disagreement.svg)
+![Both metrics now rank belief above blind, after the ranking fix](../assets/chart-metric-disagreement.svg)
 
 **`M6-015`'s evidence measures a quantity the game does not score.**
 
 The shipped comparison asserts that belief-driven evasion beats the blind baseline on
-**total survival steps**, over four fixed openings. It does, and comfortably: 125 against
-52, a 2.4× advantage. That test passes and is not wrong about what it measures.
+**total survival steps**, over four fixed openings. It does, and comfortably: 140 against
+52, a 2.7× advantage. That test passes and is not wrong about what it measures. (It read
+125 until 2026-08-08; the wall-pressure term in `M6-032` raised it, and
+`results/strategy_comparison.json` is regenerated rather than quoted from memory.)
 
 Widening the scenario set to all 24 perimeter openings, and then scoring the runs the way
 Appendix F actually scores them:
@@ -173,9 +175,14 @@ converts fewer scenarios into points the further out the threshold moves.
 ## Decision cost
 
 Recorded separately by `scripts/benchmark_decision.py` in `results/decision_benchmark.json`:
-mean 0.86 ms and worst case 2.11 ms on 7×7 over 3 000 iterations; 1.53 ms and 3.47 ms on
+mean 0.56 ms and worst case 2.01 ms on 7×7 over 3 000 iterations; 1.52 ms and 3.61 ms on
 20×20 over 1 000. Against the negotiated 30 000 ms response timeout the worst case is
 **0.012%** of budget, so computational fairness is not close to contested.
+
+Unlike every other figure in this report these two are **machine-dependent** — they are wall
+clock on the laptop that ran them, and they move a little on every re-run. They are quoted to
+establish an order of magnitude, not a reproducible constant; the reproducible claim is the
+ratio to the timeout, which stays four orders of magnitude clear.
 
 ## Learning curves
 

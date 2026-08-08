@@ -52,12 +52,18 @@ The verifier reaches `Verified OK` or `TAMPERED` on a saved log — including on
 repository did not write — and reports structural damage separately from the cryptographic
 verdict.
 
-The repository still deliberately implements no public tunnel and **no GUI** (`ui/` is an
-empty package), so the replay banner cannot yet be photographed for the mandatory
-submission screenshot. Gmail credentials are deliberately absent (rules 39–40), so the
-sender is built but unexercised. And, decisively, there is still **no second peer that
-plays back**: the opponent's moves in every run so far come from a local script, so **no
-game has been played against a real opponent**.
+**Both GUIs now exist and both mandatory screenshots are real captures** (§5 below): a live
+belief-map window taken during a two-process match, and a replay viewer showing `Verified OK`
+over a log this repository actually played. `p2p-thief serve --peer … --game …` plays a whole
+match over a socket, and `p2p-thief replay --log …` re-verifies a stored log from the command
+line, matching the reference's own `replay --log` shape.
+
+What is still absent is absent for a stated reason: a **public tunnel** (`shared/tunnel.py`
+resolves and validates a public URL, but nothing here can open one — that is the operator's
+machine and account), **OAuth consent and a live Gmail send** (credentials are deliberately
+not in the repository under rules 39–40, so the sender is built but unexercised), and a
+**counted league game**. Every match played so far is this team's Thief against this team's
+Cop or a scripted peer — an engineering rehearsal, never described here as a league result.
 
 Earlier Cop-bundle reviews are retained as historical audit evidence only. No
 peer-owned file was integrated, and those bundles are not inputs to the current
@@ -65,9 +71,11 @@ Thief-authored conformance workflow. The dated findings remain in
 [COORDINATOR_VERDICT_2026-07-28.md](docs/COORDINATOR_VERDICT_2026-07-28.md) and
 [CONTRACT_REVIEW.md](docs/CONTRACT_REVIEW.md).
 
-On 2026-07-28 the copy model was **superseded**. Under `THIEF-002` this repository has
-no access to the companion Cop repository and must play unknown classmate opponents, so
-byte-parity with one peer would prove nothing about interoperability. M1 is therefore a
+On 2026-07-28 the copy model was **superseded**. Under `THIEF-002` this repository does not
+take the companion's bundle as a wire input and must play unknown classmate opponents, so
+byte-parity with one peer would prove nothing about interoperability. (`THIEF-002` governs
+wire *inputs*, not authorship — see
+[SHARED_MATERIAL_AND_AUTHORSHIP.md](docs/SHARED_MATERIAL_AND_AUTHORSHIP.md).) M1 is therefore a
 conformance gate rather than a copy gate: the Thief authors its own wire profile.
 
 On 2026-07-29 that profile was re-based onto the reference simulator's wire
@@ -88,8 +96,9 @@ uv sync --frozen
 uv run p2p-thief --help
 ```
 
-The command exposes scaffold metadata and help only. It does not start a peer or a
-game.
+The CLI has three verbs: `serve` starts this peer's mailbox and, given `--peer`, plays a whole
+match; `replay` re-verifies a stored log and prints its banner; `verify` is the same check
+with an exit code instead of output.
 
 ## Quality gates
 
@@ -109,11 +118,14 @@ profile or conformance work.
 
 - Cop and Thief are separate processes and repositories with no shared memory, database,
   runtime filesystem, or private truth (`SR-001`, `SR-004`, `THIEF-001`).
-- This repository is developed with no read and no write access to the companion Cop
-  repository, and must interoperate with an **unknown** opponent (`THIEF-002`). League
-  play is against classmates, so matching one companion repository is evidence about
-  that repository only. Interoperability is demonstrated against a neutral stub sharing
-  no files with either side.
+- The **wire** is authored without reference to the companion Cop repository: it is matched
+  against the book and the pinned reference simulator, because league play is against
+  classmates and matching one sibling would be evidence about that sibling only
+  (`THIEF-002`). Interoperability is demonstrated against a neutral stub sharing no files
+  with either side. **This is a design-input discipline, not an authorship claim** — both
+  repositories are written by the same team and share support code, which
+  [SHARED_MATERIAL_AND_AUTHORSHIP.md](docs/SHARED_MATERIAL_AND_AUTHORSHIP.md) itemises. The
+  separation the rules require is at run time (rules 1 and 2), and that one is structural.
 - Legal moves are north, south, east, west, and stay; diagonals are illegal
   (`AF-015`).
 - Barrier placement is disclosed; a barrier on the Thief’s current cell and a trapped
@@ -169,10 +181,25 @@ the address is named like an address or merely looks like one.
 
 ## Usage
 
-This peer is not yet runnable as a live agent. The SDK, protocol layer, both
-transport adapters, the agreement gate, and the turn loop all exist; what is missing
-is the wiring that points them at a real opponent and a second peer to answer. Today's
-honest usage surface:
+This peer is runnable. With `--peer` it negotiates, plays every commit-reveal turn, answers
+capture claims, reveals its audit, and writes the artifact set a counted game owes:
+
+```text
+uv run p2p-thief serve --port 8801 --peer <opponent mailbox url> \
+                       --game <shared match config json> \
+                       --private config/thief/game.toml \
+                       --artifacts games/<game_id> --sub-game 1
+```
+
+Without `--peer` it only listens. The full match-day procedure, including the tunnel step, is
+[docs/MATCH_RUNBOOK.md](docs/MATCH_RUNBOOK.md). To re-verify a stored log:
+
+```text
+uv run p2p-thief replay --log games/<game_id>/log_<game_id>_g01.json
+uv run p2p-thief verify --log <path>          # exit 1 if TAMPERED
+```
+
+The version probe:
 
 ```text
 uv run p2p-thief --version        # 1.00
@@ -187,8 +214,15 @@ uv run pytest tests/integration/test_localhost_two_processes.py -v
 uv run pytest tests/integration/test_negotiation_gate.py -v
 ```
 
-This section will gain the live `peer` invocation, its flags, and replay
-screenshots once the turn loop and a full sub-game land.
+To regenerate the two submission screenshots from committed inputs:
+
+```text
+uv run python scripts/capture_replay_screenshots.py   # Verified OK and TAMPERED
+uv run python scripts/capture_live_gui_screenshot.py  # live belief map
+```
+
+What this section still cannot show is a game against a classmate; that needs the tunnel and
+an opponent, and the procedure lives in the match runbook rather than in a promise here.
 
 ## Contributing
 
@@ -205,7 +239,7 @@ The gates enforce the standards, so a change that passes CI already meets them:
   opponent URL, credentials, and commitment nonces stay in the git-ignored
   `config/game.toml` or `.env`.
 - **`THIEF-002`.** No task may be satisfied by reading, cloning, or inspecting the
-  companion Cop repository. The pinned simulator is the sanctioned wire reference:
+  companion Cop repository as a **wire** input. The pinned simulator is the sanctioned reference:
   match its wire, never copy its source.
 - **The contract checker** (`scripts/check_shared_contracts.py`) is **fail-closed**
   and exits non-zero while no accepted parity manifest exists. Never edit it to
@@ -521,7 +555,7 @@ at all, so the module can be handed to an opponent as the book recommends. It fa
 a **docstring line beginning with the word "from"** — a crude check catching a real
 property, which is the trade a shareability guard should make.
 
-*The evidence.* The companion Cop peer, written independently, produces the identical
+*The evidence.* The companion Cop peer, whose protocol layer is written separately, produces the identical
 digest `416a57e1…`. Two implementations agreeing is the difference between an
 interoperability contract and a number we hash alone and trust.
 
@@ -1279,7 +1313,7 @@ The **distance objective** is then the baseline's: the most likely Cop cell beco
 threat, and the policy maximises distance from it with every legality and determinism
 guarantee intact — a belief that misdirects can never produce an illegal move, and the
 language model never touches the decision. Against the blind baseline this more than
-doubles survival — **125 vs 52** steps over four fixed pursuit scenarios
+triples survival — **140 vs 52** steps over four fixed pursuit scenarios
 (`docs/PRD_strategy.md`, `results/strategy_comparison.json`). The formulas are in
 [docs/PRD_scent_belief.md](docs/PRD_scent_belief.md).
 
@@ -1298,34 +1332,46 @@ deterministic and weight-free, so there is no convergence to plot, and the book 
 a substitute. [`docs/RESEARCH-REPORT-Performance-Analysis.md`](docs/RESEARCH-REPORT-Performance-Analysis.md)
 answers the same question by measurement — and the answer is uncomfortable.
 
-![The two metrics rank the strategies in opposite directions](assets/chart-metric-disagreement.svg)
+![Both metrics now rank belief above blind, after the ranking fix](assets/chart-metric-disagreement.svg)
 
-**`M6-015`'s acceptance criterion measures a quantity the game does not score.** It asserts
-that belief-driven evasion beats the blind baseline on *total survival steps*, over four
-fixed openings, and it does: 125 to 52. Widening to all 24 perimeter openings and scoring
-the runs the way Appendix F scores them:
+**`M6-015`'s acceptance criterion measured a quantity the game does not score — and for a
+while that hid a policy that was losing.** The criterion asserts that belief-driven evasion
+beats the blind baseline on *total survival steps* over four fixed openings, and it does:
+140 to 52. Widening to all 24 perimeter openings and scoring the runs the way Appendix F
+scores them:
 
 | Metric | blind | belief | Winner |
 |---|---|---|---|
-| Total survival steps | 437 | **661** | belief (1.51×) |
-| Scenarios reaching the horizon | **11** | 4 | blind |
-| **League points** (10 survive / 5 captured, both `Fixed`) | **175** | 140 | **blind** |
+| Total survival steps | 437 | **810** | belief (1.85×) |
+| Scenarios reaching the horizon | 11 | **23** | belief |
+| **League points** (10 survive / 5 captured, both `Fixed`) | 175 | **235** | **belief** |
+| Paired, per scenario | — | **13 wins, 0 losses, 11 ties** | belief |
 
-There is nothing between 5 and 10: a policy that reliably survives 28 of 35 turns scores
-exactly what one caught on turn 2 scores.
+**This table read the other way until 2026-08-07, and that is the more interesting result.**
+Belief then scored **140 against blind's 175** — worse than a random walk at the only thing
+a sub-game pays for — while comfortably winning on survival steps (661 v 437). Both numbers
+were true at once, because Appendix F pays for *reaching the threshold* or *being captured*
+with nothing in between: forty extra steps ending in capture are worth exactly what one
+extra step ending in capture is worth.
+
+The cause was one line of ranking. The policy ordered its criteria lexicographically with
+threat distance first, so room to move only ever broke ties between equally distant moves —
+and maximising distance on a bounded board walks a Thief into a corner: distance large,
+exits zero. Scoring distance **plus** mobility optimises P(reach the horizon) instead of
+E[steps], which is the quantity that pays.
 
 ![Survival steps by evasion arm](assets/chart-survival-distribution.svg)
 
-The blind baseline is **bimodal** — 11 outright escapes, the rest caught in 2–7 turns.
-Belief is **consistent** — median 29, standard deviation halved from 15.8 to 7.6 — but
-converts far fewer scenarios into the only outcome that pays. Paired, belief wins 13 and
-loses 11.
+The blind baseline is **bimodal** — 11 outright escapes, the rest caught in 2–7 turns —
+while belief now has median 35 and escapes 23 of 24. `metric_disagreement` in
+`results/strategy_arms.json`, a flag that exists to catch exactly this failure, now reads
+`false`.
 
-This is not proof that blind is the better strategy: it is one deterministic Cop on one
-board, and a pursuer that anticipated evasion could reverse it. It *is* evidence that the
-criterion behind `M6-015` does not track the scoring rules, and that four scenarios were too
-few to notice. Opened as **`M6-015c`** rather than silently patched — changing the strategy
-is a larger decision than a measurement batch.
+**The lesson outlived the bug.** `M6-015` accepted the policy on four hand-picked openings
+using total steps, and that criterion kept passing for as long as the policy was losing the
+league. An acceptance test that measures something adjacent to the score is worse than no
+test, because it produces confidence. The criterion is now league points over the full
+opening set (`M6-015c`), and the four-scenario comparison is kept only as a regression.
 
 Six charts, all SVG, all regenerable:
 
@@ -1336,10 +1382,10 @@ uv run python scripts/render_charts.py
 
 ### 5. Live belief map and "Verified OK" replay screenshots
 
-**The verifier behind the `Verified OK` stamp now exists in this repository; the screen that
-shows it does not yet.** Rule 20's sanction is a "threshold condition for confirmation of
-logs and submission of the project" (p.129/272), so this was the largest remaining gap here
-— M8 stood at zero.
+**Both screens exist and both captures below are real photographs of them**, taken over a
+match this repository actually played. Rule 20's sanction is a "threshold condition for
+confirmation of logs and submission of the project" (p.129/272), so it is worth being precise
+about what the pictures are evidence *of*.
 
 `src/p2p_thief_agent/replay/` loads a saved log, recomputes every commitment from the file's
 own bytes, and reaches one of exactly two verdicts; one altered record voids the whole match
@@ -1374,17 +1420,27 @@ run. The `Verified OK` capture belongs "within the README.md academic report" (p
 
 ### The replay viewer
 
-![Replay viewer showing a green Verified OK stamp over an eight-step log](assets/replay-verified-ok.png)
+![Replay viewer showing a green Verified OK stamp over a twenty-one-step played match](assets/replay-verified-ok.png)
 
 *`assets/replay-verified-ok.png` — the mandatory submission capture (`:1769`; "absolute
-mandatory" at p.81/189). Every commitment in `log_verified_ok.json` was recomputed from the
-file's own bytes at the moment the picture was taken.*
+mandatory" at p.81/189). The log is `games/game-593df753457f/log_game-593df753457f_g01.json`
+— **a match this peer actually played**, committed next to the configuration it was played
+under, with the opponent's revealed log beside it so both trails draw. Every one of the 21
+commitments was recomputed from the file's own bytes at the moment the picture was taken.*
+
+**The capture was corrected on 2026-08-08, and the reason generalises.** The previous image
+was a real screenshot of a real match — but of a log living in a temporary directory no
+grader could open, and its caption pointed at a test fixture instead. Asked directly, the
+book requires these captures to show a game **actually played**, not a fixture; so the played
+match is committed and the script reads it from the repository. A screenshot whose subject is
+not in the repository is reproducible by exactly one person.
 
 The screen shows what the book asks a replay viewer to show: for each entry the `nonce`,
 the `move` and the original `commit` (p.56/142); a verdict indicator — a green
 `Verified OK` stamp or a red `TAMPERED` banner; and controls to move "back and forth in
-time" (p.56/141). It does **not** draw the board, because the board is not a requirement
-and the belief map belongs to the live GUI, where the book puts it.
+time" (p.56/141). It also draws the board — both trails, barriers as placed, the capture
+ring — which rule 9 permits here and forbids in the live GUI: the replay is the
+*Retrospective Witness*, and after the reveal the true history is exactly what it is for.
 
 ![Replay viewer showing a red TAMPERED banner with step 5 highlighted](assets/replay-tampered.png)
 
@@ -1472,8 +1528,56 @@ uv run python scripts/capture_live_gui_screenshot.py
 
 ### 6. Companion repository
 
-<https://github.com/SharbelMaroun/p2p-cop-agent> — the Cop-side peer. Under
-`THIEF-002` it is not an input to this repository's development.
+<https://github.com/SharbelMaroun/p2p-cop-agent> — the Cop-side peer.
+
+**Both repositories are written by the same team** (`sharNamr`), as rule 49 intends. Under
+`THIEF-002` the companion is not an input to the **wire** — that is matched against the book
+and the pinned reference simulator — but the two trees do share support code, itemised in
+[SHARED_MATERIAL_AND_AUTHORSHIP.md](docs/SHARED_MATERIAL_AND_AUTHORSHIP.md). The separation
+the rules demand is at run time (rules 1 and 2), and that one is structural and tested.
+
+
+### What an external audit changed in this report
+
+**Added 2026-08-08.** An independent examiner was asked to evaluate both repositories with a
+hostile brief: reproduce every claim, hunt Appendix E sanctions first, and treat anything
+unreproducible as unverified. It is recorded here because the result changes how the numbers
+above should be read.
+
+**The gates held and no sanction-level rule was violated.** Every declared check was re-run by
+someone trying to break it: the frozen install, `ruff`, the full suite with branch coverage,
+the file-length and secret gates, and the secret scan over *every blob in history* rather than
+the working tree. Rules 2, 8/9, 11, 15, 17/18/19, 20, 23 and 39/40 were each attacked directly
+and each held; the commit-reveal digest and the scent-model lock were recomputed and matched
+the companion repository byte for byte.
+
+**What did not hold was the documentation.** `results/strategy_comparison.json` claimed a
+survival total of 125 that the current code returns as 140 — the only result file in the
+repository that failed to reproduce. Section 4 of this report still argued the
+metric-disagreement finding, with belief losing the league 140 to 175, three weeks after the
+ranking fix that reversed it: the research report and the academic report had both been
+corrected, `results/strategy_arms.json` already carried `metric_disagreement: false`, and
+this section was never brought along. The chart beside it was titled "the two metrics rank
+the strategies in opposite directions" while drawing them in the same direction. The
+self-assessment scored a docstring row 2 out of 2 on ruff enforcement that has never been
+enabled; measuring it moved the total from 26/30 to **25/30**. And `THIEF-002` was written
+as a claim of no access to the companion repository when it is a discipline about wire
+*inputs* — both repositories are one team's work and share support code.
+
+Three lessons are recorded rather than quietly fixed, because they are the reusable part:
+
+1. **Regenerating results is not updating the report.** `results/*.json` has a script;
+   the prose quoting it does not, so the two drift silently and only the prose is graded.
+2. **A number written into a document is a claim with an expiry date, and nothing watches it.**
+   The fix applied here where it was possible was to *derive* the wording from the data rather
+   than restate it.
+3. **Screenshots must have committed subjects.** A capture of a file in a temporary directory
+   is real evidence that no third party can ever reproduce, which makes it indistinguishable
+   from a fabricated one at exactly the moment it matters.
+
+What the audit could not fix, because it is not a documentation problem: no counted league
+game has been played, no public tunnel has been opened, and OAuth consent has not been run.
+Those are stated in **Current milestone** above and are the operator's remaining work.
 
 ## License and provenance
 

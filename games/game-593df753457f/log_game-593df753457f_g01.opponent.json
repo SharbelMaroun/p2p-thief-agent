@@ -1,0 +1,443 @@
+{
+  "_schema": "game-log",
+  "game_id": "game-593df753457f",
+  "game_uid": "593df753457f77c66c6b44f049850942",
+  "links": {
+    "config": "config_game-593df753457f_g01.json",
+    "log": "log_game-593df753457f_g01.json"
+  },
+  "mutual_agreement": {
+    "confirmed": true,
+    "opponent_group_id": "rehearsal-thief-group",
+    "sha256": "593df753457f77c66c6b44f0498509429c440f6e611fa5295322e6cf54550667"
+  },
+  "records": [
+    {
+      "commit": "7d04a3b2f2746caf9c81e7577c1432559dac1d71baa2f579eb45a3ae7478931c",
+      "hint": "heading toward the the waterfront",
+      "intent": "truth",
+      "move": "MOVE:SOUTH",
+      "nonce": "f5f6e99b16e7743379e77335e1177c4b",
+      "payload": {
+        "barriers": [],
+        "hint": "heading toward the the waterfront",
+        "intent": "truth",
+        "move": "MOVE:SOUTH",
+        "position": [
+          1,
+          0
+        ],
+        "step": 1
+      },
+      "sender": "police",
+      "step": 1
+    },
+    {
+      "commit": "5e3569de3a0afe9a01cc33a4ee296a1f41f3038e12f6d03e7b573a91d042f1af",
+      "hint": "way past the the waterfront",
+      "intent": "bluff",
+      "move": "MOVE:SOUTH",
+      "nonce": "641fcb2bd7a66ca895dd3aa89954fe01",
+      "payload": {
+        "barriers": [],
+        "hint": "way past the the waterfront",
+        "intent": "bluff",
+        "move": "MOVE:SOUTH",
+        "position": [
+          2,
+          0
+        ],
+        "step": 2
+      },
+      "sender": "police",
+      "step": 2
+    },
+    {
+      "commit": "9c33611f93fc2f24e1c979daa4f4e6200f6e867875bc2df808f81bc98505ccd7",
+      "hint": "closing in near the the waterfront",
+      "intent": "truth",
+      "move": "MOVE:SOUTH",
+      "nonce": "8e715b0654a1ed50e0b7dad2c4900236",
+      "payload": {
+        "barriers": [],
+        "hint": "closing in near the the waterfront",
+        "intent": "truth",
+        "move": "MOVE:SOUTH",
+        "position": [
+          3,
+          0
+        ],
+        "step": 3
+      },
+      "sender": "police",
+      "step": 3
+    },
+    {
+      "commit": "a48783442ded9ed011ee72a6103830b46e3a97f187a49a7efb21066b860fd019",
+      "hint": "far from the the old subway line",
+      "intent": "bluff",
+      "move": "MOVE:SOUTH",
+      "nonce": "ed8add3c1b54d003581c700935dd58db",
+      "payload": {
+        "barriers": [],
+        "hint": "far from the the old subway line",
+        "intent": "bluff",
+        "move": "MOVE:SOUTH",
+        "position": [
+          4,
+          0
+        ],
+        "step": 4
+      },
+      "sender": "police",
+      "step": 4
+    },
+    {
+      "commit": "0ecb76a56a34a2abe3ac0409226969f25c7580ffecf4d7ddd8b4551aa8b6b491",
+      "hint": "somewhere by the the old subway line",
+      "intent": "truth",
+      "move": "MOVE:SOUTH",
+      "nonce": "65d9c962e1a9411e40993ad05195956c",
+      "payload": {
+        "barriers": [],
+        "hint": "somewhere by the the old subway line",
+        "intent": "truth",
+        "move": "MOVE:SOUTH",
+        "position": [
+          5,
+          0
+        ],
+        "step": 5
+      },
+      "sender": "police",
+      "step": 5
+    },
+    {
+      "commit": "ad85de53878f4644df04fb3c5623d0f12b371f3eb1d143d17123beaf950e745a",
+      "hint": "nowhere near the the old subway line",
+      "intent": "bluff",
+      "move": "MOVE:EAST",
+      "nonce": "c54d8f99b37efff64eeaf27df3ed6ef0",
+      "payload": {
+        "barriers": [],
+        "hint": "nowhere near the the old subway line",
+        "intent": "bluff",
+        "move": "MOVE:EAST",
+        "position": [
+          5,
+          1
+        ],
+        "step": 6
+      },
+      "sender": "police",
+      "step": 6
+    },
+    {
+      "commit": "00a6a753db2daf22b33457f7adad4e666ceba878629d8bf75f95281a30572649",
+      "hint": "heading toward the the old subway line",
+      "intent": "truth",
+      "move": "MOVE:EAST",
+      "nonce": "59130b4abb2adc6e56e2c8ff4a34f6fe",
+      "payload": {
+        "barriers": [],
+        "hint": "heading toward the the old subway line",
+        "intent": "truth",
+        "move": "MOVE:EAST",
+        "position": [
+          5,
+          2
+        ],
+        "step": 7
+      },
+      "sender": "police",
+      "step": 7
+    },
+    {
+      "commit": "0c6c7aeeab51b7eb580bf32227466fcdc31465ffe6e4ca4b14e982243e95fa3a",
+      "hint": "way past the the old subway line",
+      "intent": "bluff",
+      "move": "MOVE:NORTH",
+      "nonce": "d29749aa321d4d698fce2be7d60204cf",
+      "payload": {
+        "barriers": [],
+        "hint": "way past the the old subway line",
+        "intent": "bluff",
+        "move": "MOVE:NORTH",
+        "position": [
+          4,
+          2
+        ],
+        "step": 8
+      },
+      "sender": "police",
+      "step": 8
+    },
+    {
+      "commit": "6e079fef587ce8269c126262b20eed7d9c594d30e17cd9bc964d1d29ebf139ea",
+      "hint": "closing in near the the waterfront",
+      "intent": "truth",
+      "move": "MOVE:NORTH",
+      "nonce": "7b1f3e9bd306490bcd373a82e71b17cf",
+      "payload": {
+        "barriers": [],
+        "hint": "closing in near the the waterfront",
+        "intent": "truth",
+        "move": "MOVE:NORTH",
+        "position": [
+          3,
+          2
+        ],
+        "step": 9
+      },
+      "sender": "police",
+      "step": 9
+    },
+    {
+      "commit": "df6a0f5d28df26a0e9b36d4800a6e973b4abf29fc632bc3c0b8f8cf7e5f18c25",
+      "hint": "far from the the waterfront",
+      "intent": "bluff",
+      "move": "MOVE:NORTH",
+      "nonce": "04211b75c52096126a8f222deefd9fd0",
+      "payload": {
+        "barriers": [],
+        "hint": "far from the the waterfront",
+        "intent": "bluff",
+        "move": "MOVE:NORTH",
+        "position": [
+          2,
+          2
+        ],
+        "step": 10
+      },
+      "sender": "police",
+      "step": 10
+    },
+    {
+      "commit": "49a9f51a5bf1e8d04745c8066a4c24ed2701097f679c074180e928066626d60a",
+      "hint": "somewhere by the the waterfront",
+      "intent": "truth",
+      "move": "MOVE:NORTH",
+      "nonce": "b798c1a30de52b92b8ed879915a1b905",
+      "payload": {
+        "barriers": [],
+        "hint": "somewhere by the the waterfront",
+        "intent": "truth",
+        "move": "MOVE:NORTH",
+        "position": [
+          1,
+          2
+        ],
+        "step": 11
+      },
+      "sender": "police",
+      "step": 11
+    },
+    {
+      "commit": "2ed4eaeb881593bf42355f9c2a43addcf58d209ae92a6859ed2ff8030f6c78e2",
+      "hint": "nowhere near the the waterfront",
+      "intent": "bluff",
+      "move": "MOVE:EAST",
+      "nonce": "9d1ef283357d2f60ef784c5914937ab4",
+      "payload": {
+        "barriers": [],
+        "hint": "nowhere near the the waterfront",
+        "intent": "bluff",
+        "move": "MOVE:EAST",
+        "position": [
+          1,
+          3
+        ],
+        "step": 12
+      },
+      "sender": "police",
+      "step": 12
+    },
+    {
+      "commit": "8534cbc705a17e9ef035ee119c1d4255789e16b0b4a4882d0a3c8bfbd20e0a76",
+      "hint": "heading toward the the museum steps",
+      "intent": "truth",
+      "move": "MOVE:EAST",
+      "nonce": "336268549c13d2a1783e5848aa30955a",
+      "payload": {
+        "barriers": [],
+        "hint": "heading toward the the museum steps",
+        "intent": "truth",
+        "move": "MOVE:EAST",
+        "position": [
+          1,
+          4
+        ],
+        "step": 13
+      },
+      "sender": "police",
+      "step": 13
+    },
+    {
+      "commit": "bb0977b1e9f691054194c5d7ddedef9b149d79002a2950dd3b2209dec46c4cb0",
+      "hint": "way past the the museum steps",
+      "intent": "bluff",
+      "move": "MOVE:SOUTH",
+      "nonce": "54ddbcc5a0e9ab21e7a6c9e9df89c208",
+      "payload": {
+        "barriers": [],
+        "hint": "way past the the museum steps",
+        "intent": "bluff",
+        "move": "MOVE:SOUTH",
+        "position": [
+          2,
+          4
+        ],
+        "step": 14
+      },
+      "sender": "police",
+      "step": 14
+    },
+    {
+      "commit": "5126ee99771db2fe8ffd0e088ecd5c72b31375b06b2089b2204eecb5bbe14169",
+      "hint": "closing in near the the museum steps",
+      "intent": "truth",
+      "move": "MOVE:SOUTH",
+      "nonce": "b57fc5490fe64c2f040ad7c2ef364c99",
+      "payload": {
+        "barriers": [],
+        "hint": "closing in near the the museum steps",
+        "intent": "truth",
+        "move": "MOVE:SOUTH",
+        "position": [
+          3,
+          4
+        ],
+        "step": 15
+      },
+      "sender": "police",
+      "step": 15
+    },
+    {
+      "commit": "dcb0a9e5e22713ffb71a218546745df387e1b4b2e9f1c5e15b6d20373951684a",
+      "hint": "far from the the park gates",
+      "intent": "bluff",
+      "move": "MOVE:SOUTH",
+      "nonce": "1cd6862257a56e9de43346aa42ec7663",
+      "payload": {
+        "barriers": [],
+        "hint": "far from the the park gates",
+        "intent": "bluff",
+        "move": "MOVE:SOUTH",
+        "position": [
+          4,
+          4
+        ],
+        "step": 16
+      },
+      "sender": "police",
+      "step": 16
+    },
+    {
+      "commit": "979bf2cd48daa72affae7c69c4afa94b2f8bf6e240116fc609c8d8063ddbd449",
+      "hint": "somewhere by the the park gates",
+      "intent": "truth",
+      "move": "MOVE:SOUTH",
+      "nonce": "1310062c3bce456bc800c4cf7a390b7c",
+      "payload": {
+        "barriers": [],
+        "hint": "somewhere by the the park gates",
+        "intent": "truth",
+        "move": "MOVE:SOUTH",
+        "position": [
+          5,
+          4
+        ],
+        "step": 17
+      },
+      "sender": "police",
+      "step": 17
+    },
+    {
+      "commit": "5892c42d22ccf3e9e65c273d67d2596abe9e8f9dc2b3a30e82b86cf775c03882",
+      "hint": "nowhere near the the park gates",
+      "intent": "bluff",
+      "move": "MOVE:EAST",
+      "nonce": "5ac6f31b25a1ecfc095efff4e6461ff1",
+      "payload": {
+        "barriers": [],
+        "hint": "nowhere near the the park gates",
+        "intent": "bluff",
+        "move": "MOVE:EAST",
+        "position": [
+          5,
+          5
+        ],
+        "step": 18
+      },
+      "sender": "police",
+      "step": 18
+    },
+    {
+      "commit": "25a7ccbdd6e40d8af6c0470e38c1f6acb4e6424899a233e17408f15b5e88df05",
+      "hint": "heading toward the the park gates",
+      "intent": "truth",
+      "move": "BARRIER:[5, 6]",
+      "nonce": "30e3bce82d76786334c84156cc7e4bc3",
+      "payload": {
+        "barriers": [
+          [
+            5,
+            6
+          ]
+        ],
+        "hint": "heading toward the the park gates",
+        "intent": "truth",
+        "move": "BARRIER:[5, 6]",
+        "position": [
+          5,
+          5
+        ],
+        "step": 19
+      },
+      "sender": "police",
+      "step": 19
+    },
+    {
+      "commit": "94ff75b5c86f8a2f4dab916cf07c54769a5f5d8e9893b314724ceeea028ae4cb",
+      "hint": "way past the the park gates",
+      "intent": "bluff",
+      "move": "MOVE:SOUTH",
+      "nonce": "6e2674883b0acc9fc55b9459c2ea5ffc",
+      "payload": {
+        "barriers": [
+          [
+            5,
+            6
+          ]
+        ],
+        "hint": "way past the the park gates",
+        "intent": "bluff",
+        "move": "MOVE:SOUTH",
+        "position": [
+          6,
+          5
+        ],
+        "step": 20
+      },
+      "sender": "police",
+      "step": 20
+    }
+  ],
+  "schema_version": "1.2",
+  "sub_game_number": 1,
+  "summary": {
+    "audit": {},
+    "duration_seconds": 0,
+    "ended_at": "2026-08-08T12:02:34.857043+00:00",
+    "group_id": "rehearsal-cop-group",
+    "opponent_group_id": "rehearsal-thief-group",
+    "result": "capture",
+    "role": "police",
+    "started_at": "2026-08-08T12:01:51.106235+00:00",
+    "steps": 21,
+    "sub_game_number": 1,
+    "timezone": "UTC",
+    "tokens_total": 0,
+    "winner_role": "police"
+  }
+}

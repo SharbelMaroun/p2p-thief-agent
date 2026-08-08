@@ -1,0 +1,103 @@
+{
+  "_schema": "declaration",
+  "config_sha256": "593df753457f77c66c6b44f0498509429c440f6e611fa5295322e6cf54550667",
+  "declaration_lock": "50a67254cf4fcf6d7044c488331c572d676712075334004c52ef83e064bcae8e",
+  "declaration_type": "pre_game",
+  "game_ended_at": null,
+  "game_id": "game-593df753457f",
+  "game_started_at": "2026-08-08T12:01:51.106235+00:00",
+  "game_uid": "593df753457f77c66c6b44f049850942",
+  "games_played_declaration": {
+    "counted_games_before_this": 0,
+    "first_meeting_between_groups": true,
+    "games_played_including_this": 1,
+    "opponent_group_id": "rehearsal-thief-group",
+    "warm_ups_excluded": 0
+  },
+  "github_commit": "4e529014f546388596b45db366ebb9292f058502",
+  "groups": [
+    {
+      "group_id": "rehearsal-cop-group",
+      "group_name": "rehearsal-cop-group",
+      "hardware_spec": {
+        "cpu_cores": 8,
+        "cpu_freq_mhz": 3600,
+        "cpu_type": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+        "gpu_model": "none",
+        "os": "Windows-11-10.0.26200-SP0",
+        "ram_gb": 16,
+        "vram_gb": 0
+      },
+      "llm_model": "template-zero-token",
+      "mcp_servers": {
+        "rehearsal-cop-group": "http://127.0.0.1:8802/mcp"
+      },
+      "members": [
+        "Sharbel Maroun",
+        "Amr safadi"
+      ],
+      "repos": {
+        "cop": "https://example.invalid/cop",
+        "thief": "https://example.invalid/thief"
+      },
+      "signature": "9832fb7d2caf94cdc68f308bda1582e137ce79d54eb3fe747cac08b872a3e021"
+    },
+    {
+      "group_id": "rehearsal-thief-group",
+      "group_name": "rehearsal-thief-group",
+      "hardware_spec": {
+        "cpu_cores": 0,
+        "cpu_freq_mhz": 3600,
+        "cpu_type": "",
+        "gpu_model": "none",
+        "os": "",
+        "ram_gb": 16,
+        "vram_gb": 0
+      },
+      "llm_model": "template-zero-token",
+      "mcp_servers": {
+        "cop": "http://127.0.0.1:8802/mcp",
+        "thief": "http://127.0.0.1:8801/mcp"
+      },
+      "members": [
+        "Sharbel Maroun",
+        "Amr safadi"
+      ],
+      "repos": {
+        "cop": "https://example.invalid/cop",
+        "thief": "https://example.invalid/thief"
+      },
+      "signature": null
+    }
+  ],
+  "links": {
+    "config": [
+      "config_game-593df753457f_g01.json",
+      "config_game-593df753457f_g02.json",
+      "config_game-593df753457f_g03.json",
+      "config_game-593df753457f_g04.json",
+      "config_game-593df753457f_g05.json",
+      "config_game-593df753457f_g06.json"
+    ],
+    "declaration": "declaration_game-593df753457f.json",
+    "log": [
+      "log_game-593df753457f_g01.json",
+      "log_game-593df753457f_g02.json",
+      "log_game-593df753457f_g03.json",
+      "log_game-593df753457f_g04.json",
+      "log_game-593df753457f_g05.json",
+      "log_game-593df753457f_g06.json"
+    ],
+    "result": "result_game-593df753457f.json"
+  },
+  "max_tokens_per_game": 33333,
+  "num_sub_games": 6,
+  "repositories": [
+    "https://example.invalid/cop",
+    "https://example.invalid/thief",
+    "https://example.invalid/cop",
+    "https://example.invalid/thief"
+  ],
+  "schema_version": "1.1",
+  "timezone": "UTC"
+}
