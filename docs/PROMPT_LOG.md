@@ -862,3 +862,61 @@ claim to an LLM-driven strategy) rather than only what it saves.
 `requires-python = ">=3.11"` was suppressing 8 real findings. All were fixed rather than
 ignored; consolidating a `datetime` import kept `adapters/serve.py` inside the 150-line cap
 instead of widening the gate to fit the change.
+
+
+## 2026-08-08 (vii) — the scent kernel was wrong, and our own reading rule is why
+
+**Prompt.** A classmate team's analysis of our repositories, forwarded by Amr, claimed our
+5x5 emission kernel disagrees with theirs: diagonal `0.42` not `0.20`, mid-side `0.20` not
+`0.14`, and the eight-cell ring `0.14` rather than a negotiated residual. Asked to check it
+before changing anything.
+
+**Three of their four claims did not survive checking.** Their `game_id`/`game_uid` finding
+was wrong -- we do derive both deterministically in `adapters/serve.py`; they read the
+`MatchIdentity` dataclass and not the call site. Their report-signature proposal (spaced
+separators, a Hebrew consensus key) appears nowhere in the book and its spaced separators
+would contradict the canonical-JSON rule the book *does* state, so it is one team's private
+convention. Their open question -- whether a scent mismatch could surface as an audit hash
+mismatch -- is answered by the code: `smell_grid` rides in the **public** turn fields, never
+inside the sealed payload, so the worst case is a clean pre-game refusal, never a both-zero
+audit.
+
+**The fourth claim was right, and it was ours to have caught.** Fit `tau = 0.9*exp(-k*d^2)`
+through the only two values every reading agrees on -- centre `0.90`, cross `0.62` -- and the
+remaining classes follow with **no free parameter**: `0.427`, `0.203`, `0.140`, `0.046`. That
+is their kernel to two decimals, four for four, and it is exactly what Figure 4's caption
+describes: a hill decaying radially. Our table matched at the centre, the cross and the
+corners and was wrong in the middle -- the same curve **shifted inward by one radial class**.
+The shift also explains the thing we had treated as a gap in the book: the eight "unnamed"
+cells were unnamed only because the shift had consumed the class that owns `0.14`. The book
+PDF, asked directly, confirms all six classes and states that every one of the 25 cells
+carries a value.
+
+**The worst part is that we had already been told.** On 2026-08-05 `U-030`/`U-025` were closed
+against these exact numbers, with the reasoning written into the ledger: *"A NotebookLM answer
+claimed Figure 4 prints all 25 cells with diagonals at 0.42 and the ring at 0.14; the book
+summary contradicts it on every point... a notebook answer is not a source."* But the notebook
+holds the **PDF**, and `inst/police_thief_p2p_Summary.md` is a **translation**. The rule we
+were applying -- *a restatement of a source is not the source* -- was the right rule, pointed
+backwards. It cost a wrong emission kernel in both peers for three days, and it would have
+cost a refused game against any classmate who read the figure correctly.
+
+**What changed.** The kernel in both repositories, the lock digest (`416a57e1...` ->
+`e6aef097...`, still identical across the two peers), the stored scent vectors, the regression
+matrix, both PRDs, both unknown registers, and every measured result -- belief sits directly
+on the emission field, so nothing downstream was still valid. The tournament headline
+survived the change: the served stack still captures 40/40 against all five archetypes on
+both board sizes, equal to the referee-truth oracle.
+
+**And one test that should have existed from the start now does.** `test_scent.py` pins the
+*curve* -- every class within 0.01 of `0.9*exp(-k*d^2)` -- not just the table. It needs no
+source to argue with, and it fails on a one-class shift by twenty times its own tolerance.
+The old suite pinned the table to itself, which is why five scent tests passed for three days
+over the wrong physics.
+
+**Step 3 was completed only half.** The book notebook answered and is the authority that
+settled this. The **code notebook froze** across three attempts -- original tab, reload, and a
+brand-new tab, each rejecting even a four-character probe -- so "what does the reference
+emit?" is unanswered. Recorded rather than skipped silently: the reference uses subtractive
+decay over Chebyshev distance, a different model that cannot arbitrate Figure 4's radial
+values, which is why the correction proceeded on the book's authority alone.

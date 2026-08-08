@@ -2,15 +2,15 @@
   {
     "grid": "7x7",
     "iterations": 3000,
-    "mean_ms": 0.5594,
-    "worst_ms": 2.0053,
+    "mean_ms": 0.4696,
+    "worst_ms": 1.7734,
     "budget_ms": 30000
   },
   {
     "grid": "20x20",
     "iterations": 1000,
-    "mean_ms": 1.521,
-    "worst_ms": 3.606,
+    "mean_ms": 1.2238,
+    "worst_ms": 3.358,
     "budget_ms": 30000
   }
 ]

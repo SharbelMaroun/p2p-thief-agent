@@ -218,9 +218,9 @@ Across **24 scenarios** — every perimeter opening, Cop and Thief starting on o
 
 | Metric | Blind baseline | Belief policy | Winner |
 | --- | ---: | ---: | --- |
-| Total survival steps | 437 | **810** | belief (1.85×) |
-| Scenarios reaching the horizon | 11 | **23** | belief |
-| **League points** (10 survive / 5 captured) | 175 | **235** | **belief** |
+| Total survival steps | 437 | **782** | belief (1.79×) |
+| Scenarios reaching the horizon | 11 | **22** | belief |
+| **League points** (10 survive / 5 captured) | 175 | **230** | **belief** |
 | Paired, per scenario | — | **13 wins, 0 losses, 11 ties** | belief |
 
 **This table read the other way until 2026-08-07, and that is the more interesting result.**
@@ -265,8 +265,8 @@ were regenerated after the fix.
 
 ### 3.3 Decision cost
 
-Mean **0.56 ms**, worst case **2.01 ms** on 7×7 over 3 000 iterations; **1.52 ms** and
-**3.61 ms** on 20×20 over 1 000 (`results/decision_benchmark.json`). Against the negotiated
+Mean **0.47 ms**, worst case **1.77 ms** on 7×7 over 3 000 iterations; **1.22 ms** and
+**3.36 ms** on 20×20 over 1 000 (`results/decision_benchmark.json`). Against the negotiated
 30 000 ms response timeout, the worst case is **0.012%** of budget. Computational fairness is
 not close to contested, which is worth establishing precisely so it can stop being discussed.
 

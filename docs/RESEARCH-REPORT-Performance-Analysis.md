@@ -31,9 +31,9 @@ Appendix F actually scores them:
 
 | Metric | blind | belief | Winner |
 |---|---|---|---|
-| Total survival steps | 437 | **810** | belief (1.85×) |
-| Scenarios reaching the horizon | 11 | **23** | belief |
-| **League points** (10 survive / 5 captured) | 175 | **235** | **belief** |
+| Total survival steps | 437 | **782** | belief (1.79×) |
+| Scenarios reaching the horizon | 11 | **22** | belief |
+| **League points** (10 survive / 5 captured) | 175 | **230** | **belief** |
 
 > **Corrected 2026-08-07.** This table previously read `175` for blind against
 > `140` for belief — our policy losing to a random walk on the only metric a
@@ -53,6 +53,11 @@ Thief's *current* cell. Re-run against two stronger pursuers on the same 24 open
 | greedy (the harness Cop) | 23/24 | 235 |
 | herding — closes, and breaks ties to shrink our room | 23/24 | 235 |
 | **anticipating** — chases the centroid of our *next* legal cells | **8/24** | **160** |
+
+> **Measured 2026-08-07, under the pre-correction scent kernel.** Kept as the dated record
+> that motivated the work below rather than restated, because the sequence of attempts *is*
+> the finding. The current numbers, regenerated under the corrected kernel, are in the
+> 2026-08-08 (iii) addendum; `results/pursuer_grid.json` is always the live source.
 
 Belief beats the blind arm against all three, so the fix in §3.1 is real and not an artifact
 of the opponent. But **23/24 is a greedy-Cop number, not a league expectation.** A classmate
@@ -175,7 +180,7 @@ converts fewer scenarios into points the further out the threshold moves.
 ## Decision cost
 
 Recorded separately by `scripts/benchmark_decision.py` in `results/decision_benchmark.json`:
-mean 0.56 ms and worst case 2.01 ms on 7×7 over 3 000 iterations; 1.52 ms and 3.61 ms on
+mean 0.47 ms and worst case 1.77 ms on 7×7 over 3 000 iterations; 1.22 ms and 3.36 ms on
 20×20 over 1 000. Against the negotiated 30 000 ms response timeout the worst case is
 **0.012%** of budget, so computational fairness is not close to contested.
 
@@ -271,13 +276,19 @@ residual against the agreed 5×5 profile localises the emitter — the true cell
 zero mismatch, the best rival at least `(0.9 − 0.62)²`. The full factorial grid
 (`scripts/experiment_pursuers.py`, 24 paired perimeter openings):
 
-| arm | greedy | herding | anticipating |
-| --- | ---: | ---: | ---: |
-| shipped policy, raw belief | 23/24 (235) | 8/24 (160) | 5/24 (145) |
-| adaptive policy, raw belief | 23/24 (235) | 4/24 (140) | 4/24 (140) |
-| shipped policy, **decoded belief** | 23/24 (235) | 8/24 (160) | 18/24 (210) |
-| **adaptive policy, decoded belief** | **24/24 (240)** | **24/24 (240)** | **24/24 (240)** |
-| truth-fed ceiling (instrument) | 24/24 | 24/24 | 24/24 |
+| arm | greedy | herding | anticipating | interceptor |
+| --- | ---: | ---: | ---: | ---: |
+| shipped policy, raw belief | 22/24 (230) | 7/24 (155) | 3/24 (135) | 7/24 (155) |
+| adaptive policy, raw belief | 22/24 (230) | 6/24 (150) | 2/24 (130) | 6/24 (150) |
+| shipped policy, **decoded belief** | 23/24 (235) | 8/24 (160) | 18/24 (210) | 8/24 (160) |
+| **adaptive policy, decoded belief** | **24/24 (240)** | **24/24 (240)** | **24/24 (240)** | **24/24 (240)** |
+| truth-fed ceiling (instrument) | 24/24 | 24/24 | 24/24 | 24/24 |
+
+**Regenerated 2026-08-08 under the corrected scent kernel** (`M6-005d`). The raw-belief arms
+each lost a scenario or two — a sharper emission field sharpens the *Cop's* inference as well
+as ours, which is the honest reading. The result that matters is unchanged: the served
+decoded-adaptive arm still equals the truth-fed ceiling on **every** cell, now including the
+fourth pursuer model.
 
 Robustness agrees where every earlier attempt failed hardest: anticipating at 9×9 —
 **32/32**; at horizon 50 — **24/24** (the raw-belief arms manage 8–10/32 and 4–5/24

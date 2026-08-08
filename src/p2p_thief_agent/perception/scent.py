@@ -11,24 +11,32 @@ book's prose "reduced by 90%" on p.43 is an arithmetic slip, corrected under the
 contradiction clause (`C-014`). The pinned simulator's subtractive/immediate decay has
 lower authority and is not copied (`C-009`, `ADR-0005`).
 
-**Emission shape.** Book Figure 4 (p.44,
-`inst/police_thief_p2p_Summary.md:947-955`) names the radial profile of the new emission
-Δτ by distance class: centre `0.90`, the orthogonal cross `0.62`, the diagonals `0.20`,
-the mid-side edges `0.14`, the corners `0.04`. Those five classes cover 17 of the 25
-cells. The **eight** cells at squared-distance 5 — the `(±1,±2)`/`(±2,±1)` ring — are
-**not** named by the figure (`U-025`).
+**Emission shape — corrected 2026-08-08 (`U-025`, reopened and re-closed).** Book
+Figure 4 names the radial profile of the emission Δτ by squared distance from the centre:
+centre `0.90`, orthogonal cross `0.62`, diagonals **`0.42`**, mid-side edges **`0.20`**,
+the eight `(±1,±2)`/`(±2,±1)` cells **`0.14`**, corners `0.04` — **25 of 25 cells**,
+none unnamed.
 
-**That ring is now negotiated, not privately assumed.** No source yields a value for it,
-so a private constant could only ever be this peer's guess, and two peers guessing
-differently would emit different fields and discover it at an audit worth zero to both.
-The book's own boxed section (PDF p.31,
-`inst/police_thief_p2p_Summary.md:1043-1048`) prescribes the alternative: the parties
-**agree** the emission and decay model, confirm they read it identically, and lock it
-with a SHA-256 hash. So the ring is a parameter with a published default, and
-`scent_lock` hashes the whole model at negotiation.
+**How the old table went wrong, because the shape of the error is the lesson.** The
+translation at `inst/police_thief_p2p_Summary.md:947-955` lists five classes and gives
+the diagonals `0.20` and the mid-side `0.14` — the true values of the *next two rings
+out*. The table was the right curve **shifted inward by one radial class**, which is why
+its endpoints (`0.90`, `0.62`, `0.04`) matched perfectly while the middle did not, and
+why eight cells looked unnamed: the shift had consumed the class that owns `0.14`.
 
-`DEFAULT_OUTER_RING_DELTA` carries **no book authority** and is not written as though it
-does. It is our opening offer; the lock is what makes a disagreement visible in time.
+**What settles it.** Fit `τ = 0.9·exp(−k·d²)` using only the two values every reading
+agrees on — centre `0.90` and cross `0.62` — and the rest follow with no free parameter:
+`0.427`, `0.203`, `0.140`, `0.046`. That is the corrected table to two decimals, four for
+four, and it is exactly what the figure's caption describes: a hill that decays radially.
+The book PDF confirms it directly, and a classmate team reproduced the same kernel.
+
+This repository defended the old reading on 2026-08-05 against these very values, on the
+grounds that "a notebook answer is not a source" — but the notebook holds the **PDF**, and
+the file it was checked against is a *translation*. A restatement is not the source
+either; the rule was applied backwards, and it cost a wrong emission table in both peers.
+
+`DEFAULT_OUTER_RING_DELTA` now carries book authority. The parameter survives only so a
+peer insisting on a different ring can still be met and locked.
 """
 
 from __future__ import annotations
@@ -39,15 +47,16 @@ EMISSION_CENTER = 0.9
 DECAY_RATE = 0.10
 FIELD_SIZE = 5
 
-# Book Figure 4 (p.44): the emission Δτ by squared distance from the centre. These five
-# classes are authoritative; every value is book-confirmed.
-_CONFIRMED_EMISSION: dict[int, float] = {0: 0.90, 1: 0.62, 2: 0.20, 4: 0.14, 8: 0.04}
+# Book Figure 4: the emission Δτ by squared distance from the centre. Corrected
+# 2026-08-08 — the diagonals are 0.42 and the mid-side 0.20; the previous 0.20/0.14 were
+# this same curve shifted inward by one radial class.
+_CONFIRMED_EMISSION: dict[int, float] = {0: 0.90, 1: 0.62, 2: 0.42, 4: 0.20, 8: 0.04}
 
-# The squared distance of the eight cells Figure 4 leaves unnamed (`U-025`).
+# The squared distance of the eight cells that looked unnamed until the shift was found.
 OUTER_RING_SQUARED_DISTANCE = 5
 
-# The negotiated default for that ring. NO BOOK AUTHORITY — see the module docstring.
-DEFAULT_OUTER_RING_DELTA = 0.04
+# Figure 4's value for that ring, book-authoritative since the 2026-08-08 correction.
+DEFAULT_OUTER_RING_DELTA = 0.14
 
 
 class ScentModelError(ValueError):

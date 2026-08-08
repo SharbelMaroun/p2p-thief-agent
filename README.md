@@ -568,7 +568,7 @@ a **docstring line beginning with the word "from"** — a crude check catching a
 property, which is the trade a shareability guard should make.
 
 *The evidence.* The companion Cop peer, whose protocol layer is written separately, produces the identical
-digest `416a57e1…`. Two implementations agreeing is the difference between an
+digest `e6aef097…`. Two implementations agreeing is the difference between an
 interoperability contract and a number we hash alone and trust.
 
 *Still open, and deliberately not folded in.* `min_center_intensity`. The reference
@@ -1354,9 +1354,9 @@ scores them:
 
 | Metric | blind | belief | Winner |
 |---|---|---|---|
-| Total survival steps | 437 | **810** | belief (1.85×) |
-| Scenarios reaching the horizon | 11 | **23** | belief |
-| **League points** (10 survive / 5 captured, both `Fixed`) | 175 | **235** | **belief** |
+| Total survival steps | 437 | **782** | belief (1.79×) |
+| Scenarios reaching the horizon | 11 | **22** | belief |
+| **League points** (10 survive / 5 captured, both `Fixed`) | 175 | **230** | **belief** |
 | Paired, per scenario | — | **13 wins, 0 losses, 11 ties** | belief |
 
 **This table read the other way until 2026-08-07, and that is the more interesting result.**
@@ -1375,7 +1375,7 @@ E[steps], which is the quantity that pays.
 ![Survival steps by evasion arm](assets/chart-survival-distribution.svg)
 
 The blind baseline is **bimodal** — 11 outright escapes, the rest caught in 2–7 turns —
-while belief now has median 35 and escapes 23 of 24. `metric_disagreement` in
+while belief now has median 35 and escapes 22 of 24. `metric_disagreement` in
 `results/strategy_arms.json`, a flag that exists to catch exactly this failure, now reads
 `false`.
 

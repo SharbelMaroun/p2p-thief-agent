@@ -1,13 +1,13 @@
 {
   "belief": {
     "max": 35.0,
-    "mean": 33.75,
+    "mean": 32.5833,
     "median": 35.0,
     "min": 5.0,
     "q1": 35.0,
     "q3": 35.0,
     "runs": 24,
-    "stdev": 6.1237
+    "stdev": 8.1929
   },
   "blind": {
     "max": 35.0,
@@ -21,7 +21,7 @@
   },
   "board_size": 7,
   "league_points": {
-    "belief": 235,
+    "belief": 230,
     "blind": 175
   },
   "max_steps": 35,
@@ -35,11 +35,11 @@
   },
   "scenarios": 24,
   "survived_full_horizon": {
-    "belief": 23,
+    "belief": 22,
     "blind": 11
   },
   "total_steps": {
-    "belief": 810.0,
+    "belief": 782.0,
     "blind": 437.0
   }
 }

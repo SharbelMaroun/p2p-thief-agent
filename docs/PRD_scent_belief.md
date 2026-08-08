@@ -23,10 +23,19 @@ Book Figure 4 (p.44) fixes the radial profile of the new emission Δτ by distan
 |---|---|---|
 | Centre (agent's cell) | 1 | `0.90` |
 | Orthogonal cross | 4 | `0.62` |
-| Diagonal | 4 | `0.20` |
-| Mid-side edge | 4 | `0.14` |
+| Diagonal | 4 | `0.42` |
+| Mid-side edge | 4 | `0.20` |
+| Squared-distance 5 ring | 8 | `0.14` |
 | Corner | 4 | `0.04` |
-| Squared-distance 5 ring | 8 | **`U-025`** — unnamed by the figure; `perception/scent` holds a documented residual `0.04` pending a ruling |
+
+**Corrected 2026-08-08 (`U-025` reopened and re-closed).** This table read diagonal `0.20`,
+mid-side `0.14` and treated the eight-cell ring as unnamed. Those are the true values of the
+*next two rings out*: the table was the correct curve **shifted inward by one radial class**,
+which is why it matched at the centre, the cross and the corners while the middle was wrong,
+and why eight cells appeared to have no value — the shift had consumed the class owning
+`0.14`. Confirmed by the book PDF, by a zero-parameter fit of `τ = 0.9·exp(−k·d²)` through
+the two agreed values (giving `0.427 / 0.203 / 0.140 / 0.046`), and by a classmate team's
+independent kernel.
 
 `perception/scent.py` implements this as `emission_field()` plus the per-turn update
 `settle`/`advance_field` (`τ(t+1) = max(0, (1-ρ)·τ(t) + Δτ)`, ρ = 0.10), with the p.43
@@ -152,7 +161,7 @@ update                               = "tau_next = max(0, (1 - decay_per_step) *
 center_intensity                     = 0.9
 decay_per_step                       = 0.10
 field_size                           = 5
-emission_profile_by_squared_distance = {"0":0.90, "1":0.62, "2":0.20, "4":0.14, "5":0.04, "8":0.04}
+emission_profile_by_squared_distance = {"0":0.90, "1":0.62, "2":0.42, "4":0.20, "5":0.14, "8":0.04}
 ```
 
 `scent_model_hash = canonical_sha256(record)` — the same canonicalisation as the config and
@@ -169,17 +178,15 @@ none, folding its pheromone parameters into `config_sha256` instead. The rule is
 **tolerate omission, refuse a mismatch**, matching how `config_sha256` is already handled:
 Appendix E rule 23 sanctions a *deviation from the formula*, not the absence of a message.
 
-**The squared-distance-5 ring is negotiated, not assumed.** Book Figure 4
-(`inst/police_thief_p2p_Summary.md:947-955`) names five radial classes covering **17 of 25**
-cells and gives these eight none, so no value for them can be derived from any source —
-which is why `U-025` was closed by agreement rather than by a ruling. `DEFAULT_OUTER_RING_DELTA`
-(`0.04`) carries **no book authority**; it is this peer's opening offer, and the lock is what
-makes a disagreement visible before the first move instead of at an audit worth zero to both
-sides. The book prescribes exactly this (PDF p. 31): agree the emission and decay model,
-confirm both sides interpret it identically, then lock it.
+**The squared-distance-5 ring is book-named, and used to be treated as negotiated.**
+Figure 4 gives it `0.14`; `DEFAULT_OUTER_RING_DELTA` now carries book authority and the
+parameter survives only so a peer insisting on a different ring can still be met and locked.
+The lock is what makes a disagreement visible before the first move instead of at an audit
+worth zero to both sides, which is what the book prescribes (PDF p. 31): agree the emission
+and decay model, confirm both sides interpret it identically, then lock it.
 
 The record above is the **interop contract**. Its digest
-`416a57e17434ef21b3209052198a27a0d46e7a0e09fdaa5df3b61e4a8f2711ea` is reproduced exactly by
+`e6aef0978ff91fe8aaf7d0a49d8bb839f03cd259a554e4251c182a20b02c6ea1` is reproduced exactly by
 the independently written companion Cop peer — which is the only evidence that locking a
 model is worth anything at all.
 
