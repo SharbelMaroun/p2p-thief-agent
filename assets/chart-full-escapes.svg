@@ -8,21 +8,21 @@
 <line x1="70" y1="336.0" x2="690" y2="336.0" stroke="#e0e0e0" stroke-width="1"/>
 <text x="62.0" y="340.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">0</text>
 <line x1="70" y1="279.6" x2="690" y2="279.6" stroke="#e0e0e0" stroke-width="1"/>
-<text x="62.0" y="283.6" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">2.2</text>
+<text x="62.0" y="283.6" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">4.4</text>
 <line x1="70" y1="223.2" x2="690" y2="223.2" stroke="#e0e0e0" stroke-width="1"/>
-<text x="62.0" y="227.2" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">4.4</text>
+<text x="62.0" y="227.2" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">8.8</text>
 <line x1="70" y1="166.8" x2="690" y2="166.8" stroke="#e0e0e0" stroke-width="1"/>
-<text x="62.0" y="170.8" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">6.6</text>
+<text x="62.0" y="170.8" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">13.2</text>
 <line x1="70" y1="110.4" x2="690" y2="110.4" stroke="#e0e0e0" stroke-width="1"/>
-<text x="62.0" y="114.4" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">8.8</text>
+<text x="62.0" y="114.4" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">17.6</text>
 <line x1="70" y1="54.0" x2="690" y2="54.0" stroke="#e0e0e0" stroke-width="1"/>
-<text x="62.0" y="58.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">11</text>
+<text x="62.0" y="58.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="end" font-weight="normal">22</text>
 <text x="225.0" y="352.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">blind</text>
-<rect x="147.5" y="54.0" width="152.0" height="282.0" fill="#2980b9"/>
-<text x="223.5" y="50.0" font-family="Segoe UI,Arial,sans-serif" font-size="9" fill="#263238" text-anchor="middle" font-weight="normal">11</text>
+<rect x="147.5" y="195.0" width="152.0" height="141.0" fill="#2980b9"/>
+<text x="223.5" y="191.0" font-family="Segoe UI,Arial,sans-serif" font-size="9" fill="#263238" text-anchor="middle" font-weight="normal">11</text>
 <text x="535.0" y="352.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#607d8b" text-anchor="middle" font-weight="normal">belief</text>
-<rect x="457.5" y="233.5" width="152.0" height="102.5" fill="#2980b9"/>
-<text x="533.5" y="229.5" font-family="Segoe UI,Arial,sans-serif" font-size="9" fill="#263238" text-anchor="middle" font-weight="normal">4</text>
+<rect x="457.5" y="54.0" width="152.0" height="282.0" fill="#2980b9"/>
+<text x="533.5" y="50.0" font-family="Segoe UI,Arial,sans-serif" font-size="9" fill="#263238" text-anchor="middle" font-weight="normal">22</text>
 <rect x="70" y="366" width="11" height="11" fill="#2980b9"/>
 <text x="86.0" y="375.0" font-family="Segoe UI,Arial,sans-serif" font-size="10" fill="#263238" text-anchor="start" font-weight="normal">full escapes</text>
 </svg>

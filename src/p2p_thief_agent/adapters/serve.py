@@ -104,7 +104,7 @@ def serve_match(
     if game_config is not None:
         # `M5-014f` on the playable path: agree before the first move. The companion
         # Cop refuses an unnegotiated game, and so does the book.
-        from datetime import datetime, timezone  # noqa: PLC0415
+        from datetime import UTC, datetime  # noqa: PLC0415
 
         from p2p_thief_agent.adapters.negotiated import (  # noqa: PLC0415
             NegotiatedServeError,
@@ -121,7 +121,7 @@ def serve_match(
         except NegotiatedServeError as exc:
             raise ServeError(str(exc)) from exc
         threshold = int(agreement.terms["max_steps"])
-        started_at = datetime.now(timezone.utc).isoformat()
+        started_at = datetime.now(UTC).isoformat()
 
     # `receive` owns the bounded waiting; the raw non-blocking take made the loop
     # check the inbox once, microseconds after its own send, and declare a live

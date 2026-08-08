@@ -14,13 +14,17 @@ from p2p_thief_agent.perception.scent import emission_field, settle
 
 BOARD = Board(size=7)
 
-# The exact 5×5 emission field (Figure 4 named classes + the U-025 residual on the d²=5 ring).
+# The exact 5×5 emission field, all six radial classes from Figure 4.
+# **Corrected 2026-08-08**: the diagonal is 0.42 and the mid-side 0.20, and the d²=5 ring
+# is 0.14 rather than a negotiated residual. The old matrix was this curve shifted inward
+# by one radial class -- it matched at the centre, the cross and the corners, which is why
+# it looked right. Hand-derived from the class values and cross-checked against the code.
 EXPECTED_EMISSION = (
-    (0.04, 0.04, 0.14, 0.04, 0.04),
-    (0.04, 0.20, 0.62, 0.20, 0.04),
-    (0.14, 0.62, 0.90, 0.62, 0.14),
-    (0.04, 0.20, 0.62, 0.20, 0.04),
-    (0.04, 0.04, 0.14, 0.04, 0.04),
+    (0.04, 0.14, 0.20, 0.14, 0.04),
+    (0.14, 0.42, 0.62, 0.42, 0.14),
+    (0.20, 0.62, 0.90, 0.62, 0.20),
+    (0.14, 0.42, 0.62, 0.42, 0.14),
+    (0.04, 0.14, 0.20, 0.14, 0.04),
 )
 
 # Pure decay of a lone cell over five turns, settle(τ, 0): retains 90% each turn.

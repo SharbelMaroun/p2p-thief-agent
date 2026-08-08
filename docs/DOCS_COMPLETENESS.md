@@ -50,6 +50,7 @@ state, so a "current maturity" for them would have to be re-dated forever.
 | `docs/VERIFICATION_POLICY.md` | Yes | What counts as evidence, and what may never be claimed without it |
 | `docs/QUALITY_EVIDENCE.md` | Yes | Gate-by-gate evidence: ruff, coverage, file lengths, secrets, history scan |
 | `docs/SELF_ASSESSMENT.md` | Yes | Grade self-assessment against the published rubric |
+| `docs/SHARED_MATERIAL_AND_AUTHORSHIP.md` | Yes | What is shared byte-for-byte with the companion repository, what is authored separately, and why run-time separation is the boundary the rules set |
 | `docs/REPOSITORY_AUDIT.md` | Yes | Structure and content audit against the book's chapter 9 requirements |
 | `docs/SUBMISSION_CHECKLIST.md` | Yes | What must be true before the annotated tag is made (`scripts/check_submission_tag.py` checks the tag itself) |
 | `docs/USAGE.md` | Yes | How to run the peer, the replay verifier and the gates |

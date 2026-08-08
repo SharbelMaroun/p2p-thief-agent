@@ -218,9 +218,9 @@ Across **24 scenarios** — every perimeter opening, Cop and Thief starting on o
 
 | Metric | Blind baseline | Belief policy | Winner |
 | --- | ---: | ---: | --- |
-| Total survival steps | 437 | **810** | belief (1.85×) |
-| Scenarios reaching the horizon | 11 | **23** | belief |
-| **League points** (10 survive / 5 captured) | 175 | **235** | **belief** |
+| Total survival steps | 437 | **782** | belief (1.79×) |
+| Scenarios reaching the horizon | 11 | **22** | belief |
+| **League points** (10 survive / 5 captured) | 175 | **230** | **belief** |
 | Paired, per scenario | — | **13 wins, 0 losses, 11 ties** | belief |
 
 **This table read the other way until 2026-08-07, and that is the more interesting result.**
@@ -265,10 +265,46 @@ were regenerated after the fix.
 
 ### 3.3 Decision cost
 
-Mean **0.86 ms**, worst case **2.11 ms** on 7×7 over 3 000 iterations; **1.53 ms** and
-**3.47 ms** on 20×20 over 1 000 (`results/decision_benchmark.json`). Against the negotiated
+Mean **0.47 ms**, worst case **1.77 ms** on 7×7 over 3 000 iterations; **1.22 ms** and
+**3.36 ms** on 20×20 over 1 000 (`results/decision_benchmark.json`). Against the negotiated
 30 000 ms response timeout, the worst case is **0.012%** of budget. Computational fairness is
 not close to contested, which is worth establishing precisely so it can stop being discussed.
+
+These two figures are the only **machine-dependent** numbers in this report — wall clock on
+the laptop that ran them, moving slightly on every re-run. The reproducible claim is the ratio
+to the timeout, which stays four orders of magnitude clear.
+
+### 3.5 Token and resource accounting — `M9-034`
+
+Rule 54 requires the tokens a game consumed, reported per game and across the series. Both
+figures are emitted: `tokens_total` per sub-game in the log artifact and `tokens_total_series`
+in the result, through `reporting/token_ledger.py`.
+
+| Configuration | Tokens per 6-sub-game series | Monetary cost |
+| --- | ---: | --- |
+| **Shipped default** (template provider) | **0** | **0** |
+| Optional local model (`ollama`) | 0 API tokens | electricity only |
+| Optional cloud model (`claude_api`) | counted against the agreed estimate | provider-dependent |
+
+**The shipped configuration consumes no tokens at all**, and that is a decision rather than an
+omission. Movement is pure Python and deterministic (§2.1), so the language model is confined
+to the verbal layer, where the zero-token template provider satisfies the same requirement a
+paid model would. Appendix F's `[Estimated Tokens for Series]` of ~200 000 is a budget this
+agent simply never approaches.
+
+**Why that is a competitive position and not a corner cut.** The book grades *computational
+fairness*: it asks whether an agent on a phone races a workstation fairly, and rewards agents
+that reach their result with minimal resources rather than by buying compute. An evasion policy
+that scores 24/24 against every committed pursuer archetype while consuming **zero tokens and
+under 4 ms per decision** is evidence for exactly that claim — the advantage is in the
+algorithm, not in the hardware or the API budget. It also removes an entire failure mode from
+match day: no API key, no rate limit, no provider outage, and no dependence on the tunnel host
+having working internet beyond the peer connection itself.
+
+**What it costs, stated honestly.** No rhetorical sophistication in the hints, and no claim to
+an LLM-driven strategy. A classmate spending 200 000 tokens buys a persuasive verbal layer we
+have chosen not to buy; the book confines the model to text and forbids letting it move a
+piece, so what they can buy with it is bounded (§2.1, rule 25).
 
 ### 3.4 Learning curves
 

@@ -7,15 +7,15 @@
     {
       "belief": {
         "max": 35.0,
-        "mean": 33.75,
+        "mean": 32.5833,
         "median": 35.0,
         "min": 5.0,
         "q1": 35.0,
         "q3": 35.0,
         "runs": 24,
-        "stdev": 6.1237
+        "stdev": 8.1929
       },
-      "belief_survived_full": 23,
+      "belief_survived_full": 22,
       "blind": {
         "max": 35.0,
         "mean": 18.2083,
@@ -28,7 +28,7 @@
       },
       "blind_survived_full": 11,
       "league_points": {
-        "belief": 235,
+        "belief": 230,
         "blind": 175
       },
       "scenarios": 24,
@@ -37,15 +37,15 @@
     {
       "belief": {
         "max": 45.0,
-        "mean": 43.3333,
+        "mean": 41.75,
         "median": 45.0,
         "min": 5.0,
         "q1": 45.0,
         "q3": 45.0,
         "runs": 24,
-        "stdev": 8.165
+        "stdev": 11.0148
       },
-      "belief_survived_full": 23,
+      "belief_survived_full": 22,
       "blind": {
         "max": 45.0,
         "mean": 22.7917,
@@ -58,7 +58,7 @@
       },
       "blind_survived_full": 11,
       "league_points": {
-        "belief": 235,
+        "belief": 230,
         "blind": 175
       },
       "scenarios": 24,
@@ -67,15 +67,15 @@
     {
       "belief": {
         "max": 55.0,
-        "mean": 52.9167,
+        "mean": 50.9167,
         "median": 55.0,
         "min": 5.0,
         "q1": 55.0,
         "q3": 55.0,
         "runs": 24,
-        "stdev": 10.2062
+        "stdev": 13.8373
       },
-      "belief_survived_full": 23,
+      "belief_survived_full": 22,
       "blind": {
         "max": 55.0,
         "mean": 27.375,
@@ -88,7 +88,7 @@
       },
       "blind_survived_full": 11,
       "league_points": {
-        "belief": 235,
+        "belief": 230,
         "blind": 175
       },
       "scenarios": 24,
@@ -97,15 +97,15 @@
     {
       "belief": {
         "max": 65.0,
-        "mean": 62.5,
+        "mean": 60.0833,
         "median": 65.0,
         "min": 5.0,
         "q1": 65.0,
         "q3": 65.0,
         "runs": 24,
-        "stdev": 12.2474
+        "stdev": 16.6601
       },
-      "belief_survived_full": 23,
+      "belief_survived_full": 22,
       "blind": {
         "max": 65.0,
         "mean": 31.9583,
@@ -118,7 +118,7 @@
       },
       "blind_survived_full": 11,
       "league_points": {
-        "belief": 235,
+        "belief": 230,
         "blind": 175
       },
       "scenarios": 24,
@@ -127,15 +127,15 @@
     {
       "belief": {
         "max": 75.0,
-        "mean": 72.0833,
+        "mean": 69.25,
         "median": 75.0,
         "min": 5.0,
         "q1": 75.0,
         "q3": 75.0,
         "runs": 24,
-        "stdev": 14.2887
+        "stdev": 19.483
       },
-      "belief_survived_full": 23,
+      "belief_survived_full": 22,
       "blind": {
         "max": 75.0,
         "mean": 36.5417,
@@ -148,7 +148,7 @@
       },
       "blind_survived_full": 11,
       "league_points": {
-        "belief": 235,
+        "belief": 230,
         "blind": 175
       },
       "scenarios": 24,

@@ -39,7 +39,7 @@ comparison the book gives each.
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from enum import Enum
+from enum import StrEnum
 
 from p2p_thief_agent.services.limits import WATCHDOG_TIMEOUT, read_limit
 
@@ -48,7 +48,7 @@ class WatchdogError(RuntimeError):
     """Raised on misconfiguration or a heartbeat after a controlled shutdown."""
 
 
-class WatchdogState(str, Enum):
+class WatchdogState(StrEnum):
     """The two outcomes of a check, matching the book's return values."""
 
     ALIVE = "ALIVE"

@@ -16,22 +16,24 @@ uv run python scripts/render_charts.py       # writes assets/chart-*.svg
 
 ## The finding that matters
 
-![The two metrics rank the strategies in opposite directions](../assets/chart-metric-disagreement.svg)
+![Both metrics now rank belief above blind, after the ranking fix](../assets/chart-metric-disagreement.svg)
 
 **`M6-015`'s evidence measures a quantity the game does not score.**
 
 The shipped comparison asserts that belief-driven evasion beats the blind baseline on
-**total survival steps**, over four fixed openings. It does, and comfortably: 125 against
-52, a 2.4× advantage. That test passes and is not wrong about what it measures.
+**total survival steps**, over four fixed openings. It does, and comfortably: 140 against
+52, a 2.7× advantage. That test passes and is not wrong about what it measures. (It read
+125 until 2026-08-08; the wall-pressure term in `M6-032` raised it, and
+`results/strategy_comparison.json` is regenerated rather than quoted from memory.)
 
 Widening the scenario set to all 24 perimeter openings, and then scoring the runs the way
 Appendix F actually scores them:
 
 | Metric | blind | belief | Winner |
 |---|---|---|---|
-| Total survival steps | 437 | **810** | belief (1.85×) |
-| Scenarios reaching the horizon | 11 | **23** | belief |
-| **League points** (10 survive / 5 captured) | 175 | **235** | **belief** |
+| Total survival steps | 437 | **782** | belief (1.79×) |
+| Scenarios reaching the horizon | 11 | **22** | belief |
+| **League points** (10 survive / 5 captured) | 175 | **230** | **belief** |
 
 > **Corrected 2026-08-07.** This table previously read `175` for blind against
 > `140` for belief — our policy losing to a random walk on the only metric a
@@ -51,6 +53,11 @@ Thief's *current* cell. Re-run against two stronger pursuers on the same 24 open
 | greedy (the harness Cop) | 23/24 | 235 |
 | herding — closes, and breaks ties to shrink our room | 23/24 | 235 |
 | **anticipating** — chases the centroid of our *next* legal cells | **8/24** | **160** |
+
+> **Measured 2026-08-07, under the pre-correction scent kernel.** Kept as the dated record
+> that motivated the work below rather than restated, because the sequence of attempts *is*
+> the finding. The current numbers, regenerated under the corrected kernel, are in the
+> 2026-08-08 (iii) addendum; `results/pursuer_grid.json` is always the live source.
 
 Belief beats the blind arm against all three, so the fix in §3.1 is real and not an artifact
 of the opponent. But **23/24 is a greedy-Cop number, not a league expectation.** A classmate
@@ -173,9 +180,14 @@ converts fewer scenarios into points the further out the threshold moves.
 ## Decision cost
 
 Recorded separately by `scripts/benchmark_decision.py` in `results/decision_benchmark.json`:
-mean 0.86 ms and worst case 2.11 ms on 7×7 over 3 000 iterations; 1.53 ms and 3.47 ms on
+mean 0.47 ms and worst case 1.77 ms on 7×7 over 3 000 iterations; 1.22 ms and 3.36 ms on
 20×20 over 1 000. Against the negotiated 30 000 ms response timeout the worst case is
 **0.012%** of budget, so computational fairness is not close to contested.
+
+Unlike every other figure in this report these two are **machine-dependent** — they are wall
+clock on the laptop that ran them, and they move a little on every re-run. They are quoted to
+establish an order of magnitude, not a reproducible constant; the reproducible claim is the
+ratio to the timeout, which stays four orders of magnitude clear.
 
 ## Learning curves
 
@@ -264,13 +276,19 @@ residual against the agreed 5×5 profile localises the emitter — the true cell
 zero mismatch, the best rival at least `(0.9 − 0.62)²`. The full factorial grid
 (`scripts/experiment_pursuers.py`, 24 paired perimeter openings):
 
-| arm | greedy | herding | anticipating |
-| --- | ---: | ---: | ---: |
-| shipped policy, raw belief | 23/24 (235) | 8/24 (160) | 5/24 (145) |
-| adaptive policy, raw belief | 23/24 (235) | 4/24 (140) | 4/24 (140) |
-| shipped policy, **decoded belief** | 23/24 (235) | 8/24 (160) | 18/24 (210) |
-| **adaptive policy, decoded belief** | **24/24 (240)** | **24/24 (240)** | **24/24 (240)** |
-| truth-fed ceiling (instrument) | 24/24 | 24/24 | 24/24 |
+| arm | greedy | herding | anticipating | interceptor |
+| --- | ---: | ---: | ---: | ---: |
+| shipped policy, raw belief | 22/24 (230) | 7/24 (155) | 3/24 (135) | 7/24 (155) |
+| adaptive policy, raw belief | 22/24 (230) | 6/24 (150) | 2/24 (130) | 6/24 (150) |
+| shipped policy, **decoded belief** | 23/24 (235) | 8/24 (160) | 18/24 (210) | 8/24 (160) |
+| **adaptive policy, decoded belief** | **24/24 (240)** | **24/24 (240)** | **24/24 (240)** | **24/24 (240)** |
+| truth-fed ceiling (instrument) | 24/24 | 24/24 | 24/24 | 24/24 |
+
+**Regenerated 2026-08-08 under the corrected scent kernel** (`M6-005d`). The raw-belief arms
+each lost a scenario or two — a sharper emission field sharpens the *Cop's* inference as well
+as ours, which is the honest reading. The result that matters is unchanged: the served
+decoded-adaptive arm still equals the truth-fed ceiling on **every** cell, now including the
+fourth pursuer model.
 
 Robustness agrees where every earlier attempt failed hardest: anticipating at 9×9 —
 **32/32**; at horizon 50 — **24/24** (the raw-belief arms manage 8–10/32 and 4–5/24
@@ -297,3 +315,19 @@ its own truth-aimed stack still cannot corner a mobility evader, so the directio
 that risk favours the Thief), no live opponent has been played, and the decoder's
 exactness assumes the opponent honours the hash-locked emission model — a deviator
 degrades us to the uniform-safe belief, and degrades itself to a rule-23 sanction.
+
+
+## The results-analysis notebook: checked, and NOT a Jupyter file
+
+**Recorded 2026-08-08 after an audit finding that turned out to be wrong.** An external review
+flagged 'no analysis notebook in either repo' against guidelines section 9.2, which asks for a
+'results analysis notebook'. Asked directly, the book **does not require a Jupyter `.ipynb`**:
+it defines the deliverable as a Markdown research report and names it -
+`RESEARCH-REPORT-Performance-Analysis.md` under `/docs` - which is exactly the file this
+repository already ships. The pinned reference simulator contains no notebook either; its
+analysis is markdown plus plain Python scripts.
+
+The finding was an **invented requirement**: a real rule (section 9.2) read through the word
+'notebook' rather than through what the source says the artifact is. It is written down here so
+the next reader does not 'fix' it by adding a Jupyter file that satisfies nothing, and because
+a review that manufactures requirements is a review that wasted the time it cost.

@@ -19,10 +19,10 @@ from __future__ import annotations
 
 import json
 import re
+import tomllib
 from pathlib import Path
 
 import pytest
-import tomllib
 
 from p2p_thief_agent.reporting.config_artifact import build_config
 from p2p_thief_agent.reporting.declaration import build_declaration

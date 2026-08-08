@@ -35,7 +35,7 @@ packages = ["src/p2p_thief_agent"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py311"  # matches requires-python; py310 was a claim nothing exercised
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM"]

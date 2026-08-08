@@ -17,19 +17,19 @@ Scale: **2** = met with evidence a third party can check · **1** = partially me
 | 2 | `docs/PLAN.md` with architecture and ADRs | 1 | Present with ADRs, **but the C4 and UML diagrams §2.2 asks for are prose and tables, not diagrams** |
 | 3 | `docs/TODO.md` with priorities, status, DoD | 2 | Every row carries a definition of done and an evidence string; 78 M9 rows tracked individually |
 | 4 | Comments explain the *why*, not the *what* | 2 | Enforced by review rather than a tool. Module docstrings carry the rule and its sanction, not a restatement of the code |
-| 5 | Docstrings on every module and function | 2 | Ruff `D` rules in the pinned select set; zero findings |
-| 6 | Automated tests with meaningful coverage | 2 | 1428 tests, 99.26% branch against an 85% floor. Guards are proven to bite by injecting the defect they catch |
+| 5 | Docstrings on every module and function | 1 | **Corrected 2026-08-08.** This row claimed ruff `D` enforcement; `D` is **not** in the select set (`pyproject.toml`), so the claim was false. Measured instead: 596 of 687 public definitions and modules carry docstrings (91 missing, mostly `__init__` and nested chart helpers). Present by review, not tool-enforced |
+| 6 | Automated tests with meaningful coverage | 2 | 1591 tests, 95.58% branch against an 85% floor (re-measured 2026-08-08; the earlier 99.26% predated three subsystems). Guards are proven to bite by injecting the defect they catch |
 | 7 | Linting at zero findings | 2 | `ruff check .` clean; the select set is pinned, not default |
 | 8 | Reproducible install | 2 | `uv.lock`, `uv sync --frozen`, verified from a clean clone by `scripts/verify_clean_clone.py` |
 | 9 | CI runs every gate on every push | 2 | `.github/workflows/ci.yml`. **Was 1 until 2026-08-07** — the history scanner existed and CI never ran it |
-| 10 | No secrets in the repository | 2 | Scanner over the working tree *and* every blob in history; 1744 objects, 0 findings; `.gitignore` covers every credential path |
+| 10 | No secrets in the repository | 2 | Scanner over the working tree *and* every blob in history; 2050 objects, 0 findings; `.gitignore` covers every credential path |
 | 11 | Standard project structure | 2 | `src/` layout, `docs/`, `scripts/`, `tests/{unit,integration,conformance}` |
 | 12 | Maintainability — modular, analysable | 1 | 150-line cap holds, but **some splits were made to satisfy the cap rather than for cohesion** |
 | 13 | Portability | 1 | Frozen install verified from a clean clone, **Windows only — never run on Linux or macOS** |
 | 14 | Prompt-engineering log | 2 | `docs/PROMPT_LOG.md`, updated per significant batch |
 | 15 | Performance evidence | 1 | Benchmarks and a research report exist; **no profiling against an adversarial peer** |
 
-**Total: 26 / 30.**
+**Total: 25 / 30.**
 
 ## What is not met, and why — `M9-009b`
 
@@ -70,6 +70,15 @@ do not ask for them:
 
 ## Final self-assessed score — `M9-022`
 
-**26 / 30 (87%).** Four requirements at partial credit, none at zero. The two that would cost
+**25 / 30 (83%).** Five requirements at partial credit, none at zero. The two that would cost
 most to fix late are portability and diagrams; both are recorded here rather than discovered
 by a grader.
+
+**The score went down on 2026-08-08, which is the only evidence that it means anything.** It
+was 26/30 until an audit checked row 5's evidence against `pyproject.toml`: the ruff `D`
+enforcement this document claimed was never in the select set. The row is now scored 1 on a
+measurement (596 of 687 public definitions carry docstrings) and the false claim is left
+visible above rather than replaced with a true claim of equal weight. Row 6's coverage figure
+moved the same way — 99.26% was accurate when written and had decayed to 95.58% as the
+perception, verbal and reporting layers landed. **A number in a document is a claim with an
+expiry date, and neither of these expired loudly.**

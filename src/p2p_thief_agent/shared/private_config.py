@@ -25,10 +25,9 @@ out: a shared object carrying one is refused before it can be signed `[AE-10]`
 
 from __future__ import annotations
 
+import tomllib
 from collections.abc import Iterator, Mapping, Sequence
 from pathlib import Path
-
-import tomllib
 
 NETWORK_SECTION = "network"
 OPPONENT_URL_KEY = "opponent_url"

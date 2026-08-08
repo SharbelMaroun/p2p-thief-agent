@@ -32,14 +32,14 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 from p2p_thief_agent.protocol.crypto import CryptoError, verify
 
 REVEAL_FIELDS = ("commit", "payload", "nonce")
 
 
-class Verdict(str, Enum):
+class Verdict(StrEnum):
     """The only two outcomes the rules define. `:1707` labels the second "disqualify"."""
 
     VERIFIED_OK = "Verified OK"

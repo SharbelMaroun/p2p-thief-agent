@@ -61,7 +61,7 @@ full log-audit phase at the end of the game (chapter 5).
 | No report can be composed without a passed audit | `reporting/email_report._require_agreed` |
 | Nonces refused before the game ends | `reporting/log_artifact.build_log` requires `ended_at` |
 | A stored match re-verifies off disk | `tests/integration/test_replay_of_stored_match.py` |
-| No secret anywhere in history | `scripts/scan_git_history.py` — 1744 objects, 0 findings |
+| No secret anywhere in history | `scripts/scan_git_history.py` — 2050 objects, 0 findings |
 
 ### Architecture — `M9-014d`
 
@@ -85,7 +85,7 @@ full log-audit phase at the end of the game (chapter 5).
 | **Usability** | `docs/RUNBOOK_reporting_setup.md`, `docs/USAGE.md`, the live GUI, the replay viewer | No user testing. The audience is one grader and two students |
 | **Reliability** | Atomic artifact writes (`reporting/emit.py`), watchdog, deadline tracker, 429 backoff, refuse-don't-block queues | Recovery from a mid-series crash is untested; the ledger would need rebuilding by hand |
 | **Security** | `gmail.send`-only scope; private-field guard matching on key names; secret scanner over the tree **and** history; nonce secrecy enforced at build time | No threat-model document. The scanner's one reviewed history finding is a false positive pinned by blob SHA |
-| **Maintainability** | 150-line file cap, ≥85% branch coverage (actual 99%), a PRD per mechanism, docstrings that carry the *why* | Some modules are split to satisfy the line cap rather than for cohesion. That is a cost of the rule, recorded not hidden |
+| **Maintainability** | 150-line file cap, ≥85% branch coverage (actual 95.58%, re-measured 2026-08-08), a PRD per mechanism, docstrings that carry the *why* | Some modules are split to satisfy the line cap rather than for cohesion. That is a cost of the rule, recorded not hidden |
 | **Portability** | `uv.lock` frozen install, verified from a clean clone by `scripts/verify_clean_clone.py` | **Windows only.** Never run on Linux or macOS; `M9-013a` (second machine) is open |
 
 ## Extension seams — `M9-008b`

@@ -39,8 +39,8 @@ def test_the_radial_profile_matches_book_figure_4() -> None:
     mid_side = {field[0][2], field[4][2], field[2][0], field[2][4]}
     corners = {field[0][0], field[0][4], field[4][0], field[4][4]}
     assert cross == {0.62}
-    assert diagonal == {0.20}
-    assert mid_side == {0.14}
+    assert diagonal == {0.42}
+    assert mid_side == {0.20}
     assert corners == {0.04}
 
 

@@ -25,6 +25,7 @@ from pathlib import Path
 import pytest
 
 from p2p_thief_agent.live import LocalTruth, TurnState, frame_of, local_truth
+from tests.unit.boundary_imports import project_imports
 
 SRC = Path(__file__).resolve().parents[2] / "src" / "p2p_thief_agent"
 
@@ -38,6 +39,7 @@ def _truth(**overrides) -> LocalTruth:
     base = {"grid_size": 4, "own_position": (3, 3),
             "turn_state": TurnState.YOUR_TURN, "step": 1}
     return local_truth(**{**base, **overrides})
+
 
 
 def test_the_snapshot_carries_exactly_the_permitted_fields_and_no_others() -> None:
@@ -74,12 +76,11 @@ def test_the_live_package_never_imports_the_runtime_or_the_opponents_state() -> 
     """Structural, because one import is all it would take."""
     for module in sorted((SRC / "live").glob("*.py")):
         tree = ast.parse(module.read_text("utf-8"))
-        for node in ast.walk(tree):
-            if isinstance(node, ast.ImportFrom) and (node.module or "").startswith("p2p_thief"):
-                assert (node.module or "").startswith("p2p_thief_agent.live"), (
-                    f"{module.name} imports {node.module}; the live view must not be able "
-                    "to reach objective state [AE-8] [AE-9]"
-                )
+        for imported in project_imports(tree, "p2p_thief"):
+            assert imported.startswith("p2p_thief_agent.live"), (
+                f"{module.name} imports {imported}; the live view must not be able "
+                "to reach objective state [AE-8] [AE-9]"
+            )
 
 
 def test_the_widget_layer_imports_only_the_view_model() -> None:
@@ -91,9 +92,8 @@ def test_the_widget_layer_imports_only_the_view_model() -> None:
     """
     allowed = ("p2p_thief_agent.live", "p2p_thief_agent.ui.style")
     tree = ast.parse((SRC / "ui" / "live_app.py").read_text("utf-8"))
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom) and (node.module or "").startswith("p2p_thief"):
-            assert (node.module or "").startswith(allowed), node.module
+    for imported in project_imports(tree, "p2p_thief"):
+        assert imported.startswith(allowed), imported
 
 
 def test_the_style_module_is_stateless_chrome() -> None:

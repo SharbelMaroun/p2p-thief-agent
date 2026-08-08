@@ -30,12 +30,12 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 from p2p_thief_agent.protocol.crypto import audit_records
 
 
-class Settled(str, Enum):
+class Settled(StrEnum):
     """How a series ended. Only `AGREED` may be reported."""
 
     AGREED = "agreed"

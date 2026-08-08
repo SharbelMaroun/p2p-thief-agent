@@ -5,11 +5,21 @@ The book calls this "absolute mandatory" in the README report (p.81/189): a scre
 `Verified OK` is mandatory — the `TAMPERED` capture is ours, because a viewer shown only
 passing is a viewer that might not be checking anything.
 
-**`M8-015d`: reproducible from a stored fixture.** The condition is "a grader can
-regenerate them", so the images are a function of two committed JSON files in
-`tests/fixtures/replay/` rather than artefacts of one session:
+**`M8-015d`: reproducible from committed inputs.** The condition is "a grader can
+regenerate them", so the images are a function of JSON files committed in this repository
+rather than artefacts of one session:
 
     uv run python scripts/capture_replay_screenshots.py
+
+**The mandatory shot must show a real game, not a fixture (corrected 2026-08-08).** Asked
+directly, the book requires the submission captures to show a game that was actually played
+rather than a test fixture. So `Verified OK` is captured from `games/game-593df753457f/` --
+the revealed log of a real two-process match this peer played, committed next to its
+negotiated configuration. Until this correction the committed image showed a log that lived
+only in a temporary directory: reproducible on one machine, on one day, by one person.
+
+`TAMPERED` stays on the fixture deliberately. A forged log is not a game anyone played, so
+there is no real version of it to photograph.
 
 **These are real screen captures, not drawings.** The window is built, given a fixed size
 so the output is stable, and photographed through the Windows GDI. A rendered picture of
@@ -36,14 +46,20 @@ from p2p_thief_agent.replay import Replay, load_log  # noqa: E402
 from p2p_thief_agent.ui.replay_app import ReplayWindow  # noqa: E402
 
 FIXTURES = ROOT / "tests" / "fixtures" / "replay"
+PLAYED = ROOT / "games" / "game-593df753457f"
 # `assets/` is the submission guidelines' conventional home for images. Asked directly, the
 # book "only mandates that the images be displayed within the README.md academic report"
 # and an `assets/` directory "is not mandated" — so this location is a project choice.
 ASSETS = ROOT / "assets"
 WINDOW = (1180, 520)
+# (log, opponent log or None, image). The opponent's log is loaded for the played match so
+# the board draws **both** trails, which is what the mutual audit actually looks at; a
+# tampered fixture has no counterpart, so it draws one.
 SHOTS = (
-    ("log_verified_ok.json", "replay-verified-ok.png"),
-    ("log_tampered.json", "replay-tampered.png"),
+    (PLAYED / "log_game-593df753457f_g01.json",
+     PLAYED / "log_game-593df753457f_g01.opponent.json",
+     "replay-verified-ok.png"),
+    (FIXTURES / "log_tampered.json", None, "replay-tampered.png"),
 )
 
 _CAPTURE = """
@@ -87,12 +103,21 @@ def capture(window: tk.Misc, destination: Path) -> None:
 def main() -> int:
     _match_screen_pixels()
     ASSETS.mkdir(exist_ok=True)
-    for fixture, image in SHOTS:
-        replay = Replay(load_log(FIXTURES / fixture))
-        window = ReplayWindow(replay)
-        window.root.geometry(f"{WINDOW[0]}x{WINDOW[1]}+80+80")
+    for source, opponent_source, image in SHOTS:
+        replay = Replay(load_log(source))
+        opponent = load_log(opponent_source) if opponent_source else None
+        window = ReplayWindow(replay, opponent=opponent)
+        # Let Tk size the window to its own content. A fixed height cropped the transport
+        # controls and the last rows of a 21-step match, so the picture proved less than the
+        # viewer does -- the one failure mode a verification screenshot cannot have.
+        window.root.update_idletasks()
+        window.root.geometry("+80+80")
         if replay.verdict.first_bad is not None:
             replay.go_to_first_divergence()  # a TAMPERED shot must show the bad step
+            window.refresh()
+        else:
+            while replay.position < replay.total - 1:  # end on the completed match
+                replay.step_forward()
             window.refresh()
         window.root.update()
         destination = ASSETS / image

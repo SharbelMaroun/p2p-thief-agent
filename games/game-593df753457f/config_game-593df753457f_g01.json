@@ -1,0 +1,75 @@
+{
+  "_schema": "per-subgame-config",
+  "agreed_between": [
+    "rehearsal-cop-group",
+    "rehearsal-thief-group"
+  ],
+  "config": {
+    "board_and_agents": {
+      "axis_origin_corner": "top-left",
+      "axis_start_index": 0,
+      "cop_start": [
+        0,
+        0
+      ],
+      "grid_size": 7,
+      "num_agents": 2,
+      "thief_start": [
+        3,
+        3
+      ]
+    },
+    "movement_and_barriers": {
+      "max_barriers": 14,
+      "max_moves": 35,
+      "move_set": [
+        "N",
+        "S",
+        "E",
+        "W",
+        "STAY"
+      ],
+      "survival_threshold": 35
+    },
+    "network_and_league": {
+      "diversity_reward": 10,
+      "max_games_per_team": 10,
+      "min_games_to_pass": 2,
+      "num_games": 6,
+      "response_timeout_sec": 30,
+      "token_budget_per_series": 200000,
+      "watchdog_timeout_sec": 60
+    },
+    "pheromones": {
+      "pheromone_center_intensity": 0.9,
+      "pheromone_decay": 0.1,
+      "pheromone_grid_size": 5
+    },
+    "rate_limiter_gatekeeper": {
+      "concurrent_requests": 2,
+      "max_retries": 3,
+      "queue_depth": 100,
+      "requests_per_minute": 30,
+      "retry_backoff_sec": 5
+    },
+    "scoring": {
+      "capture_cop": 20,
+      "capture_thief": 5,
+      "survival_cop": 5,
+      "survival_thief": 10,
+      "technical_loss": 0,
+      "tie_score": 2
+    }
+  },
+  "config_name": "config_game-593df753457f_g01.json",
+  "config_sha256": "593df753457f77c66c6b44f0498509429c440f6e611fa5295322e6cf54550667",
+  "game_id": "game-593df753457f",
+  "game_uid": "593df753457f77c66c6b44f049850942",
+  "links": {
+    "config": "config_game-593df753457f_g01.json",
+    "log": "log_game-593df753457f_g01.json"
+  },
+  "scent_model_sha256": "416a57e17434ef21b3209052198a27a0d46e7a0e09fdaa5df3b61e4a8f2711ea",
+  "schema_version": "1.2",
+  "sub_game_number": 1
+}

@@ -10,10 +10,16 @@ condition: "clear axes, legend, caption".
 Every chart reads `results/*.json`. This script computes nothing and invents nothing, which
 is the separation that lets a reader check a picture against the file behind it.
 
-The headline chart is `chart-metric-disagreement.svg`, because the most important thing the
-measurements found is that two reasonable metrics rank the strategies **in opposite
-directions** — and a reader who saw only the survival-steps chart would draw the wrong
-conclusion.
+The headline chart is `chart-metric-disagreement.svg`, which exists because two reasonable
+metrics — survival steps and the points Appendix F actually pays — once ranked the strategies
+in **opposite** directions, and a reader who saw only the survival-steps chart would have
+drawn the wrong conclusion.
+
+**Its title and caption are derived from the data rather than written down (2026-08-08).**
+They said "opposite directions" for a day after the policy was fixed and the metrics agreed
+again — a chart asserting the opposite of its own bars. A hard-coded conclusion about a
+measured quantity is a claim with an expiry date nobody is watching, so the wording is now
+computed from the same numbers the bars are drawn from.
 """
 
 from __future__ import annotations
@@ -47,6 +53,27 @@ def _summary(block: dict) -> Summary:
                    q3=block["q3"], maximum=block["max"])
 
 
+
+def _metric_title(points: dict, total: dict) -> str:
+    """Name what the bars show, computed from the bars (`M9-006`)."""
+    leads_points = points["belief"] > points["blind"]
+    leads_steps = total["belief"] > total["blind"]
+    if leads_points and leads_steps:
+        return "Both metrics now rank belief above blind"
+    if leads_points != leads_steps:
+        return "The two metrics rank the strategies in opposite directions"
+    return "Both metrics rank blind above belief"
+
+
+def _metric_caption(n: int, steps: int, points: dict, total: dict) -> str:
+    """State the comparison in the direction the numbers actually run."""
+    verb = "leads" if total["belief"] > total["blind"] else "trails"
+    pays = "and also leads" if points["belief"] > points["blind"] else "but trails"
+    return (f"{n} openings, {steps}-turn horizon. Belief {verb} on survival steps "
+            f"({total['belief']:.0f} vs {total['blind']:.0f}) {pays} on the points the "
+            f"scoring table actually pays ({points['belief']} vs {points['blind']}).")
+
+
 def charts() -> dict[str, str]:
     arms = load("strategy_arms")
     board, horizon = load("sweep_board_size"), load("sweep_horizon")
@@ -56,11 +83,8 @@ def charts() -> dict[str, str]:
 
     return {
         "chart-metric-disagreement.svg": bar_chart(
-            title="The two metrics rank the strategies in opposite directions",
-            caption=f"{n} openings, {steps}-turn horizon. Belief leads on survival steps "
-                    f"({total['belief']:.0f} vs {total['blind']:.0f}) and trails on the "
-                    f"points the scoring table actually pays ({points['belief']} vs "
-                    f"{points['blind']}).",
+            title=_metric_title(points, total),
+            caption=_metric_caption(n, steps, points, total),
             x_label="metric", y_label="value (steps ÷ 10, points as scored)",
             categories=["total steps ÷ 10", "league points"],
             series=[Series("blind", [total["blind"] / 10, points["blind"]]),

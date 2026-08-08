@@ -9,6 +9,7 @@ lies is the one thing rule 19's audit exists to catch, including ours.
 
 from __future__ import annotations
 
+from datetime import UTC
 from pathlib import Path
 
 # Outcome value -> the role the scoring table pays as the winner of that outcome.
@@ -25,14 +26,14 @@ def write_match_log(directory: Path, records: list[dict], result: object,
     drill falls back to the clearly-labelled placeholders, because a counted game's
     artifact naming a placeholder opponent is a false record wearing a valid schema.
     """
-    from datetime import datetime, timezone  # noqa: PLC0415
+    from datetime import datetime  # noqa: PLC0415
 
     from p2p_thief_agent.reporting.emit import write_artifact  # noqa: PLC0415
     from p2p_thief_agent.reporting.log_artifact import build_log  # noqa: PLC0415
     from p2p_thief_agent.reporting.naming import MatchIdentity, log_filename  # noqa: PLC0415
 
     context = context or {}
-    ended = datetime.now(timezone.utc).isoformat()
+    ended = datetime.now(UTC).isoformat()
     identity = MatchIdentity(game_id=context.get("game_id", "local-match"),
                              game_uid=context.get("game_uid", "local-match-uid"))
     sub_game = int(context.get("sub_game", 1))

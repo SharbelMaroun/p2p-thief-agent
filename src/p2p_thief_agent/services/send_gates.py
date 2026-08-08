@@ -39,7 +39,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 
 from p2p_thief_agent.services.token_bucket import TokenBucket
 
@@ -54,7 +54,7 @@ DEFAULT_BURST_WINDOW_SECONDS = 10.0
 DEFAULT_BURST_LIMIT = 12
 
 
-class SendVerdict(str, Enum):
+class SendVerdict(StrEnum):
     """Why a send did or did not go out. Three refusals, three remedies."""
 
     ALLOWED = "allowed"
