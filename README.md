@@ -8,16 +8,28 @@ Companion Cop repository:
 
 ## Milestone status
 
-M2 and M4 are complete; M6 is at 80/81 and **M7 at 84/86** — the two open M7 rows are the
-OAuth consent flow (`M7-013`, `M7-013a`), left deliberately unclaimed because running consent
-is the operator's action on their own machine, not an agent's. The simulator-conformant
-protocol layer (commit-reveal, canonical hashing, wire messages, signed-terms handshake) is
-implemented. M1 is at 39/46 with five rows superseded: the wire profile is authored and
-adopted, but no acceptance verdict is recorded and the contract checker stays fail-closed.
-M5 is at 71/80. **M8 is at 57/58** — its replay verifier is built, and its one open row
-(`M8-003c`, rehearsing against a real classmate agent) needs a counterpart we do not have;
-the local rehearsal that *is* possible was built instead as `M7-018`. **M9 has not started**
-(8/78). M0's six open rows are the book's internal contradictions the report must disclose.
+Counted from `docs/TODO.md` on 2026-08-08: **M0 18/18, M1 40/46, M2 24/24, M3 23/23,
+M4 39/39, M5 78/83, M6 83/86, M7 86/86, M8 58/59, M9 76/93.**
+
+The simulator-conformant protocol layer (commit-reveal, canonical hashing, wire messages,
+signed-terms handshake) is implemented. M1's open rows are the conformance gate: the wire
+profile is authored and adopted, but no acceptance verdict is recorded and the contract
+checker stays fail-closed. M8's single open row (`M8-003c`, rehearsing against a real
+classmate agent) needs a counterpart we do not have; the local rehearsal that *is* possible
+was built instead as `M7-018`. M9's open rows are the league itself — counted games, the
+tunnel, OAuth consent and Moodle — every one of which is the operator's action rather than
+an agent's. M0's open rows are the book's internal contradictions the report must disclose.
+
+**Where this stood earlier, kept because the milestone story is part of the record.** Until
+2026-08-07 this section read "M7 at 84/86" and "**M9 has not started** (8/78)", and both were
+true when written — the two open M7 rows were the OAuth consent flow (`M7-013`, `M7-013a`),
+left deliberately unclaimed because running consent is the operator's action on their own
+machine, and M9 genuinely had not begun. Saying so at each step is the point of this section,
+not a lapse in it.
+
+What changed on 2026-08-08 is only that the counts are **derived from the ledger** rather than
+carried by hand. A snapshot is worth writing; an *undated* snapshot in the opening paragraph
+is read as current, and this one had drifted a whole milestone behind the file beneath it.
 Unresolved choices are raised explicitly rather than classified as blockers.
 
 Version `1.00` began as an M0–M1 documentation and package scaffold. The inspected
