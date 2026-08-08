@@ -70,3 +70,46 @@ def edge_contacts(board: Board, cell: Coordinate) -> int:
     on_row_edge = cell.row in (board.min_index, board.max_index)
     on_col_edge = cell.col in (board.min_index, board.max_index)
     return int(on_row_edge) + int(on_col_edge)
+
+
+def one_wall_trap(
+    board: Board,
+    target: Coordinate,
+    believed_cop: Coordinate,
+    barriers: Iterable[Coordinate] = (),
+) -> bool:
+    """Return whether one legal Police wall next turn could finish a thief on ``target``.
+
+    The Police may spend a turn walling its own cell or one orthogonal step from it
+    (book §3.4), and a walled current cell or a fully sealed cell is a capture
+    (`AE-046`). So a target adjacent to the believed Police whose escape count a
+    single in-range wall reduces to zero — or the target cell itself being in walling
+    range — is a cell where surviving next turn depends on the opponent declining a
+    winning move. The check is exact for the rule, not a heuristic: it enumerates
+    every in-range wall and asks whether any ends the game.
+    """
+    return wall_pressure(board, target, believed_cop, barriers) == 0
+
+
+def wall_pressure(
+    board: Board,
+    target: Coordinate,
+    believed_cop: Coordinate,
+    barriers: Iterable[Coordinate] = (),
+) -> int:
+    """Return the exits ``target`` keeps after the believed Police's best single wall.
+
+    ``0`` is `one_wall_trap`'s condition — the next wall (or a wall on the target
+    itself) ends the game. ``1`` is the seal cascade the waller grid measured: a
+    two-exit corner loses one exit, the survivor is the only move left, and the wall
+    after that finishes it — so the refusal has to fire a step before the trap is
+    literal. Out of walling range the answer is simply the current mobility.
+    """
+    blocked = frozenset(barriers)
+    reach = [believed_cop, *_reachable_neighbours(board, believed_cop, blocked)]
+    if target in reach:
+        return 0  # a wall on our own cell is an immediate capture
+    worst = mobility(board, target, blocked)
+    for wall in reach:
+        worst = min(worst, mobility(board, target, blocked | {wall}))
+    return worst

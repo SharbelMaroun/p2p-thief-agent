@@ -1182,6 +1182,44 @@ commands, the ruled six-sub-game role schedule, the rule-51/commit/screenshot du
 troubleshooting list in which every entry is a failure one of our own rehearsal runs paid
 for.
 
+#### The pursuer that walls, and the boundary it drew (`M6-032`, `M6-033`, 2026-08-08)
+
+Every pursuer this repository had ever measured against only moves — yet the book arms
+the Police with fourteen walls, a wall on our cell captures, and a sealed cell is a
+capture (`AE-046`). The waller grid closes that blind spot, and what it found deserves
+plain words rather than a euphemism.
+
+Three things shipped. The **interceptor model** joins the archetype roster: a pursuer
+that closes on the whole flight set by summed step distance, which a bobbing evader
+cannot tie the way it ties a centroid chaser — the strongest cheap mover a classmate
+can ship, and now a shape our classifier can fit and our exact solver can plan
+against. The **wall-pressure guard** leads the live ranking: a cell the believed
+Police could finish with one in-range wall — or leave one seal from finished — is
+refused before any comfort is ranked, exactly per the §3.4 placement rule, and far
+from the threat it degrades to plain mobility so the mover ceiling is untouched by
+construction. And the **fail-safe**: a strategy exception in the live turn now seals a
+truthful `STAY` and the game continues, because an uncaught raise reaches the watchdog
+as a freeze and the technical 0/0 pays less than losing honestly does.
+
+The boundary: against the reference-shaped waller (greedy chase, finishing walls)
+survival is **23/24** — a classmate adding walls to the default brain changes nothing.
+Against an *interception* waller it is **8/24**, and that number moved for none of the
+three defenses we measured — the pressure guard, a first-disclosed-wall regime switch,
+risk-first promotion. The mechanism is structural: an interceptor collapses the escape
+space from beyond walling range, so by the time any in-range refusal can fire the
+pocket is already sealed shut. The companion repository measured the same fact from
+the other side of the board — its interception stack converts every evasion archetype
+40/40, truth-fed and belief-fed alike. A wall-armed equal-speed interceptor is simply
+the winning side of this game on a bounded board; we record the limit with its
+mechanism, the way the Cop's own 0/40 stood recorded until its cause was found.
+
+*Problem hit.* The first two defenses were designed, built, measured useless, and
+**kept out** — the regime switch because evidence of walling arrives only after the
+position is lost, and pure risk-first because it was indistinguishable from the graded
+form. Their measurements are in the grid history so the next session does not rebuild
+them. What survives is the graded guard, whose value is the close-range refusals
+against every lesser waller, at zero measured cost against every mover.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a
@@ -1218,6 +1256,14 @@ language model never touches the decision. Against the blind baseline this more 
 doubles survival — **125 vs 52** steps over four fixed pursuit scenarios
 (`docs/PRD_strategy.md`, `results/strategy_comparison.json`). The formulas are in
 [docs/PRD_scent_belief.md](docs/PRD_scent_belief.md).
+
+Since 2026-08-08 the live ranking carries one term ahead of everything above:
+**wall pressure** (`M6-032`) — the exits the destination would keep after the believed
+Police's best single in-range wall. A cell one wall from ending the game, or one seal
+from it, is refused before any escape set or comfort is consulted; out of walling
+range the term equals plain mobility and the ranking is exactly the measured one. The
+live loop also carries the `M6-033` fail-safe: any strategy exception seals a truthful
+`STAY` instead of freezing the match into a technical 0/0.
 
 ### 4. Learning curves
 

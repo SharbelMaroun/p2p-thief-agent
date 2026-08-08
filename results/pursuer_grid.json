@@ -18,6 +18,12 @@
         "league_points": 140,
         "scenarios": 24,
         "total_steps": 350
+      },
+      "interceptor": {
+        "escapes": 4,
+        "league_points": 140,
+        "scenarios": 24,
+        "total_steps": 350
       }
     },
     "adaptive_decoded": {
@@ -34,6 +40,12 @@
         "total_steps": 840
       },
       "herding": {
+        "escapes": 24,
+        "league_points": 240,
+        "scenarios": 24,
+        "total_steps": 840
+      },
+      "interceptor": {
         "escapes": 24,
         "league_points": 240,
         "scenarios": 24,
@@ -58,6 +70,12 @@
         "league_points": 160,
         "scenarios": 24,
         "total_steps": 426
+      },
+      "interceptor": {
+        "escapes": 8,
+        "league_points": 160,
+        "scenarios": 24,
+        "total_steps": 426
       }
     },
     "shipped_decoded": {
@@ -74,6 +92,12 @@
         "total_steps": 810
       },
       "herding": {
+        "escapes": 8,
+        "league_points": 160,
+        "scenarios": 24,
+        "total_steps": 446
+      },
+      "interceptor": {
         "escapes": 8,
         "league_points": 160,
         "scenarios": 24,
@@ -147,6 +171,10 @@
       "scenarios": 24
     },
     "herding": {
+      "escapes": 24,
+      "scenarios": 24
+    },
+    "interceptor": {
       "escapes": 24,
       "scenarios": 24
     }

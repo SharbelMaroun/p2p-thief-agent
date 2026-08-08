@@ -1,0 +1,51 @@
+{
+  "arms": {
+    "adaptive_decoded": {
+      "greedy_waller": {
+        "escapes": 23,
+        "league_points": 235,
+        "scenarios": 24,
+        "total_steps": 811
+      },
+      "interceptor_waller": {
+        "escapes": 8,
+        "league_points": 160,
+        "scenarios": 24,
+        "total_steps": 468
+      }
+    },
+    "shipped_decoded": {
+      "greedy_waller": {
+        "escapes": 23,
+        "league_points": 235,
+        "scenarios": 24,
+        "total_steps": 810
+      },
+      "interceptor_waller": {
+        "escapes": 8,
+        "league_points": 160,
+        "scenarios": 24,
+        "total_steps": 446
+      }
+    }
+  },
+  "board": 7,
+  "horizon": 35,
+  "robustness": {
+    "interceptor_waller_9x9_h35": {
+      "adaptive_decoded": {
+        "escapes": 16,
+        "league_points": 240,
+        "scenarios": 32,
+        "total_steps": 868
+      },
+      "shipped_decoded": {
+        "escapes": 16,
+        "league_points": 240,
+        "scenarios": 32,
+        "total_steps": 844
+      }
+    }
+  },
+  "wall_quota": 14
+}
