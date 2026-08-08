@@ -756,3 +756,18 @@ Process note: the first version of the ranking comment claimed the re-measuremen
 before it existed ("the waller conversions fell") — written prospectively, caught
 against the grid, corrected to the measured truth. A comment that predicts a result
 is an invented requirement wearing measurement's clothes.
+
+## 2026-08-08 (vi) — the replay board, and our own log breaking our own viewer
+
+GUI enhancement under the full gate (notebooks first: rule 9 binds the live interface
+only, the replay is the "Retrospective Witness", and the reference's own viewer draws
+both true positions from the two logs). The viewer now reconstructs the chase — fading
+trails, barriers as placed, a ring on the cell we were caught on — with Play
+auto-advance, and the screenshots are taken from the real rehearsal match, both logs
+cross-loaded. The finding that outlives the feature: our OWN emitted log broke our own
+row table and sequence checker, because both read step/sender/move at the record's top
+level while the sealing keeps them in `payload` — every fixture had the flat shape, so
+the defect was invisible until a real artifact arrived. Fixed with payload fallbacks;
+the sender column now fills from the log's declared role.
+
+Style addendum, same day: both windows moved onto a dark-navy chrome with glowing pill banners, rounded cells, and neon trails (`ui/style.py`) — pure tkinter, no theme dependency. The verdict colours and the heat ramp were deliberately left alone: reference-matched, test-pinned meaning is not styling. The styled replay window crossed the 150-line cap and split its evidence panels into `ui/replay_panels.py` rather than widening the gate.

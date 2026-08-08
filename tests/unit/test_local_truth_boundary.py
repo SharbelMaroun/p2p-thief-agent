@@ -83,11 +83,27 @@ def test_the_live_package_never_imports_the_runtime_or_the_opponents_state() -> 
 
 
 def test_the_widget_layer_imports_only_the_view_model() -> None:
-    """The same boundary one layer out: the window may not bypass the snapshot."""
+    """The same boundary one layer out: the window may not bypass the snapshot.
+
+    `ui.style` is admitted beside the view model because it is chrome — colours and
+    canvas geometry — and the next test pins that it stays chrome: a style module that
+    imported any project code could smuggle exactly what this boundary refuses.
+    """
+    allowed = ("p2p_thief_agent.live", "p2p_thief_agent.ui.style")
     tree = ast.parse((SRC / "ui" / "live_app.py").read_text("utf-8"))
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom) and (node.module or "").startswith("p2p_thief"):
-            assert (node.module or "").startswith("p2p_thief_agent.live"), node.module
+            assert (node.module or "").startswith(allowed), node.module
+
+
+def test_the_style_module_is_stateless_chrome() -> None:
+    """The admission above is safe only while style imports nothing of the project."""
+    tree = ast.parse((SRC / "ui" / "style.py").read_text("utf-8"))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            assert not (node.module or "").startswith("p2p_thief"), node.module
+        if isinstance(node, ast.Import):
+            assert all(not alias.name.startswith("p2p_thief") for alias in node.names)
 
 
 def test_the_marked_cell_is_our_inference_not_a_reported_position() -> None:
