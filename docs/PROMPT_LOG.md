@@ -972,3 +972,50 @@ half is covered from `inst/` directly, which is the source the notebook only sum
 11 and 12 (config symmetry and the Appendix F floors), 23 (the scent lock), 24 (the Step-0
 hardware declaration), 39–40 (no secrets), and 53 (the commit hash). Recorded rather than
 skipped silently.
+
+
+## 2026-08-09 (iii) — the wait that never ran
+
+**Prompt.** The first real match attempt against `amireman`. Our Cop started, its own mailbox
+came up, and then it died instantly:
+
+    HandshakeError: our offer could not be delivered: negotiate failed in transport:
+    Server error '502 Bad Gateway' for url 'https://...trycloudflare.com/mcp'
+
+**The 502 was his — the bug was ours.** His tunnel was routable with nothing behind it, which
+is a normal state for a peer that has not started yet. `serve_match` exists to tolerate exactly
+that: it waits up to `connect_timeout_seconds` (120) for the opponent before negotiating. The
+wait never ran.
+
+**Why.** The readiness probe was `port_answers(host, port)` — a TCP connect to the host and
+port parsed out of the opponent's URL. Through a tunnel that host is a **Cloudflare edge**, and
+it accepts on 443 whether or not the opponent's process exists. Proved live: against an
+endpoint returning 502, `port_answers` returned `True`. So the probe reported "he's up", the
+wait was skipped, and the very first `negotiate` hit the 502 that the wait was there to absorb.
+
+The old probe's docstring defended the choice: TCP "rather than an MCP call" so that "not up
+yet" stays distinguishable from "refused the match". **That reasoning is right and is kept** —
+what was wrong is that a socket connect stopped meaning "the peer exists" the moment a CDN sat
+in front of it. It was correct on localhost, where the only thing that can accept a connection
+is the peer itself, and **every rehearsal was on localhost**.
+
+**The fix.** `peer_answers(url)` asks the endpoint instead of the socket: 502/503/504 mean *no
+origin behind the tunnel*, and any other answer — including the `406` an MCP endpoint returns
+to a bare GET — means *present*. The distinction the old docstring cared about survives
+intact: a peer that answers and refuses is up, and what it thinks of the match is negotiation's
+business.
+
+The Thief carried the same defect with an extra edge: it parsed the port out of the URL and
+**defaulted to 80** when an https URL named none, so it was probing the wrong port of the right
+CDN.
+
+**A test earned its keep within a minute of being written.** The malformed-URL case failed —
+`urllib.request.Request()` raises from the *constructor*, which sat outside the `try`, so the
+probe crashed instead of reporting "not ready". A readiness check that raises turns "the
+opponent is late" into a crash. Moved inside the try.
+
+**Lesson, and it is the same one twice in a day.** The schema bug and this one were both
+correct in every environment we had ever run, and both were exposed within minutes of a real
+tunnelled opponent. Localhost is not a small-scale model of the league — it removes the exact
+component (a CDN between the peers) that both bugs lived in. The friendly series has now paid
+for itself twice without a single game being played.
