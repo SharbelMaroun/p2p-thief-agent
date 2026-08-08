@@ -71,9 +71,11 @@ vram_gb = 0            # 0 is valid and means no graphics card
 [reporting]
 credential_path = "C:/path/outside/this/repo/token_p2p_send.json"
 
-[email]
-recipient = "private-unconfigured"
-mode = "draft"
+# NOTE: there is deliberately no [email] block and no on/off switch for reporting.
+# One lived here until 2026-08-08 (`recipient`, `mode = "draft"`) and **no code ever read
+# it** -- a control that looks authoritative and does nothing is worse than none. Sending is
+# impossible unless a credential exists at [reporting].credential_path, and `preflight`
+# prints that state rather than asking you to trust a flag.
 
 # Credentials, tunnel tokens, API keys, signing secrets, and per-turn commitment
 # nonces belong in an ignored .env or credential store -- never in this example,
