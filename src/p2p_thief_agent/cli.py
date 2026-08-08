@@ -69,6 +69,10 @@ def build_parser() -> argparse.ArgumentParser:
                        ("verify", "re-verify a stored log; exit non-zero if tampered")):
         node = sub.add_parser(name, help=text)
         node.add_argument("--log", required=True, type=Path, help="path to a log artifact")
+
+    pre = sub.add_parser("preflight", help="report what is configured and armed before a match")
+    pre.add_argument("--match", required=True, type=Path, help="path to the shared match config")
+    pre.add_argument("--private", required=True, type=Path, help="path to this peer's game.toml")
     return parser
 
 
@@ -80,7 +84,25 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _serve(args)
     if args.command in {"replay", "verify"}:
         return _replay(args.log, quiet=args.command == "verify")
+    if args.command == "preflight":
+        return _preflight(args.match, args.private)
     parser.print_help()
+    return 0
+
+
+def _preflight(match_path: Path, private_path: Path) -> int:
+    """Print the readout. Exit 1 on any failed check, so a script can gate on it."""
+    from p2p_thief_agent.services.preflight import preflight  # noqa: PLC0415
+
+    checks = preflight(match_path, private_path)
+    for check in checks:
+        mark = "  " if check.ok is None else ("OK" if check.ok else "!!")
+        print(f"{mark} {check.name:<15} {check.value}")
+    failed = [check.name for check in checks if check.failed]
+    if failed:
+        print(f"\nnot ready: {', '.join(failed)}")
+        return 1
+    print("\nready")
     return 0
 
 
