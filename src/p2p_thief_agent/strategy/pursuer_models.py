@@ -114,7 +114,52 @@ def anticipating_step(
                                                a.value))]
 
 
+def _step_distances(
+    board: Board, origin: Coordinate, blocked: frozenset
+) -> dict[Coordinate, int]:
+    """Barrier-aware breadth-first step counts from ``origin``; unreachable is absent."""
+    distances = {origin: 0}
+    frontier = [origin]
+    while frontier:
+        cell = frontier.pop(0)
+        for action in legal_actions(board, cell, blocked):
+            if action is Action.STAY:
+                continue
+            neighbour = resolve_move(board, cell, action, blocked)
+            if neighbour not in distances:
+                distances[neighbour] = distances[cell] + 1
+                frontier.append(neighbour)
+    return distances
+
+
+def interceptor_step(
+    board: Board,
+    cop: Coordinate,
+    thief: Coordinate,
+    blocked: Iterable[Coordinate] = _NO_BARRIERS,
+) -> Coordinate:
+    """Close on the whole flight set by summed true step distance, spread included.
+
+    The centroid chaser collapses the flight set to its mean, so a runner bobbing on
+    a pinned axis ties it and the tie-break dances. Summing barrier-aware distances
+    to *every* flight cell prices the spread — the strongest mover shape a strong
+    classmate can cheaply ship, so the planner must be able to assume it. An
+    unreachable flight cell prices as one full board: conceded ground, not ignored.
+    """
+    blocked = frozenset(blocked)
+    cells = _flight(board, thief, blocked)
+    fields = [_step_distances(board, cell, blocked) for cell in cells]
+    far = board.size * board.size + 1
+    targets = _targets(board, cop, blocked)
+
+    def race(target: Coordinate) -> tuple[int, int]:
+        steps = [field.get(target, far) for field in fields]
+        return (sum(steps), max(steps))
+
+    return targets[min(targets, key=lambda a: (*race(targets[a]), a.value))]
+
+
 # Classification order is also the tie-break order: on equal evidence assume the
 # simplest pursuer, which is the reference shape a classmate most likely runs.
 PURSUERS = {"greedy": greedy_step, "herding": herding_step,
-            "anticipating": anticipating_step}
+            "anticipating": anticipating_step, "interceptor": interceptor_step}

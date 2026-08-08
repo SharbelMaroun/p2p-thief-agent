@@ -59,5 +59,9 @@ def test_all_three_gain_ground_every_turn() -> None:
 
 
 def test_the_classification_order_starts_with_the_reference_shape() -> None:
-    """Ties resolve to the simplest pursuer — the one a classmate most likely runs."""
-    assert list(PURSUERS) == ["greedy", "herding", "anticipating"]
+    """Ties resolve to the simplest pursuer — the one a classmate most likely runs.
+
+    The interceptor (`M6-032`) joins last for the same reason it joins at all: it is
+    the strongest shape, so it must be assumable but never assumed on equal evidence.
+    """
+    assert list(PURSUERS) == ["greedy", "herding", "anticipating", "interceptor"]

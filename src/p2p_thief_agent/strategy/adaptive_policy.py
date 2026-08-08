@@ -48,7 +48,7 @@ from p2p_thief_agent.domain.movement import legal_actions, resolve_move
 from p2p_thief_agent.strategy.baseline import _ACTION_ORDER, is_dead_end, mobility
 from p2p_thief_agent.strategy.belief_policy import Grid, believed_cop_cell
 from p2p_thief_agent.strategy.escape_search import Memo, escape_actions
-from p2p_thief_agent.strategy.metrics import manhattan_distance
+from p2p_thief_agent.strategy.metrics import manhattan_distance, wall_pressure
 from p2p_thief_agent.strategy.pursuer_models import PURSUERS
 
 
@@ -147,11 +147,27 @@ def choose_adaptive_action(
 
     def rank(action: Action) -> tuple:
         target = targets[action]
+        pressure = wall_pressure(board, target, believed, blocked)
+        votes = -sum(1 for actions in escapes.values() if action in actions)
         shipped = (is_dead_end(board, target, position, blocked),
                    -(manhattan_distance(target, believed) + mobility(board, target, blocked)),
                    _ACTION_ORDER.index(action))
-        return (action not in favourite,
-                -sum(1 for actions in escapes.values() if action in actions),
-                *shipped)
+        # Wall pressure leads unconditionally, in two grades. Grade one is
+        # `one_wall_trap`'s condition (a single in-range wall ends the game — book
+        # §3.4 + `AE-046`); grade two is the measured seal cascade (the best wall
+        # leaves one exit, and the wall after that finishes it). Both are exact for
+        # the rule and fire only within the believed Police's actual walling range,
+        # so far from the threat the ranking is untouched and the mover grid is
+        # unchanged by construction. Measured honestly (`results/waller_grid.json`):
+        # against a sealing *interception* pursuer the conversions did not fall —
+        # 8/24 with or without this term, and with a first-wall regime switch too —
+        # because an interceptor collapses the escape space from beyond walling
+        # range before any refusal here can matter. That boundary is structural (the
+        # wall-armed equal-speed pursuer is the winning side of this game; the
+        # companion measured it from the other side at 40/40) and is documented
+        # rather than tuned at: what the term buys is the close-range refusals
+        # against every lesser waller, at zero cost anywhere else.
+        return (pressure == 0, pressure == 1,
+                action not in favourite, votes, *shipped)
 
     return min(legal, key=rank)

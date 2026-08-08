@@ -136,11 +136,16 @@ def make_decide(
             state["answered"] = (claim, caught)
 
         blocked = frozenset(state["barriers"])
-        if caught:
-            action = Action.STAY  # the sealed record must show the cell we were caught on
-        else:
-            action = choose_adaptive_action(board, state["cell"], state["belief"],
-                                            state["tracker"], step, blocked)
+        # A caught Thief seals the caught cell; and — the `M6-033` fail-safe — a
+        # strategy exception must cost one imperfect turn, never the match: an
+        # uncaught raise here reaches the watchdog as a freeze and scores the
+        # technical 0/0, strictly worse than any legal move. STAY is legal from
+        # every on-board cell and keeps the sealed record truthful.
+        try:
+            action = Action.STAY if caught else choose_adaptive_action(
+                board, state["cell"], state["belief"], state["tracker"], step, blocked)
+        except Exception:  # noqa: BLE001 - the match outlives any strategy bug
+            action = Action.STAY
         state["cell"] = resolve_move(board, state["cell"], action, blocked)
         state["trail"] = deposit(state["trail"], board, state["cell"])
 

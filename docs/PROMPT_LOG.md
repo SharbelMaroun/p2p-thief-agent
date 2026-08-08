@@ -730,3 +730,29 @@ and **redirected stdout is block-buffered** — result markers only flushed at p
 exit until PYTHONUNBUFFERED, so every wait read as a timeout. None of these is a
 game bug; all of them are exactly the operational texture a league match-day has,
 which is why the runbook now exists.
+
+## 2026-08-08 (v) — the waller grid, and a boundary named honestly
+
+Tournament hardening under the full eight-step gate. The blind spot was structural:
+every pursuer ever measured here only moves, while the book arms the Police with
+fourteen walls and two wall-capture rules. `scripts/experiment_wallers.py` closes the
+blind spot; what it found is a boundary, and the honest record is the point.
+
+Against the reference-shaped waller (greedy chase plus finishing walls) survival is
+23/24 — a classmate bolting walls onto the default brain changes nothing. Against an
+interception waller it is 8/24, and the number refused to move for three separately
+designed and measured defenses: a wall-pressure guard leading the ranking, a regime
+switch on the first disclosed wall, and risk-first promotion. Mechanism, not mystery:
+the seal cascade fires at two exits, but an interceptor collapses the escape space
+from beyond walling range — by the time any in-range refusal can act, the pocket is
+shut. The companion repository proved the same theorem from the other side the same
+day: its interception stack converts every evasion archetype 40/40. What shipped is
+what measured well: the interceptor as a fourth plannable pursuer model, the graded
+wall-pressure guard (free everywhere, decisive against lesser wallers), and the live
+fail-safe that turns a strategy exception into a sealed STAY rather than a frozen
+technical 0/0. The dead designs are recorded so nobody rebuilds them.
+
+Process note: the first version of the ranking comment claimed the re-measurement
+before it existed ("the waller conversions fell") — written prospectively, caught
+against the grid, corrected to the measured truth. A comment that predicts a result
+is an invented requirement wearing measurement's clothes.
