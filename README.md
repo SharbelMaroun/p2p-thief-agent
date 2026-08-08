@@ -1022,7 +1022,8 @@ list of four, and the register held six that the code relies on.
 
 `C-014` and `C-015` had been in `docs/SPECIFICATION_CONFLICTS.md` since M6 — the scent
 factor whose prose says "reduced by 90%" where the formula retains 90%, and the claim that
-raising $ho$ saturates the board when it empties it. Both were resolved correctly in code
+raising $
+ho$ saturates the board when it empties it. Both were resolved correctly in code
 at the time; neither was promoted into the disclosure the report owes a grader. Writing the
 academic report restated `C-014` and I described it as newly found, which it was not.
 
@@ -1219,6 +1220,31 @@ position is lost, and pure risk-first because it was indistinguishable from the 
 form. Their measurements are in the grid history so the next session does not rebuild
 them. What survives is the graded guard, whose value is the close-range refusals
 against every lesser waller, at zero measured cost against every mover.
+
+#### The replay viewer grows a board (`M8-016`, 2026-08-08)
+
+The viewer used to show the evidence table alone. The replay axis answers "what really
+happened?" — the book's "Retrospective Witness" — and rule 9's objective-board ban binds
+the *live* interface only, so the reference itself draws both true positions on one board
+when the opponent's log sits beside our own. Ours now does too: `replay/board.py`
+reconstructs the chase per cursor step (trails fading with age, barriers appearing as
+placed, a red ring on the cell we were caught on), a `Play` button walks the whole match,
+and the screenshots in `assets/` are regenerated **from the real two-process rehearsal
+match**, our log and the companion's cross-loaded, rather than from fixtures.
+
+*Problem hit — and it was the day's real finding.* The first genuine match log through
+this screen exposed a defect every fixture had hidden: the row table and the sequence
+checker read `step`/`sender`/`move` only at a record's top level, while our **own emitted
+log** seals them inside `payload`. Every row of our own evidence rendered `step ? — —`,
+and twenty-one correctly numbered steps were reported "unnumbered". Both layers now fall
+back to the sealed payload, and the sender column fills from the log's declared role. A
+viewer tested only against the fixtures it was born with is a viewer that fails on its
+first real artifact — which is precisely what the mandatory screenshot would have shown
+the grader. The live belief map was decluttered in the same pass (sub-1% labels off),
+and both windows moved onto a shared dark chrome (`ui/style.py`, re-authored here per
+`THIEF-002`): glowing pill banners, rounded cells and cards, neon trails — pure
+tkinter, no theme dependency — with the verdict colours and heat ramp deliberately
+untouched, because those are reference-matched, test-pinned meaning, not styling.
 
 ### 3. The implemented strategy
 

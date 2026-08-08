@@ -90,18 +90,26 @@ class ReplayFrame:
         return self.rows[self.position]
 
 
-def _row(index: int, record: object, check, current: int) -> StepRow:
+def _row(index: int, record: object, check, current: int,
+         default_sender: object = None) -> StepRow:
     """Render one record, including one damaged badly enough not to be an object.
 
     A viewer that raises on a forged record shows nothing at all where it is supposed to
     show `TAMPERED`, which is the worst possible failure for this particular screen.
+
+    Step, sender, and move are read from the record's top level and then from its sealed
+    `payload`: fixture logs and the companion's artifacts carry them flat, while our own
+    emitted log keeps them inside the payload — found the first time a *real* match log
+    reached this screen and every row read `step ? — —`.
     """
     fields: Mapping[str, object] = record if isinstance(record, Mapping) else {}
+    payload = fields.get("payload")
+    sealed: Mapping[str, object] = payload if isinstance(payload, Mapping) else {}
     return StepRow(
         index=index,
-        step=_text(fields.get("step", "?")),
-        sender=_text(fields.get("sender")),
-        move=_text(fields.get("move")),
+        step=_text(fields.get("step", sealed.get("step", "?"))),
+        sender=_text(fields.get("sender", sealed.get("sender", default_sender))),
+        move=_text(fields.get("move", sealed.get("move"))),
         verdict=check.verdict.value,
         reason=check.reason,
         commit=_text(fields.get("commit")),
@@ -120,6 +128,10 @@ def frame_of(replay: Replay) -> ReplayFrame:
     """
     verdict = replay.verdict
     sequence = replay.sequence
+    # Our own records carry no per-record sender — every one is ours, so the log's own
+    # declared role fills the column instead of a page of dashes.
+    summary = replay.log.document.get("summary")
+    role = summary.get("role") if isinstance(summary, dict) else None
     return ReplayFrame(
         origin=replay.log.origin,
         game_id=_text(replay.log.game_id),
@@ -132,7 +144,7 @@ def frame_of(replay: Replay) -> ReplayFrame:
         sequence_summary=sequence.summary,
         sequence_ok=sequence.contiguous,
         rows=tuple(
-            _row(index, record, check, replay.position)
+            _row(index, record, check, replay.position, role)
             for index, (record, check) in enumerate(
                 zip(replay.log.records, verdict.checks, strict=True)
             )
