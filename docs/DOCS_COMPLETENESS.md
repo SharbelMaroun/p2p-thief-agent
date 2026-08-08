@@ -1,4 +1,4 @@
-# Documentation Completeness
+﻿# Documentation Completeness
 
 Presence and content maturity are separate. Every document in `docs/` is listed below
 with its current maturity.
@@ -7,7 +7,7 @@ with its current maturity.
 `scripts/check_ledger_consistency.py` (`G-010`) fails if a document exists without a row,
 or a row claims a file that is not in the tree. It found **29 missing rows** on
 2026-08-07: the table was last reviewed 2026-07-28, when the repository was still an M1
-scaffold, and every row still in it was individually accurate — which is why the gap
+scaffold, and every row still in it was individually accurate ג€” which is why the gap
 survived. That is the argument for the check rather than for another careful pass.
 
 Gate-scoped verification records (`M1_VERIFICATION.md`, `M2_DOMAIN.md`,
@@ -18,7 +18,7 @@ state, so a "current maturity" for them would have to be re-dated forever.
 | Artifact | Present | Current maturity |
 |---|---:|---|
 | `README.md` | Yes | The graded entry point: six-section academic report, quick start, gates, companion link |
-| `docs/ACADEMIC_REPORT.md` | Yes | Long-form report — formalism, architecture decisions, measured results, three disclosed source contradictions |
+| `docs/ACADEMIC_REPORT.md` | Yes | Long-form report ג€” formalism, architecture decisions, measured results, three disclosed source contradictions |
 | `docs/PRD.md` | Yes | Milestone goals, non-goals and acceptance, behaviour-free |
 | `docs/PLAN.md` | Yes | M0-M9 gates with per-gate status, now held to `TODO.md` by `check_ledger_consistency.py` |
 | `docs/TODO.md` | Yes | The single Thief-owned task ledger |
@@ -55,6 +55,7 @@ state, so a "current maturity" for them would have to be re-dated forever.
 | `docs/USAGE.md` | Yes | How to run the peer, the replay verifier and the gates |
 | `docs/HANDOVER.md` | Yes | What a new maintainer needs to know first |
 | `docs/RUNBOOK_reporting_setup.md` | Yes | Reporting setup, with credentials kept out of the repository |
+| `docs/MATCH_RUNBOOK.md` | Yes | The one-page procedure for playing a real opponent: shared-file handshake, commands, the six-sub-game role schedule, post-game duties, and the rehearsal-earned troubleshooting list |
 | `docs/TEAM_INFO.md` | Yes | Group identifier, team code and members |
 | `docs/PROMPT_LOG.md` | Yes | Historical provenance and correction entries |
 | `docs/RESEARCH-REPORT-Performance-Analysis.md` | Yes | Measured performance study |
@@ -62,8 +63,8 @@ state, so a "current maturity" for them would have to be re-dated forever.
 | `docs/DOCS_COMPLETENESS.md` | Yes | This table |
 | `docs/adr/0001-mcp-contract.md` | Yes | MCP contract names. Pending |
 | `docs/adr/0002-message-envelope-and-idempotency.md` | Yes | Message envelope and idempotency. Pending |
-| `docs/adr/0003-schema-version-discrepancy.md` | Yes | Schema version `1.1` vs `1.2` (`C-008`). Pending — held rather than normalised |
-| `docs/adr/0004-shared-json-private-toml.md` | Yes | Shared JSON / private TOML boundary. Pending — this is what keeps tunnel tokens out of negotiated files |
+| `docs/adr/0003-schema-version-discrepancy.md` | Yes | Schema version `1.1` vs `1.2` (`C-008`). Pending ג€” held rather than normalised |
+| `docs/adr/0004-shared-json-private-toml.md` | Yes | Shared JSON / private TOML boundary. Pending ג€” this is what keeps tunnel tokens out of negotiated files |
 | `docs/adr/0005-scent-model.md` | Yes | Multiplicative scent against the reference's subtractive decay. Pending |
 | `docs/adr/0007-llm-movement-policy.md` | Yes | LLM movement stays disabled, with rule 25's recommendation status preserved. Proposed |
 | `docs/adr/0008-simulator-reuse-and-license.md` | Yes | Simulator reuse and licence. Pending |

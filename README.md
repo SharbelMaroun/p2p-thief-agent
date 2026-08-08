@@ -1154,6 +1154,19 @@ the league checklist requires an accessible address, "not only localhost", plus 
 replay screenshots — the tunnel rehearsal remains the operator's step, and what it rehearses
 is now known to work.
 
+#### Evidence that counts, and the page a classmate can follow (`M9-028`, 2026-08-08)
+
+The wire log now records what negotiation actually established — the real opponent, the
+real config lock, `confirmed: true`, and a game id derived from the shared file's canonical
+hash. The verification that matters: **both repositories derived the same id
+(`game-9934e8338307`) independently**, and the Cop's revealed log replayed `Verified OK`
+under *this* repository's verifier — two separately written implementations checking each
+other's cryptography, which is the audit model doing its job. `docs/MATCH_RUNBOOK.md` is
+the one-page classmate procedure: the byte-identical shared-file handshake, both sides'
+commands, the ruled six-sub-game role schedule, the rule-51/commit/screenshot duties, and a
+troubleshooting list in which every entry is a failure one of our own rehearsal runs paid
+for.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a

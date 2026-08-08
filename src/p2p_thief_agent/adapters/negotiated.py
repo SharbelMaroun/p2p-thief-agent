@@ -45,7 +45,7 @@ def load_negotiation_inputs(
     return game_config, identity
 
 
-def negotiated_threshold(
+def negotiated_agreement(
     *,
     client: object,
     inboxes: object,
@@ -53,22 +53,23 @@ def negotiated_threshold(
     identity: Mapping[str, object],
     fallback_timeout: float,
     sleep: Callable[[float], None],
-) -> int:
-    """Agree the match over the live pair and return the negotiated horizon.
+):
+    """Agree the match over the live pair and return the whole `AgreedMatch`.
 
-    The response timeout comes from the shared file's own
-    ``network_and_league.response_timeout_sec`` — the same clock both sides read —
-    falling back to the caller's readiness budget only if the file omits it.
+    The caller reads the negotiated horizon from ``terms["max_steps"]`` and the
+    opponent's identity for the artifacts — a counted game's log must name the real
+    opponent and the real config lock, not placeholders. The response timeout comes
+    from the shared file's own ``network_and_league.response_timeout_sec`` — the same
+    clock both sides read — falling back to the caller's readiness budget.
     """
     league = game_config.get("network_and_league")
     timeout = float(league.get("response_timeout_sec", fallback_timeout)
                     if isinstance(league, Mapping) else fallback_timeout)
     try:
-        agreed = negotiate_for_serve(
+        return negotiate_for_serve(
             client=client, inboxes=inboxes,
             terms=terms_from_shared_config(game_config), identity=identity,
             timeout=timeout, clock=monotonic, sleep=sleep,
         )
     except NegotiationError as exc:
         raise NegotiatedServeError(f"the match was refused before play: {exc}") from exc
-    return int(agreed.terms["max_steps"])

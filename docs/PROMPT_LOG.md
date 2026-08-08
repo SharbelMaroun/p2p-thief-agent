@@ -693,3 +693,22 @@ Lesson: **a rehearsal is a test whose fixture is reality.** The final run — ne
 35 commit-reveal turns, both sides SURVIVAL at 35, `Verified OK — 35 steps re-verified` —
 is worth more than any number this project has produced, because it is the first one an
 opponent's machine helped compute.
+
+## 2026-08-08 (v) — "go do 1 and 2 and 3": evidence, runbook, and the cross-check
+
+The counted-game gap closed in three moves. The wire log now carries what negotiation
+actually established (real opponent, real config lock, derived game id, sub-game number)
+instead of placeholders — and the strongest moment of the batch was watching both
+repositories derive the **same** game id (`game-9934e8338307`) from the same shared file
+through two independently written canonical-JSON implementations. The match runbook
+(`docs/MATCH_RUNBOOK.md`) is one page a classmate can follow cold; its troubleshooting
+section is simply the list of our own rehearsal failures, which is what makes it credible.
+And the final validation crossed implementations: the Cop's revealed log replayed
+`Verified OK` under **this** repository's verifier — each side's cryptography checked by
+the other side's tool, which is the audit model working exactly as the book intends.
+
+Notebook discipline held: the code notebook supplied the reference's id-derivation and
+log-naming conventions before we hardened ours; the book notebook supplied the match-day
+duty list (Step-0, tunnels, history declaration, byte-identical lock; rule-51 report and
+screenshots after) that became the runbook's skeleton, with the template's exact
+summary-field roster — which caught one missing key (`audit`) in the Cop's new writer.

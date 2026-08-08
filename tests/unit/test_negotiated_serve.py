@@ -11,7 +11,7 @@ import pytest
 from p2p_thief_agent.adapters.negotiated import (
     NegotiatedServeError,
     load_negotiation_inputs,
-    negotiated_threshold,
+    negotiated_agreement,
 )
 from p2p_thief_agent.protocol.handshake import Handshake
 from p2p_thief_agent.protocol.terms_projection import TermsProjectionError, terms_from_shared_config
@@ -96,18 +96,20 @@ class _Pair:
 def test_the_live_handshake_agrees_and_returns_the_horizon() -> None:
     terms = terms_from_shared_config(SHARED)
     pair = _Pair(terms)
-    threshold = negotiated_threshold(
+    agreed = negotiated_agreement(
         client=pair, inboxes=pair.inboxes, game_config=SHARED, identity=identity(),
         fallback_timeout=1.0, sleep=lambda _s: None,
     )
-    assert threshold == 35
+    assert agreed.terms["max_steps"] == 35
+    assert agreed.peer_identity["group_id"] == "g-cop", (
+        "the artifacts need the real opponent, so the whole agreement comes back")
 
 
 def test_a_differing_offer_is_refused_with_the_term_named() -> None:
     other_terms = {**terms_from_shared_config(SHARED), "max_steps": 60}
     pair = _Pair(other_terms)
     with pytest.raises(NegotiatedServeError, match="max_steps"):
-        negotiated_threshold(
+        negotiated_agreement(
             client=pair, inboxes=pair.inboxes, game_config=SHARED, identity=identity(),
             fallback_timeout=1.0, sleep=lambda _s: None,
         )
@@ -116,7 +118,7 @@ def test_a_differing_offer_is_refused_with_the_term_named() -> None:
 def test_a_silent_opponent_is_a_bounded_refusal_not_a_hang() -> None:
     pair = _Pair(terms_from_shared_config(SHARED), respond=False)
     with pytest.raises(NegotiatedServeError, match="refused before play"):
-        negotiated_threshold(
+        negotiated_agreement(
             client=pair, inboxes=pair.inboxes,
             game_config={**SHARED, "network_and_league": {"num_games": 6,
                                                           "response_timeout_sec": 0.2}},

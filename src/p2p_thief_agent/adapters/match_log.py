@@ -15,29 +15,46 @@ from pathlib import Path
 WINNER_BY_OUTCOME = {"survival": "thief", "capture": "police"}
 
 
-def write_match_log(directory: Path, records: list[dict], result: object) -> Path:
-    """Write the finished sub-game log, with the end time rule 18's guard requires."""
+def write_match_log(directory: Path, records: list[dict], result: object,
+                    context: dict | None = None) -> Path:
+    """Write the finished sub-game log, with the end time rule 18's guard requires.
+
+    ``context`` carries what negotiation actually established — the derived game
+    identity, our and the opponent's group ids, the config lock, the true start time
+    and sub-game number. A negotiated match writes those; only an un-negotiated local
+    drill falls back to the clearly-labelled placeholders, because a counted game's
+    artifact naming a placeholder opponent is a false record wearing a valid schema.
+    """
     from datetime import datetime, timezone  # noqa: PLC0415
 
     from p2p_thief_agent.reporting.emit import write_artifact  # noqa: PLC0415
     from p2p_thief_agent.reporting.log_artifact import build_log  # noqa: PLC0415
     from p2p_thief_agent.reporting.naming import MatchIdentity, log_filename  # noqa: PLC0415
 
+    context = context or {}
     ended = datetime.now(timezone.utc).isoformat()
-    identity = MatchIdentity(game_id="local-match", game_uid="local-match-uid")
+    identity = MatchIdentity(game_id=context.get("game_id", "local-match"),
+                             game_uid=context.get("game_uid", "local-match-uid"))
+    sub_game = int(context.get("sub_game", 1))
     outcome = getattr(getattr(result, "outcome", None), "value", "unknown")
     summary = {
-        "sub_game_number": 1, "group_id": "sharNamr", "role": "thief",
-        "opponent_group_id": "opponent", "result": outcome,
+        "sub_game_number": sub_game,
+        "group_id": context.get("group_id", "sharNamr"), "role": "thief",
+        "opponent_group_id": context.get("opponent_group_id", "opponent"),
+        "result": outcome,
         "winner_role": WINNER_BY_OUTCOME.get(outcome, "unknown"),
         "steps": getattr(result, "steps", 0),
-        "timezone": "UTC", "started_at": ended, "ended_at": ended,
+        "timezone": "UTC", "started_at": context.get("started_at") or ended,
+        "ended_at": ended,
         "duration_seconds": 0, "tokens_total": 0, "audit": {},
     }
     artifact = build_log(
         identity=identity, summary=summary, links={},
-        mutual_agreement={"opponent_group_id": "opponent", "sha256": "0" * 64,
-                          "confirmed": False},
+        mutual_agreement={
+            "opponent_group_id": context.get("opponent_group_id", "opponent"),
+            "sha256": context.get("config_sha256", "0" * 64),
+            "confirmed": bool(context.get("confirmed", False)),
+        },
         records=records,
     )
-    return write_artifact(Path(directory), log_filename(identity.game_id, 1), artifact)
+    return write_artifact(Path(directory), log_filename(identity.game_id, sub_game), artifact)

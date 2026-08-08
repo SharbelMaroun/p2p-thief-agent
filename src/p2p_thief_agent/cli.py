@@ -62,6 +62,8 @@ def build_parser() -> argparse.ArgumentParser:
                        help="the shared byte-identical match JSON. With it, the match "
                        "is NEGOTIATED before play (signed terms, identity, rule 11); "
                        "requires --private for this peer's identity")
+    serve.add_argument("--sub-game", type=int, default=1, dest="sub_game",
+                       help="this sub-game's number in the six-game series (artifacts)")
 
     for name, text in (("replay", "re-verify a stored log and print its banner"),
                        ("verify", "re-verify a stored log; exit non-zero if tampered")):
