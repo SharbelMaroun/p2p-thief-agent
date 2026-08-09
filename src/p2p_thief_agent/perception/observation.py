@@ -12,8 +12,19 @@ every intensity to a **pinned precision** (`M6-006c`), so an identical field ser
 byte-identical bytes on both peers — without which the locked scent-model hash would mean
 nothing, two conforming peers still disagreeing on the field.
 
-Parsing rejects a malformed key, a non-numeric/negative intensity, and — when the
-negotiated board is supplied — any **off-board** cell (`M6-006b`).
+Parsing rejects a malformed key and a non-numeric/negative intensity. An off-board cell —
+when the negotiated ``board`` is supplied — is **dropped, not rejected** (`M6-006b`,
+corrected 2026-08-09): the reference wire sends a *fixed-size* 5x5 window centred on the
+sender, "includes zero cells rather than omitting them" (see `docs/SIM_WIRE_PROTOCOL.md`),
+and on a 7x7 board only the central 3x3 of sender positions (9 of 49 cells, 18%) yields a
+window with no off-board coordinate. Rejecting the *whole* grid over one such cell, from a
+peer standing anywhere in the outer 82% of the board, discarded every real observation and
+froze belief for the rest of the match — reproduced 2026-08-09 against the companion Cop
+repository's matching defect. Dropping only the off-board cells matches this module's own
+stated rule for what it sends: "strict in what we send, generous in what we accept." A
+malformed *key* or *intensity* still raises — that is genuine corruption, not a coordinate
+system difference, and `parse_smell_grid_dropped_count` keeps the discard rate visible so a
+grid that is mostly or entirely off-board stays observable rather than vanishing silently.
 """
 
 from __future__ import annotations
@@ -38,21 +49,38 @@ def parse_smell_grid(smell_grid: object, board: Board | None = None) -> dict[Cel
     """Parse an inbound `{"r,c": intensity}` map into `(row, col) -> intensity`.
 
     Order-independent: the same cells parse to the same map whatever order they arrive
-    in. A malformed key or a non-numeric/negative intensity is rejected by name. When the
-    negotiated ``board`` is supplied, a cell outside its bounds is rejected too (`M6-006b`):
-    an opponent's field is untrusted input and must not carry a cell that cannot exist.
+    in. A malformed key or a non-numeric/negative intensity is rejected by name — that is
+    genuine corruption. When the negotiated ``board`` is supplied, a cell outside its
+    bounds is **dropped**, not rejected (`M6-006b`): a fixed-size window from a sender near
+    an edge or corner necessarily carries such cells, and they are not evidence of a
+    hostile or corrupt peer, only of a different (equally valid) encoding convention. Use
+    `parse_smell_grid_dropped_count` alongside this to keep the discard rate visible.
     """
+    parsed = _parse_all(smell_grid)
+    if board is None:
+        return parsed
+    return {cell: value for cell, value in parsed.items() if _on_board(cell, board)}
+
+
+def parse_smell_grid_dropped_count(smell_grid: object, board: Board) -> int:
+    """Return how many cells `parse_smell_grid` would drop from `smell_grid` for being
+    off `board` — diagnostic visibility, so a grid that is mostly or entirely off-board
+    (a real encoding mismatch, not just an edge-of-board window) does not vanish silently
+    into an empty observation with no trace anywhere.
+    """
+    parsed = _parse_all(smell_grid)
+    return sum(1 for cell in parsed if not _on_board(cell, board))
+
+
+def _parse_all(smell_grid: object) -> dict[Cell, float]:
     if not isinstance(smell_grid, Mapping):
         raise ObservationError('smell_grid must be an object of {"r,c": intensity}')
-    parsed = {_parse_key(key): _parse_intensity(value, key) for key, value in smell_grid.items()}
-    if board is not None:
-        for row, col in parsed:
-            if not (board.min_index <= row <= board.max_index
-                    and board.min_index <= col <= board.max_index):
-                raise ObservationError(
-                    f"smell_grid cell ({row},{col}) is off the {board.size}x{board.size} board"
-                )
-    return parsed
+    return {_parse_key(key): _parse_intensity(value, key) for key, value in smell_grid.items()}
+
+
+def _on_board(cell: Cell, board: Board) -> bool:
+    row, col = cell
+    return board.min_index <= row <= board.max_index and board.min_index <= col <= board.max_index
 
 
 def _parse_key(key: object) -> Cell:
@@ -65,8 +93,9 @@ def _parse_key(key: object) -> Cell:
         row, col = int(parts[0]), int(parts[1])
     except ValueError as exc:
         raise ObservationError(f"smell_grid key {key!r} is not two integers") from exc
-    if row < 0 or col < 0:
-        raise ObservationError(f"smell_grid key {key!r} has a negative coordinate")
+    # A negative coordinate is not malformed data by itself -- it is off-board only
+    # relative to a board's axis_start_index, which `parse_smell_grid` decides when a
+    # board is supplied. Structural key validity ends here.
     return (row, col)
 
 
