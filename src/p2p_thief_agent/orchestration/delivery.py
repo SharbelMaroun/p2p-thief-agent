@@ -13,6 +13,7 @@ error kinds and the retry primitive here is not a subsystem-to-subsystem link (`
 
 from __future__ import annotations
 
+import time
 from collections.abc import Callable, Mapping
 
 from p2p_thief_agent.adapters.fastmcp_client import TransportError
@@ -44,3 +45,37 @@ def deliver(
         sleep=sleep,
         retry_on=(TransportError,),
     )
+
+
+def retrying_deliver(
+    game_config: Mapping[str, object] | None,
+    sleep: Callable[[float], None],
+    clock: Callable[[], float] = time.monotonic,
+) -> Callable[[Send, Mapping[str, object]], JsonObject]:
+    """Bind the **agreed** retry budget onto a send, for the live match paths.
+
+    Lives here rather than beside its callers because binding the budget needs both the
+    MCP Connector's error kinds and the Deadline Tracker's policy, and only the
+    orchestration layer may join two subsystems (`M5-001b`) — a helper in `adapters/`
+    would be exactly the direct subsystem-to-subsystem link the gateway exists to prevent.
+
+    `RetryPolicy.from_match` reads `max_retries` and `retry_backoff_sec` out of the
+    **signed** match object, so neither peer can quietly give itself a longer rope; with
+    no negotiated config (a bare `--peer` development run) the Appendix F defaults apply.
+
+    A limit this cannot parse falls back to those defaults rather than raising. Reading a
+    retry budget is a *reliability* concern, and refusing to play because the retry policy
+    itself would not load turns a resilience feature into a new way to lose a match —
+    strictly worse than the single-attempt behaviour it replaced. Appendix F conformance
+    of the agreed values is `protocol/agreement.check_appendix_f`'s job, at negotiation,
+    where a bad value is refused **by name** before either peer commits to anything.
+    """
+    try:
+        policy = RetryPolicy.from_match(game_config or {})
+    except Exception:  # noqa: BLE001 - see above: never fail a match over the retry policy
+        policy = RetryPolicy.from_match({})
+
+    def deliver_with_retry(send: Send, message: Mapping[str, object]) -> JsonObject:
+        return deliver(send, message, policy=policy, clock=clock, sleep=sleep)
+
+    return deliver_with_retry

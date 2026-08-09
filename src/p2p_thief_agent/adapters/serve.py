@@ -111,11 +111,10 @@ def serve_match(
         # Cop refuses an unnegotiated game, and so does the book.
         from datetime import UTC, datetime  # noqa: PLC0415
 
-        from p2p_thief_agent.adapters.negotiated import (  # noqa: PLC0415
-            NegotiatedServeError,
-            negotiated_agreement,
-        )
+        from p2p_thief_agent.adapters import negotiated  # noqa: PLC0415
 
+        NegotiatedServeError = negotiated.NegotiatedServeError  # noqa: N806
+        negotiated_agreement = negotiated.negotiated_agreement
         if not identity:
             raise ServeError("negotiation needs this peer's identity; pass --private")
         try:
@@ -131,6 +130,10 @@ def serve_match(
     # `receive` owns the bounded waiting; the raw non-blocking take made the loop
     # check the inbox once, microseconds after its own send, and declare a live
     # opponent silent — the first two-process rehearsal died at step 1 on this.
+    # `M5-010`, wired 2026-08-09: over a tunnel a single 502 is a blip, not a decision
+    # (rules 6/7). `delivery.deliver` was built for exactly this and had no production
+    # call site until now, so one transient fault on any turn ended the sub-game 0/0.
+    from p2p_thief_agent.orchestration.delivery import retrying_deliver  # noqa: PLC0415
     from p2p_thief_agent.orchestration.polling import poll_for_turn  # noqa: PLC0415
 
     records: list[dict] = []
@@ -144,6 +147,7 @@ def serve_match(
         answer_claim=answer_claim,
         survival_threshold=threshold,
         records=records,
+        deliver=retrying_deliver(game_config, sleep, clock=time.monotonic),
     )
     if artifacts_dir is not None:
         context = None

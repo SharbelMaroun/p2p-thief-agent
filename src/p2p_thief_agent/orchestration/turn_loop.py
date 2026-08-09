@@ -28,6 +28,7 @@ from p2p_thief_agent.adapters.fastmcp_client import PeerRejectionError, Transpor
 from p2p_thief_agent.orchestration.phases import Phase, PhaseMachine
 from p2p_thief_agent.protocol.crypto import CryptoError
 from p2p_thief_agent.protocol.wire import WireError
+from p2p_thief_agent.services.deadlines import DeadlineError
 
 # Decide this turn: given the opponent's last message (None when this peer opens),
 # return the public turn message to send and the sealed record to keep.
@@ -36,6 +37,11 @@ Decide = Callable[[dict | None, int], tuple[dict, dict]]
 Receive = Callable[[], dict | None]
 # Called with every phase entered, for the log manager (`M5-008`).
 OnTransition = Callable[[Phase], None]
+# Put one sealed turn on the wire. Injected so the bounded retry that Appendix E rules
+# 6/7 require (`orchestration/delivery.deliver`) can be supplied by the caller that owns
+# the agreed limits, while this module stays transport- and policy-neutral. The default
+# is a single attempt (`_send_once`), which is right for an in-memory double.
+Deliver = Callable[[Callable[[Mapping[str, object]], dict], dict], object]
 
 
 class TurnLoopError(RuntimeError):
@@ -63,11 +69,17 @@ def run_turn(
     records: list[dict],
     opens: bool = False,
     on_transition: OnTransition | None = None,
+    deliver: Deliver | None = None,
 ) -> TurnRecord:
     """Run one turn through the phase machine and return what it did.
 
     ``records`` is this peer's private audit ledger; the sealed record is appended
     **once**, before the send, and never rewritten if delivery fails.
+
+    ``deliver`` puts the sealed turn on the wire; pass
+    `orchestration.delivery.deliver` bound to the agreed `RetryPolicy` so a transient
+    transport fault is retried rather than surrendered to. Omitted, a single attempt is
+    made — correct for an in-memory double, wrong for a real tunnel.
     """
     entered: list[Phase] = []
 
@@ -94,7 +106,7 @@ def run_turn(
     records.append(sealed)
 
     enter(Phase.AWAITING_REVEAL)
-    _deliver(step, message, transport, machine)
+    _deliver(step, message, transport, machine, deliver)
 
     enter(Phase.VERIFYING)
     enter(Phase.WAITING_FOR_OPPONENT)
@@ -121,19 +133,38 @@ def _await_opponent(machine: PhaseMachine, receive: Receive, enter: OnTransition
     return incoming
 
 
-def _deliver(step: int, message: dict, transport: object, machine: PhaseMachine) -> None:
+def _send_once(send: Callable[[Mapping[str, object]], dict], message: dict) -> object:
+    """Deliver with no retry — the default, and correct only for an in-memory double."""
+    return send(message)
+
+
+def _deliver(
+    step: int,
+    message: dict,
+    transport: object,
+    machine: PhaseMachine,
+    deliver: Deliver | None = None,
+) -> None:
     """Send the sealed turn, never re-sealing it, and route a failure cleanly.
 
     ``PeerRejectionError`` is a decided game outcome and ``TransportError`` a carrier
-    fault. Both end the turn, but keeping them apart is what stops a lost game being
-    retried forever as a network blip (`M5-010a`).
+    fault. Keeping them apart is what stops a lost game being retried forever as a
+    network blip (`M5-010a`) — but the distinction only pays off if the carrier fault is
+    actually *retried*, which is ``deliver``'s job.
+
+    **Until 2026-08-09 it was not.** This function made one bare attempt and ended the
+    sub-game on the first `TransportError`, so a single tunnel 502 or timeout on any turn
+    cost the whole game 0/0 — while `orchestration/delivery.deliver`, built and tested for
+    exactly this under `M5-010`, had no production call site at all. `DeadlineError` is
+    caught alongside the transport errors because that is how a *spent* retry budget
+    arrives: rules 6/7 permit retry-then-declare, and this is the declare.
     """
     send = getattr(transport, "receive_turn", None)
     if send is None:
         raise TurnLoopError("transport does not expose receive_turn")
     try:
-        send(message)
-    except (TransportError, PeerRejectionError) as exc:
+        (deliver or _send_once)(send, message)
+    except (TransportError, PeerRejectionError, DeadlineError) as exc:
         machine.fail()
         raise TurnLoopError(f"step {step} was sealed but not delivered: {exc}") from exc
 

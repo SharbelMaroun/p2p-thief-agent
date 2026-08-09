@@ -61,15 +61,23 @@ def negotiated_agreement(
     opponent and the real config lock, not placeholders. The response timeout comes
     from the shared file's own ``network_and_league.response_timeout_sec`` — the same
     clock both sides read — falling back to the caller's readiness budget.
+
+    The offer send carries the **signed** bounded retry (2026-08-09). Without it one
+    transient tunnel fault raised a raw `TransportError` straight out of `serve_match`,
+    which is the failure `PROMPT_LOG.md` records for the first real match attempt.
     """
+    from p2p_thief_agent.orchestration.delivery import retrying_deliver  # noqa: PLC0415
+
     league = game_config.get("network_and_league")
     timeout = float(league.get("response_timeout_sec", fallback_timeout)
                     if isinstance(league, Mapping) else fallback_timeout)
+    deliver_offer = retrying_deliver(game_config, sleep, clock=monotonic)
+
     try:
         return negotiate_for_serve(
             client=client, inboxes=inboxes,
             terms=terms_from_shared_config(game_config), identity=identity,
-            timeout=timeout, clock=monotonic, sleep=sleep,
+            timeout=timeout, clock=monotonic, sleep=sleep, deliver_offer=deliver_offer,
         )
     except NegotiationError as exc:
         raise NegotiatedServeError(f"the match was refused before play: {exc}") from exc

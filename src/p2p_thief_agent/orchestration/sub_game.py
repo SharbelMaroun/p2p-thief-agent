@@ -29,6 +29,7 @@ from dataclasses import dataclass
 from p2p_thief_agent.orchestration.phases import PhaseMachine
 from p2p_thief_agent.orchestration.turn_loop import (
     Decide,
+    Deliver,
     OnTransition,
     Receive,
     TurnLoopError,
@@ -64,12 +65,16 @@ def run_sub_game_over_wire(
     records: list[dict] | None = None,
     on_transition: OnTransition | None = None,
     send_audit: bool = True,
+    deliver: Deliver | None = None,
 ) -> SubGameOutcome:
     """Play turns until decided, then reveal every sealed record.
 
     This peer **opens**: the book gives the Thief the first move of every turn cycle,
     so step 1 does not wait for the opponent. A Thief that waited would deadlock
     against a Cop correctly waiting for it.
+
+    ``deliver`` is passed straight to `run_turn`; over a real tunnel it should carry the
+    agreed bounded retry, or one transient fault ends the sub-game (see `_deliver`).
     """
     if isinstance(survival_threshold, bool) or not isinstance(survival_threshold, int):
         raise TurnLoopError(f"survival_threshold must be an integer, got {survival_threshold!r}")
@@ -90,6 +95,7 @@ def run_sub_game_over_wire(
                 records=ledger,
                 opens=step == 1,
                 on_transition=on_transition,
+                deliver=deliver,
             )
         except TurnLoopError as exc:
             return _finish(Outcome.TECHNICAL_LOSS, step - 1, str(exc), turns, ledger,
