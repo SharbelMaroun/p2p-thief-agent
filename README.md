@@ -1591,6 +1591,36 @@ What the audit could not fix, because it is not a documentation problem: no coun
 game has been played, no public tunnel has been opened, and OAuth consent has not been run.
 Those are stated in **Current milestone** above and are the operator's remaining work.
 
+### What reading another team's interop spec changed
+
+**Added 2026-08-10.** A classmate group sent a detailed list of the interoperability points that
+had cost them or an opponent a playing window. Checking our code against it — rather than taking
+their word for it — found one defect here that **every gate had passed**.
+
+**Every outbound call was unbounded.** `FastMCPClient` has always accepted a `timeout`; `serve`
+built it as `FastMCPClient(peer_url)` and never passed one, so a live call could wait forever.
+The failure is arithmetic rather than networking, which is exactly why 1611 tests never caught
+it: the MCP SDK's own per-call default equals the 30s we sign as `response_timeout_sec`, so one
+delivered-but-unanswered push, one backoff and a second push exceed the deadline *while every
+individual call looks healthy* — we breach a deadline we signed and score ourselves the
+technical loss. The cap is now derived from the signed budget rather than chosen, and the tests
+found two things the design missed: at **zero** negotiated retries the derivation returned the
+whole deadline, and the two limits live in **different config sections**, so a plausible-looking
+config silently falls back to a default instead of failing loudly.
+
+**What did not need fixing, and why that is worth stating.** Our turn `timestamp` was already
+ISO-8601 with a UTC offset, matching the reference's own `peer/sealing.py`. The companion Cop
+was sending `"t1"` — an opaque counter that satisfied the shared schema's `type: string`,
+`minLength: 1` and therefore passed every check on that side too. Two repositories built from
+one specification drifted apart on a field neither schema could constrain, and only an outside
+reader noticed.
+
+The pattern matches what the live game against `amireman` taught: **our gates check us against
+ourselves.** Green means internally consistent, not interoperable. Every defect of this class so
+far arrived through contact with a real peer or a real peer's specification, never through the
+suite — which argues for warm-up games and for reading other teams' specs, not for more tests of
+the kind that already pass.
+
 ## License and provenance
 
 The [MIT license](LICENSE) covers team-authored material where legally valid.

@@ -80,6 +80,7 @@ def serve_match(
         peer_answers,  # noqa: PLC0415
         serve_in_background,  # noqa: PLC0415
     )
+    from p2p_thief_agent.services.limits import call_timeout_sec  # noqa: PLC0415
     from p2p_thief_agent.services.readiness import wait_for_peer  # noqa: PLC0415
 
     inboxes = PeerInboxes()
@@ -102,7 +103,12 @@ def serve_match(
             f"the opponent at {peer_url} never answered within {ready_timeout:g}s. Both peers "
             "must be running: start theirs, or check the address and port")
 
-    client = FastMCPClient(peer_url)
+    # Bound every outbound call (`M9-27`). Left unset the client waits forever, and two tries
+    # plus a backoff quietly outlive the deadline we signed -- see `services.limits.call_timeout_sec`,
+    # which lives there rather than beside `RetryPolicy` because `adapters` importing
+    # `services.deadlines` is a subsystem link the orchestrator boundary forbids. It falls back
+    # to Appendix F's defaults before a config is agreed, bounding the unnegotiated path too.
+    client = FastMCPClient(peer_url, timeout=call_timeout_sec(game_config))
     threshold = survival_threshold
     agreement = None
     started_at = None

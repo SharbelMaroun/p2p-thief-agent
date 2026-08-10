@@ -33,6 +33,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 
 from p2p_thief_agent.services.limits import (
+    MARGIN,
     MAX_RETRIES,
     RESPONSE_TIMEOUT,
     RETRY_BACKOFF,
@@ -89,6 +90,30 @@ class RetryPolicy:
     def attempts(self) -> int:
         """Total tries: the first, plus the permitted retries."""
         return self.max_retries + 1
+
+    @property
+    def call_timeout_sec(self) -> float:
+        """Cap one outbound call so a *retry* still fits inside the signed deadline.
+
+        **Added 2026-08-10, same defect as the companion Cop.** ``FastMCPClient`` accepts a
+        ``timeout`` but ``serve`` never passed one, so ``self._timeout is None`` and every live
+        call waited indefinitely. The breach is arithmetic rather than networking: the MCP
+        SDK's own per-call default equals the 30s we sign as ``response_timeout_sec``, so one
+        delivered-but-unanswered push, one backoff, and a second push exceed the deadline while
+        **each individual call looks healthy** -- we breach a deadline we signed and hand
+        ourselves the technical loss.
+
+        ``attempts`` calls at the cap must fit the whole deadline, making the budget over the
+        attempt count the largest legal cap: 7.5s of a 30s deadline at Appendix F's three
+        retries. ``MARGIN`` binds only when a peer negotiates **zero** retries -- ``attempts``
+        is then 1 and the division alone would hand one call the entire deadline, leaving
+        nothing for transport, which is the very breach this prevents.
+
+        The arithmetic lives in ``services.limits`` so the MCP connector can reach it without
+        importing this subsystem; this property is the same rule expressed over an already-read
+        policy, and must not drift from it.
+        """
+        return min(self.response_timeout_sec / self.attempts, self.response_timeout_sec * MARGIN)
 
     def deadline(self, now: float) -> Deadline:
         """Open one request's deadline at ``now``."""
