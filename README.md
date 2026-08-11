@@ -1292,6 +1292,32 @@ and both windows moved onto a shared dark chrome (`ui/style.py`, re-authored her
 tkinter, no theme dependency — with the verdict colours and heat ramp deliberately
 untouched, because those are reference-matched, test-pinned meaning, not styling.
 
+#### A guard with tests and no caller (`C-027`, `C-028`, 2026-08-11)
+
+Group `uoh-ay26` proposed a friendly and published a **Police** endpoint, which makes this
+repository the peer that dials. Two fields of their `game.json` refuse a match at the
+handshake — `schema_version: "1.00"` where this build implements `1.2`, and
+`agreed_between: ["cop", "thief"]`, the two *roles* rather than the two group ids. The other
+14 signed terms were correct, Appendix F included.
+
+*Problem hit.* `p2p-thief preflight` printed **`ready`** for that file, because the readout
+validates the terms projection and the projection reads neither field. The uncomfortable part
+is that the check already existed here: `check_config_schema_version`, with
+`SUPPORTED_CONFIG_SCHEMA_VERSIONS = {"1.2"}`, exercised by `test_config_shape.py`, exported
+from `protocol/__init__.py` — and **called from nowhere on the runtime path**. Tests prove a
+function works; they do not prove anything invokes it, and nothing in this repository's gates
+distinguishes the two. Both checks now run in `services/preflight.py::_wire_gates`, and three
+new tests drive them to their failing verdict, including the literal `["cop", "thief"]` shape
+that arrived.
+
+Asking the reference why their side would not have caught it was the useful half: it runs
+**no** explicit `group_id in agreed_between` test at all. The field is policed only because it
+sits inside the SHA-256-signed terms, so a reference-shaped peer accepts `["cop", "thief"]`
+from itself indefinitely and fails only when it meets a peer that spells the field differently
+— which is a good description of interoperability failure generally. The corrected file then
+played end to end across two local processes: negotiated, 21 turns, `CAPTURE`, matching
+outcomes on both sides, and `Verified OK — 21 steps re-verified`.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a

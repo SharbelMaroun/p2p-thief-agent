@@ -1019,3 +1019,46 @@ correct in every environment we had ever run, and both were exposed within minut
 tunnelled opponent. Localhost is not a small-scale model of the league — it removes the exact
 component (a CDN between the peers) that both bugs lived in. The friendly series has now paid
 for itself twice without a single game being played.
+
+## 2026-08-11 — a guard with tests and no caller, found by a second opponent's file
+
+**Prompt.** Group `uoh-ay26` (Aisha Abu Dahesh, Yousef Asadi) proposed a friendly and sent a
+`game.json` plus their Police endpoint, `https://cop.uohay26game.com/mcp` — the peer *this*
+repository dials. "We want to play a friendly game with this group."
+
+**Two gates refused their file; every other gate passed it.** `schema_version` was `"1.00"`
+where this build implements `1.2`, and `agreed_between` was `["cop", "thief"]` — the two
+*roles*, not the two group ids, so `validate_participants` could not find `sharNamr`.
+Everything else was clean: 14 signed terms including the simulator-profile
+`min_center_intensity`, every Appendix F `Fixed` value correct, every `Minimum` at or above its
+floor, and a `world` block (`Haifa`, 15 words) the terms projection requires.
+
+**`p2p-thief preflight` printed `ready` for it.** The readout validates the terms projection,
+and the projection reads neither field. Worse, this repository already *had* the check:
+`check_config_schema_version` in `protocol/config_integrity.py`, `SUPPORTED_CONFIG_SCHEMA_VERSIONS
+= {"1.2"}`, exercised by `test_config_shape.py` — and **not called from anywhere on the runtime
+path**. It was written, tested, exported in `protocol/__init__.py`, and dead. Tests prove a
+function works; they do not prove anything calls it.
+
+Both checks now run inside `_match` via `_wire_gates`, and the same fix went into the companion
+Cop, which had no equivalent function at all. The fixture `_private()` used `group_id = "t"`,
+which was safe only while nothing compared it to `agreed_between`; it now defaults to a real
+participant, and three new tests drive both checks to their failing verdict — including the
+literal `["cop", "thief"]` shape that arrived.
+
+**What each notebook contributed.** Code notebook: the reference loads `game.json` through
+`ConfigManager.__init__` (`src/police_thief/shared/config.py`), ships `schema_version: "1.3"`
+in its own copy for both roles, and validates through `_check_version` against
+`SUPPORTED_CONFIG_VERSIONS` (`shared/version.py`), raising `ConfigVersionError`. It runs **no**
+explicit `group_id in agreed_between` test — the field is policed only because it sits inside
+the SHA-256-signed terms, so a reference-shaped peer accepts `["cop", "thief"]` right up until
+it meets one that does not. Book notebook: warm-ups are excluded from the rule 37/38
+declaration and the rule 51 report and count toward neither `max_games_per_team` nor
+`min_games_to_pass` (p. 70/166, 70/169), verified against `inst/police_thief_p2p_Summary.md:2028`
+and rule 52 at `:3442`. So reporting stays off, and a friendly does not spend the single
+counted meeting rule 52 allows against this group.
+
+**Evidence.** Two OS processes played the corrected file end to end on localhost: negotiated,
+21 turns, `CAPTURE`, both sides reporting the same outcome, and `replay` printing
+`Verified OK — 21 steps re-verified`. Their endpoint answered `502` — Cloudflare up, their
+tunnel down — so no game has been played against them yet.

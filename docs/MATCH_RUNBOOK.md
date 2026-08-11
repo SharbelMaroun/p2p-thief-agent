@@ -78,10 +78,33 @@ Fresh state every sub-game (new process = new belief, new barriers, new trail �
 4. **Commit the artifacts** under the agreed names (Appendix F obligation 4) and take
    the mandatory screenshots: Live GUI belief map + Replay `Verified OK` (p. 81/189).
 
+## Run preflight on their file the moment it arrives
+
+```powershell
+uv run p2p-thief preflight --match <their-game.json> --private config\thief\game.toml
+```
+
+Do this **before** agreeing a time, not on match day. It now checks the two things that
+refuse a match at the handshake, and both were live defects in the first file group
+`uoh-ay26` sent us on 2026-08-11:
+
+- `participants` — `agreed_between` must name our `group_id`. Theirs said
+  `["cop", "thief"]`: the two *roles*. Appendix B prints the two **group ids**
+  (`inst/police_thief_p2p_Summary.md:2928`).
+- `schema version` — must be `1.2`. Theirs said `"1.00"`, the guidelines' config
+  revision, which is a **different key** (the optional `version`). The reference
+  simulator ships `"1.3"`, so agree the value in writing; see `C-027`.
+
+Until that day preflight printed **`ready`** for that file — the terms projection reads
+neither field — and the refusal only landed mid-handshake with the opponent waiting.
+
 ## Troubleshooting (each of these cost us a rehearsal run)
 
 - `offering group '<id>' is not in agreed_between` — the shared file's
   `agreed_between` does not name that team's exact `group_id`.
+- `502` from the opponent's URL — Cloudflare (or ngrok) is up but **their** tunnel is
+  not running; that is a peer-not-started, not a network fault. `peer_answers` reports
+  it as not-ready rather than treating the socket as proof of life.
 - `Unexpected UTF-8 BOM` — the shared file was saved with a BOM (PowerShell's
   `Out-File` does this); re-save as plain UTF-8.
 - Technical loss at step 1 on both sides — one peer is not actually reachable at the

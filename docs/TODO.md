@@ -22,6 +22,20 @@ the Thief role. **M9 has not started**: the counted-league, identity, dry-run, a
 submission rows are all still `PENDING`, and a friendly game counts for none of
 them `[AE-52]`.
 
+**2026-08-11 second opponent proposed; nothing closes yet.** Group `uoh-ay26` (Aisha Abu
+Dahesh, Yousef Asadi) offered a friendly and published a **Police** endpoint, which makes
+this repository the peer that dials — so `M8-003c` and `M5-005c` finally have a route to
+close in the Thief role. They stay `PENDING`: the endpoint answered `502` (their tunnel
+down), so no game has been played. Validating their shared file did close a real defect
+that is *not* opponent-specific — `preflight` reported `ready` for a match the handshake
+refuses, because it read neither `schema_version` nor `agreed_between`, and this
+repository's own `check_config_schema_version` had **no caller on the runtime path**
+despite having unit tests. Both checks now run in `services/preflight.py::_wire_gates`.
+Their file's two errors and the three-way `schema_version` disagreement between the book
+(`1.2`), the reference (`1.3`) and their file (`1.00`) are registered as `C-027`/`C-028`.
+A friendly remains uncounted `[AE-52]`, so it consumes none of the rule-52 counted
+meeting against this group.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order

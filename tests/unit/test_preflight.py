@@ -23,11 +23,16 @@ def _named(checks, name):
     return next(check for check in checks if check.name == name)
 
 
-def _private(tmp_path: Path, *, port: int = 8899, credential: str = "C:/nowhere/token.json") -> Path:
+def _private(tmp_path: Path, *, port: int = 8899, credential: str = "C:/nowhere/token.json",
+             group_id: str = "sharNamr") -> Path:
+    """`group_id` defaults to a real participant of `MATCH`. It used to be `"t"`, which was
+    fine while nothing compared it to anything; `participants` compares it to
+    `agreed_between`, so a placeholder now reads as "not our match" -- tested below."""
     path = tmp_path / "game.toml"
     path.write_text(
         'version = "1.00"\n'
-        '[game]\ngroup_name = "t"\ngroup_id = "t"\nsub_game_number = 1\nmembers = ["t"]\n'
+        f'[game]\ngroup_name = "t"\ngroup_id = "{group_id}"\nsub_game_number = 1\n'
+        'members = ["t"]\n'
         'repos = { cop = "https://example.invalid/c", thief = "https://example.invalid/t" }\n'
         f'[network]\nmy_port = {port}\nopponent_url = "https://them.invalid/mcp"\n'
         'public_url = "https://us.invalid/mcp"\nturn_timeout_seconds = 180\n'
@@ -87,6 +92,41 @@ def test_a_match_config_breaking_appendix_f_fails(tmp_path: Path) -> None:
     check = _named(preflight(broken, _private(tmp_path)), "match config")
     assert check.failed
     assert "board_size" in check.value
+
+
+def test_a_match_naming_roles_instead_of_groups_fails(tmp_path: Path) -> None:
+    """The uoh-ay26 defect, 2026-08-11: `agreed_between` held the two *roles*.
+
+    Everything else about that file was legal -- 14 terms, Appendix F clean -- so this
+    command printed `ready` for a match the handshake then refused before move one.
+    """
+    game = json.loads(MATCH.read_text(encoding="utf-8"))
+    game["agreed_between"] = ["cop", "thief"]
+    broken = tmp_path / "roles_match.json"
+    broken.write_text(json.dumps(game), encoding="utf-8")
+    check = _named(preflight(broken, _private(tmp_path)), "participants")
+    assert check.failed
+    assert "sharNamr" in check.value
+
+
+def test_a_match_we_are_not_a_party_to_fails(tmp_path: Path) -> None:
+    """Two named groups, both real, neither of them us -- still not our match."""
+    check = _named(preflight(MATCH, _private(tmp_path, group_id="someone-else")), "participants")
+    assert check.failed
+
+
+def test_an_unsupported_schema_version_fails(tmp_path: Path) -> None:
+    """`ADR-0003`: uoh-ay26 sent `"1.00"`, the reference ships `"1.3"`, Appendix B says `"1.2"`.
+
+    Three sources, three values, so an unimplemented one is refused rather than guessed.
+    """
+    game = json.loads(MATCH.read_text(encoding="utf-8"))
+    game["schema_version"] = "1.00"
+    broken = tmp_path / "old_schema.json"
+    broken.write_text(json.dumps(game), encoding="utf-8")
+    check = _named(preflight(broken, _private(tmp_path)), "schema version")
+    assert check.failed
+    assert "1.00" in check.value
 
 
 def test_an_unreadable_private_config_is_reported_not_raised(tmp_path: Path) -> None:

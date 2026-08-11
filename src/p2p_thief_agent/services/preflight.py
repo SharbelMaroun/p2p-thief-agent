@@ -26,11 +26,20 @@ from __future__ import annotations
 
 import json
 import socket
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
 from p2p_thief_agent.perception.scent_lock import scent_model_hash
-from p2p_thief_agent.protocol.agreement import AgreementError, check_appendix_f
+from p2p_thief_agent.protocol.agreement import (
+    AgreementError,
+    check_appendix_f,
+    validate_participants,
+)
+from p2p_thief_agent.protocol.config_integrity import (
+    ConfigIntegrityError,
+    check_config_schema_version,
+)
 from p2p_thief_agent.protocol.terms_projection import terms_from_shared_config
 from p2p_thief_agent.services.credential_location import credential_path
 from p2p_thief_agent.shared import __version__
@@ -89,7 +98,34 @@ def _port(config: object) -> Check:
     return Check("port", f"{port} free", ok=True)
 
 
-def _match(path: Path) -> list[Check]:
+def _wire_gates(game: Mapping[str, object], group_id: object) -> list[Check]:
+    """The two refusals the wire applies to a shared file that this readout used to miss.
+
+    Added 2026-08-11 after uoh-ay26 sent a shared file whose `agreed_between` was
+    `["cop", "thief"]` -- the two *roles*, not the two group ids -- and whose
+    `schema_version` was `"1.00"`. This command printed `ready` for it, because
+    `terms_from_shared_config` reads neither field; both refusals only landed
+    mid-handshake, with an opponent already waiting. Moving them here is the whole
+    point of a preflight.
+    """
+    checks = []
+    try:
+        check_config_schema_version(game)
+        checks.append(Check("schema version", f"{game.get('schema_version', 'absent')} OK",
+                            ok=True))
+    except ConfigIntegrityError as exc:
+        checks.append(Check("schema version", str(exc), ok=False))
+    try:
+        validate_participants(game.get("agreed_between"), group_id)
+        named = game.get("agreed_between")
+        checks.append(Check("participants", f"{' vs '.join(named)} — we are {group_id!r}",  # type: ignore[arg-type]
+                            ok=True))
+    except AgreementError as exc:
+        checks.append(Check("participants", str(exc), ok=False))
+    return checks
+
+
+def _match(path: Path, group_id: object = None) -> list[Check]:
     """Rule 11/12: the shared object must load and satisfy Appendix F before anyone plays."""
     try:
         game = json.loads(path.read_text(encoding="utf-8"))
@@ -102,6 +138,7 @@ def _match(path: Path) -> list[Check]:
         return [Check("match config", f"{path.name}: {exc}", ok=False)]
     return [
         Check("match config", f"{path.name} — {len(terms)} terms, Appendix F OK", ok=True),
+        *_wire_gates(game, group_id),
         Check("board", f"{terms['board_size']}x{terms['board_size']}, "
                        f"{terms['max_steps']} steps, {terms['barriers_max']} barriers"),
     ]
@@ -121,7 +158,9 @@ def preflight(match_path: Path, private_path: Path) -> list[Check]:
         except Exception as exc:  # noqa: BLE001
             checks.append(Check(label, f"missing: {exc}", ok=False))
     checks.append(_port(config))
-    checks.extend(_match(match_path))
+    game_section = config.get("game", {}) if isinstance(config, dict) else {}
+    group_id = game_section.get("group_id") if isinstance(game_section, dict) else None
+    checks.extend(_match(match_path, group_id))
     checks.append(Check("scent lock", scent_model_hash()))
     checks.append(_reporting(config))
     return checks
