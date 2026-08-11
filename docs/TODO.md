@@ -36,6 +36,18 @@ Their file's two errors and the three-way `schema_version` disagreement between 
 A friendly remains uncounted `[AE-52]`, so it consumes none of the rule-52 counted
 meeting against this group.
 
+**2026-08-12 first live game in the Thief role — played, won, and scored 0/0.** Sub-game 1
+against `uoh-ay26` ran to `survival` over 35 steps and replays `Verified OK`, so `M8-003c`
+and `M5-005c` have their evidence at last. **Neither closes yet**, because the opponent
+recorded a `technical_loss`: this peer wrote its log and exited before their `submit_audit`
+arrived, and rule 35 scores conflicting reports 0/0 for both. `adapters/post_match.py` now
+holds the mailbox open for `audit_send_timeout_seconds` after the last move and derives
+`mutual_agreement.confirmed` from whether an audit actually arrived — it was the literal
+`True` before, asserting an agreement that had not happened. `services/wire_log.py` records
+every inbound tool call and verdict to `logs/wire.jsonl`, which is what the opaque
+negotiation failure earlier that night had no evidence for. Rows close on a replayed
+sub-game whose outcome **both** sides report identically.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order

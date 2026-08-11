@@ -1318,6 +1318,41 @@ from itself indefinitely and fails only when it meets a peer that spells the fie
 played end to end across two local processes: negotiated, 21 turns, `CAPTURE`, matching
 outcomes on both sides, and `Verified OK — 21 steps re-verified`.
 
+#### The game we won and lost by hanging up first (`M7-018d`, `M9-042`, 2026-08-12)
+
+We played group `uoh-ay26` in the Thief role and survived all 35 steps. Our log says
+`survival` and replays `Verified OK — 35 steps re-verified`. Their log says `technical_loss`.
+Rule 35 scores conflicting reports **0/0 for both**, so a clean win became nothing.
+
+*Problem hit.* Nothing was wrong with the game — we left before the conversation was over.
+`serve_match` wrote the artifact and returned the instant the horizon was reached, the CLI
+exited, and the mailbox died with it. Their Cop called `submit_audit` a moment later, met a
+live tunnel with no process behind it, and correctly recorded a loss. Rule 36 makes the mutual
+audit "a mandatory condition before agreement", and an agreement needs two peers present: a
+peer that stops listening as soon as *its own* result is decided can never satisfy it, and
+forces an honest opponent to score a game it actually played as a forfeit. `post_match.py` now
+holds the mailbox open for `audit_send_timeout_seconds` and drains until an audit lands or the
+window closes — bounded, because an opponent that never audits must not be able to turn its
+fault into our hang (rule 6).
+
+The second defect was worse than the first. The log hardcoded `"confirmed": True`. It had
+always meant "negotiation succeeded", but it *reads* as "the result was mutually agreed", and
+it was written unconditionally — including in the game the opponent scored as a technical
+loss. An audit artifact asserting an agreement that never happened is the shape of a false
+declaration, so `confirmed` is now the return value of the audit wait rather than a constant.
+
+*Also fixed, and it is the same failure one layer down.* Earlier that night an offer from the
+same opponent reached this peer and vanished, leaving nothing but a column of `200 OK`. An MCP
+tool error is an application-level result, so HTTP reports 200 whether a call succeeded, named
+a tool we do not have, or used the wrong argument name; our tools acknowledge on *enqueue*
+while validation happens later at *drain*; and nothing recorded either — the rejection reason
+was computed into a `Delivery` and discarded by every caller but the turn loop. `wire_log.py`
+appends one JSONL line per arrival and per verdict: tool, queued, top-level key names,
+accepted, reason. **No payload is ever written** — a turn carries the sealed commitment and,
+after reveal, the nonce, and putting those in an unmanaged file is a rule 18/39 hazard for a
+diagnostic nobody needed; the key *names* are what diagnose a shape mismatch. Every write
+failure is swallowed, because logging that can refuse a turn is worse than no logging.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a

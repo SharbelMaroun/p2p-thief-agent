@@ -1,0 +1,151 @@
+"""Stay reachable after the last move, so the opponent's audit is not a 502 (`M7-018d`).
+
+**The defect this exists to fix, seen live on 2026-08-11.** We played group `uoh-ay26`,
+survived all 35 steps, wrote the log and **exited**. Their Cop then called `submit_audit`
+on our endpoint, met a dead process behind a live tunnel, and recorded:
+
+    Opponent unreachable mid-match -- resolving as technical loss:
+    submit_audit timed out: ... Server error '502 Bad Gateway'
+
+So our artifact said `survival` and theirs said `technical_loss`. Rule 35 scores conflicting
+reports **0/0 for both**, which turned a clean win into nothing. Nothing was wrong with the
+game; we simply left before the conversation was over.
+
+**Rule 36 makes this mandatory, not polite.** The mutual audit is "a mandatory condition
+before agreement", and an agreement needs two peers present. A peer that stops listening the
+instant its own result is decided can never satisfy it, and — worse — it forces an honest
+opponent to record a technical loss against a game it actually played.
+
+**Why a bounded wait rather than "serve forever".** The opponent may legitimately never
+audit: it may have crashed, or be a peer that does not implement the exchange. Waiting
+forever converts their fault into our hang, and rule 6's watchdog exists precisely so no peer
+freezes on another's silence. So the window is bounded by `audit_send_timeout_seconds` from
+the private TOML — the same budget we allow ourselves for sending one — and its expiry is a
+normal outcome, not an error: we return whether an audit arrived and let the caller record
+that honestly.
+
+**`confirmed` is what this changes.** Before this module the log hardcoded
+`"confirmed": True`, which read as "the result was mutually agreed" while actually meaning
+"negotiation succeeded". Those are different claims and only the second was ever true. The
+artifact now asserts the first only when an opponent audit really arrived.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Callable, Mapping
+from typing import Any
+
+DEFAULT_AUDIT_WINDOW = 60.0
+POLL_INTERVAL = 0.5
+
+
+def audit_window_seconds(private: Mapping[str, object] | None,
+                         default: float = DEFAULT_AUDIT_WINDOW) -> float:
+    """Read `[network].audit_send_timeout_seconds`, the budget for one audit exchange."""
+    network = private.get("network") if isinstance(private, Mapping) else None
+    value = network.get("audit_send_timeout_seconds") if isinstance(network, Mapping) else None
+    return float(value) if isinstance(value, (int, float)) and not isinstance(value, bool) \
+        else float(default)
+
+
+def await_opponent_audit(
+    *,
+    drain: Callable[[], Any],
+    audits_seen: Callable[[], int],
+    clock: Callable[[], float],
+    sleep: Callable[[float], None],
+    timeout: float,
+    poll_interval: float = POLL_INTERVAL,
+) -> bool:
+    """Keep draining the mailbox until an audit lands or the window closes.
+
+    Returns whether one arrived. `drain` is injected rather than the inboxes themselves so a
+    test can drive this without a socket — the same injection `readiness` and the watchdog
+    use. The count is read through `audits_seen` for the same reason.
+
+    The mailbox is already serving in the background; this does not re-bind anything. All it
+    does is refuse to let the process exit while the opponent may still be talking.
+    """
+    if timeout <= 0:
+        return audits_seen() > 0
+    deadline = clock() + timeout
+    while True:
+        drain()
+        if audits_seen() > 0:
+            return True
+        if clock() >= deadline:
+            return False
+        sleep(min(poll_interval, max(0.0, deadline - clock())))
+
+
+def log_context(
+    *,
+    sha: str,
+    sub_game: int,
+    identity: Mapping[str, object],
+    opponent_group_id: object,
+    started_at: object,
+    confirmed: bool,
+) -> dict:
+    """Build the log artifact's context block.
+
+    Lifted out of `serve.py` unchanged apart from `confirmed`, which used to be the literal
+    `True`.
+    """
+    return {
+        "game_id": f"game-{sha[:12]}",
+        "game_uid": sha[:32],
+        "sub_game": sub_game,
+        "group_id": identity.get("group_id", "unknown"),
+        "opponent_group_id": opponent_group_id,
+        "config_sha256": sha,
+        "confirmed": confirmed,
+        "started_at": started_at,
+    }
+
+
+def finalise(
+    *,
+    inboxes: Any,
+    artifacts_dir: Any,
+    records: list,
+    result: Any,
+    agreement: Any,
+    game_config: Mapping[str, object] | None,
+    identity: Mapping[str, object] | None,
+    sub_game: int,
+    started_at: object,
+    audit_window: float,
+    sleep: Callable[[float], None],
+    clock: Callable[[], float],
+    write_log: Callable[..., Any],
+) -> bool:
+    """Hold the door open for the audit, then write the log. Returns whether one arrived.
+
+    Kept here rather than in `serve.py` for the `G-04` length gate, but the grouping is
+    honest on its own: everything after the last move belongs to the same phase.
+    """
+    from p2p_thief_agent.adapters.fastmcp_server import drain
+    from p2p_thief_agent.peer.inbound import InboundPeer
+
+    audit_peer = InboundPeer()
+    audited = await_opponent_audit(
+        drain=lambda: drain(inboxes, audit_peer),
+        audits_seen=lambda: len(audit_peer.audits_verified),
+        clock=clock, sleep=sleep, timeout=audit_window,
+    )
+    print(f"opponent audit {'received' if audited else 'did not arrive in the window'}")
+    if artifacts_dir is None:
+        return audited
+    context = None
+    if agreement is not None and game_config is not None and identity is not None:
+        from p2p_thief_agent.protocol.crypto import canonical_sha256
+
+        sha = canonical_sha256(dict(game_config))
+        context = log_context(
+            sha=sha, sub_game=sub_game, identity=identity,
+            opponent_group_id=agreement.peer_identity.get("group_id", "unknown"),
+            started_at=started_at, confirmed=audited,
+        )
+    write_log(artifacts_dir, records, result, context)
+    return audited

@@ -61,6 +61,13 @@ def _enqueue(inbox: queue.Queue, message: object) -> bool:
     return True
 
 
+def _log_call(tool: str, message: object, *, queued: bool) -> None:
+    """Record the arrival. Separate function so each tool costs one line, not three."""
+    from p2p_thief_agent.services import wire_log  # noqa: PLC0415
+
+    wire_log.received(tool, message, queued=queued)
+
+
 @dataclass(slots=True)
 class PeerInboxes:
     """Thread-safe mailboxes filled by the MCP tools and drained by the runtime.
@@ -111,37 +118,44 @@ def build_server(inboxes: PeerInboxes, name: str = "p2p-thief") -> FastMCP:
 
     @mcp.tool
     def negotiate(message: dict) -> dict:
-        if not _enqueue(inboxes.agreements, message):
-            return {"ok": False, "reason": "inbox full"}
-        return {"ok": True}
+        queued = _enqueue(inboxes.agreements, message)
+        _log_call("negotiate", message, queued=queued)
+        return {"ok": True} if queued else {"ok": False, "reason": "inbox full"}
 
     @mcp.tool
     def receive_turn(message: dict) -> dict:
-        if not _enqueue(inboxes.turns, message):
-            return {"ok": False, "reason": "inbox full"}
-        return {"ok": True}
+        queued = _enqueue(inboxes.turns, message)
+        _log_call("receive_turn", message, queued=queued)
+        return {"ok": True} if queued else {"ok": False, "reason": "inbox full"}
 
     @mcp.tool
     def submit_audit(payload: dict) -> dict:
-        if not _enqueue(inboxes.audits, payload):
-            return {"ok": False, "reason": "inbox full"}
-        return {"ok": True}
+        queued = _enqueue(inboxes.audits, payload)
+        _log_call("submit_audit", payload, queued=queued)
+        return {"ok": True} if queued else {"ok": False, "reason": "inbox full"}
 
     @mcp.tool
     def receive_control(message: dict) -> dict:
-        if not _enqueue(inboxes.controls, message):
-            return {"ok": False, "reason": "inbox full"}
-        return {"ok": True}
+        queued = _enqueue(inboxes.controls, message)
+        _log_call("receive_control", message, queued=queued)
+        return {"ok": True} if queued else {"ok": False, "reason": "inbox full"}
 
     return mcp
 
 
 def _apply(peer: InboundPeer, tool: str, message: JsonObject) -> Delivery:
+    from p2p_thief_agent.services import wire_log  # noqa: PLC0415
+
     try:
         peer.dispatch(tool, message)
-        return Delivery(tool, accepted=True)
     except (WireError, CryptoError, TypeError) as exc:
+        # Recorded here because this is the only place the reason exists: every caller
+        # but the turn loop discards the `Delivery`, which is how a refused offer became
+        # indistinguishable from silence on 2026-08-11.
+        wire_log.validated(tool, accepted=False, reason=exc)
         return Delivery(tool, accepted=False, reason=str(exc))
+    wire_log.validated(tool, accepted=True)
+    return Delivery(tool, accepted=True)
 
 
 def _drain_box(box: queue.Queue, peer: InboundPeer, tool: str) -> list[Delivery]:

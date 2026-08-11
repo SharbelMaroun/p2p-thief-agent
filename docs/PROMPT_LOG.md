@@ -1062,3 +1062,54 @@ counted meeting rule 52 allows against this group.
 21 turns, `CAPTURE`, both sides reporting the same outcome, and `replay` printing
 `Verified OK — 21 steps re-verified`. Their endpoint answered `502` — Cloudflare up, their
 tunnel down — so no game has been played against them yet.
+
+## 2026-08-12 — the game we won and lost: leaving before the audit
+
+**Prompt.** "Add the logging" — plus the opponent's message: *"Opponent unreachable mid-match
+— resolving as technical loss: submit_audit timed out … 502 Bad Gateway. Technical loss
+recorded."*
+
+**We played group `uoh-ay26` and survived all 35 steps.** Our log says `survival`, replays
+`Verified OK — 35 steps re-verified`, and cost zero tokens. Their log says `technical_loss`.
+Rule 35 scores conflicting reports **0/0 for both**, so a clean win became nothing.
+
+**Nothing was wrong with the game. We left before the conversation was over.** `serve_match`
+wrote the log and returned the instant the horizon was reached; the CLI then exited and the
+mailbox died with it. Their Cop called `submit_audit` a moment later, met a live tunnel with
+no process behind it, and correctly recorded a technical loss. Rule 36 makes the mutual audit
+"a mandatory condition before agreement" — and an agreement needs two peers present. A peer
+that stops listening the moment *its own* result is decided can never satisfy it, and forces
+an honest opponent to record a loss against a game it actually played.
+
+`adapters/post_match.py` now holds the mailbox open for `audit_send_timeout_seconds` (60)
+after the last move, draining until an audit lands or the window closes. The wait is bounded
+on purpose: the opponent may legitimately never audit, and waiting forever converts their
+fault into our hang, which is exactly what rule 6's watchdog exists to prevent.
+
+**A second defect fell out of the first, and it is the worse one.** The log hardcoded
+`"confirmed": True`. It was never a claim about agreement — it meant "negotiation succeeded" —
+but it *reads* as "the result was mutually agreed", and it was written unconditionally,
+including in the game the opponent scored as a technical loss. An audit artifact asserting a
+mutual agreement that never happened is the shape of a false declaration. `confirmed` is now
+the return value of the audit wait.
+
+**The logging, and why it was the same failure.** Earlier that night an offer from the same
+opponent reached this peer and vanished, leaving only a column of `200 OK`. An MCP tool error
+is an application-level result, so the HTTP layer reports 200 whether the call succeeded,
+named a tool we do not have, or used the wrong argument name; our tools acknowledge on
+*enqueue* while validation happens later at *drain*; and nothing wrote either down. The
+rejection reason was computed into a `Delivery` and discarded by every caller but the turn
+loop. `services/wire_log.py` appends one JSONL line per arrival and per verdict —
+tool, queued, top-level key names, accepted, reason. **No payload**: a turn carries the sealed
+commitment and, after reveal, the nonce, and writing those to an unmanaged file is a rule
+18/39 hazard for a diagnostic nobody needed. The key *names* are what diagnose a shape
+mismatch; the values never came into it. Every write failure is swallowed, because logging
+that can refuse a turn is worse than no logging.
+
+Verified end to end over two processes: `opponent audit received`, `CAPTURE after 21 steps`,
+43 wire events including `submit_audit` received and validated. 1658 tests, 94.96% branch
+coverage. `serve.py` also dropped under the 150-line gate it had been one line over.
+
+**Still open, and it is the same bug with the roles swapped:** the companion Cop returns
+immediately after `write_match_log` with no audit window, so sub-games 2/4/6 will fail exactly
+this way against an opponent Thief that audits. Recorded rather than fixed tonight.

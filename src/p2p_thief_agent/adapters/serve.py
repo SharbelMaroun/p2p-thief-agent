@@ -56,6 +56,7 @@ def serve_match(
     game_config: Mapping[str, object] | None = None,
     identity: Mapping[str, object] | None = None,
     sub_game: int = 1,
+    audit_window: float = 60.0,
 ) -> MatchOutcome:
     """Bind, wait for the opponent, then play one sub-game to a decision.
 
@@ -155,19 +156,18 @@ def serve_match(
         records=records,
         deliver=retrying_deliver(game_config, sleep, clock=time.monotonic),
     )
-    if artifacts_dir is not None:
-        context = None
-        if agreement is not None and game_config is not None and identity is not None:
-            from p2p_thief_agent.protocol.crypto import canonical_sha256  # noqa: PLC0415
+    # Rule 36: the mutual audit is a condition of agreement, and an agreement needs two
+    # peers present. Exiting here is what turned a clean 35-step survival into 0/0 against
+    # `uoh-ay26` on 2026-08-11 — their `submit_audit` met a 502 and they recorded a
+    # technical loss. See `post_match` for the whole account.
+    from p2p_thief_agent.adapters.post_match import finalise  # noqa: PLC0415
 
-            sha = canonical_sha256(dict(game_config))
-            context = {
-                "game_id": f"game-{sha[:12]}", "game_uid": sha[:32], "sub_game": sub_game,
-                "group_id": identity.get("group_id", "unknown"),
-                "opponent_group_id": agreement.peer_identity.get("group_id", "unknown"),
-                "config_sha256": sha, "confirmed": True, "started_at": started_at,
-            }
-        _write_log(artifacts_dir, records, result, context)
+    finalise(
+        inboxes=inboxes, artifacts_dir=artifacts_dir, records=records, result=result,
+        agreement=agreement, game_config=game_config, identity=identity,
+        sub_game=sub_game, started_at=started_at, audit_window=audit_window,
+        sleep=sleep, clock=time.monotonic, write_log=_write_log,
+    )
     return MatchOutcome(outcome=result.outcome, steps=result.steps, records=records)
 
 

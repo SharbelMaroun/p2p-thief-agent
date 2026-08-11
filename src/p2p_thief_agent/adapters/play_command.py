@@ -12,6 +12,27 @@ import argparse
 from pathlib import Path
 
 
+def _audit_window(private: Path | None) -> float:
+    """How long to stay reachable for the opponent's audit, from the private TOML.
+
+    Never raises: a missing or unreadable private file falls back to the default window
+    rather than refusing to play. The window is generous by design — see `post_match`.
+    """
+    from p2p_thief_agent.adapters.post_match import (  # noqa: PLC0415
+        DEFAULT_AUDIT_WINDOW,
+        audit_window_seconds,
+    )
+
+    if private is None:
+        return DEFAULT_AUDIT_WINDOW
+    try:
+        from p2p_thief_agent.shared.private_config import load_private_config  # noqa: PLC0415
+
+        return audit_window_seconds(load_private_config(private))
+    except Exception:  # noqa: BLE001 - a config problem must not cost the audit window
+        return DEFAULT_AUDIT_WINDOW
+
+
 def resolve_peer_address(peer: str | None, private: Path | None) -> str:
     """Decide which address to dial, from a flag or the private config (`M5-005`).
 
@@ -82,6 +103,12 @@ def play(args: argparse.Namespace) -> int:
             print(str(exc))
             return 2
 
+    # Armed before the mailbox takes its first call, so the wire log covers negotiation —
+    # the phase that failed opaquely against `uoh-ay26` on 2026-08-11.
+    from p2p_thief_agent.services import wire_log  # noqa: PLC0415
+
+    if wire_log.enable(Path(args.artifacts or ".") / "logs"):
+        print(f"wire log: {wire_log.target()}")
     print(f"Thief on http://{args.host}:{args.port}, playing {peer} ...")
     # The decide callable carries its honest claim-answerer: both close over the same
     # position, so the answer given on the wire and the answer that ends our loop can
@@ -95,6 +122,7 @@ def play(args: argparse.Namespace) -> int:
             artifacts_dir=args.artifacts,
             game_config=game_config, identity=identity,
             sub_game=getattr(args, "sub_game", 1),
+            audit_window=_audit_window(args.private),
         )
     except ServeError as exc:
         print(f"match did not start: {exc}")
