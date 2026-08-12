@@ -1682,6 +1682,40 @@ far arrived through contact with a real peer or a real peer's specification, nev
 suite — which argues for warm-up games and for reading other teams' specs, not for more tests of
 the kind that already pass.
 
+### What reading an opponent's source changed
+
+**Added 2026-08-12.** Group `uoh-ay26`'s Thief emits `win_claim` `{"type": "boxed_in"}` for
+the book's third capture condition — a Thief whose every cardinal neighbour is barriered or
+off-board. The companion Cop **rejected the whole turn message** over that value, because its
+shared schema pinned the member to `survival`; the match would have hung into a mutual 0/0.
+
+This repository did not have that defect, and the reason is worth being honest about: it is
+luck, not design. `protocol/wire.py` validates `sender` and carries `win_claim` through
+uninterpreted, so an unknown claim shape costs nothing here. An unpinned guarantee is one
+refactor from being lost, so the rule is now stated and tested in the direction this role
+faces — such a claim must **never capture us**. `_caught_by` reads only `capture_claim` and
+checks it against our real cell, because rule 22 makes a false capture declaration
+disqualifying and believing an unproven assertion would let an opponent end a game it was
+losing by asserting a fact it cannot observe.
+
+Both sources were consulted and neither supports emitting the value: the book settles the
+condition through the Cop's claim and the Thief's duty of truth, and the reference has no
+such signal at all. So this side still declares only `survival`, unchanged.
+
+### Where the belief update lives
+
+**Added 2026-08-12.** The companion Cop split its live turn this week so that interpreting
+the opponent's scent stopped sharing a file with choosing a move. This repository has
+carried that boundary from the start: `perception/` holds observation, scent decoding,
+trust and belief, while `strategy/` holds the evasion policy that consumes them.
+
+Checking the split against the sources confirmed the shape is the mandated one rather than
+a stylistic preference. Rule 3 puts five subsystems behind the orchestrator — MCP connector,
+decision module, log manager, deadline tracker, watchdog — and belief update is drawn inside
+the Decision Module rather than beside it, so a `perception/` package is a component of that
+module and not a sixth subsystem. The reference draws the same line even harder, updating
+belief in its inbound turn handler and selecting the move in a separate package.
+
 ## License and provenance
 
 The [MIT license](LICENSE) covers team-authored material where legally valid.

@@ -48,6 +48,21 @@ every inbound tool call and verdict to `logs/wire.jsonl`, which is what the opaq
 negotiation failure earlier that night had no evidence for. Rows close on a replayed
 sub-game whose outcome **both** sides report identically.
 
+**2026-08-12b the companion's schema defect, and the mirrored rule here (`C-029`).** Group
+`uoh-ay26`'s Thief sends `win_claim` `{"type": "boxed_in"}` for the book's third capture
+condition. The companion Cop **rejected the whole turn message** over it; this repository did
+not, because `protocol/wire.py` carries `win_claim` uninterpreted and validates only
+`sender`. That is luck rather than design, so the rule is now stated and pinned here in the
+direction that matters for this role: such a claim must **never capture us**. `_caught_by`
+reads only `capture_claim` and checks it against our real cell — rule 22 makes a false
+capture declaration disqualifying, and believing an unproven assertion would let an opponent
+end a game it was losing by asserting a fact it cannot observe. Both notebooks were asked:
+the book settles the condition by Cop claim plus truthful answer
+(`inst/police_thief_p2p_Summary.md:810`, `:830`), and the reference has no such signal at all
+(`win_claim` ∈ {`survival`, `None`}, `peer/turn_sender.py::take_turn`). No status changes;
+`tests/unit/test_boxed_in_claim.py` (5) turns an accident into a guarantee. `THIEF-002`
+forbids closing anything here on the companion's evidence, and nothing is closed.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order

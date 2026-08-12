@@ -1113,3 +1113,38 @@ coverage. `serve.py` also dropped under the 150-line gate it had been one line o
 **Still open, and it is the same bug with the roles swapped:** the companion Cop returns
 immediately after `write_match_log` with no audit window, so sub-games 2/4/6 will fail exactly
 this way against an opponent Thief that audits. Recorded rather than fixed tonight.
+
+
+## 2026-08-12b — the mirrored `boxed_in` rule (`C-029`)
+
+**Prompt.** Same review as the companion: can group `uoh-ay26` play us across all six
+sub-games? Their Thief sends `win_claim` `{"type": "boxed_in"}` for the book's third capture
+condition, and the companion Cop rejected the entire turn message over it.
+
+**This repository did not have that defect** — `protocol/wire.py` validates only `sender` and
+carries `win_claim` through uninterpreted — but that is luck, not design, and an unpinned
+guarantee is one refactor from being lost. So the rule is stated here in the direction this
+role actually faces: a `boxed_in` claim must **never capture us**. `_caught_by` reads only
+`capture_claim` and checks it against our real cell; rule 22 makes a false capture
+declaration disqualifying, and believing an unproven assertion would let an opponent end a
+game it was losing by asserting a fact it cannot observe.
+
+Both notebooks were asked and gave different halves of the answer: the book settles the
+condition by Cop claim plus truthful answer (`inst/police_thief_p2p_Summary.md:810`, `:830`),
+while the reference has no such signal at all (`win_claim` ∈ {`survival`, `None`},
+`peer/turn_sender.py::take_turn`). Neither supports emitting it, so this side still emits only
+`survival`, unchanged.
+
+Five tests, no status changes, no behaviour change — `THIEF-002` forbids closing anything
+here on the companion's evidence, and nothing is closed. ruff and the 150-line gate are clean
+in this repository.
+
+
+## 2026-08-12c — length gate confirmed clean here
+
+The companion repository had two `G-04` violations at `HEAD` and CI was red on that step.
+This repository was checked at the same time and is clean: 148 source/script files and 183
+test files, zero violations, so nothing was split and no code changed. Recorded because
+"the other repo had a gate failure" is exactly the kind of thing that turns into an
+assumption about this one, and the eight-step workflow says both repositories are checked
+every time.
