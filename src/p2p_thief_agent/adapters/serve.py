@@ -140,9 +140,14 @@ def serve_match(
     # `M5-010`, wired 2026-08-09: over a tunnel a single 502 is a blip, not a decision
     # (rules 6/7). `delivery.deliver` was built for exactly this and had no production
     # call site until now, so one transient fault on any turn ended the sub-game 0/0.
+    # The audit must open with a sealed step-0 `system_spec` record; peers reject an audit
+    # without it "at steps [0]" (agreed with uoh-ay26 2026-08-12). It rides the audit only,
+    # never the log, and `build_step_zero` returns None rather than raising if it cannot.
+    from p2p_thief_agent.adapters.step_zero import build_step_zero  # noqa: PLC0415
     from p2p_thief_agent.orchestration.delivery import retrying_deliver  # noqa: PLC0415
     from p2p_thief_agent.orchestration.polling import poll_for_turn  # noqa: PLC0415
 
+    step_zero = build_step_zero(identity, game_config, sub_game)
     records: list[dict] = []
     result = run_sub_game_over_wire(
         machine=PhaseMachine(),
@@ -155,6 +160,7 @@ def serve_match(
         survival_threshold=threshold,
         records=records,
         deliver=retrying_deliver(game_config, sleep, clock=time.monotonic),
+        step_zero=step_zero,
     )
     # Rule 36: the mutual audit is a condition of agreement, and an agreement needs two
     # peers present. Exiting here is what turned a clean 35-step survival into 0/0 against

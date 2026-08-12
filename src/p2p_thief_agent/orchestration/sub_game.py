@@ -66,6 +66,7 @@ def run_sub_game_over_wire(
     on_transition: OnTransition | None = None,
     send_audit: bool = True,
     deliver: Deliver | None = None,
+    step_zero: dict | None = None,
 ) -> SubGameOutcome:
     """Play turns until decided, then reveal every sealed record.
 
@@ -99,18 +100,19 @@ def run_sub_game_over_wire(
             )
         except TurnLoopError as exc:
             return _finish(Outcome.TECHNICAL_LOSS, step - 1, str(exc), turns, ledger,
-                           transport, send_audit)
+                           transport, send_audit, step_zero)
         turns.append(record)
 
         caught = _caught_by(record.received, answer_claim)
         if caught is not None:
-            return _finish(Outcome.CAPTURE, step, caught, turns, ledger, transport, send_audit)
+            return _finish(Outcome.CAPTURE, step, caught, turns, ledger, transport,
+                           send_audit, step_zero)
 
     return _finish(
         Outcome.SURVIVAL,
         survival_threshold,
         f"survived the agreed limit of {survival_threshold} steps",
-        turns, ledger, transport, send_audit,
+        turns, ledger, transport, send_audit, step_zero,
     )
 
 
@@ -138,18 +140,27 @@ def _finish(
     records: list[dict],
     transport: object,
     send_audit: bool,
+    step_zero: dict | None = None,
 ) -> SubGameOutcome:
     """Reveal every sealed record, then report the outcome.
 
     The audit goes out even when this peer is taking the technical loss: a reveal
     that is withheld cannot be checked, and the whole point is that the opponent
     recomputes it.
+
+    ``step_zero`` is the sealed `system_spec` attestation (rule 24). It is prepended to
+    the **audit** records but never to the ledger the log is written from -- the reference
+    convention, confirmed with uoh-ay26 on 2026-08-12: the audit carries a step-0
+    `system_spec` record that peers unconditionally expect, while the saved game log
+    excludes it. We build the record (`sealed_spec_record`) but had never attached it to
+    the audit, so every cross-team audit was rejected "at steps [0]".
     """
     audit: dict | None = None
     if send_audit:
+        audit_records = [step_zero, *records] if step_zero is not None else list(records)
         audit = {
             "sender": "thief",
-            "records": list(records),
+            "records": audit_records,
             "result_claim": wire_result_claim(outcome),
         }
         submit = getattr(transport, "submit_audit", None)

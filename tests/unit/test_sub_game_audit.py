@@ -26,6 +26,34 @@ def test_the_audit_reveals_every_sealed_turn_and_recomputes() -> None:
     assert audit_records(result.audit["records"])["passed"] is True
 
 
+def test_the_step_zero_attestation_opens_the_audit_but_not_the_log() -> None:
+    """`AE-024`, agreed with uoh-ay26 2026-08-12: peers reject an audit whose records do
+    not open with a step-0 `system_spec` attestation ("rejected at steps [0]"). The record
+    rides the audit only; the game log the outcome carries stays moves-only."""
+    from p2p_thief_agent.protocol.sealing import sealed_spec_record
+
+    step_zero = sealed_spec_record(
+        spec={"os": "test"}, model="template", group_name="sharNamr",
+        github_commit="deadbeef", token_budget=33333, sub_game_number=1)
+
+    result = play(Opponent(*(cop_turn(s) for s in range(1, 3))), threshold=3,
+                  step_zero=step_zero)
+
+    records = result.audit["records"]
+    assert records[0]["payload"]["step"] == 0
+    assert records[0]["payload"]["type"] == "system_spec"
+    assert audit_records(records)["passed"] is True          # every record, step 0 included
+    assert len(records) == 4                                  # step 0 + three moves
+    # The per-turn records the log is written from stay moves-only (steps 1..n).
+    assert [r.step for r in result.turns] == [1, 2, 3]
+
+
+def test_without_a_step_zero_the_audit_is_unchanged() -> None:
+    """The fix is additive: omitting the record reproduces the old moves-only audit."""
+    result = play(Opponent(*(cop_turn(s) for s in range(1, 3))), threshold=3)
+    assert all(r["payload"]["step"] != 0 for r in result.audit["records"])
+
+
 def test_the_sealed_records_carry_the_true_position_each_step() -> None:
     """This is why a false denial cannot pay: our own reveal contradicts it."""
     result = play(Opponent(*(cop_turn(s) for s in range(1, 3))), threshold=3)
