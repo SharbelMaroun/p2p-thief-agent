@@ -1750,6 +1750,18 @@ before the opponent's audit lands — the mailbox now lingers, and
 Evidence: `games/friendly-uohay26-0812-1934/` and `-0812-2201/`, each with all six logs
 this role wrote in its games plus the complete inbound wire journal.
 
+
+**The strategy duel, from this side (2026-08-13).** After two 6-0 sweeps the opponent
+patched their evader specifically against the companion Cop's corner-trap captures --
+their regression tests are named after those games -- and the third series was six
+survivals, a 47-47 draw. This repository's role in the duel was constancy: its Thief
+survived all nine hunts across the three series, before and after their upgrade, and
+was the half of the team their patch could not touch. The companion's answer (M10,
+sanctuary denial: deny the clearance core their evader is bound to, cut each surviving
+orbit, corner them on the resulting paths) is recorded in the companion's report; it
+measured 40/40 against a faithful port of their public planner where the previous stack
+and even a truth-fed oracle measured 0/40.
+
 ## License and provenance
 
 The [MIT license](LICENSE) covers team-authored material where legally valid.
