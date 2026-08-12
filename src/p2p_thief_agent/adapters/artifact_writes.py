@@ -103,6 +103,12 @@ def _group_block(identity: Mapping[str, object], *, ours: bool) -> dict:
         withheld = [name for name in ("llm_model", "hardware_spec") if block[name] is None]
         if withheld:
             block["undeclared"] = withheld
+    # The declaration requires a `signature` member per group: ours commits to the
+    # block itself (the companion Cop signs identically); a peer's is None, since
+    # only a group can sign its own declaration and inventing one would be forgery.
+    from p2p_thief_agent.protocol.crypto import canonical_sha256  # noqa: PLC0415
+
+    block["signature"] = canonical_sha256(block) if ours else None
     return block
 
 
