@@ -37,6 +37,14 @@ from typing import Any
 
 DEFAULT_AUDIT_WINDOW = 60.0
 POLL_INTERVAL = 0.5
+# Keep serving this long AFTER the audit lands, before exiting. Found 2026-08-12 against
+# uoh-ay26: we received and verified their audit every time (confirmed:true), but exited
+# within ~0.5s -- and their client, over a Tel-Aviv->Cloudflare->them tunnel, was still
+# closing its session / retrying. That tail hit our already-dead origin as a 502, and they
+# scored the sub-game a technical loss. The audit is mutual; the exchange is not over the
+# instant we have what WE need. Draining continues through the grace, so a duplicate or a
+# late follow-up is absorbed rather than refused.
+AUDIT_GRACE_SECONDS = 12.0
 
 
 def audit_window_seconds(private: Mapping[str, object] | None,
@@ -56,26 +64,38 @@ def await_opponent_audit(
     sleep: Callable[[float], None],
     timeout: float,
     poll_interval: float = POLL_INTERVAL,
+    grace: float = AUDIT_GRACE_SECONDS,
 ) -> bool:
-    """Keep draining the mailbox until an audit lands or the window closes.
+    """Wait up to `timeout` for the opponent's audit; once it lands, linger `grace` more.
 
     Returns whether one arrived. `drain` is injected rather than the inboxes themselves so a
     test can drive this without a socket — the same injection `readiness` and the watchdog
     use. The count is read through `audits_seen` for the same reason.
 
-    The mailbox is already serving in the background; this does not re-bind anything. All it
-    does is refuse to let the process exit while the opponent may still be talking.
+    The grace is the fix for the teardown race: exiting the instant we have the audit leaves
+    the opponent's client hitting a dead origin (502) while it finishes its side of the
+    exchange over a tunnel. We keep draining through the grace so a duplicate or a late
+    follow-up is absorbed, then return. The grace stays well inside the watchdog budget.
     """
     if timeout <= 0:
+        drain()
         return audits_seen() > 0
     deadline = clock() + timeout
+    received_at: float | None = None
     while True:
         drain()
-        if audits_seen() > 0:
-            return True
-        if clock() >= deadline:
+        if received_at is None and audits_seen() > 0:
+            received_at = clock()
+        now = clock()
+        if received_at is not None:
+            if now >= received_at + grace:
+                return True
+            until = received_at + grace - now  # lingering for the teardown grace
+        elif now >= deadline:
             return False
-        sleep(min(poll_interval, max(0.0, deadline - clock())))
+        else:
+            until = deadline - now  # still waiting for the audit
+        sleep(min(poll_interval, max(0.0, until)))
 
 
 def log_context(

@@ -45,6 +45,30 @@ def test_an_audit_that_arrives_is_waited_for() -> None:
         clock=clock, sleep=clock.sleep, timeout=30.0) is True
 
 
+def test_it_lingers_after_the_audit_so_the_opponent_can_tear_down() -> None:
+    """The teardown-race fix (2026-08-12): exiting the instant the audit lands leaves the
+    opponent's client hitting a dead origin (502). We keep serving for the grace window and
+    keep draining, so a late follow-up or duplicate is absorbed rather than refused."""
+    clock = _Clock()
+    arrivals = {"n": 0}
+    drains_after_receipt = {"n": 0}
+    received_at: dict[str, float] = {}
+
+    def drain() -> None:
+        if clock.now >= 1.0 and arrivals["n"] == 0:
+            arrivals["n"] = 1
+            received_at["t"] = clock.now
+        if arrivals["n"]:
+            drains_after_receipt["n"] += 1
+
+    assert await_opponent_audit(
+        drain=drain, audits_seen=lambda: arrivals["n"],
+        clock=clock, sleep=clock.sleep, timeout=30.0, grace=12.0) is True
+    # Returned only after lingering the full grace past receipt, still draining.
+    assert clock.now >= received_at["t"] + 12.0
+    assert drains_after_receipt["n"] > 1
+
+
 def test_a_silent_opponent_closes_the_window_rather_than_hanging() -> None:
     """Rule 6: their silence must not become our freeze. Expiry is normal, not an error."""
     clock = _Clock()
