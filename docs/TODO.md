@@ -112,6 +112,13 @@ same way their next counter will not be readable by us if they reciprocate. Ever
 pushed before this moment is assumed already cloned; privacy protects future commits
 only.
 
+**2026-08-13e repositories returned to public.** The private interval lasted from before
+M10 landed until after it was pushed; both repositories are public again by owner
+decision. Consequence, stated plainly: `strategy/denial.py` and the `flee_interior`
+archetype are now readable by the opponent, so the next round of the strategy duel is
+played open-book in both directions -- the same symmetric openness we benefited from
+when reading their planner. Rule 49 is satisfied in either state.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order
