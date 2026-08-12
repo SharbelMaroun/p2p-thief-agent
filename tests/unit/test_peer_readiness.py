@@ -39,7 +39,7 @@ def _server(status: int) -> tuple[HTTPServer, str]:
     return httpd, f"http://127.0.0.1:{httpd.server_address[1]}/mcp"
 
 
-@pytest.mark.parametrize("status", [502, 503, 504])
+@pytest.mark.parametrize("status", [502, 503, 504, 530])
 def test_a_gateway_error_means_the_peer_is_not_up(status: int) -> None:
     """**The bug this module exists for.** A tunnel with no origin answers 502; the peer is
     not there, however routable its hostname is."""
@@ -48,6 +48,30 @@ def test_a_gateway_error_means_the_peer_is_not_up(status: int) -> None:
         assert peer_answers(url, timeout=5.0) is False
     finally:
         httpd.shutdown()
+
+
+def test_the_probe_identifies_itself_so_cloudflare_returns_the_real_status() -> None:
+    """Without a User-Agent, Cloudflare answers urllib's default agent with a 403 (bot
+    protection) rather than the true 502/530, so every tunnelled peer read as "up" and the
+    wait never ran. Found 2026-08-12. The probe must send an agent header."""
+    seen: dict[str, str] = {}
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self) -> None:  # noqa: N802
+            seen["ua"] = self.headers.get("User-Agent", "")
+            self.send_response(406)
+            self.end_headers()
+
+        def log_message(self, *_args: object) -> None:
+            return
+
+    httpd = HTTPServer(("127.0.0.1", 0), Handler)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    try:
+        peer_answers(f"http://127.0.0.1:{httpd.server_address[1]}/mcp", timeout=5.0)
+    finally:
+        httpd.shutdown()
+    assert seen["ua"] and "Python-urllib" not in seen["ua"]
 
 
 @pytest.mark.parametrize("status", [200, 400, 406])

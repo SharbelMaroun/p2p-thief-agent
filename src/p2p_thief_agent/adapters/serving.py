@@ -111,7 +111,12 @@ def port_answers(host: str, port: int, timeout: float = 1.0) -> bool:
 # Gateway statuses meaning "the tunnel is routable but nothing is serving behind it".
 # A peer that answers *anything* else -- including 406, which is what an MCP endpoint
 # returns to a bare GET -- is up, whatever it thinks of the request.
-_NO_ORIGIN = frozenset({502, 503, 504})
+# 530 added 2026-08-12: Cloudflare returns it (body "error code: 1033") when the hostname
+# exists but NO tunnel is registered for it -- the opponent's route is not up. Without it,
+# dialling a 530 endpoint passed readiness on the first probe and failed inside negotiate
+# seconds later, instead of the readiness loop waiting out its budget. Same "no origin"
+# condition as 502, one layer up.
+_NO_ORIGIN = frozenset({502, 503, 504, 530})
 
 
 def peer_answers(url: str, timeout: float = 2.0) -> bool:
@@ -132,7 +137,11 @@ def peer_answers(url: str, timeout: float = 2.0) -> bool:
     try:
         # Built inside the try: an unparseable URL raises from the constructor, and a
         # readiness probe that raises turns "the opponent is late" into a crash.
-        request = urllib.request.Request(url, method="GET")
+        # A User-Agent is not optional. Cloudflare answers urllib's default agent with a
+        # 403 (bot protection), not the true 502/530, so readiness read every tunnelled peer
+        # as "up" and never waited -- the 8s failure on game 2 (2026-08-12).
+        request = urllib.request.Request(
+            url, method="GET", headers={"User-Agent": "p2p-thief/1.0 (readiness probe)"})
         with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310
             return response.status not in _NO_ORIGIN
     except urllib.error.HTTPError as exc:
