@@ -1723,6 +1723,13 @@ negotiation identity carried no `git_commit_hash` — a member the book homes in
 Step-0 declaration and the reference omits entirely. The serve path now attaches it
 best-effort from the fail-closed resolver; the mandated home is untouched.
 
+
+**Final postscript — the first complete series (2026-08-12, evening).** Survival at the
+horizon in all three Thief games of a 6–0 series, every audit accepted — this repository's
+step-0 record had carried the reference-verbatim members all along, which is exactly what
+the companion's Police builder lacked. The consensus-envelope tolerance was adopted here
+the same night.
+
 ## License and provenance
 
 The [MIT license](LICENSE) covers team-authored material where legally valid.

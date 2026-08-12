@@ -74,6 +74,15 @@ stays the sealed Step-0 attestation (rules 24/53). Both notebooks confirmed the 
 excludes the hash from the series-static declaration and the reference identity carries no
 code version. `tests/unit/test_identity_commit_hash.py` (3). No status changes.
 
+**2026-08-12f the first complete series, and this side's share of its two edge defects.**
+The six-game series completed 6–0 (survival 1/3/5 in this role, captures 2/4/6 by the
+companion). This repository's audits all passed the opponent's verifier; the companion's
+failed on a step-0 shape this repository had right all along (`sealed_spec_record` carries
+the reference-verbatim `step`/`type` members — companion `C-041`). Adopted here:
+`series_consensus` tolerance (`C-031`), mirroring companion `C-040` — parse, acknowledge,
+never score, refuse if it smuggles records. No status changes; the counted series waits on
+the opponent's own fixes.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order

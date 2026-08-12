@@ -1162,3 +1162,15 @@ fail-closed; the accommodation is best-effort because an optional duplicate must
 refuse a match. Three tests pin presence, untouched mandated members, and the non-fatal
 fallback. The evening friendly's game-1 log here replays `Verified OK` at 35 steps —
 the voided sign-off was their reading of our identity, not our evidence.
+
+
+## 2026-08-12f — series complete; consensus tolerance adopted (`C-031`)
+
+This role's share of the night: survival at 35 in all three Thief games, every audit
+accepted by the opponent's verifier — because `sealed_spec_record` has carried the
+reference-verbatim step-0 members all along, which is precisely what the companion's
+Police builder lacked (companion `C-041`). Adopted the `series_consensus` tolerance
+mirroring companion `C-040`: `AuditPayload` parses the claim, refuses it if it smuggles
+records, and the inbound handler acknowledges it vacuously. Four tests. Step-3 disclosure
+as in the companion's log: no fresh notebook queries — both fixes implement agreements
+already established and verified earlier today.

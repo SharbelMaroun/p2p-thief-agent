@@ -136,7 +136,15 @@ class AuditPayload:
     def __post_init__(self) -> None:
         if self.sender not in ROLES:
             raise WireError("AuditPayload.sender must be 'thief' or 'police'")
-        if self.result_claim not in RESULT_CLAIMS:
+        # `series_consensus` (companion C-040): uoh-ay26's post-series SHA exchange --
+        # an empty-record envelope, never a game outcome. Tolerated so the final
+        # exchange is acknowledged instead of refused; a non-empty record list under
+        # that claim is still malformed, because a consensus that smuggles records
+        # is not a consensus.
+        if self.result_claim == "series_consensus":
+            if self.records:
+                raise WireError("series_consensus must carry no records")
+        elif self.result_claim not in RESULT_CLAIMS:
             raise WireError("AuditPayload.result_claim must be capture/survival/timeout")
         if not isinstance(self.records, list):
             raise WireError("AuditPayload.records must be an array")
