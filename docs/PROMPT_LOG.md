@@ -1174,3 +1174,14 @@ mirroring companion `C-040`: `AuditPayload` parses the claim, refuses it if it s
 records, and the inbound handler acknowledges it vacuously. Four tests. Step-3 disclosure
 as in the companion's log: no fresh notebook queries — both fixes implement agreements
 already established and verified earlier today.
+
+
+## 2026-08-12g — companion `C-042`: this repository's record shape was the standard
+
+The opponent's converter crashed on the companion Police's sealed records -- missing
+`state` -- while this repository's records converted cleanly in every game they ever
+parsed. The companion now seals this repository's exact shape (`state_str` format,
+post-move, `verdict` mirroring `intent`). Nothing changed here; recorded because the
+drift family (`C-039` wire-log arming, `C-041` step-0 shape, `C-042` record shape) is
+three-for-three the same lesson: two repos implementing "the same" record independently
+drift until a third party parses both.
