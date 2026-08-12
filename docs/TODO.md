@@ -94,6 +94,15 @@ pipeline was also proven live: the companion's result artifact for the first ser
 built by `build_result`'s first real caller and delivered by Gmail API (self-addressed
 test, lecturer untouched), so the reporting gap is now wiring-only.
 
+**2026-08-12i rule 53's per-game commit, and one gap surfaced (`companion C-043`).** Log
+summaries here now seal `github_commit` per team at write time (ours from the running
+tree, theirs from the C-038 identity member). The companion's template-report audit also
+surfaced that **this serve path writes no declaration/config artifacts** -- the builders
+in `reporting/declaration.py` exist and are unwired, the same pattern as the wire
+recorder and `build_result` before it. A counted series currently gets its config family
+from cop games only. NEW ROW: wire declaration+config writes into `adapters/post_match`
+before counted play.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order

@@ -48,6 +48,9 @@ def write_match_log(directory: Path, records: list[dict], result: object,
         "timezone": "UTC", "started_at": context.get("started_at") or ended,
         "ended_at": ended,
         "duration_seconds": 0, "tokens_total": 0, "audit": {},
+        # Rule 53 per game, per team (inst/:1295): recorded at write time so the
+        # series report can carry it without reconstruction (companion C-043).
+        "github_commit": dict(context.get("github_commit") or {}),
     }
     artifact = build_log(
         identity=identity, summary=summary, links={},

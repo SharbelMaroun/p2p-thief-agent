@@ -35,6 +35,12 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from typing import Any
 
+from p2p_thief_agent.shared.git_info import GitInfoError, running_git_commit
+
+try:  # resolved once; a non-git deployment still writes an honest log
+    _RUNNING_COMMIT = running_git_commit()
+except GitInfoError:
+    _RUNNING_COMMIT = "unknown"
 DEFAULT_AUDIT_WINDOW = 60.0
 POLL_INTERVAL = 0.5
 # Keep serving this long AFTER the audit lands, before exiting. Found 2026-08-12 against
@@ -106,6 +112,7 @@ def log_context(
     opponent_group_id: object,
     started_at: object,
     confirmed: bool,
+    opponent_commit: object = "unknown",
 ) -> dict:
     """Build the log artifact's context block.
 
@@ -121,7 +128,10 @@ def log_context(
         "config_sha256": sha,
         "confirmed": confirmed,
         "started_at": started_at,
+        "github_commit": {str(identity.get("group_id", "unknown")): _RUNNING_COMMIT,
+                          str(opponent_group_id): str(opponent_commit)},
     }
+
 
 
 def finalise(
@@ -166,6 +176,7 @@ def finalise(
             sha=sha, sub_game=sub_game, identity=identity,
             opponent_group_id=agreement.peer_identity.get("group_id", "unknown"),
             started_at=started_at, confirmed=audited,
+            opponent_commit=agreement.peer_identity.get("git_commit_hash", "unknown"),
         )
     write_log(artifacts_dir, records, result, context)
     return audited
