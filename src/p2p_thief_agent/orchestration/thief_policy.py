@@ -104,13 +104,30 @@ def make_decide(
             if 0 <= r < board.size and 0 <= c < board.size
         }
 
+    def _neighbours(cell):
+        from p2p_thief_agent.domain.coordinates import Coordinate
+        return (Coordinate(cell.row - 1, cell.col), Coordinate(cell.row + 1, cell.col),
+                Coordinate(cell.row, cell.col - 1), Coordinate(cell.row, cell.col + 1))
+
     def decide(incoming: dict | None, step: int) -> tuple[dict, dict]:
         if isinstance(incoming, dict):
             absorb_observation(state, incoming, step, board)
         claim = _claim_cell(incoming)
-        caught = claim == [state["cell"].row, state["cell"].col] if claim else False
-        if claim is not None:
-            state["answered"] = (claim, caught)
+        here = [state["cell"].row, state["cell"].col]
+        # Book (S)3.4 conditions 2 and 3, answered truthfully (rules 21/22): a barrier
+        # on our cell captures us, and a barrier that leaves us no passable orthogonal
+        # neighbour traps us. Both were silent gaps until amireman's interop guide
+        # named them (their conditions B and C); their cop also claims its own
+        # post-move cell every turn, so `claim` alone never signalled these.
+        barrier = incoming.get("barrier_placed") if isinstance(incoming, dict) else None
+        walled = isinstance(barrier, list) and list(barrier) == here
+        trapped = all(
+            not board.contains(nb) or nb in state["barriers"]
+            for nb in _neighbours(state["cell"])
+        )
+        caught = bool(claim == here if claim else False) or walled or trapped
+        if claim is not None or caught:
+            state["answered"] = (claim if claim is not None else (barrier or here), caught)
 
         blocked = frozenset(state["barriers"])
         # A caught Thief seals the caught cell; and — the `M6-033` fail-safe — a
@@ -138,7 +155,9 @@ def make_decide(
             step=step, sender="thief", hint=hint.text,
             smell_grid=encode_smell_grid(_window(state["cell"])),
             commit=record["commit"],
-            claim_response={"claim": claim, "caught": caught} if claim is not None else None,
+            claim_response=({"claim": claim if claim is not None else (barrier or here),
+                             "caught": caught}
+                            if (claim is not None or caught) else None),
             win_claim={"type": "survival"} if threshold is not None and step >= threshold else None,
         ).to_dict()
         return message, record

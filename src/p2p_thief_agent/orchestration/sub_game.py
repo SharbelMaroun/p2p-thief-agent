@@ -104,6 +104,15 @@ def run_sub_game_over_wire(
         turns.append(record)
 
         caught = _caught_by(record.received, answer_claim)
+        if caught is None:
+            # Book (S)3.4 conditions 2/3, conceded by our own truthful answer: a
+            # barrier on our cell, or a barrier that leaves us no passable
+            # neighbour, ends the game as a capture -- and the concession must end
+            # OUR loop too, or the opponent records capture while we time out into
+            # technical_loss and rule 35 scores the conflict 0/0 for both.
+            answer = (record.sent or {}).get("claim_response")
+            if isinstance(answer, dict) and answer.get("caught") is True:
+                caught = f"we conceded capture at {answer.get('claim')!r}"
         if caught is not None:
             return _finish(Outcome.CAPTURE, step, caught, turns, ledger, transport,
                            send_audit, step_zero)
