@@ -103,6 +103,15 @@ recorder and `build_result` before it. A counted series currently gets its confi
 from cop games only. NEW ROW: wire declaration+config writes into `adapters/post_match`
 before counted play.
 
+**2026-08-13c both repositories switched to private.** Rule 49 explicitly permits
+"private shared with the lecturer", and `rmisegal` was already a collaborator on both
+repositories before the switch, so lecturer access was continuous. Rationale: the
+opponent's tactical patch was derived from game logs (their right), but future strategy
+work — the wall-planner counter — should not be readable before the counted series, the
+same way their next counter will not be readable by us if they reciprocate. Everything
+pushed before this moment is assumed already cloned; privacy protects future commits
+only.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order
