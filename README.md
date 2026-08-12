@@ -1716,6 +1716,13 @@ the Decision Module rather than beside it, so a `perception/` package is a compo
 module and not a sixth subsystem. The reference draws the same line even harder, updating
 belief in its inbound turn handler and selecting the move in a separate package.
 
+
+**Postscript, the same evening (`C-030`).** The first live series proved the family a
+third time: their `mutual_sign_off` voided our cleanly audited game-1 survival because the
+negotiation identity carried no `git_commit_hash` — a member the book homes in the sealed
+Step-0 declaration and the reference omits entirely. The serve path now attaches it
+best-effort from the fail-closed resolver; the mandated home is untouched.
+
 ## License and provenance
 
 The [MIT license](LICENSE) covers team-authored material where legally valid.

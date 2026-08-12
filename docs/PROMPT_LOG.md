@@ -1148,3 +1148,17 @@ test files, zero violations, so nothing was split and no code changed. Recorded 
 "the other repo had a gate failure" is exactly the kind of thing that turns into an
 assumption about this one, and the eight-step workflow says both repositories are checked
 every time.
+
+
+## 2026-08-12d — the identity accommodation on this side (`C-030`)
+
+The companion's log entry carries the full investigation; this side's share: our serve
+path builds identity in `adapters/negotiated.py::load_negotiation_inputs` via
+`identity_from_private`, which sends the seven reference-shaped members and no
+`git_commit_hash` — the member `uoh-ay26`'s `mutual_sign_off` regexes. Attached now from
+`shared/git_info.py::running_git_commit` under `contextlib.suppress(GitInfoError)`. The
+book's mandated home for the hash (sealed Step-0, `github_commit`) is untouched and stays
+fail-closed; the accommodation is best-effort because an optional duplicate must never
+refuse a match. Three tests pin presence, untouched mandated members, and the non-fatal
+fallback. The evening friendly's game-1 log here replays `Verified OK` at 35 steps —
+the voided sign-off was their reading of our identity, not our evidence.

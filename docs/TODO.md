@@ -63,6 +63,17 @@ the book settles the condition by Cop claim plus truthful answer
 `tests/unit/test_boxed_in_claim.py` (5) turns an accident into a guarantee. `THIEF-002`
 forbids closing anything here on the companion's evidence, and nothing is closed.
 
+**2026-08-12d the same identity accommodation, on this side's serve path (`C-030`).** Their
+`mutual_sign_off` reads `identity.git_commit_hash` from the negotiation identity; this
+repository's identity (built by `identity_from_private`) carried the seven reference-shaped
+members and no hash, so the cleanly audited game-1 survival of the evening friendly was
+saved on their side with `mutual_sign_off=false`. `adapters/negotiated.py::
+load_negotiation_inputs` now attaches the hash from the fail-closed
+`shared/git_info.py::running_git_commit`, best-effort, never fatal — the mandated home
+stays the sealed Step-0 attestation (rules 24/53). Both notebooks confirmed the book
+excludes the hash from the series-static declaration and the reference identity carries no
+code version. `tests/unit/test_identity_commit_hash.py` (3). No status changes.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order

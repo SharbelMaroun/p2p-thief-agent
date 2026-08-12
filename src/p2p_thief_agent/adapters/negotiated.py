@@ -11,6 +11,7 @@ mailbox pair, and hand back the negotiated horizon that governs play.
 
 from __future__ import annotations
 
+import contextlib
 import json
 from collections.abc import Callable, Mapping
 from pathlib import Path
@@ -18,6 +19,7 @@ from time import monotonic
 
 from p2p_thief_agent.orchestration.negotiation import NegotiationError, negotiate_for_serve
 from p2p_thief_agent.protocol.terms_projection import terms_from_shared_config
+from p2p_thief_agent.shared.git_info import GitInfoError, running_git_commit
 from p2p_thief_agent.shared.private_config import identity_from_private, load_private_config
 
 
@@ -36,12 +38,25 @@ def load_negotiation_inputs(
     The identity comes from the private TOML because rule 24 mandates the exchange
     carry the group, members, repositories, MCP addresses, model, and hardware —
     which is exactly the material that must never live in the shared file.
+
+    ``git_commit_hash`` is attached when resolvable, as a **peer accommodation**, not
+    a book member (`C-030`). The book homes the commit hash in the sealed Step-0
+    declaration and the emailed `github_commit` (rules 24/53, `inst/:1295`), and the
+    reference's wire identity carries no code version at all -- but group `uoh-ay26`'s
+    `mutual_sign_off` reads `identity.git_commit_hash` and quietly voids the mutual
+    result when it is absent, which would fail the reference itself. Identity is
+    unsigned and role-free, so the extra member costs nothing. Best-effort on purpose:
+    the mandated home keeps its fail-closed resolver (`shared/git_info.py`), while an
+    optional duplicate must not refuse a match that Step-0 would attest correctly.
     """
     if private_path is None:
         raise NegotiatedServeError(
             "--game needs --private: negotiation must carry this peer's identity")
     game_config = json.loads(Path(game_path).read_text("utf-8"))
     identity = identity_from_private(load_private_config(private_path), own_url, peer_url)
+    # Optional duplicate; Step-0 remains the mandated, fail-closed home.
+    with contextlib.suppress(GitInfoError):
+        identity["git_commit_hash"] = running_git_commit()
     return game_config, identity
 
 
