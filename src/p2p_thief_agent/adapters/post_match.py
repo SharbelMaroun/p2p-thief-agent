@@ -35,12 +35,12 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from typing import Any
 
-from p2p_thief_agent.shared.git_info import GitInfoError, running_git_commit
+from p2p_thief_agent.adapters.artifact_writes import (
+    RUNNING_COMMIT,
+    log_context,
+    write_pre_game_artifacts,
+)
 
-try:  # resolved once; a non-git deployment still writes an honest log
-    _RUNNING_COMMIT = running_git_commit()
-except GitInfoError:
-    _RUNNING_COMMIT = "unknown"
 DEFAULT_AUDIT_WINDOW = 60.0
 POLL_INTERVAL = 0.5
 # Keep serving this long AFTER the audit lands, before exiting. Found 2026-08-12 against
@@ -104,36 +104,6 @@ def await_opponent_audit(
         sleep(min(poll_interval, max(0.0, until)))
 
 
-def log_context(
-    *,
-    sha: str,
-    sub_game: int,
-    identity: Mapping[str, object],
-    opponent_group_id: object,
-    started_at: object,
-    confirmed: bool,
-    opponent_commit: object = "unknown",
-) -> dict:
-    """Build the log artifact's context block.
-
-    Lifted out of `serve.py` unchanged apart from `confirmed`, which used to be the literal
-    `True`.
-    """
-    return {
-        "game_id": f"game-{sha[:12]}",
-        "game_uid": sha[:32],
-        "sub_game": sub_game,
-        "group_id": identity.get("group_id", "unknown"),
-        "opponent_group_id": opponent_group_id,
-        "config_sha256": sha,
-        "confirmed": confirmed,
-        "started_at": started_at,
-        "github_commit": {str(identity.get("group_id", "unknown")): _RUNNING_COMMIT,
-                          str(opponent_group_id): str(opponent_commit)},
-    }
-
-
-
 def finalise(
     *,
     inboxes: Any,
@@ -177,6 +147,11 @@ def finalise(
             opponent_group_id=agreement.peer_identity.get("group_id", "unknown"),
             started_at=started_at, confirmed=audited,
             opponent_commit=agreement.peer_identity.get("git_commit_hash", "unknown"),
+        )
+        write_pre_game_artifacts(
+            artifacts_dir, context=context, identity=identity,
+            peer_identity=agreement.peer_identity, game_config=game_config,
+            started_at=str(started_at), github_commit=RUNNING_COMMIT,
         )
     write_log(artifacts_dir, records, result, context)
     return audited
