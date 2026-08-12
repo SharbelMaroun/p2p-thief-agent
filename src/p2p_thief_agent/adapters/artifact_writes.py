@@ -65,6 +65,27 @@ def log_context(
 
 
 
+_SPEC_ALIASES = {"cpu": "cpu_type", "gpu": "gpu_model"}
+_SPEC_KEYS = ("os", "cpu_type", "cpu_freq_mhz", "cpu_cores", "ram_gb",
+              "gpu_model", "vram_gb")
+
+
+def _conforming_spec(spec: object) -> dict | None:
+    """Return a spec under our declaration's key set, or None if it cannot conform.
+
+    A peer's spec arrives under its own vocabulary; known aliases are mapped, and
+    anything still missing makes the whole spec unusable -- recorded as withheld
+    rather than partially invented, because rule 38 forbids filling in a spec and
+    the builder rightly refuses a partial one.
+    """
+    if not isinstance(spec, Mapping) or not spec:
+        return None
+    named = {_SPEC_ALIASES.get(k, k): v for k, v in spec.items()}
+    if any(key not in named for key in _SPEC_KEYS):
+        return None
+    return {key: named[key] for key in _SPEC_KEYS}
+
+
 def _group_block(identity: Mapping[str, object], *, ours: bool) -> dict:
     """Map a negotiation identity onto the declaration's group entry, honestly."""
     spec = identity.get("spec")
@@ -76,7 +97,7 @@ def _group_block(identity: Mapping[str, object], *, ours: bool) -> dict:
         "repos": identity.get("repos") or {},
         "mcp_servers": identity.get("mcp_servers") or {},
         "llm_model": model if isinstance(model, str) and model else None,
-        "hardware_spec": dict(spec) if isinstance(spec, Mapping) and spec else None,
+        "hardware_spec": _conforming_spec(spec),
     }
     if not ours:
         withheld = [name for name in ("llm_model", "hardware_spec") if block[name] is None]

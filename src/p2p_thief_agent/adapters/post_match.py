@@ -148,10 +148,18 @@ def finalise(
             started_at=started_at, confirmed=audited,
             opponent_commit=agreement.peer_identity.get("git_commit_hash", "unknown"),
         )
-        write_pre_game_artifacts(
-            artifacts_dir, context=context, identity=identity,
-            peer_identity=agreement.peer_identity, game_config=game_config,
-            started_at=str(started_at), github_commit=RUNNING_COMMIT,
-        )
     write_log(artifacts_dir, records, result, context)
+    if context is not None and agreement is not None and game_config is not None:
+        # The log IS the game; the pre-game artifacts must never cost it. Found
+        # live 2026-08-13: an opponent spec with foreign key names raised here
+        # BEFORE the log was written, and sub-game 1 of a played, audited game
+        # left no record on our side.
+        try:
+            write_pre_game_artifacts(
+                artifacts_dir, context=context, identity=identity,
+                peer_identity=agreement.peer_identity, game_config=game_config,
+                started_at=str(started_at), github_commit=RUNNING_COMMIT,
+            )
+        except Exception as exc:  # noqa: BLE001 - artifacts are secondary evidence
+            print(f"pre-game artifacts failed (log already written): {exc}")
     return audited
