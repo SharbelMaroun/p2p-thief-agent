@@ -1730,6 +1730,26 @@ step-0 record had carried the reference-verbatim members all along, which is exa
 the companion's Police builder lacked. The consensus-envelope tolerance was adopted here
 the same night.
 
+### The live interoperability campaign, from this role
+
+**Added 2026-08-12, end of day.** Two complete six-game series against `uoh-ay26`,
+both 6–0 (90–30 in writing from both sides), the second with zero rejected wire events
+end to end. This agent played Thief in games 1/3/5 of each — six live games, six
+survivals at the full horizon, every audit accepted by the opponent's verifier.
+
+This repository's role in the day's ten-defect campaign (the full table and the process
+lessons live in the companion Cop's report) was mostly to be the proven half: its step-0
+record and sealed movement shape were the formats the opponent's converter accepted all
+along, and both became the standard the companion adopted (`C-041`, `C-042`). Its own
+contributions: the `boxed_in` rule stated and pinned from the defending side (`C-029` —
+an unproven assertion of our capture is never believed), the consensus-finale tolerance
+(`C-031`), and the evening's earlier lesson that a won game is scored 0/0 if you exit
+before the opponent's audit lands — the mailbox now lingers, and
+`mutual_agreement.confirmed` is earned from a received audit rather than asserted.
+
+Evidence: `games/friendly-uohay26-0812-1934/` and `-0812-2201/`, each with all six logs
+this role wrote in its games plus the complete inbound wire journal.
+
 ## License and provenance
 
 The [MIT license](LICENSE) covers team-authored material where legally valid.

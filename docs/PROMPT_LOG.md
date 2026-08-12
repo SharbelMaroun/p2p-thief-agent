@@ -1185,3 +1185,12 @@ post-move, `verdict` mirroring `intent`). Nothing changed here; recorded because
 drift family (`C-039` wire-log arming, `C-041` step-0 shape, `C-042` record shape) is
 three-for-three the same lesson: two repos implementing "the same" record independently
 drift until a third party parses both.
+
+
+## 2026-08-12h — six Thief-role games, zero rejections, two rows move
+
+Series `0812-2201` reproduced `0812-1934` exactly from this role: survival at the full
+horizon in games 1/3/5, every audit accepted, and — new tonight — not one rejected wire
+event anywhere in the series. `M8-003c` closes on this evidence (six live Thief-role
+games across two complete series, both sides reading 90–30 in writing); `M5-005c`
+narrows to its two M8 screenshots.
