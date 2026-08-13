@@ -162,6 +162,17 @@ gate at `HEAD`** — `scripts/check_file_lengths.py` had not been run since the
 `claim_reveals_cop` change landed. The redundant local re-import of `Coordinate` inside
 `_neighbours` (already bound in the enclosing scope) is gone and the gate passes.
 
+**Open, from the same night's Cop work: what this agent should actually be afraid of.**
+The companion's weight search found that a Cop scores best with its distance-to-Thief
+term set to **zero** — pure containment, shrinking the evader's reachable region and
+destroying its cycles, because one pursuer provably cannot corner an equal-speed evader
+on a grid but can on a forest. `choose_evasive_action` ranks moves by *distance plus
+mobility*, which is the mirror of the term that was found not to matter. The suggested
+experiment is a region/cycle-rank term on this side too: prefer the move that keeps the
+largest reachable area with the most independent cycles, rather than the one that is
+furthest away. Not implemented — this agent has survived all nine live hunts and every
+measured archetype, so there is no evidence of a gap yet, only a reason to look.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order
