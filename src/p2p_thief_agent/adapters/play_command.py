@@ -33,6 +33,30 @@ def _audit_window(private: Path | None) -> float:
         return DEFAULT_AUDIT_WINDOW
 
 
+def _connect_budget(private: Path | None) -> float:
+    """How long to wait for the opponent to answer, from the private TOML.
+
+    The Cop has read ``[network].connect_timeout_seconds`` since M9; this side silently
+    kept `serve_match`'s 30-second default, and that asymmetry ended the first amireman
+    smoke at the role swap: their Police server was still rebinding for sub-game 2 when
+    our 30 seconds ran out, and the whole series quit as "match did not start". Same
+    never-raise contract as `_audit_window` — a config problem must not shrink the wait.
+    """
+    from p2p_thief_agent.services.readiness import (  # noqa: PLC0415
+        DEFAULT_CONNECT_TIMEOUT,
+        timeouts_from_private_config,
+    )
+
+    if private is None:
+        return DEFAULT_CONNECT_TIMEOUT
+    try:
+        from p2p_thief_agent.shared.private_config import load_private_config  # noqa: PLC0415
+
+        return timeouts_from_private_config(load_private_config(private))[0]
+    except Exception:  # noqa: BLE001 - a config problem must not shrink the wait
+        return DEFAULT_CONNECT_TIMEOUT
+
+
 def resolve_peer_address(peer: str | None, private: Path | None) -> str:
     """Decide which address to dial, from a flag or the private config (`M5-005`).
 
@@ -122,6 +146,7 @@ def play(args: argparse.Namespace) -> int:
             artifacts_dir=args.artifacts,
             game_config=game_config, identity=identity,
             sub_game=getattr(args, "sub_game", 1),
+            ready_timeout=_connect_budget(args.private),
             audit_window=_audit_window(args.private),
         )
     except ServeError as exc:

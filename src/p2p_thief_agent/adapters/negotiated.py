@@ -84,8 +84,16 @@ def negotiated_agreement(
     from p2p_thief_agent.orchestration.delivery import retrying_deliver  # noqa: PLC0415
 
     league = game_config.get("network_and_league")
-    timeout = float(league.get("response_timeout_sec", fallback_timeout)
-                    if isinstance(league, Mapping) else fallback_timeout)
+    # The offer wait is PRE-game patience, so the connect budget is its floor. Capping it
+    # at `response_timeout_sec` (30) ended the second amireman smoke at the role swap:
+    # their sub-game-2 negotiate had landed on our game-1 agent's audit window and was
+    # gone, and 30 seconds was not enough for their server to rebind and try again. The
+    # in-game timer starts governing once play does, not before the opponent exists.
+    timeout = max(
+        float(league.get("response_timeout_sec", fallback_timeout)
+              if isinstance(league, Mapping) else fallback_timeout),
+        fallback_timeout,
+    )
     deliver_offer = retrying_deliver(game_config, sleep, clock=monotonic)
 
     try:
