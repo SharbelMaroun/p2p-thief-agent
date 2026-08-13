@@ -44,15 +44,28 @@ def log_context(
     started_at: object,
     confirmed: bool,
     opponent_commit: object = "unknown",
+    game_id: str,
+    game_uid: str,
 ) -> dict:
     """Build the log artifact's context block.
 
     Lifted out of `serve.py` unchanged apart from `confirmed`, which used to be the literal
     `True`.
+
+    `game_id` and `game_uid` are **supplied**, not derived here. They used to be
+    ``f"game-{sha[:12]}"`` and ``sha[:32]`` -- a config digest, which Appendix F table 20
+    and the reference both rule out, and a uid only this side ever computed. That cost the
+    counted G009 series its first sub-game: this repository wrote
+    ``log_game-5a7b4a6e58be_g01.json`` while the companion wrote ``config_G009_g02.json``
+    for the same series, and a result report linking six files would have found three.
+
+    Required keyword arguments rather than defaulted ones, deliberately: every caller must
+    say which identity it is writing under, because a default here is exactly how the two
+    repositories drifted apart while each looked correct on its own.
     """
     return {
-        "game_id": f"game-{sha[:12]}",
-        "game_uid": sha[:32],
+        "game_id": game_id,
+        "game_uid": game_uid,
         "sub_game": sub_game,
         "group_id": identity.get("group_id", "unknown"),
         "opponent_group_id": opponent_group_id,

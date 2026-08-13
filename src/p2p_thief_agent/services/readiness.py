@@ -22,7 +22,7 @@ number rather than by sleeping on a socket `[ADR-0009]`.
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 
 # Return True when the opponent answers. Must not raise: an unreachable peer during
 # startup is the expected case, not an error, so a probe that throws is a bug in the
@@ -87,3 +87,16 @@ def timeouts_from_private_config(config: object) -> tuple[float, float]:
     timeout = section.get("connect_timeout_seconds", DEFAULT_CONNECT_TIMEOUT)
     interval = section.get("retry_interval_seconds", DEFAULT_RETRY_INTERVAL)
     return float(timeout), float(interval)
+
+
+def turn_timeout(game_config: Mapping[str, object] | None, fallback: float) -> float:
+    """The per-turn wait budget: the shared file's response timeout, or the fallback.
+
+    Moved out of `adapters/serve.py` on 2026-08-13 -- that file sat exactly on the
+    150-line gate, and a timeout read out of the negotiated config belongs beside
+    `timeouts_from_private_config` rather than in the launcher. Behaviour unchanged.
+    """
+    league = (game_config or {}).get("network_and_league")
+    if isinstance(league, Mapping):
+        return float(league.get("response_timeout_sec", fallback))
+    return float(fallback)

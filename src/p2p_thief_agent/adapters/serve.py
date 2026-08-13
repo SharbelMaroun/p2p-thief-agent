@@ -57,6 +57,7 @@ def serve_match(
     identity: Mapping[str, object] | None = None,
     sub_game: int = 1,
     audit_window: float = 60.0,
+    series_game_id: str,
 ) -> MatchOutcome:
     """Bind, wait for the opponent, then play one sub-game to a decision.
 
@@ -82,7 +83,7 @@ def serve_match(
         serve_in_background,  # noqa: PLC0415
     )
     from p2p_thief_agent.services.limits import call_timeout_sec  # noqa: PLC0415
-    from p2p_thief_agent.services.readiness import wait_for_peer  # noqa: PLC0415
+    from p2p_thief_agent.services.readiness import turn_timeout, wait_for_peer  # noqa: PLC0415
 
     inboxes = PeerInboxes()
     serve_in_background(inboxes, port=port, host=host)
@@ -154,7 +155,7 @@ def serve_match(
         transport=client,
         receive=lambda: poll_for_turn(
             lambda: _take(inboxes), clock=time.monotonic, sleep=sleep,
-            timeout=_turn_timeout(game_config, ready_timeout)),
+            timeout=turn_timeout(game_config, ready_timeout)),
         decide=decide,
         answer_claim=answer_claim,
         survival_threshold=threshold,
@@ -173,16 +174,10 @@ def serve_match(
         agreement=agreement, game_config=game_config, identity=identity,
         sub_game=sub_game, started_at=started_at, audit_window=audit_window,
         sleep=sleep, clock=time.monotonic, write_log=_write_log,
+        series_game_id=series_game_id,
     )
     return MatchOutcome(outcome=result.outcome, steps=result.steps, records=records)
 
-
-def _turn_timeout(game_config: Mapping[str, object] | None, fallback: float) -> float:
-    """The per-turn wait budget: the shared file's response timeout, or the fallback."""
-    league = (game_config or {}).get("network_and_league")
-    if isinstance(league, Mapping):
-        return float(league.get("response_timeout_sec", fallback))
-    return float(fallback)
 
 
 def _take(inboxes: object) -> Mapping[str, object] | None:  # noqa: D401

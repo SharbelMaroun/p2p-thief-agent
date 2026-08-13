@@ -119,6 +119,7 @@ def finalise(
     sleep: Callable[[float], None],
     clock: Callable[[], float],
     write_log: Callable[..., Any],
+    series_game_id: str,
 ) -> bool:
     """Hold the door open for the audit, then write the log. Returns whether one arrived.
 
@@ -140,13 +141,24 @@ def finalise(
     context = None
     if agreement is not None and game_config is not None and identity is not None:
         from p2p_thief_agent.protocol.crypto import canonical_sha256
+        from p2p_thief_agent.protocol.terms_projection import terms_from_shared_config
+        from p2p_thief_agent.shared.series_identity import derive_game_uid
 
         sha = canonical_sha256(dict(game_config))
+        # The agreed label names the files; the shared derivation names the set. Both are
+        # computed here rather than defaulted, because a default is how this repository
+        # and the companion drifted into two naming schemes for one G009 series.
+        opponent_gid = str(agreement.peer_identity.get("group_id", "unknown"))
         context = log_context(
             sha=sha, sub_game=sub_game, identity=identity,
             opponent_group_id=agreement.peer_identity.get("group_id", "unknown"),
             started_at=started_at, confirmed=audited,
             opponent_commit=agreement.peer_identity.get("git_commit_hash", "unknown"),
+            game_id=series_game_id,
+            game_uid=derive_game_uid(
+                terms_from_shared_config(dict(game_config)),
+                [str(identity.get("group_id", "unknown")), opponent_gid],
+            ),
         )
     write_log(artifacts_dir, records, result, context)
     if context is not None and agreement is not None and game_config is not None:

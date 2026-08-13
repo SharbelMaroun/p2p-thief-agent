@@ -114,5 +114,5 @@ def test_serve_match_refuses_to_play_without_an_honest_claim_answerer() -> None:
     from p2p_thief_agent.adapters.serve import ServeError, serve_match
 
     with pytest.raises(ServeError, match="answer_claim"):
-        serve_match(peer_url="http://127.0.0.1:9", port=9009,
+        serve_match(peer_url="http://127.0.0.1:9", port=9009, series_game_id="G009",
                     survival_threshold=5, decide=lambda incoming, step: ({}, {}))

@@ -11,6 +11,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from p2p_thief_agent.shared.series_identity import series_game_id_from_private
+
 
 def _audit_window(private: Path | None) -> float:
     """How long to stay reachable for the opponent's audit, from the private TOML.
@@ -170,6 +172,7 @@ def play(args: argparse.Namespace) -> int:
             sub_game=getattr(args, "sub_game", 1),
             ready_timeout=_connect_budget(args.private),
             audit_window=_audit_window(args.private),
+            series_game_id=series_game_id_from_private(args.private),
         )
     except ServeError as exc:
         print(f"match did not start: {exc}")

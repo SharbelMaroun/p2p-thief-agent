@@ -104,16 +104,27 @@ def test_a_boolean_is_not_a_timeout() -> None:
 def test_confirmed_reports_the_audit_rather_than_asserting_it() -> None:
     """It was the literal `True` before, which claimed an agreement that never happened."""
     common = {"sha": "ab" * 32, "sub_game": 1, "identity": {"group_id": "sharNamr"},
-              "opponent_group_id": "uoh-ay26", "started_at": "2026-08-11T21:03:01+00:00"}
+              "opponent_group_id": "uoh-ay26", "started_at": "2026-08-11T21:03:01+00:00",
+              "game_id": "G009", "game_uid": "7b1d942e-5a9c-6e0c-312a-761dd7dec131"}
     assert log_context(**common, confirmed=True)["confirmed"] is True
     assert log_context(**common, confirmed=False)["confirmed"] is False
 
 
-def test_the_context_identifiers_derive_from_the_config_hash() -> None:
+def test_the_context_identifiers_are_supplied_not_derived_from_the_hash() -> None:
+    """The regression: these used to be `game-<sha[:12]>` and `sha[:32]`.
+
+    Appendix F table 20 names all four artifacts from `<game_id>`, and the book says that
+    identifier is the agreed label rather than a config digest. The old derivation split
+    the counted G009 series across two naming schemes -- this side wrote
+    `log_game-5a7b4a6e58be_g01.json` while the companion wrote `config_G009_g02.json` --
+    so the identifiers are now passed in and the config hash keeps its own field.
+    """
     sha = "5a7b4a6e58be447982bcc5ca1b3b9ad160190e9127edb13b7c7d4e9e171e9f01"
     context = log_context(
         sha=sha, sub_game=2, identity={"group_id": "sharNamr"},
-        opponent_group_id="uoh-ay26", started_at="t", confirmed=False)
-    assert context["game_id"] == "game-5a7b4a6e58be"
-    assert context["game_uid"] == sha[:32]
+        opponent_group_id="uoh-ay26", started_at="t", confirmed=False,
+        game_id="G009", game_uid="7b1d942e-5a9c-6e0c-312a-761dd7dec131")
+    assert context["game_id"] == "G009"
+    assert context["game_uid"] == "7b1d942e-5a9c-6e0c-312a-761dd7dec131"
     assert context["config_sha256"] == sha
+    assert "game-" not in context["game_id"]
