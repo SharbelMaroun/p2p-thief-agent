@@ -1259,3 +1259,41 @@ the counted game.
 **Method.** Step 3 was attempted, blocked on a disconnected Chrome extension, and work
 stopped there rather than proceeding — then both notebooks were asked once it was
 reconnected. Steps 1, 2, 4, 6, 7 and 8 ran in full across both repositories.
+
+
+## 2026-08-13c — the warning we wrote and did not act on, found live in the counted game
+
+**Prompt.** "I stopped it, fix the thief repo."
+
+Earlier today this repository's TODO and README gained a paragraph saying it writes the
+logs for sub-games 1/3/5, had **not** been audited for the companion's artifact-naming
+defect, and should be checked before the counted game. It was not checked. The counted
+`G009` series then produced `log_game-5a7b4a6e58be_g01.json` from this side and
+`config_G009_g02.json` from the companion, in the same series directory, along with two
+declarations. Stopped at sub-game 2.
+
+**The lesson is not "we had a bug".** It is that a warning recorded in the repository that
+cannot act on it is worth nothing. The companion's fix was made where the defect was
+observed; this half was left with a note. Two repositories that cannot see each other
+produce one artifact set, so a fix in one is not a fix -- and the only mechanism that would
+have caught it is the one now added: a test pinning the shared `game_uid` constant that
+both sides must reproduce.
+
+**Method note.** Step 3 was not re-run. Both notebooks were asked this same question
+earlier in the session -- the book gave Appendix F table 20 and the prohibition on a
+hash-derived id, the reference gave `derive_game_ids` and the terms-plus-groups mechanism
+-- and the standing order says to ask each what only it can answer rather than send the
+same question twice. This is the identical defect in the second repository, so the answers
+already obtained govern it. Steps 1, 2, 4, 5, 6, 7 and 8 ran in full.
+
+**Verified rather than assumed.** Before wiring `derive_game_uid`, all three
+implementations were checked to produce `7b1d942e-5a9c-6e0c-312a-761dd7dec131` from the
+same terms: this repository, the companion, and the value `uoh-ay26` sent us. The
+canonical-JSON form is byte-identical across the two repositories
+(`sort_keys=True, ensure_ascii=False, separators=(",", ":")`), which is what makes the
+duplicated derivation safe under `THIEF-002`.
+
+**The refusal earned itself immediately.** `series_game_id` raises when the label is
+missing, and the first run raised -- the private toml had never carried
+`[game].series_game_id`. That is the failure surfacing at launch instead of at grading,
+which is the whole argument for refusing over defaulting.

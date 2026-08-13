@@ -1888,6 +1888,23 @@ is where the defect was observed. Recorded here rather than left implicit, becau
 whose two halves name their artifacts differently reintroduces the identical defect, and
 the halves are written by different repositories.
 
+**Audited and fixed the same day, after it cost a counted game.** The paragraph above was
+written as a warning and not acted on. The defect then landed live: `G009` sub-game 1 --
+written by this side -- produced `log_game-5a7b4a6e58be_g01.json` while the companion's
+sub-game 2 produced `config_G009_g02.json`. One series, two naming schemes, and a result
+report that would have linked six logs of which three existed. The series was stopped and
+replayed.
+
+The fix mirrors the companion's: the agreed `G00N` label from `[game].series_game_id` names
+every artifact, and `game_uid` is derived from the agreed terms plus the sorted group pair.
+Both are now **required** arguments rather than derived from the config hash, because a
+default is precisely how the two repositories drifted while each looked correct alone.
+
+The detail worth keeping: all three implementations -- this repository, the companion, and
+`uoh-ay26`'s -- independently derive the same `game_uid` for these terms, and a test pins
+that constant. Two repositories that cannot import from each other can only be kept in
+agreement by asserting the agreement.
+
 ## License and provenance
 
 The [MIT license](LICENSE) covers team-authored material where legally valid.

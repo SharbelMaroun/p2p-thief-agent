@@ -209,6 +209,30 @@ just removed. **Verify before the counted game** that this side names artifacts 
 derives either from the config hash, it needs the same change. Not yet audited here — the
 companion's fix was made first because that is where the defect was observed.
 
+**AUDITED AND FIXED 2026-08-13, after it cost a counted game.** The warning above was
+written and not acted on, and the defect landed live: `G009` sub-game 1 -- a Thief turn,
+written here -- produced `log_game-5a7b4a6e58be_g01.json` while the companion's sub-game 2
+produced `config_G009_g02.json`. One series, two naming schemes, two declarations, and a
+result report that would have linked six logs of which three existed. The series was
+stopped at sub-game 2 and replayed from the start.
+
+`shared/series_identity.py` now provides `series_game_id` (the agreed `[game].G00N` label,
+**refusing** rather than defaulting) and `derive_game_uid` (terms plus the sorted group
+pair). `log_context` takes both as **required** keyword arguments instead of deriving
+`game-<sha[:12]>` and `sha[:32]`; the label is threaded `play_command -> serve_match ->
+finalise`. `[game].series_game_id` was added to the private toml, which never had it --
+which is why the new refusal fired on the very first run rather than after another game.
+
+Verified before wiring, since the two repositories cannot import from each other: this
+side, the companion, and `uoh-ay26` all independently derive
+`7b1d942e-5a9c-6e0c-312a-761dd7dec131` for these terms. `test_series_identity.py` (8) pins
+that constant, because a golden value is the only thing that catches the two halves
+drifting apart again -- which is exactly what happened here. 1799 pass, 93.21%.
+
+Two files crossed the 150-line gate as a side effect; `turn_timeout` moved to
+`services/readiness.py` beside the other timeout readers and the private-config reader
+moved into `series_identity.py`, rather than trimming the reasoning (`M9-21`).
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order
