@@ -1194,3 +1194,37 @@ horizon in games 1/3/5, every audit accepted, and — new tonight — not one re
 event anywhere in the series. `M8-003c` closes on this evidence (six live Thief-role
 games across two complete series, both sides reading 90–30 in writing); `M5-005c`
 narrows to its two M8 screenshots.
+
+
+## 2026-08-13 — no code changed here; the companion's cheap region test, written down
+
+**Prompt.** "Finish the test and docs", closing a session a power cut had interrupted. The
+interrupted work was entirely in the companion Cop repository. This entry exists because
+steps 6 and 7 of the standing order say *both* repositories, and because the finding has a
+real consequence for the open evader experiment recorded above.
+
+**Nothing here was damaged and nothing here was edited in `src/`.** `git fsck` clean, no
+truncated file, no interrupted git operation; the suite is green at 1791 passed, 93.35%
+coverage. The working tree's one modified file is a friendly game log, which is a separate
+open question and was deliberately left untouched.
+
+**What was recorded.** The open note from `2026-08-13`'s Cop work — that a pursuer scores
+best with its distance term at zero, which is the mirror of this agent's distance-plus-
+mobility ranking — now carries the two results that make the counter-experiment cheap.
+Reachability between the two agents is one spread rather than a search, because flooding
+the evader's component with the pursuer's cell walled off puts a cell adjacent to the
+pursuer in that component exactly when a path exists. And `E - V + components` needs no
+component pass when the scored region is a flood's own output, since that is connected by
+construction. Both are graph facts, established without reading companion code, so
+`THIEF-002` is intact.
+
+**The claim is deliberately narrow.** The experiment is still not run and still not
+evidenced. Cheapening a measurement says nothing about whether the term is right for the
+side being chased, and this agent has survived all nine live hunts it has played. It is
+written down so the next attempt starts from the cheap formulation rather than
+rediscovering the expensive one and abandoning it on cost.
+
+**Method: step 3 was skipped.** Neither notebook was asked — the work was a unit test for
+an internal parameter in the companion plus a documentation catch-up, and neither the
+reference simulator's behaviour nor the book's requirements govern either. Steps 1, 2, 5,
+6, 7 and 8 ran in full across both repositories.

@@ -1840,6 +1840,34 @@ One more thing fell out of running the gates: `orchestration/thief_policy.py` wa
 landed. A local re-import of `Coordinate` inside `_neighbours`, already bound in the
 enclosing scope, was the line. It is gone.
 
+### An open question this agent has not answered
+
+Nothing in this section changed the evader, and this last part changed no code here at all.
+It is recorded because the alternative is losing it. The companion Cop's weight search
+found that a pursuer scores best with its **distance-to-evader term set to zero** — pure
+containment, shrinking the reachable region and destroying its cycles, on the graph fact
+that one pursuer cannot corner an equal-speed evader on a grid but can on a forest.
+`choose_evasive_action` ranks moves by *distance plus mobility*, which is the mirror of the
+term that turned out not to matter. The obvious experiment is a region-and-cycle-rank
+ranking on this side too: keep the largest reachable area carrying the most independent
+cycles, rather than simply the cell that is furthest away.
+
+It has not been run. What has changed is its price. Both quantities looked expensive per
+candidate move, and two general results — graph facts, not companion code, so `THIEF-002`
+is untouched — take most of that away. Reachability between the two agents needs one
+spread rather than a search: flood the evader's component with the pursuer's cell treated
+as a wall, and a path exists exactly when some cell of that component is adjacent to the
+pursuer, since the step before the last one on any such path is in the component by
+construction. And `E - V + components` needs no component pass when the region being scored
+is a flood's own output, because that is connected by construction and the count is one.
+
+The honest position is that this is a **reason to look, not a gap that has been shown**.
+This agent has survived all nine live hunts it has played and escaped every measured
+archetype, cheapening a measurement says nothing about whether the term is right for the
+side being chased, and the mirror of a good pursuer heuristic is not automatically a good
+evader heuristic. It is written down so the next attempt begins from the cheap formulation
+instead of rediscovering the expensive one and dropping it on cost.
+
 ## License and provenance
 
 The [MIT license](LICENSE) covers team-authored material where legally valid.

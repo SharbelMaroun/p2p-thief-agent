@@ -173,6 +173,24 @@ largest reachable area with the most independent cycles, rather than the one tha
 furthest away. Not implemented — this agent has survived all nine live hunts and every
 measured archetype, so there is no evidence of a gap yet, only a reason to look.
 
+**What changed on that experiment since: the term got cheap to measure.** The objection to
+trying a region/cycle-rank ranking here was never that it might not help, it was that both
+quantities look expensive per candidate move. The companion has since reported two results
+that remove most of that cost, and both are general graph facts rather than anything
+specific to its repository, so they are usable here without touching it (`THIEF-002`).
+First, "can the pursuer still reach me?" needs one spread, not a search: flood the evader's
+component with the pursuer's own cell treated as a wall, and a path exists exactly when
+some cell of that component is adjacent to the pursuer, because the step before the last
+one on any such path is in the component by construction. Second, the independent-cycle
+count `E - V + components` needs no component pass at all when the region being scored is
+itself a flood's output, since that is connected by construction and the count is one.
+
+So the experiment is now cheap enough to run rather than only to describe. It is still
+**not implemented and still not evidenced**: cheapening a measurement says nothing about
+whether the term is right for the evader's side, and the mirror of a good pursuer heuristic
+is not automatically a good evader heuristic. Recorded so the next attempt starts from the
+cheap formulation instead of rediscovering the expensive one and abandoning it on cost.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order
