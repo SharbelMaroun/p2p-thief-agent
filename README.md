@@ -1353,6 +1353,39 @@ after reveal, the nonce, and putting those in an unmanaged file is a rule 18/39 
 diagnostic nobody needed; the key *names* are what diagnose a shape mismatch. Every write
 failure is swallowed, because logging that can refuse a turn is worse than no logging.
 
+#### The amireman series: honest concessions, a stolen negotiate, and free intel (2026-08-13)
+
+Group `amireman`'s interop guide names the book's three capture conditions the way their
+Thief judges them: (A) the Cop's claim co-locates, (B) a barrier lands on the Thief's cell,
+(C) no passable orthogonal neighbour remains. This Thief answered only (A) — conditions
+(B) and (C) were silent gaps, unpunished until an opponent's guide spelled them out.
+`thief_policy.py` now concedes all three truthfully in the `claim_response`, and
+`sub_game.py` ends **our own loop** as a capture on our own concession — otherwise the
+opponent records a capture while we time out into a technical loss, which rule 35 scores
+0/0 for both. Four tests pin the concessions; an ordinary turn still concedes nothing.
+
+The first smoke died at the role swap, twice, and the second defect was this repository's
+alone: `play()` never passed `ready_timeout`, so `serve_match`'s hardcoded 30-second
+default silently overrode the private TOML's `connect_timeout_seconds = 600` — and a
+30-second budget is not enough for an opponent whose server rebinds between sub-games.
+The offer wait had the same disease one layer up: `negotiated_agreement` capped it at
+`response_timeout_sec` (30), an in-game request timer doing a pre-game job. Both waits
+now floor at the connect budget, both pinned by tests, and the in-game timers are
+untouched once play starts.
+
+Then the smoke's Thief game was lost in nine steps, and the loss was information thrown
+away: their Cop **claims its own post-move cell every turn**, so every missed claim is
+the pursuer's true position — and this Thief discarded it, wandering on a decoded belief
+while being told the answer nine times. `claim_reveals_cop` (private `[strategy]` flag,
+default **off**) collapses the belief onto the claimed cell. Off by default because the
+default profile's claim names the cell the Cop believes *we* are on — pinning belief
+there would chase our own shadow. Gated per opponent, exactly like the Cop's
+`claim_every_turn`. Simulated against a perfect-vision greedy chaser: 35-step survival
+from every realistic start; in the live G006/G007/G008 series that followed, this Thief
+survived **all nine** of its Thief-role games, including **G008 — the first counted
+game** — three series ending 3–3, 47–47, consensus SHA bit-equal in both directions,
+zero wire rejections.
+
 ### 3. The implemented strategy
 
 Movement is **pure Python and deterministic**; the language model never selects a

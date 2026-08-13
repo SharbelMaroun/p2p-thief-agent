@@ -119,6 +119,22 @@ archetype are now readable by the opponent, so the next round of the strategy du
 played open-book in both directions -- the same symmetric openness we benefited from
 when reading their planner. Rule 49 is satisfied in either state.
 
+**2026-08-13f the amireman series: this agent's first counted game, and three defects it
+paid for first.** Second live opponent (group `amireman`, AMIR13BD). What changed here,
+each with tests: (1) capture conditions (B) barrier-on-cell and (C) trapped are now
+conceded truthfully and end our own sub-game loop as a capture — silent gaps until their
+interop guide named them; (2) `play()` now passes the private `connect_timeout_seconds`
+(600) instead of inheriting `serve_match`'s hardcoded 30-second `ready_timeout`, and
+`negotiated_agreement` floors its offer wait at the same budget — both were in-game
+timers doing pre-game work, and each killed one smoke attempt at the role swap;
+(3) `claim_reveals_cop` (private `[strategy]`, default off) turns their every-turn
+self-position claim into pursuer certainty — the first smoke's Thief game was lost in
+nine steps by discarding exactly that intel. Result: G006 (demo), G007 (rehearsal), and
+**G008 — the counted rule-52 meeting** — all 3–3, 47–47, consensus SHA bit-equal both
+directions, this agent surviving all nine Thief-role games, zero wire rejections, and
+the G008 report emailed to the lecturer's reporting address with the team in copy
+(rules 32/51, exercised on a counted game by the companion's report path).
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order
