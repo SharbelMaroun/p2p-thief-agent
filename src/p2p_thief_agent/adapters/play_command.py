@@ -57,6 +57,25 @@ def _connect_budget(private: Path | None) -> float:
         return DEFAULT_CONNECT_TIMEOUT
 
 
+def _strategy(private: Path | None) -> dict:
+    """Per-opponent strategy flags from the private TOML's ``[strategy]`` table.
+
+    Private on purpose: these describe the OPPONENT's protocol profile (e.g. amireman's
+    Cop claims its own cell every turn, so ``claim_reveals_cop`` turns that claim into
+    pursuer intel), and never enter the signed terms. Same never-raise contract as the
+    other private readers — a config problem costs the flag, not the match.
+    """
+    if private is None:
+        return {}
+    try:
+        from p2p_thief_agent.shared.private_config import load_private_config  # noqa: PLC0415
+
+        section = load_private_config(private).get("strategy")
+        return dict(section) if isinstance(section, dict) else {}
+    except Exception:  # noqa: BLE001 - a config problem must not cost the match
+        return {}
+
+
 def resolve_peer_address(peer: str | None, private: Path | None) -> str:
     """Decide which address to dial, from a flag or the private config (`M5-005`).
 
@@ -137,7 +156,10 @@ def play(args: argparse.Namespace) -> int:
     # The decide callable carries its honest claim-answerer: both close over the same
     # position, so the answer given on the wire and the answer that ends our loop can
     # never disagree — the mismatch the audit would score as a forgery `[AE-021]`.
-    decide = make_decide(threshold=args.threshold)
+    decide = make_decide(
+        threshold=args.threshold,
+        claim_reveals_cop=bool(_strategy(args.private).get("claim_reveals_cop")),
+    )
     try:
         result = serve_match(
             peer_url=peer, port=args.port, host=args.host,

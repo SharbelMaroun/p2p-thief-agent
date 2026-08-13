@@ -44,6 +44,7 @@ def make_decide(
     start: tuple[int, int] = (3, 3),
     cop_start: tuple[int, int] | None = None,
     threshold: int | None = None,
+    claim_reveals_cop: bool = False,
 ):
     """Build the turn-loop `decide` callable from the measured evasion policy.
 
@@ -128,6 +129,14 @@ def make_decide(
         caught = bool(claim == here if claim else False) or walled or trapped
         if claim is not None or caught:
             state["answered"] = (claim if claim is not None else (barrier or here), caught)
+        # Opponent-profile intel (amireman): their Cop claims its OWN post-move cell every
+        # turn, so a missed claim is the pursuer's true position — certainty, not evidence.
+        # Gated per opponent because the default profile's claim names the cell the Cop
+        # believes WE are on; collapsing belief there would chase our own shadow. The
+        # first amireman smoke lost the Thief game by discarding exactly this intel.
+        if claim_reveals_cop and claim is not None and not caught:
+            with suppress(Exception):
+                state["belief"] = initial_belief(board, Coordinate(*claim))
 
         blocked = frozenset(state["barriers"])
         # A caught Thief seals the caught cell; and — the `M6-033` fail-safe — a
