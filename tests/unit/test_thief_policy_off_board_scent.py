@@ -4,7 +4,7 @@ this Thief the way it froze the companion Cop repository.
 The companion Cop repository's smell-grid parser rejected the whole grid when a peer's
 fixed-size 5x5 window carried any off-board cell -- and a fixed-size window from a peer
 near an edge or corner always does. This peer's own `cop_start` is `[0, 0]`
-(`config/match_friendly_amireman.json`), a corner, so the same shape of defect here would
+(`config/match_amireman.json`), a corner, so the same shape of defect here would
 blind this Thief from turn 1 of every real match. `parse_smell_grid` now drops only the
 impossible cells instead of the whole grid; these tests prove that fix end to end through
 the live `decide` loop, using a foreign encoder that this repository's own tests never

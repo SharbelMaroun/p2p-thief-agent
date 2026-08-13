@@ -102,7 +102,7 @@ class Inboxes:
 
 
 def negotiate(client: object) -> None:
-    game_config = json.loads((ROOT / "config" / "match_friendly_amireman.json")
+    game_config = json.loads((ROOT / "config" / "match_amireman.json")
                              .read_text(encoding="utf-8"))
     identity = {"group_id": "sharNamr", "group_name": "sharNamr", "members": ["a"],
                 "repos": {"cop": "https://x", "thief": "https://y"}, "mcp_servers": {},

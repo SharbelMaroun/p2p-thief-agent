@@ -15,7 +15,7 @@ from pathlib import Path
 from p2p_thief_agent.services.preflight import ARMED, DISABLED, preflight
 
 ROOT = Path(__file__).resolve().parents[2]
-MATCH = ROOT / "config" / "match_friendly_amireman.json"
+MATCH = ROOT / "config" / "match_amireman.json"
 EXAMPLE_TOML = ROOT / "config" / "thief" / "game.toml.example"
 
 
