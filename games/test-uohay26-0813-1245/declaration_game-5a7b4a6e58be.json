@@ -1,0 +1,83 @@
+{
+  "_schema": "declaration",
+  "declaration_type": "pre_game",
+  "game_ended_at": "2026-08-13T10:02:01.137076+00:00",
+  "game_id": "game-5a7b4a6e58be",
+  "game_started_at": "2026-08-13T10:02:01.137076+00:00",
+  "game_uid": "5a7b4a6e58be447982bcc5ca1b3b9ad1",
+  "github_commit": "2c581a7d1251cbf2b24e6f30b788c427499de0d5",
+  "groups": [
+    {
+      "group_id": "sharNamr",
+      "group_name": "sharNamr",
+      "hardware_spec": {
+        "cpu_cores": 4,
+        "cpu_freq_mhz": 1992,
+        "cpu_type": "Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
+        "gpu_model": "Intel(R) UHD Graphics 620",
+        "os": "Microsoft Windows 11 Home",
+        "ram_gb": 8,
+        "vram_gb": 1
+      },
+      "llm_model": "template-zero-token",
+      "mcp_servers": {
+        "cop": "https://cop.uohay26game.com/mcp",
+        "thief": "http://127.0.0.1:8801/mcp"
+      },
+      "members": [
+        "Sharbel Maroun",
+        "Amr safadi"
+      ],
+      "repos": {
+        "cop": "https://github.com/SharbelMaroun/p2p-cop-agent",
+        "thief": "https://github.com/SharbelMaroun/p2p-thief-agent"
+      },
+      "signature": "421ff0f6f7c645d47f8b8809872fc345d275581e9dc0ffcb0ab20bc4ab275524"
+    },
+    {
+      "group_id": "uoh-ay26",
+      "group_name": "uoh-ay26",
+      "hardware_spec": null,
+      "llm_model": "gemini-3.1-flash-lite",
+      "mcp_servers": {
+        "cop": "https://cop.uohay26game.com/mcp"
+      },
+      "members": [
+        "Aisha Abu Dahesh",
+        "Yousef Asadi"
+      ],
+      "repos": {
+        "cop": "https://github.com/aishadahesh/uoh-ay26-final-project-cop",
+        "thief": "https://github.com/aishadahesh/uoh-ay26-final-project-thief"
+      },
+      "signature": null,
+      "undeclared": [
+        "hardware_spec"
+      ]
+    }
+  ],
+  "links": {
+    "configs": [
+      "config_game-5a7b4a6e58be_g01.json",
+      "config_game-5a7b4a6e58be_g02.json",
+      "config_game-5a7b4a6e58be_g03.json",
+      "config_game-5a7b4a6e58be_g04.json",
+      "config_game-5a7b4a6e58be_g05.json",
+      "config_game-5a7b4a6e58be_g06.json"
+    ],
+    "declaration": "declaration_game-5a7b4a6e58be.json",
+    "logs": [
+      "log_game-5a7b4a6e58be_g01.json",
+      "log_game-5a7b4a6e58be_g02.json",
+      "log_game-5a7b4a6e58be_g03.json",
+      "log_game-5a7b4a6e58be_g04.json",
+      "log_game-5a7b4a6e58be_g05.json",
+      "log_game-5a7b4a6e58be_g06.json"
+    ],
+    "result": "result_game-5a7b4a6e58be.json"
+  },
+  "max_tokens_per_game": 33333,
+  "num_sub_games": 6,
+  "schema_version": "1.1",
+  "timezone": "UTC"
+}
