@@ -135,6 +135,33 @@ directions, this agent surviving all nine Thief-role games, zero wire rejections
 the G008 report emailed to the lecturer's reporting address with the team in copy
 (rules 32/51, exercised on a counted game by the companion's report path).
 
+**2026-08-13g the belief could go blind against any peer that reads the book
+differently (`M11-001`).** Found from the Cop side and fixed here the same night,
+because the defect is symmetric. `emitter_likelihood` inverts **our** scent physics: our
+decay order, our profile, our answer to the open re-emission-clamp question. A peer whose
+implementation differs on any of them — all legitimate readings — produces a window our
+decoder cannot explain; the likelihood comes back flat and belief stays uniform. For this
+agent that is not a small loss, because `choose_evasive_action` runs *away from the
+believed Cop*: a belief that points at the wrong cell does not merely fail to help, it
+aims the evasion at the pursuer. Every arena here fed the decoder a window from our own
+emitter, so it was grading its own homework.
+
+`perception/window_geometry.py` reads the window's **shape** instead of its values. A
+published `smell_grid` is a board-clipped square window centred on its emitter, so the
+key set alone fixes the Cop exactly while assuming nothing about that peer's constants —
+and a window of honest zeros, which carries no evidence at all to a likelihood, is a
+complete position fix to geometry. Every fix is verified against the window it implies
+and refused when the shape is ambiguous; anything that is not a window (zeros omitted,
+ragged, wrong size) falls through to the `M6-031` decoder unchanged. `absorb_observation`
+tries geometry first. The companion repository measured the end-to-end effect on its own
+live path at **566/840 → 742/840** captures, with three plausible foreign emitters going
+from 0/24 to full recovery.
+
+Also here: `orchestration/thief_policy.py` was **one significant line over the 150-line
+gate at `HEAD`** — `scripts/check_file_lengths.py` had not been run since the
+`claim_reveals_cop` change landed. The redundant local re-import of `Coordinate` inside
+`_neighbours` (already bound in the enclosing scope) is gone and the gate passes.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order

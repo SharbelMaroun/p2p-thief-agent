@@ -106,7 +106,8 @@ def make_decide(
         }
 
     def _neighbours(cell):
-        from p2p_thief_agent.domain.coordinates import Coordinate
+        # `Coordinate` is already bound in the enclosing `make_decide` scope; the local
+        # re-import this used to carry put the file one line over the length gate.
         return (Coordinate(cell.row - 1, cell.col), Coordinate(cell.row + 1, cell.col),
                 Coordinate(cell.row, cell.col - 1), Coordinate(cell.row, cell.col + 1))
 

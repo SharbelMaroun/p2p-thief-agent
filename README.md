@@ -1795,6 +1795,51 @@ orbit, corner them on the resulting paths) is recorded in the companion's report
 measured 40/40 against a faithful port of their public planner where the previous stack
 and even a truth-fed oracle measured 0/40.
 
+### The belief that could go blind against an honest opponent (`M11-001`, 2026-08-13)
+
+This one was found from the other side. The companion Cop had just played a counted
+series in which it produced **the same move sequence in every sub-game** against a Thief
+behaving differently each time — the signature of a policy whose belief never localised.
+Its cause applies here unchanged, so it was fixed here the same night.
+
+`perception/emitter_decoder.py` inverts the scent physics to find the emitter, and the
+physics it inverts are **ours**: our decay-then-deposit order, our 5×5 profile, our
+answer to the still-open question of whether re-emission clamps at the centre intensity.
+A classmate who reads the same book and answers any of those differently is not cheating
+and is not malformed — they are simply not us, and the residual their window produces
+explains nothing. The likelihood comes back flat and belief stays uniform.
+
+For a Thief that is worse than it sounds. `choose_evasive_action` runs *away from the
+believed Cop*. A belief that points nowhere is a belief whose row-major argmax points at
+a corner, so the evasion is aimed at a fiction — and can be aimed straight at the
+pursuer. Worse, nothing in the repository could have caught it: every arena here builds
+the Cop's window with **our own** emitter, so the decoder was being graded on its own
+homework and scored perfectly.
+
+The fix reads the window's **shape** rather than its values. A published `smell_grid` is
+a fixed-size square window centred on its emitter and clipped to the board, so the key
+set alone determines the centre exactly — and determines it while assuming *nothing*
+about the sender's constants. The pleasing part is the degenerate case: a window of
+honest zeros carries no evidence whatsoever to a likelihood, and pins the Cop to a single
+cell geometrically.
+
+`perception/window_geometry.py` never guesses. It reconstructs the window its inferred
+centre would produce and refuses unless that set matches the observation exactly, so a
+peer that omits its zero cells, sends a ragged grid, or uses a window whose size the
+board cannot disambiguate gets `None` and the `M6-031` decoder keeps the turn untouched.
+A wrong fix would be worse than no fix, because this one is trusted absolutely.
+
+Measured end to end on the companion's live path against seven emitter models: **566/840
+→ 742/840** captures, with three plausible foreign emitters — re-emission clamped,
+strongest-deposit-kept, and a gradient-free window — going from **0/24 to full recovery**
+on three archetypes each.
+
+One more thing fell out of running the gates: `orchestration/thief_policy.py` was already
+**one significant line over the 150-line limit at `HEAD`**, because
+`scripts/check_file_lengths.py` had not been run since the `claim_reveals_cop` change
+landed. A local re-import of `Coordinate` inside `_neighbours`, already bound in the
+enclosing scope, was the line. It is gone.
+
 ## License and provenance
 
 The [MIT license](LICENSE) covers team-authored material where legally valid.

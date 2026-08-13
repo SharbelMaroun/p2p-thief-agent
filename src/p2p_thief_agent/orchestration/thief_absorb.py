@@ -18,6 +18,7 @@ from p2p_thief_agent.perception.observation import (
     parse_smell_grid,
     parse_smell_grid_dropped_count,
 )
+from p2p_thief_agent.perception.window_geometry import certainty_belief, window_centre
 
 
 def absorb_observation(state: dict, incoming: dict, step: int, board: Board) -> None:
@@ -49,12 +50,21 @@ def absorb_observation(state: dict, incoming: dict, step: int, board: Board) -> 
     except ObservationError:
         observed = {}
     if observed:
-        # `M6-031`: invert the locked physics rather than weighting raw intensity. The
-        # residual against last turn's observation IS the newest stamp, and the window
-        # is partial, so scoring trusts only cells both windows covered.
-        before = state["seen"][1] if state["seen"] and state["seen"][0] == step - 1 else None
-        trusted = set(observed) & set(before) if before else None
-        state["belief"] = apply_evidence(
-            uniform_belief(board.size, board.size),
-            emitter_likelihood(board, observed, before, trusted))
+        # `M11-001`: the window's *shape* fixes its emitter, and unlike the residual it
+        # assumes nothing about that peer's scent constants. Tried first because it is a
+        # verified fix rather than an inference; a peer whose grid is not a window --
+        # zeros omitted, ragged, wrong size -- falls through to the decoder below.
+        located = window_centre(observed, board)
+        if located is not None:
+            state["belief"] = certainty_belief(located, board)
+        else:
+            # `M6-031`: invert the locked physics rather than weighting raw intensity.
+            # The residual against last turn's observation IS the newest stamp, and the
+            # window is partial, so scoring trusts only cells both windows covered.
+            before = (state["seen"][1]
+                      if state["seen"] and state["seen"][0] == step - 1 else None)
+            trusted = set(observed) & set(before) if before else None
+            state["belief"] = apply_evidence(
+                uniform_belief(board.size, board.size),
+                emitter_likelihood(board, observed, before, trusted))
         state["seen"] = (step, observed)
