@@ -1,0 +1,84 @@
+{
+  "_schema": "declaration",
+  "declaration_type": "pre_game",
+  "game_ended_at": "2026-08-13T02:36:14.582196+00:00",
+  "game_id": "game-772de8f029e4",
+  "game_started_at": "2026-08-13T02:36:14.582196+00:00",
+  "game_uid": "772de8f029e42892faf7f4016f77c268",
+  "github_commit": "7dfe9fd11df0aca2dc88554a301938bf0a8385ae",
+  "groups": [
+    {
+      "group_id": "sharNamr",
+      "group_name": "sharNamr",
+      "hardware_spec": {
+        "cpu_cores": 4,
+        "cpu_freq_mhz": 1992,
+        "cpu_type": "Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
+        "gpu_model": "Intel(R) UHD Graphics 620",
+        "os": "Microsoft Windows 11 Home",
+        "ram_gb": 8,
+        "vram_gb": 1
+      },
+      "llm_model": "template-zero-token",
+      "mcp_servers": {
+        "cop": "https://parties-differ-detected-adsl.trycloudflare.com/mcp",
+        "thief": "http://127.0.0.1:8801/mcp"
+      },
+      "members": [
+        "Sharbel Maroun",
+        "Amr safadi"
+      ],
+      "repos": {
+        "cop": "https://github.com/SharbelMaroun/p2p-cop-agent",
+        "thief": "https://github.com/SharbelMaroun/p2p-thief-agent"
+      },
+      "signature": "061a47eca6bc469bc155d56e0e430f124fbdf83401d03975522e6ff964a810f7"
+    },
+    {
+      "group_id": "amireman",
+      "group_name": "amireman",
+      "hardware_spec": null,
+      "llm_model": "template",
+      "mcp_servers": {
+        "cop": "https://parties-differ-detected-adsl.trycloudflare.com/mcp",
+        "thief": "https://parties-differ-detected-adsl.trycloudflare.com/mcp"
+      },
+      "members": [
+        "Amir Fadila",
+        "Eman Sarhan"
+      ],
+      "repos": {
+        "cop": "https://github.com/AMIR13BD/Game-P2P-Cop-Chase-Police",
+        "thief": "https://github.com/AMIR13BD/Game-P2P-Cop-Chase-Thief"
+      },
+      "signature": null,
+      "undeclared": [
+        "hardware_spec"
+      ]
+    }
+  ],
+  "links": {
+    "configs": [
+      "config_game-772de8f029e4_g01.json",
+      "config_game-772de8f029e4_g02.json",
+      "config_game-772de8f029e4_g03.json",
+      "config_game-772de8f029e4_g04.json",
+      "config_game-772de8f029e4_g05.json",
+      "config_game-772de8f029e4_g06.json"
+    ],
+    "declaration": "declaration_game-772de8f029e4.json",
+    "logs": [
+      "log_game-772de8f029e4_g01.json",
+      "log_game-772de8f029e4_g02.json",
+      "log_game-772de8f029e4_g03.json",
+      "log_game-772de8f029e4_g04.json",
+      "log_game-772de8f029e4_g05.json",
+      "log_game-772de8f029e4_g06.json"
+    ],
+    "result": "result_game-772de8f029e4.json"
+  },
+  "max_tokens_per_game": 33333,
+  "num_sub_games": 6,
+  "schema_version": "1.1",
+  "timezone": "UTC"
+}
