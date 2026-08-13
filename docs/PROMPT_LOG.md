@@ -1297,3 +1297,32 @@ duplicated derivation safe under `THIEF-002`.
 missing, and the first run raised -- the private toml had never carried
 `[game].series_game_id`. That is the failure surfacing at launch instead of at grading,
 which is the whole argument for refusing over defaulting.
+
+
+## 2026-08-13d — G009 counted: three sub-games, three survivals, against a Police rebuilt to catch us
+
+This repository played sub-games 1, 3 and 5 of the counted `G009` series against
+`uoh-ay26`. All three ended in **survival at the full 35 steps**. The series went 60–40 to
+`sharNamr`, and with `G008` that is two counted games against two groups, so `[AE-31]`'s
+minimum is met.
+
+**The part worth recording is who we survived against.** Twelve minutes after losing the
+uncounted `G005` series 0–6, `uoh-ay26` pushed `68a69dbe`, whose message is "harden cop
+pursuit against stale scent trails" and whose comment names our games: *"G005 g01/g03
+exposed this exact failure: the apparent singleton was treated as certainty and the Cop
+spent a whole turn walling the trail."* They raised `max_ambiguity` from 8 to 16, deleted
+the early return that promoted an inferred scent centre to certainty, and rewrote their
+motion test so any change in candidate support counts as ambiguity.
+
+It changed nothing. Three full horizons against the hardened pursuer, exactly as against
+the version it replaced. The `M6-031` decoder and the window-geometry inference are not
+winning on an exploit that a patch closes — which is the claim, and this is the first
+evidence for it against an opponent who had specifically tried.
+
+**The naming fix, proven where it mattered.** Every artifact written here carries `G009`,
+one declaration, zero hash-named files. Hours earlier the same series had to be aborted at
+sub-game 2 because this side wrote `log_game-5a7b4a6e58be_g01.json` while the companion
+wrote `config_G009_g02.json`. The replay produced a clean set from both halves.
+
+**Method.** Steps 1–8 ran. Step 3 was not re-queried; both notebooks were asked earlier in
+the session about artifact naming and nothing here turns on a question only they can answer.

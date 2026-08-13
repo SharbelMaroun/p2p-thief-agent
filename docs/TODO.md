@@ -233,6 +233,26 @@ Two files crossed the 150-line gate as a side effect; `turn_timeout` moved to
 `services/readiness.py` beside the other timeout readers and the private-config reader
 moved into `series_identity.py`, rather than trimming the reasoning (`M9-21`).
 
+**2026-08-13 `G009` counted vs `uoh-ay26`: this agent went 3 from 3.** Sub-games 1, 3 and 5
+were played from this repository, all three **survival at the full 35 steps** — 10 points
+each against their Police's 5. The series ended 60–40 to `sharNamr`, which with `G008`
+gives two counted games against two groups and meets `[AE-31]`.
+
+Worth stating plainly because the other half did not hold: their Police had been rebuilt
+specifically against us twelve minutes after the uncounted `G005`, raising `max_ambiguity`
+from 8 to 16, deleting the early return that promoted an inferred scent centre to
+certainty, and refusing to spend barriers on a shifting candidate set. It changed nothing.
+This agent survived three full horizons against the hardened version exactly as it had
+against the previous one. The scent-shape decoder and the evasion ranking are doing what
+they claim.
+
+The companion's Police half is where the series was actually contested: two survivals and
+one capture across its three sub-games, against an evader they had also just patched.
+
+All three of this side's logs replay `Verified OK` with `tampered: false`, and every
+artifact written here is named `G009` — the naming defect fixed hours earlier, proven on a
+counted set. Artifacts in `games/counted-uohay26-0813-G009/`.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order

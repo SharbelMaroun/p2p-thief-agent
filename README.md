@@ -1905,6 +1905,24 @@ The detail worth keeping: all three implementations -- this repository, the comp
 that constant. Two repositories that cannot import from each other can only be kept in
 agreement by asserting the agreement.
 
+### The counted league, from this side
+
+`G009` vs `uoh-ay26` was the second counted game and closed the `[AE-31]` minimum of two
+counted games against two different groups. This repository played sub-games 1, 3 and 5 and
+**survived the full 35 steps in all three**, worth 10 points each. The series ended **60–40**
+to `sharNamr`; the companion's Police half took two survivals and one capture at step 25.
+
+The detail worth keeping: their Police had been rebuilt against us specifically. Twelve
+minutes after losing the uncounted `G005` series 0–6 they pushed a commit whose message
+names our sub-games — "G005 g01/g03 exposed this exact failure" — raising their scent
+ambiguity cap from 8 to 16, removing the early return that promoted an inferred centre to
+certainty, and refusing to spend barriers on a shifting candidate set. **It changed
+nothing.** Three full horizons against the hardened pursuer, same as against the old one.
+
+All three logs replay `Verified OK` with `tampered: false` on both sides, and every artifact
+this side wrote is named `G009` — the naming defect that had split the aborted first attempt,
+fixed and then proven where it counted.
+
 ## License and provenance
 
 The [MIT license](LICENSE) covers team-authored material where legally valid.
