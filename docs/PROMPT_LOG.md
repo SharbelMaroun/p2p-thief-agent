@@ -1228,3 +1228,34 @@ rediscovering the expensive one and abandoning it on cost.
 an internal parameter in the companion plus a documentation catch-up, and neither the
 reference simulator's behaviour nor the book's requirements govern either. Steps 1, 2, 5,
 6, 7 and 8 ran in full across both repositories.
+
+
+## 2026-08-13b — the companion's naming defect, recorded here because this side names artifacts too
+
+**No code changed here.** Steps 6 and 7 say both repositories, and this one has a real
+stake in the finding rather than a courtesy mention.
+
+**What was found next door.** The Cop repository derived `game_id` as
+`game-<12 hex of the config sha>` and wrote its artifacts under that name, while its result
+report used the agreed `G00N` label — so the report linked log files that did not exist.
+No gate caught it because none compares an artifact's *name* against the report that
+*points at* it; it surfaced only by diffing two teams' result files after the live G005
+series.
+
+**Both notebooks were asked.** The book: Appendix F table 20 names all four artifacts from
+`<game_id>`, and that identifier is the label the two teams agree — explicitly **not** a
+value derived from a hash of the configuration, whose only job is locking the config under
+`config_sha256`. The reference: `derive_game_ids` in `domain/game_ids.py` computes a human
+id from the agreed terms plus both group ids, so both peers reach it without an extra round
+trip. Both rule out a digest-derived name.
+
+**Why it matters on this side.** This repository writes the log for sub-games 1/3/5, so it
+names artifacts on half of every series. If it derives `game_id` or `game_uid` from the
+config hash, a series produces a set whose two halves disagree — which is the defect that
+was just removed, reintroduced from the other end. **This side has not been audited yet**;
+the companion was fixed first because that is where the defect was observed. Verify before
+the counted game.
+
+**Method.** Step 3 was attempted, blocked on a disconnected Chrome extension, and work
+stopped there rather than proceeding — then both notebooks were asked once it was
+reconnected. Steps 1, 2, 4, 6, 7 and 8 ran in full across both repositories.

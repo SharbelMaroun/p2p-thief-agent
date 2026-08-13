@@ -191,6 +191,24 @@ whether the term is right for the evader's side, and the mirror of a good pursue
 is not automatically a good evader heuristic. Recorded so the next attempt starts from the
 cheap formulation instead of rediscovering the expensive one and abandoning it on cost.
 
+**From the companion's reporting fix, and it applies here too.** The Cop repository was
+naming its artifact set from a hash — `game_id` derived as `game-<12 hex of the config
+sha>` — while its result report used the agreed `G00N` label, so the report linked log
+files that did not exist. Both notebooks were asked: Appendix F table 20 names all four
+artifacts from `<game_id>` and the book states plainly that this identifier is the label
+the two teams agree, **not** a value derived from a hash of the configuration, whose only
+job is locking the config under `config_sha256`. The reference derives a human id from the
+agreed terms plus both group ids so neither peer needs an extra round trip.
+
+This repository writes the log for sub-games 1/3/5 and therefore names artifacts on those
+turns. Its `game_id`/`game_uid` must come from the same agreed sources, or a series will
+again produce a set whose halves disagree — the Cop's half now says `G005` and the derived
+UUID, and a Thief half still saying anything else reintroduces exactly the defect that was
+just removed. **Verify before the counted game** that this side names artifacts from
+`[game].series_game_id` and derives `game_uid` from terms plus both group ids; if it
+derives either from the config hash, it needs the same change. Not yet audited here — the
+companion's fix was made first because that is where the defect was observed.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order

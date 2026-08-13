@@ -1868,6 +1868,26 @@ side being chased, and the mirror of a good pursuer heuristic is not automatical
 evader heuristic. It is written down so the next attempt begins from the cheap formulation
 instead of rediscovering the expensive one and dropping it on cost.
 
+### An artifact-naming defect found next door, unaudited here
+
+The companion Cop repository was naming its artifact set from a hash — `game_id` derived
+as `game-<12 hex of the config sha>` — while its result report used the agreed `G00N`
+label. The report therefore linked log files that did not exist, and nothing caught it,
+because no gate compares an artifact's name against the report that points at it. It
+surfaced only by diffing two teams' reports after a live series.
+
+Both notebooks were asked and neither supports the old form: Appendix F table 20 names all
+four artifacts from `<game_id>`, and the book states the identifier is the label the teams
+agree — **not** a value derived from a hash, whose only job is locking the config under
+`config_sha256`. The reference derives a human id from the agreed terms plus both group
+ids so both peers reach it independently.
+
+This side writes the log for sub-games 1/3/5 and so names artifacts on those turns. It has
+**not yet been audited** against the same rule; the companion was fixed first because that
+is where the defect was observed. Recorded here rather than left implicit, because a series
+whose two halves name their artifacts differently reintroduces the identical defect, and
+the halves are written by different repositories.
+
 ## License and provenance
 
 The [MIT license](LICENSE) covers team-authored material where legally valid.
