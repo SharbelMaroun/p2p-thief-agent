@@ -25,6 +25,7 @@ state, so a "current maturity" for them would have to be re-dated forever.
 | `docs/PRD_commit_reveal.md` | Yes | SHA-256 commit-reveal, canonical bytes, and the post-game audit |
 | `docs/PRD_scent_belief.md` | Yes | Scent physics, the public observation, and Thief-local belief |
 | `docs/PRD_strategy.md` | Yes | Evasion policy and the survival baseline |
+| `docs/BARRIER_AWARE_V2.md` | Yes | Experimental barrier-aware evasion (`M6-035`): design, results, latency, SHIP_CANDIDATE verdict; default-off |
 | `docs/PRD_p2p_mcp.md` | Yes | FastMCP peer roles and the negotiated wire |
 | `docs/PRD_gatekeeper_reporting.md` | Yes | Rate limiting, report delivery and the JSON attachment |
 | `docs/PRD_gui.md` | Yes | Local-truth GUI boundary |

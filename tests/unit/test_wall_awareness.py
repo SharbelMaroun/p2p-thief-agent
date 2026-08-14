@@ -101,7 +101,13 @@ def test_a_raising_strategy_yields_a_truthful_stay(monkeypatch) -> None:
     def poisoned(*_args, **_kwargs):
         raise RuntimeError("injected strategy failure")
 
-    monkeypatch.setattr(adaptive_policy, "choose_adaptive_action", poisoned)
+    # The live turn reaches the shipped policy through `evasion_action`, which binds
+    # `choose_adaptive_action` in the barrier_aware_policy namespace — patch it where it is
+    # actually looked up so the injected failure reaches the fail-safe (the assertions below
+    # are unchanged: a raising strategy must still seal a truthful STAY).
+    from p2p_thief_agent.strategy import barrier_aware_policy  # noqa: PLC0415
+
+    monkeypatch.setattr(barrier_aware_policy, "choose_adaptive_action", poisoned)
     decide = thief_policy.make_decide(start=(3, 3))
     message, sealed = decide(_cop_message(1, Coordinate(3, 1)), 1)
     assert sealed["payload"]["move"] == "MOVE:STAY"
