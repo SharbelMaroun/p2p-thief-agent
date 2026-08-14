@@ -1,7 +1,7 @@
 """Danger-gated barrier-aware policy: no mover regression, safe overrides (`M6-035`)."""
 
 from p2p_thief_agent.domain.board import Board
-from p2p_thief_agent.domain.coordinates import Action, Coordinate
+from p2p_thief_agent.domain.coordinates import Coordinate
 from p2p_thief_agent.domain.movement import legal_actions
 from p2p_thief_agent.strategy.adaptive_policy import PursuerTracker, choose_adaptive_action
 from p2p_thief_agent.strategy.barrier_aware_policy import (
@@ -10,7 +10,7 @@ from p2p_thief_agent.strategy.barrier_aware_policy import (
 )
 from p2p_thief_agent.strategy.barrier_search import escape_actions_walled
 from p2p_thief_agent.strategy.belief_policy import believed_cop_cell, initial_belief
-from p2p_thief_agent.strategy.waller_models import greedy_waller, interceptor_waller
+from p2p_thief_agent.strategy.waller_models import interceptor_waller
 
 BOARD = Board(size=7)
 
@@ -19,14 +19,25 @@ def _belief(cop: Coordinate):
     return initial_belief(BOARD, cop)
 
 
-def test_gate_stays_shut_far_from_a_mover_and_matches_adaptive() -> None:
-    """A far Police with no disclosed barrier is no danger: identical to the shipped policy."""
+def test_legacy_gate_when_shut_matches_the_shipped_policy() -> None:
+    """With the legacy gate (`always=False`), a far mover is no danger: identical to adaptive.
+
+    The default is `always=True` (plan every step); this pins the retained gated variant.
+    """
     thief, belief = Coordinate(3, 3), _belief(Coordinate(0, 0))
     assert is_dangerous(BOARD, thief, Coordinate(0, 0), frozenset()) is False
     ours = choose_barrier_aware_action(
-        BOARD, thief, belief, PursuerTracker(35), 1, (), quota_remaining=14)
+        BOARD, thief, belief, PursuerTracker(35), 1, (), quota_remaining=14, always=False)
     theirs = choose_adaptive_action(BOARD, thief, belief, PursuerTracker(35), 1, frozenset())
     assert ours == theirs
+
+
+def test_default_is_always_on_and_stays_legal() -> None:
+    """The shipped default plans every step; the result is still always a legal action."""
+    thief, belief = Coordinate(3, 3), _belief(Coordinate(0, 0))
+    action = choose_barrier_aware_action(
+        BOARD, thief, belief, PursuerTracker(35), 1, (), quota_remaining=14, depth_cap=5)
+    assert action in legal_actions(BOARD, thief, frozenset())
 
 
 def test_a_disclosed_barrier_opens_the_gate() -> None:

@@ -8,16 +8,20 @@ openings are escapable with perfect play (`strategy/barrier_search.py`). This po
 extra search only where a wall can actually hurt, and never at the cost of the mover-strong
 behaviour.
 
-Two guarantees make it safe to graft on:
+What makes it safe to graft on is that **it only overrides an *unsafe* adaptive pick**: it keeps
+the adaptive action whenever that action already survives the assumed waller, substitutes a
+walled-safe action only when the adaptive pick would walk into the trap, and falls back to the
+adaptive pick when the solver finds no guaranteed escape. So the shipped policy is both the
+default and the floor, and the measured mover result is preserved — with the planner engaged on
+every decision the four mover archetypes stay 24/24, identical to the adaptive policy.
 
-1. **It never fires against a pure mover.** A Police that only moves discloses no barrier and
-   creates no wall pressure, so the gate stays shut and the decision is `choose_adaptive_action`
-   unchanged — the 24/24 mover result is preserved by construction.
-2. **It only overrides an *unsafe* adaptive pick.** When the gate opens, it keeps the adaptive
-   action whenever that action already survives the assumed waller; it substitutes a
-   walled-safe action only when the adaptive pick would walk into the trap. If the solver finds
-   no guaranteed escape, it falls back to the adaptive pick. So the shipped policy is both the
-   default and the floor.
+**Engaged every step, not gated.** A first design only planned once a wall was disclosed or a
+seal was one move away; measured, it recovered nothing (8/24 unchanged), because against a
+walling interceptor the escape space is lost *before* a wall is ever placed — the gate opened
+too late. Planning from the first move instead converts the interception waller 8/24 -> 24/24
+even on the decoded belief, at every search depth from 6 up. The bounded depth (`DEFAULT_DEPTH_CAP`)
+keeps the worst decision well inside the response budget; the legacy `is_dangerous` gate is
+retained only for the measured comparison (`always=False`).
 
 Deterministic and history-free (book §6 sanctions deterministic look-ahead search): identical
 inputs give an identical action, so replay verifies the logged move and the audit stays free.
@@ -41,8 +45,10 @@ from p2p_thief_agent.strategy.waller_models import greedy_waller, interceptor_wa
 # Hardest plausible waller first: an action safe against the interception waller is the
 # strongest guarantee, and the greedy waller is the cheaper shape to fall back to.
 DEFAULT_WALLERS: tuple[WallerModel, ...] = (interceptor_waller, greedy_waller)
-DEFAULT_DEPTH_CAP = 16  # receding horizon; tuned against latency and conversion in the grid
-DEFAULT_PRESSURE_GATE = 1  # open the planner at wall_pressure <= this (imminent seal)
+# Receding horizon. Conversion is already 24/24 against both wallers at depth 6; 8 is a small
+# margin over that floor, and keeps the worst decision far inside the 30 s response budget.
+DEFAULT_DEPTH_CAP = 8
+DEFAULT_PRESSURE_GATE = 1  # legacy gate only (always=False): wall_pressure <= this is danger
 
 
 def is_dangerous(
@@ -95,16 +101,22 @@ def choose_barrier_aware_action(
     threshold: int = 35,
     wallers: Sequence[WallerModel] = DEFAULT_WALLERS,
     depth_cap: int = DEFAULT_DEPTH_CAP,
+    always: bool = True,
     pressure_gate: int = DEFAULT_PRESSURE_GATE,
     stats: dict | None = None,
 ) -> Action:
-    """Return the shipped action, or a walled-safe substitute when a wall would trap it."""
+    """Return the shipped action, or a walled-safe substitute when a wall would trap it.
+
+    ``always`` (the default) plans on every decision — the configuration measured to convert
+    the walling weakness. ``always=False`` restores the legacy `is_dangerous` gate, kept only
+    for the measured comparison that showed gating recovers nothing.
+    """
     blocked = frozenset(barriers)
     adaptive = choose_adaptive_action(board, position, belief, tracker, step, blocked)
     believed = believed_cop_cell(belief, board)
     if stats is not None:
         stats["decisions"] = stats.get("decisions", 0) + 1
-    if not is_dangerous(board, position, believed, blocked, pressure_gate):
+    if not always and not is_dangerous(board, position, believed, blocked, pressure_gate):
         return adaptive
     if stats is not None:
         stats["activations"] = stats.get("activations", 0) + 1
@@ -127,3 +139,21 @@ def choose_barrier_aware_action(
     if stats is not None:
         stats["fallbacks"] = stats.get("fallbacks", 0) + 1
     return adaptive
+
+
+def evasion_action(
+    strategy: str, board: Board, position: Coordinate, belief: Grid,
+    tracker: PursuerTracker, step: int, blocked: frozenset[Coordinate],
+    *, threshold: int, quota_remaining: int,
+) -> Action:
+    """Dispatch the live evasion by named strategy — the one seam the turn loop calls.
+
+    ``"current"`` (the production default) is the shipped `choose_adaptive_action`, byte for
+    byte; ``"barrier_aware_v2"`` is the always-on walled planner. An unknown name resolves to
+    ``"current"`` so a stray config value can never leave the Thief without a legal move.
+    """
+    if strategy == "barrier_aware_v2":
+        return choose_barrier_aware_action(
+            board, position, belief, tracker, step, blocked,
+            quota_remaining=quota_remaining, threshold=threshold)
+    return choose_adaptive_action(board, position, belief, tracker, step, blocked)
