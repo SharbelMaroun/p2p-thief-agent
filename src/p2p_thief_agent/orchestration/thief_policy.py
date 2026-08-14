@@ -38,21 +38,19 @@ from contextlib import suppress
 _WINDOW_RADIUS = 2  # the agreed 5×5 smell window reaches two cells from its centre
 
 
-def make_decide(
-    *,
-    grid_size: int = 7,
-    start: tuple[int, int] = (3, 3),
-    cop_start: tuple[int, int] | None = None,
-    threshold: int | None = None,
-    claim_reveals_cop: bool = False,
-):
+def make_decide(*, grid_size: int = 7, start: tuple[int, int] = (3, 3),
+                cop_start: tuple[int, int] | None = None, threshold: int | None = None,
+                claim_reveals_cop: bool = False, strategy: str = "current",
+                barrier_quota: int = 14):
     """Build the turn-loop `decide` callable from the measured evasion policy.
 
     The returned function carries its honest claim-answerer as the attribute
     ``answer_claim`` so `serve_match` can pass both from one shared closure.
     `cop_start` sharpens the first belief to the public opening cell (`M6-021`);
     `threshold` is the negotiated horizon, carried into the planner and the
-    survival `win_claim`.
+    survival `win_claim`. `strategy` selects the evasion (`"current"`, the shipped
+    adaptive policy, is the default and the fallback; `"barrier_aware_v2"` is the
+    opt-in walled planner), and `barrier_quota` is the agreed max barriers it plans against.
     """
     from p2p_thief_agent.domain.board import Board  # noqa: PLC0415
     from p2p_thief_agent.domain.coordinates import Action, Coordinate  # noqa: PLC0415
@@ -66,10 +64,8 @@ def make_decide(
         build_turn_message,
         sealed_step_record,
     )
-    from p2p_thief_agent.strategy.adaptive_policy import (  # noqa: PLC0415
-        PursuerTracker,
-        choose_adaptive_action,
-    )
+    from p2p_thief_agent.strategy.adaptive_policy import PursuerTracker  # noqa: PLC0415
+    from p2p_thief_agent.strategy.barrier_aware_policy import evasion_action  # noqa: PLC0415
     from p2p_thief_agent.strategy.belief_policy import (  # noqa: PLC0415
         believed_cop_cell,
         initial_belief,
@@ -146,8 +142,10 @@ def make_decide(
         # technical 0/0, strictly worse than any legal move. STAY is legal from
         # every on-board cell and keeps the sealed record truthful.
         try:
-            action = Action.STAY if caught else choose_adaptive_action(
-                board, state["cell"], state["belief"], state["tracker"], step, blocked)
+            action = Action.STAY if caught else evasion_action(
+                strategy, board, state["cell"], state["belief"], state["tracker"], step, blocked,
+                threshold=threshold if threshold is not None else 35,
+                quota_remaining=max(barrier_quota - len(state["barriers"]), 0))
         except Exception:  # noqa: BLE001 - the match outlives any strategy bug
             action = Action.STAY
         state["cell"] = resolve_move(board, state["cell"], action, blocked)

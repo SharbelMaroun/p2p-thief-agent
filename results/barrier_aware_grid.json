@@ -1,0 +1,114 @@
+{
+  "board": 7,
+  "depth_cap": 8,
+  "horizon": 35,
+  "latency": {
+    "budget_ms": 30000,
+    "decisions": 5040,
+    "max_ms": 1265.23,
+    "median_ms": 158.27,
+    "p95_ms": 411.49,
+    "p99_ms": 598.22
+  },
+  "movers": {
+    "anticipating": {
+      "adaptive": {
+        "escapes": 24,
+        "league_points": 240,
+        "median_survival": 35.0,
+        "scenarios": 24,
+        "worst_survival": 35
+      },
+      "barrier_aware": {
+        "escapes": 24,
+        "league_points": 240,
+        "median_survival": 35.0,
+        "scenarios": 24,
+        "worst_survival": 35
+      }
+    },
+    "greedy": {
+      "adaptive": {
+        "escapes": 24,
+        "league_points": 240,
+        "median_survival": 35.0,
+        "scenarios": 24,
+        "worst_survival": 35
+      },
+      "barrier_aware": {
+        "escapes": 24,
+        "league_points": 240,
+        "median_survival": 35.0,
+        "scenarios": 24,
+        "worst_survival": 35
+      }
+    },
+    "herding": {
+      "adaptive": {
+        "escapes": 24,
+        "league_points": 240,
+        "median_survival": 35.0,
+        "scenarios": 24,
+        "worst_survival": 35
+      },
+      "barrier_aware": {
+        "escapes": 24,
+        "league_points": 240,
+        "median_survival": 35.0,
+        "scenarios": 24,
+        "worst_survival": 35
+      }
+    },
+    "interceptor": {
+      "adaptive": {
+        "escapes": 24,
+        "league_points": 240,
+        "median_survival": 35.0,
+        "scenarios": 24,
+        "worst_survival": 35
+      },
+      "barrier_aware": {
+        "escapes": 24,
+        "league_points": 240,
+        "median_survival": 35.0,
+        "scenarios": 24,
+        "worst_survival": 35
+      }
+    }
+  },
+  "wall_quota": 14,
+  "wallers": {
+    "greedy_waller": {
+      "adaptive": {
+        "escapes": 23,
+        "league_points": 235,
+        "median_survival": 35.0,
+        "scenarios": 24,
+        "worst_survival": 6
+      },
+      "barrier_aware": {
+        "escapes": 24,
+        "league_points": 240,
+        "median_survival": 35.0,
+        "scenarios": 24,
+        "worst_survival": 35
+      }
+    },
+    "interceptor_waller": {
+      "adaptive": {
+        "escapes": 8,
+        "league_points": 160,
+        "median_survival": 17.0,
+        "scenarios": 24,
+        "worst_survival": 6
+      },
+      "barrier_aware": {
+        "escapes": 24,
+        "league_points": 240,
+        "median_survival": 35.0,
+        "scenarios": 24,
+        "worst_survival": 35
+      }
+    }
+  }
+}

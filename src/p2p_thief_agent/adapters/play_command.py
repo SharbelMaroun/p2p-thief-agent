@@ -158,9 +158,11 @@ def play(args: argparse.Namespace) -> int:
     # The decide callable carries its honest claim-answerer: both close over the same
     # position, so the answer given on the wire and the answer that ends our loop can
     # never disagree — the mismatch the audit would score as a forgery `[AE-021]`.
+    strat = _strategy(args.private)
     decide = make_decide(
         threshold=args.threshold,
-        claim_reveals_cop=bool(_strategy(args.private).get("claim_reveals_cop")),
+        claim_reveals_cop=bool(strat.get("claim_reveals_cop")),
+        strategy=str(strat.get("policy", "current")),  # default-off: known-good adaptive
     )
     try:
         result = serve_match(
