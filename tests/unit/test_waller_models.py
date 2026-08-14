@@ -40,16 +40,13 @@ def test_a_wall_finishes_an_adjacent_thief() -> None:
 
 
 def test_a_seal_removes_an_exit_when_room_is_scarce() -> None:
-    """With the Thief down to two exits the waller spends a wall to shrink them."""
-    thief = Coordinate(6, 6)  # corner: two cardinal exits
-    cop = Coordinate(5, 6)  # adjacent, so an exit cell is in range
-    # The finish rule fires first here (thief cell in range), so test seal where the thief
-    # cell is NOT in range but an exit is: place cop two away with a scarce thief.
-    thief2, cop2 = Coordinate(6, 0), Coordinate(6, 2)
-    before = mobility(BOARD, thief2, frozenset())
-    _, wall = greedy_waller(BOARD, cop2, thief2, frozenset(), 14)
+    """With the Thief down to two exits, and its own cell out of walling range, the waller
+    spends a wall on one of the Thief's exits rather than chasing."""
+    thief, cop = Coordinate(6, 0), Coordinate(6, 2)  # a scarce corner, Police two cells away
+    before = mobility(BOARD, thief, frozenset())
+    _, wall = greedy_waller(BOARD, cop, thief, frozenset(), 14)
     assert wall is not None
-    assert mobility(BOARD, thief2, frozenset({wall})) < before
+    assert mobility(BOARD, thief, frozenset({wall})) < before
 
 
 def test_no_quota_forces_a_move_not_a_wall() -> None:
