@@ -1326,3 +1326,54 @@ wrote `config_G009_g02.json`. The replay produced a clean set from both halves.
 
 **Method.** Steps 1–8 ran. Step 3 was not re-queried; both notebooks were asked earlier in
 the session about artifact naming and nothing here turns on a question only they can answer.
+
+
+## 2026-08-14 -- Barrier-aware evasion v2: closing the walling-Cop gap (experimental, default-off)
+
+A post-real-game optimisation pass targeting the one measured weakness of the shipped
+evasion: a Cop that combines interception with proactive barrier placement. The shipped
+`choose_adaptive_action` is already 24/24 against every *mover* archetype but converts only
+**8/24** against the interception waller, because its exact solver (`escape_search`) freezes
+the barrier field and plans against movement alone.
+
+**What was built (all isolated; production default unchanged).**
+- `strategy/waller_models.py` -- the deterministic walling archetypes in `src` (byte-parity
+  with the committed `experiment_wallers` grid, pinned by a test); every wall they propose
+  passes `domain.barriers.validate_barrier_placement` (strategy proposes, the domain validates).
+- `strategy/barrier_search.py` -- an exact escape solver that carries the barrier mask and
+  quota inside the recursion, mirroring `escape_search`'s step order; with quota 0 it equals
+  `escape_search` exactly (cross-checked in tests).
+- `strategy/barrier_aware_policy.py` -- keeps the adaptive pick whenever it already survives
+  the assumed waller, substitutes a walled-safe action only when the adaptive pick would be
+  trapped, and falls back to the adaptive pick otherwise. `make_decide` gains a `strategy`
+  selector; "current" (the default, and any unknown value) is the shipped policy byte for byte.
+  Opt-in only via the private [strategy].policy key.
+
+**The finding.** A first cut gated the planner on danger (a disclosed barrier or an imminent
+seal). Measured, it recovered nothing (8/24 unchanged, zero overrides): against a walling
+interceptor the escape space is lost before a wall is placed, so the gate opened too late.
+Planning from the first move instead -- "always-on" -- converts the interception waller
+8/24 -> 24/24 and the greedy waller 23/24 -> 24/24, on the decoded belief the live Thief
+carries, at every search depth from 6 up. All four mover archetypes stay 24/24 (no
+regression). The exact solver fed the true Cop cell escapes all 24 openings against both
+wallers -- the ceiling this reaches, which refutes the earlier note that the wall-armed
+equal-speed pursuer is structurally winning from these openings.
+
+**Verdict.** SHIP_CANDIDATE, default still "current"; flipping the production default is the
+coordinator's call. Latency (depth 8, worst decision) stays far inside the response budget.
+Deterministic throughout (book section 6 sanctions deterministic minimax/expectimax), so
+replay verifies the logged move and the audit is untouched.
+
+**Method / source verification.** BOTH NotebookLM notebooks were queried (book
+ff2216f4-1d49-4614-be95-a5ec6a8a264b, simulator f504d33d-45c7-42e0-8c97-c8cf6851c594): five
+ask_question calls across both, with escalating timeouts and an explicit wait. Each returned
+only NotebookLM's loading placeholder ("Exploring your material...", "Reading your inputs...",
+"Processing material...", "Digging into details...") and never a settled grounded answer;
+setup_auth needs an interactive browser login that cannot be driven headless. The required
+rules were therefore verified against the higher-ranked source directly -- the official book
+PDF (Source-of-Truth rank 1; the simulator notebook is rank 7). Book-confirmed: section 3.4
+barrier placement one step from the Cop, permanent, capture on the Thief's cell or a fully
+trapped Thief, mandatory truthful declaration, max_barriers 14, and a barrier replaces the
+move that turn; section 6 explicitly endorses "look-ahead search (such as minimax or
+expectimax against the opponent's belief)" and stresses it "remains deterministic and
+transparent". The NotebookLM tool failure is recorded here rather than skipped.
