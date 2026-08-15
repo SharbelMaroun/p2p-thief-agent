@@ -48,6 +48,12 @@ def write_match_log(directory: Path, records: list[dict], result: object,
         "timezone": "UTC", "started_at": context.get("started_at") or ended,
         "ended_at": ended,
         "duration_seconds": 0, "tokens_total": 0, "audit": {},
+        # Companion `C-050`: why the sub-game ended, not just how it scored. Always
+        # present so its absence never has to be interpreted — empty on a clean capture
+        # or survival, populated on anything else. Two sub-games ended `technical_loss`
+        # against `yanell11` on 2026-08-15 with no recorded cause, and the diagnosis cost
+        # a series and still produced a wrong attribution.
+        "result_reason": str(context.get("result_reason") or getattr(result, "reason", "")),
         # Rule 53 per game, per team (inst/:1295): recorded at write time so the
         # series report can carry it without reconstruction (companion C-043).
         "github_commit": dict(context.get("github_commit") or {}),

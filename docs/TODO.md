@@ -381,6 +381,161 @@ pointer moves -- and the governing rule (Appendix F table 20's `<game_id>`) was 
 settled through both notebooks on 2026-08-13 when `series_identity` was written. Recorded
 rather than left to be asked.
 
+**2026-08-15c the consensus digest was computed in a form the lecturer's tooling
+does not reproduce (`C-046`).** Group `yanell11`, during pairing, said our series consensus
+hash was wrong and should be the reference's spaced form. They were right, and the way it was
+checked matters as much as the answer.
+
+Their case rested on `tools/probes/probe_s6_consensus_scope.py` in the `imreeyal`/`anrbj666`
+kit, which passes -- but the scope it pins is **hand-transcribed into the probe file**, so a
+green probe proves their tooling is self-consistent, not that the lecturer's artifact says so.
+That is the restatement-is-not-the-source pattern this project already refuses twice over. So
+the actual file was fetched -- `docs/sample-run/result_segal-police-team-vs-segal-thief-team.json`
+from `rmisegal/Game-P2P-Cop-Chase@master` -- and recomputed from **its own rows**:
+
+    spaced   31d678dadbd226dcb1ad87848386416702dcf0735746d7c812350ebc69cbdc81  == shipped
+    compact  effb75c40fcdae1b299a3936bed0b34d13fc4cfd3ffcda5232fba5cb5bce29b7  no match
+
+Three differences, not the one they named: **separators** (compact vs spaced), a **`game_uid`
+we hashed** and the reference does not, and an **`aggregate` block we omitted** (the five keys
+`total_score`, `sub_games_won`, `ties`, `winner_group`, `series_tie`). Row keys and the
+`police`/`thief` vocabulary already matched.
+
+**What it cost.** `G008` reported `95f4d5fc...` and `G009` reported `a5b2e323...`; under the
+reference form those are `b18df6c4...` and `584f372c...`. Both opponents reproduced ours and
+accepted it on the wire, so rule 35 is satisfied *between the peers* and both counted games
+stand. But neither would settle against the course's own verifier. **Two implementations
+agreeing with each other is not the same as either being right** -- and `C-044`'s golden test
+pinned an *opponent's* digest, which is why it passed all along while being wrong.
+
+`reporting/series_consensus.py` now computes the reference form; `legacy_consensus_sha` keeps
+the old construction so the two reported series stay re-derivable, and its old golden is
+demoted to that role. The new golden pins `31d678da...`, the only vector here that comes from
+outside every implementation involved, and a companion test asserts the compact form does
+**not** reproduce it -- a pin that cannot fail against the wrong serialization pins nothing.
+Our production function reproduces `yanell11`'s independent vector `71cae7d6...` exactly.
+
+**The already-reported artifacts are not being rewritten**, for the same reason `G008`'s
+filenames were not: they are reported, mutually agreed evidence. The discrepancy is recorded
+here and in `C-046`.
+
+**Method.** Steps 1, 2, 4, 5, 6, 7 ran. **Step 3 could not run** -- the browser extension is
+not connected, so neither notebook was reachable. Not skipped silently and not substituted
+with a weaker check: the reference notebook exists to answer "what does the reference do?",
+and that question was answered from the reference's **own output bytes**, which outrank the
+notebook in `SOURCE_OF_TRUTH.md` (simulator at a recorded commit, rank 5, over NotebookLM,
+rank 7). The book side was covered by step 4 directly: `inst/:2220` mandates the field and
+specifies no construction. Same substitution, and same disclosure, as the Thief's 2026-08-13
+entry when the notebooks were unreachable there.
+
+**2026-08-15d a negotiate refused for a field we had already decided to tolerate
+(`C-047`), in both repositories.** The `yanell11` friendly died at sub-game 1. Their peer
+carries `group_id` at the top level and sends no `identity` object -- which they had told us
+in writing beforehand -- and both repositories refused it, independently and for different
+reasons.
+
+**Cop:** the negotiate schema listed `identity` as `required`, and `InboundPeer.negotiate`
+validates before `verify_offer` runs. So the message died with `'identity' is a required
+property` while the code implementing our documented tolerance -- `verify_offer`, which
+requires only `terms`/`nonce`/`signature` and carries a comment explaining that refusing such
+a peer loses valid matches -- never executed. **We documented a tolerance we did not have.**
+A bare `message["identity"].get(...)` one line later would have raised `KeyError` regardless.
+
+**Thief:** `Handshake.verify_peer` called `require_identity` on the opponent's block and
+refuses an absent identity or one short of any of seven members. Sub-game 2 would have died
+the same way, one game later, and the post-mortem would have started over.
+
+Both contradict the settled rule -- `U-024` in this register, and the companion's
+equivalent row in its own: *populate ours, tolerate theirs*, with cross-peer
+enforcement explicitly open. (The two registers number unknowns independently, so
+the companion's number for this question is not cited here; that mismatch is itself
+what the ledger gate caught twice today.) Rule 24's sanction is the loss
+of a computational bonus, which is a cost we bear for what the opponent withheld, not a reason
+to void a game. And the Thief's declaration schema already permits null for a withheld member
+and marks it `undeclared`, so the refusal protected nothing that was not already handled.
+
+**Evidence, before any change.** Our own wire recorder logged their negotiate arriving at
+`18:04:08.774Z` with `queued: true` -- so the tunnel, the port and the mailbox were all fine,
+and the opponent's later `502` report was a *different window*, after the runner exited on the
+failed sub-game. Their exact captured key set was then replayed offline through the real
+validator to produce the error rather than inferring it.
+
+**Fixed.** `identity` dropped from the schema's `required`; the group id read from either home
+with absence non-fatal; `verify_peer` captures the identity and records
+`peer_identity_missing` rather than raising. Contract `0.2.13-proposed` ->
+`0.2.14-proposed` across 25 files, manifest regenerated, bundle verifies at 38 controlled
+files. `tests/unit/test_negotiate_identity_optional.py` (6) pins the Cop side against the key
+set the wire recorder actually captured; the Thief's `test_identity_content.py` gained three
+tests and **lost an assertion** -- `test_a_short_identity_is_refused_at_the_wire_not_later`
+had passed continuously while encoding a rule no source supports.
+
+**This is the third defect of exactly this shape**, after `C-033` (a verifying audit scored as
+forgery over its nonce's length) and `C-037` (a whole turn dropped over an unknown claim
+type). Each time our validation was stricter than the rule it claimed to enforce, each time
+against a peer doing something legitimate, and each time it cost a game that had been played
+fairly. The pattern is now explicit enough to state as a rule: **a receive-side check that can
+refuse a peer needs a source that mandates refusal, not merely a source that mandates the
+content.**
+
+**One defect on their side, recorded because it explains the timeline rather than to keep
+score.** Their client printed `negotiated OK with sharNamr (role None)` for the negotiate we
+refused, then waited 60 seconds for a turn that could never arrive and scored a technical
+loss. A peer that reads a refusal as agreement will play a whole sub-game with nothing agreed
+behind it; the `role None` they noticed is the same symptom, not a second bug. Passed to them.
+
+**Method.** Steps 1, 2, 4, 5, 6, 7 ran. Step 3 could not: the browser extension is not
+connected. The book side was covered directly at step 4 -- rule 24 mandates the pre-game
+*content* and its sanction is a bonus denial, which is what settles this, and `U-024` already
+records that refusal is undecided. No notebook could have said more than the open unknown
+already does.
+
+**2026-08-15e the `yanell11` campaign: five defects, all ours, every one found by
+playing.** A full six-sub-game friendly was reached only on the fourth attempt, and the three
+attempts before it each ended on a different defect of ours. In order:
+
+**`C-047` identity.** Their negotiate carries `group_id` at the top level and no `identity`
+object. Our schema required one, and validation runs before the offer review -- so the code
+implementing our own documented tolerance never executed. Fixed in three places, each found
+only after the previous fix let the game get one stage further: the schema, the inbound
+handler, and the outbound handshake that feeds `build_declaration`. Fixing per-traceback
+instead of tracing the whole path from wire to artifact cost two extra rounds.
+
+**`C-048` the scent ceiling.** We published `tau` above `0.9`; their validator range-checks
+it and declared the rule-23 deviation. Clamped, `U-031` closed. **This one has a price we
+have not yet paid off**: the emitter decoder inverts the update on the premise that the clip
+never bites, and 8 capture-rate tests now fail. Tracked below.
+
+**`C-049` six requests per turn.** They measured our session-per-call from their server log.
+We could not have seen it from here.
+
+**`C-050` the missing reason.** Recorded outcomes, never causes -- and it made us blame the
+opponent for a stall that was ours.
+
+**`C-051` the discarded evidence.** We verified their audits and kept only the verdict.
+
+**The series, and what it was actually worth.** Six sub-games completed, reported 15-60. It
+was not: `yanell11` confirmed their three technical losses were our captures, which makes it
+**75-75, or 77-77 with Table 17 row 5's draw award**. The 15-60 file is the result of nothing
+and must not be cited as one.
+
+**What is still broken, stated plainly.** Our Cop is blind against this opponent, and the
+belief log says so: **3 localisations in 102 observations.** The cause is not one bug. Their
+`smell_grid` carries the whole accumulated board -- 30 to 48 cells where a 5x5 window is at
+most 25 -- so `M11-01`'s geometry fix correctly refuses it (that is not a window) and we fall
+through to the value-based decoder, which `C-048`'s clamp then degraded. Three things
+compound: their wire shape, our fallback, our clamp. The decoder must learn to invert a whole
+field rather than only a window; the saturation-inequality fix alone is not enough. Until then
+our Cop plays legal, conformant, blind games.
+
+`smell_grid_size` is `5` and **Fixed** in the terms both teams signed, and a 48-cell grid is
+not a 5x5 window. Neither side is cheating -- they send more than required -- but which shape
+the wire carries decides what a receiver can infer, and it is unagreed.
+
+**Method.** Steps 1, 2, 4, 5, 6, 7 ran. Step 3 could not: the browser extension is not
+connected, so neither notebook was reachable all day. Where a question needed a source, it was
+taken from the higher-ranked one directly -- the lecturer's own artifact for `C-046`, the book
+for `C-048`'s range, our own wire logs for the rest.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order

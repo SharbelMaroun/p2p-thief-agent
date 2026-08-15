@@ -40,6 +40,10 @@ class MatchOutcome:
     outcome: object
     steps: int
     records: list[dict]
+    # Companion `C-050`: the text of whatever ended the sub-game. Computed by
+    # `run_sub_game` all along and dropped here, so a `technical_loss` was recorded with
+    # no cause and had to be diagnosed from the opponent's logs instead of our own.
+    reason: str = ""
 
 
 def serve_match(
@@ -176,7 +180,8 @@ def serve_match(
         sleep=sleep, clock=time.monotonic, write_log=_write_log,
         series_game_id=series_game_id,
     )
-    return MatchOutcome(outcome=result.outcome, steps=result.steps, records=records)
+    return MatchOutcome(outcome=result.outcome, steps=result.steps, records=records,
+                        reason=getattr(result, "reason", ""))
 
 
 

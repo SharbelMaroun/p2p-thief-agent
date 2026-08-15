@@ -127,6 +127,10 @@ class Handshake:
     identity: dict = field(default_factory=dict)
     nonce: str = field(default_factory=new_nonce)
     peer_identity: dict = field(default_factory=dict, init=False)
+    # Which mandated members the opponent withheld (`C-047`). Recorded rather than refused,
+    # so the declaration can mark them `undeclared` and the operator can see what rule 24's
+    # bonus was forfeited for, instead of the match simply not happening.
+    peer_identity_missing: list[str] = field(default_factory=list, init=False)
 
     def signed(self) -> dict:
         """Return this peer's agreement message: terms, nonce, signature, identity."""
@@ -145,6 +149,31 @@ class Handshake:
         if message.get("terms") != self.terms:
             raise CryptoError("agreement terms mismatch between peers")
         verify(message["terms"], message["nonce"], message["signature"])
-        # `M5-014f`: validated, not merely captured. An opponent whose identity is short
-        # cannot produce a complete declaration, and rule 24 charges us for that.
-        self.peer_identity = require_identity(message.get("identity"), whose="the opponent")
+        # `C-047`: CAPTURED, not validated. This line used to call `require_identity`, which
+        # refuses an absent identity or one missing any of the seven mandated members -- so a
+        # peer that carries its group id at the top level and sends no `identity` object at
+        # all had the handshake refused outright. Group `yanell11` do exactly that, and the
+        # companion Cop lost a live friendly to the mirror of this on 2026-08-15; this side
+        # would have lost sub-game 2 the same way, for a different reason and one game later.
+        #
+        # Refusing here contradicted `U-024`/the companion's `C-031`: the settled rule is
+        # "populate ours, tolerate theirs", and whether an opponent may be REFUSED for an
+        # incomplete identity is explicitly still open, not decided in our favour. Rule 24's
+        # sanction is denial of a computational bonus, which is a cost we bear for what the
+        # opponent withheld -- it is not a licence to void a game the opponent would win.
+        #
+        # The artifact layer already handles this correctly: the declaration schema permits
+        # null for a member an opponent withheld and records it as `undeclared`. So the
+        # incomplete-declaration worry the old code was written for was already solved one
+        # layer down, and the refusal bought nothing it did not already have.
+        self.peer_identity = dict(message.get("identity") or {})
+        # Backfilled from the top-level spelling, because the declaration needs a non-empty
+        # id per group and refusing an anonymous group in a SIGNED artifact is a real gap --
+        # unlike refusing a wire member we had already agreed to tolerate. The companion hit
+        # this one stage past the handshake, with the negotiation already agreed.
+        if not self.peer_identity.get("group_id"):
+            top_level = message.get("group_id")
+            if isinstance(top_level, str) and top_level.strip():
+                self.peer_identity["group_id"] = top_level
+        self.peer_identity_missing = [name for name in MANDATED_IDENTITY_MEMBERS
+                                      if not self.peer_identity.get(name)]

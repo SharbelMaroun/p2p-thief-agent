@@ -20,8 +20,21 @@ read every successful delivery from such a peer as a refusal and abandon a
 healthy game, so any JSON object is accepted unless it explicitly signals
 failure.
 
-**Stateless by construction (`M5-002i`).** Every call opens and closes its own
-session and `__slots__` leaves nowhere for per-turn state to hide.
+**One session per sub-game, not per call (companion `C-049`).** Every call used to
+open and close its own MCP session, on the rationale that per-turn state then has nowhere
+to hide (`M5-002i`). Group `yanell11` measured the cost from the only side that can see
+it — their server log — and it is **six HTTP requests per turn** (POST initialize, POST
+202, GET stream, POST call, POST, DELETE). Against a peer behind a rate-limited tunnel
+that is fatal deep in a game, once the per-minute cap is reached.
+
+The old rationale conflated a *transport* session with *game* state. What matters is that
+no turn's game state reaches the next, and that comes from `__slots__` holding only the
+target and timeout plus every `call_tool` taking explicit arguments — none of which a
+reused connection touches.
+
+Any carrier failure closes and clears the session, so the next call reconnects and the
+bounded re-send upstream costs one retry rather than the sub-game. `close()` ends it
+deliberately at settlement; `reuse_session=False` restores per-call sessions.
 """
 
 from __future__ import annotations
@@ -31,6 +44,7 @@ from collections.abc import Mapping
 
 from fastmcp import Client
 
+from p2p_thief_agent.adapters.mcp_session import ReusableSession
 from p2p_thief_agent.peer.transport import TOOL_ARGUMENTS, JsonObject
 
 # Values of a ``status`` field by which an opponent signals refusal.
@@ -69,11 +83,20 @@ class FastMCPClient:
     to the shared object at all.
     """
 
-    __slots__ = ("_target", "_timeout")
+    __slots__ = ("_target", "_timeout", "_reuse", "_session")
 
-    def __init__(self, target: object, *, timeout: float | None = None) -> None:
+    def __init__(self, target: object, *, timeout: float | None = None,
+                 reuse_session: bool = True) -> None:
         self._target = target
         self._timeout = timeout
+        self._reuse = reuse_session
+        # Lifetime lives in `mcp_session.ReusableSession`; this class keeps the tool
+        # surface. Constructing one opens nothing.
+        self._session = ReusableSession(target)
+
+    def close(self) -> None:
+        """End the session deliberately (settlement). Safe to call repeatedly."""
+        self._session.close()
 
     def negotiate(self, message: Mapping[str, object]) -> JsonObject:
         """Send the signed-terms agreement and return the peer's acknowledgement."""
@@ -105,8 +128,13 @@ class FastMCPClient:
 
     def _exchange(self, tool: str, arguments: JsonObject) -> object:
         """Run one request/response, mapping every carrier failure to one type."""
+        if not self._reuse:
+            try:
+                return asyncio.run(self._invoke(tool, arguments))
+            except Exception as exc:  # noqa: BLE001 - any carrier failure is one fault
+                raise TransportError(f"{tool} failed in transport: {exc}") from exc
         try:
-            return asyncio.run(self._invoke(tool, arguments))
+            return self._session.call(tool, arguments, self._timeout)
         except Exception as exc:  # noqa: BLE001 - any carrier failure is one fault
             raise TransportError(f"{tool} failed in transport: {exc}") from exc
 

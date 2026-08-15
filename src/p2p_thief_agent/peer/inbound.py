@@ -28,12 +28,18 @@ OK_RESPONSE: JsonObject = {"ok": True}
 class InboundPeer:
     """Validate inbound tool calls for one sub-game, holding no transport state."""
 
-    __slots__ = ("_dispatch", "agreed_terms", "audits_verified", "my_terms", "opponent_group", "turns")
+    __slots__ = ("_dispatch", "agreed_terms", "audits_verified", "my_terms",
+                 "opponent_audits", "opponent_group", "turns")
 
     def __init__(self, my_terms: Mapping[str, object] | None = None) -> None:
         self.turns: list[TurnMessage] = []
         self.opponent_group: str | None = None
         self.audits_verified: list[dict] = []
+        # Verified opponent audits, in arrival order (companion `C-051`).
+        # EVIDENCE, not a verdict: the revealed payloads the opponent staked its
+        # commitments on. Kept because a dispute we cannot evidence is a dispute we
+        # lose -- rule 19 has no appeal.
+        self.opponent_audits: list[dict] = []
         # This peer's own agreed terms. Supplied once the runtime has loaded the
         # shared match object; until then `negotiate` can only check the shape.
         self.my_terms: Mapping[str, object] | None = my_terms
@@ -87,6 +93,7 @@ class InboundPeer:
         if not report["passed"]:
             raise WireError(f"audit failed for steps {report['failed_steps']}")
         self.audits_verified.append(report)
+        self.opponent_audits.append(dict(payload))
         return dict(OK_RESPONSE)
 
     def receive_control(self, message: Mapping[str, object]) -> JsonObject:

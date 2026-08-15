@@ -124,13 +124,28 @@ def emission_field(
 
 
 def settle(intensity: float, emission: float, *, decay_rate: float = DECAY_RATE) -> float:
-    """Apply one turn of the update τ(t+1) = max(0, (1-ρ)·τ(t) + Δτ) to one cell.
+    """One turn of τ(t+1) = clamp((1-ρ)·τ(t) + Δτ, 0, EMISSION_CENTER) for one cell.
 
     Non-negative by construction (`M6-001d`): a cell that was silent and receives no
     emission stays `0.0` — an absence of information, never a negative one. The decay
     keeps 90% of the prior scent at the FIXED ρ = 0.10, not 10% (`C-014`).
+
+    **The UPPER clamp closes `U-031`, added after the open question cost a live sub-game
+    (companion `C-048`).** The book prints only `max(0, ...)`, so this repository applied
+    no cap and a cell already scented and emitted on again rose above the centre
+    intensity. Against group `yanell11` on 2026-08-15 the companion's Police reached
+    `≈1.46` at one cell; their verifier read the published `smell_grid`, called it a
+    deviation from the locked model and declared a technical loss — which Appendix E rule
+    23 supports, its sanction for deviating from the agreed emission formula being that
+    the game is cancelled. This agent emits the same trail and lost sub-game 2 to it.
+
+    The clamp comes from the book, not from the peer: chapter 4 declares τ continuous in
+    `[0, 0.9]`, and a value above `EMISSION_CENTER` contradicts that declaration while the
+    printed `max(0, ...)` merely omits it. Where a formula and a stated range disagree the
+    range is the tighter and safer claim — a field that never exceeds the centre cannot be
+    refused by a peer that would permit more, and the converse is what actually happened.
     """
-    return max(0.0, (1.0 - decay_rate) * intensity + emission)
+    return min(max(0.0, (1.0 - decay_rate) * intensity + emission), EMISSION_CENTER)
 
 
 def advance_field(

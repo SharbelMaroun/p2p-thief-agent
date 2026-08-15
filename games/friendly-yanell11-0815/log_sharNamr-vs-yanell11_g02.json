@@ -1,0 +1,85 @@
+{
+  "_schema": "log",
+  "game_id": "sharNamr-vs-yanell11",
+  "game_uid": "9b80122e-75f9-c32d-5bff-abc032ae086b",
+  "links": {},
+  "mutual_agreement": {
+    "confirmed": false,
+    "opponent_group_id": "yanell11",
+    "sha256": "41cd0d7dc0f6bbcc0f305f051b9fbbfa69d463122053dc8062486a24dd1c5373"
+  },
+  "records": [
+    {
+      "commit": "54a925f516c1d90ad4b4dc43987dd82d76f62c7169ed413624fdb5caeb9160a8",
+      "nonce": "379a69254528e3ec47451a5eaff6bf7a",
+      "payload": {
+        "hint": "I am always one step ahead of you.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          4,
+          3
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[4, 3];barriers=[]",
+        "step": 1,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "8a5f700fc96a374475e646774ef3f84f86c3c616f81e3c804bb22ce50ea59dcd",
+      "nonce": "523a25004080820500726780421a1733",
+      "payload": {
+        "hint": "Keep guessing, you are colder than you think.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          5,
+          3
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[5, 3];barriers=[]",
+        "step": 2,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    }
+  ],
+  "schema_version": "1.1",
+  "summary": {
+    "audit": {},
+    "duration_seconds": 0,
+    "ended_at": "2026-08-15T18:35:54.382666+00:00",
+    "github_commit": {
+      "sharNamr": "87a441417a5f2c6282ed32344354cd5123c02422",
+      "yanell11": "unknown"
+    },
+    "group_id": "sharNamr",
+    "opponent_group_id": "yanell11",
+    "result": "technical_loss",
+    "role": "thief",
+    "started_at": "2026-08-15T18:34:19.557257+00:00",
+    "steps": 2,
+    "sub_game_number": 2,
+    "timezone": "UTC",
+    "tokens_total": 0,
+    "winner_role": "unknown"
+  }
+}

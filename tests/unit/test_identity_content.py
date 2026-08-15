@@ -80,9 +80,46 @@ def test_the_refusal_names_every_missing_member_at_once() -> None:
         assert member in str(caught.value)
 
 
-def test_a_short_identity_is_refused_at_the_wire_not_later() -> None:
-    """Wired into `verify_peer`, so it stops the handshake rather than surfacing when the
-    declaration is built and both sides have already signed the terms."""
+def test_a_short_identity_is_recorded_at_the_wire_not_refused() -> None:
+    """`C-047`, replacing the assertion this test made until 2026-08-15.
+
+    It used to require `verify_peer` to RAISE on a short identity, and it passed
+    continuously while encoding a rule no source supports. Whether an opponent may be
+    refused for an incomplete identity is `U-024` -- explicitly **open**, not settled in
+    our favour -- and the companion settled the send/receive split as "populate ours,
+    tolerate theirs". Rule 24's sanction is the loss of a computational bonus, a cost we
+    bear for what the opponent withheld; it is not a licence to void a game.
+
+    A peer that carries its group id at the top level and sends no `identity` at all is
+    real: group `yanell11` do, and the companion lost a live friendly to the mirror of
+    this. This side would have lost sub-game 2 to this line.
+    """
     bob = Handshake(terms=terms(), identity={"group_id": "bob"})
+    alice = Handshake(terms=terms())
+    alice.verify_peer(bob.signed())
+    assert alice.peer_identity == {"group_id": "bob"}
+    assert "llm_model" in alice.peer_identity_missing
+
+
+def test_an_absent_identity_object_still_agrees() -> None:
+    """The shape that actually broke us: no `identity` key on the message at all."""
+    bob = Handshake(terms=terms(), identity={"group_id": "bob"})
+    message = {k: v for k, v in bob.signed().items() if k != "identity"}
+    alice = Handshake(terms=terms())
+    alice.verify_peer(message)
+    assert alice.peer_identity == {}
+    assert alice.peer_identity_missing == list(MANDATED_IDENTITY_MEMBERS)
+
+
+def test_the_terms_and_signature_are_still_enforced() -> None:
+    """Tolerating identity must not have loosened what actually binds the agreement."""
+    bob = Handshake(terms=terms(), identity={"group_id": "bob"})
+    tampered = {**bob.signed(), "terms": {**terms(), "board_size": 9}}
+    with pytest.raises(Exception):  # noqa: B017, PT011 - CryptoError, via the terms guard
+        Handshake(terms=terms()).verify_peer(tampered)
+
+
+def test_require_identity_is_still_strict_for_our_own_block() -> None:
+    """The function is not deleted: it is simply no longer aimed at the opponent."""
     with pytest.raises(IdentityError, match="AE-24"):
-        Handshake(terms=terms()).verify_peer(bob.signed())
+        require_identity({"group_id": "us"}, whose="our own")

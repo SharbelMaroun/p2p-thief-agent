@@ -180,6 +180,10 @@ def play(args: argparse.Namespace) -> int:
         print(f"match did not start: {exc}")
         return 2
     print(f"match finished: {result.outcome} after {result.steps} step(s)")
+    # Companion `C-050`: the driver captures stdout and surfaces only this tail, so a
+    # sub-game that ends badly must say why here or the cause is lost.
+    if getattr(result, "reason", ""):
+        print(f"  reason: {result.reason}")
     if args.artifacts:
         print(f"log written to {args.artifacts}")
     return 0

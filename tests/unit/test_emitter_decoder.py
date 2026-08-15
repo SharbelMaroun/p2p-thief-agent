@@ -10,6 +10,7 @@ from p2p_thief_agent.domain.board import Board
 from p2p_thief_agent.domain.coordinates import Coordinate
 from p2p_thief_agent.perception.emitter_decoder import (
     emitter_likelihood,
+    informative,
     match_error,
     residual,
 )
@@ -29,24 +30,38 @@ def argmax(grid) -> tuple[int, int]:
                key=lambda rc: (grid[rc[0]][rc[1]], -rc[0], -rc[1]))
 
 
-def test_the_residual_is_exactly_the_newest_stamp() -> None:
-    """`τ' = (1−ρ)τ + Δ` with both terms non-negative: the clip never bites, so the
-    residual recovers the stamp to floating-point precision."""
+def test_the_residual_is_exactly_the_newest_stamp_where_it_is_invertible() -> None:
+    """`τ' = (1−ρ)τ + Δ` recovers the stamp exactly — on the cells the clamp did not cut.
+
+    This asserted the property over EVERY cell until 2026-08-15, on the premise that "the
+    clip never bites". The `C-048` upper clamp makes that false for saturated cells: their
+    residual under-reports by whatever was discarded. The inversion itself is unharmed, so
+    the fix is to score only where it applies rather than to weaken the tolerance —
+    `informative` is that set, and a test that widened its epsilon instead would have hidden
+    the loss of information rather than described it.
+    """
     first = deposit(blank_field(BOARD), BOARD, Coordinate(3, 3))
     second = deposit(first, BOARD, Coordinate(3, 4))
-    delta = residual(observed(second), observed(first))
-    for (row, col), value in delta.items():
-        assert abs(value - emission_delta(row - 3, col - 4)) < 1e-9
+    now, before = observed(second), observed(first)
+    delta = residual(now, before)
+    usable = informative(now, before)
+    assert usable, "every cell saturated; the decoder would have nothing to score"
+    for cell in usable:
+        row, col = cell
+        assert abs(delta[cell] - emission_delta(row - 3, col - 4)) < 1e-9
 
 
 def test_the_true_emitter_scores_zero_and_every_rival_scores_more() -> None:
+    """Unchanged in substance: the truth still scores zero, once saturated cells are out."""
     first = deposit(blank_field(BOARD), BOARD, Coordinate(2, 2))
     second = deposit(first, BOARD, Coordinate(2, 3))
-    delta = residual(observed(second), observed(first))
-    truth = match_error(BOARD, delta, (2, 3))
+    now, before = observed(second), observed(first)
+    delta = residual(now, before)
+    usable = informative(now, before)
+    truth = match_error(BOARD, delta, (2, 3), usable)
     assert truth < 1e-12
     for rival in ((2, 2), (2, 4), (1, 3), (3, 3), (0, 0)):
-        assert match_error(BOARD, delta, rival) > 0.05
+        assert match_error(BOARD, delta, rival, usable) > 0.05
 
 
 def test_the_decoder_tracks_a_whole_walk_exactly() -> None:

@@ -127,6 +127,7 @@ def finalise(
     honest on its own: everything after the last move belongs to the same phase.
     """
     from p2p_thief_agent.adapters.fastmcp_server import drain
+    from p2p_thief_agent.adapters.opponent_audit import retain_opponent_audit
     from p2p_thief_agent.peer.inbound import InboundPeer
 
     audit_peer = InboundPeer()
@@ -161,6 +162,15 @@ def finalise(
             ),
         )
     write_log(artifacts_dir, records, result, context)
+    # Companion `C-051`: keep THEIR evidence, not just our verdict on it. `audit_peer` has
+    # just verified every commitment in these payloads; discarding them left us unable to
+    # say where their agent actually was, which is what a disputed capture claim turns on.
+    retain_opponent_audit(
+        artifacts_dir, game_id=series_game_id, sub_game=sub_game,
+        audits=audit_peer.opponent_audits,
+        opponent_group_id=str(agreement.peer_identity.get("group_id", ""))
+        if agreement is not None else "",
+    )
     if context is not None and agreement is not None and game_config is not None:
         # The log IS the game; the pre-game artifacts must never cost it. Found
         # live 2026-08-13: an opponent spec with foreign key names raised here

@@ -1,0 +1,76 @@
+{
+  "_schema": "declaration",
+  "declaration_type": "pre_game",
+  "game_ended_at": "2026-08-15T18:34:19.557257+00:00",
+  "game_id": "sharNamr-vs-yanell11",
+  "game_started_at": "2026-08-15T18:34:19.557257+00:00",
+  "game_uid": "9b80122e-75f9-c32d-5bff-abc032ae086b",
+  "github_commit": "87a441417a5f2c6282ed32344354cd5123c02422",
+  "groups": [
+    {
+      "group_id": "sharNamr",
+      "group_name": "sharNamr",
+      "hardware_spec": {
+        "cpu_cores": 4,
+        "cpu_freq_mhz": 1992,
+        "cpu_type": "Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
+        "gpu_model": "Intel(R) UHD Graphics 620",
+        "os": "Microsoft Windows 11 Home",
+        "ram_gb": 8,
+        "vram_gb": 1
+      },
+      "llm_model": "template-zero-token",
+      "mcp_servers": {
+        "cop": "https://cc53-147-235-217-182.ngrok-free.app/mcp",
+        "thief": "http://127.0.0.1:8801/mcp"
+      },
+      "members": [
+        "Sharbel Maroun",
+        "Amr safadi"
+      ],
+      "repos": {
+        "cop": "https://github.com/SharbelMaroun/p2p-cop-agent",
+        "thief": "https://github.com/SharbelMaroun/p2p-thief-agent"
+      },
+      "signature": "e45191ceb5317ebb2270d2554e8a861ed9c42e422a086a249dee130874b71ee3"
+    },
+    {
+      "group_id": "yanell11",
+      "group_name": "yanell11",
+      "hardware_spec": null,
+      "llm_model": null,
+      "mcp_servers": {},
+      "members": [],
+      "repos": {},
+      "signature": null,
+      "undeclared": [
+        "llm_model",
+        "hardware_spec"
+      ]
+    }
+  ],
+  "links": {
+    "configs": [
+      "config_sharNamr-vs-yanell11_g01.json",
+      "config_sharNamr-vs-yanell11_g02.json",
+      "config_sharNamr-vs-yanell11_g03.json",
+      "config_sharNamr-vs-yanell11_g04.json",
+      "config_sharNamr-vs-yanell11_g05.json",
+      "config_sharNamr-vs-yanell11_g06.json"
+    ],
+    "declaration": "declaration_sharNamr-vs-yanell11.json",
+    "logs": [
+      "log_sharNamr-vs-yanell11_g01.json",
+      "log_sharNamr-vs-yanell11_g02.json",
+      "log_sharNamr-vs-yanell11_g03.json",
+      "log_sharNamr-vs-yanell11_g04.json",
+      "log_sharNamr-vs-yanell11_g05.json",
+      "log_sharNamr-vs-yanell11_g06.json"
+    ],
+    "result": "result_sharNamr-vs-yanell11.json"
+  },
+  "max_tokens_per_game": 33333,
+  "num_sub_games": 6,
+  "schema_version": "1.1",
+  "timezone": "UTC"
+}

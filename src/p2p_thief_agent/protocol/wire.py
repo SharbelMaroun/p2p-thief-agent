@@ -29,6 +29,7 @@ accept" rule already applied to acknowledgements. Missing *required* fields and 
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass, fields
 
 ROLES = ("thief", "police")
@@ -131,21 +132,34 @@ class AuditPayload:
 
     sender: str
     records: list
-    result_claim: str
+    result_claim: str | dict
 
     def __post_init__(self) -> None:
         if self.sender not in ROLES:
             raise WireError("AuditPayload.sender must be 'thief' or 'police'")
-        # `series_consensus` (companion C-040): uoh-ay26's post-series SHA exchange --
-        # an empty-record envelope, never a game outcome. Tolerated so the final
-        # exchange is acknowledged instead of refused; a non-empty record list under
-        # that claim is still malformed, because a consensus that smuggles records
-        # is not a consensus.
-        if self.result_claim == "series_consensus":
+        # A STRUCTURED claim is tolerated (`C-048`). Group `yanell11` send
+        # `{"type": "technical_loss", "violator": ..., "how": ...}` -- an object, not one
+        # of our enum strings -- and refusing it meant we rejected the very message that
+        # told us why they were refusing us. Our own report then disagreed with theirs,
+        # which is rule 35's conflicting-report 0/0 arriving on top of whatever the
+        # original dispute was. The object form is READ, never emitted: we still send a
+        # plain string, and a claim of any shape is an assertion to be judged on evidence,
+        # never believed. Fourth tolerance of this family after `C-033`/`C-037` and the
+        # companion's identity refusal.
+        claim = self.result_claim
+        if isinstance(claim, Mapping):
+            if not str(claim.get("type") or "").strip():
+                raise WireError("a structured result_claim must carry a non-empty 'type'")
+        elif claim == "series_consensus":
+            # companion C-040: uoh-ay26's post-series SHA exchange -- an empty-record
+            # envelope, never a game outcome. A non-empty record list under that claim is
+            # still malformed, because a consensus that smuggles records is not one.
             if self.records:
                 raise WireError("series_consensus must carry no records")
-        elif self.result_claim not in RESULT_CLAIMS:
-            raise WireError("AuditPayload.result_claim must be capture/survival/timeout")
+        elif claim not in RESULT_CLAIMS:
+            raise WireError(
+                "AuditPayload.result_claim must be capture/survival/timeout, "
+                "series_consensus, or an object carrying a 'type'")
         if not isinstance(self.records, list):
             raise WireError("AuditPayload.records must be an array")
 

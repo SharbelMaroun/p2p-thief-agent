@@ -1447,3 +1447,121 @@ one repository and was unobservable in the other. The same asymmetry covers
 `check_artifacts_committed.py`. Gate parity across the two repositories is worth its own pass.
 
 **Method.** Steps 1, 2, 4, 5, 6, 7 ran; step 3 did not -- see `TODO.md` for the reason.
+
+## 2026-08-15c -- the consensus hash an opponent had to tell us was wrong
+
+**Prompt.** Sharbel relayed `yanell11`'s reply arguing our consensus digest should use the
+kit's spaced form, then: "Implement it".
+
+**What was done.** Ran their probe (passes), then noticed its reference scope is transcribed
+into the probe file rather than read from the artifact -- so fetched the lecturer's own
+sample-run result from `rmisegal/Game-P2P-Cop-Chase@master` and recomputed from its bytes.
+Spaced reproduces its shipped hash; compact does not. Adopted the reference form, kept the old
+one as `legacy_consensus_sha`, re-pinned the golden on the lecturer's value, added a negative
+test for the compact form, and confirmed our production function reproduces the opponent's
+independent vector.
+
+**Output.** `C-046`. Our two counted series' reported digests do not match the reference form;
+the games stand between peers, but neither settles against the course's verifier.
+
+**Lesson 1 -- a golden test is only as good as where its expected value came from.**
+`test_series_consensus_sha.py` had pinned `fd362f67...`, a digest published by `uoh-ay26`. It
+passed continuously and guaranteed nothing, because both peers had built the same wrong thing
+and the test recorded their agreement rather than the course's construction. The replacement
+pins a value from outside every implementation involved. A pin sourced from someone you play
+against measures interoperability, never correctness.
+
+**Lesson 2 -- being told you are wrong is evidence, not an attack, and still has to be
+checked.** `yanell11` were right; their probe was not sufficient proof. Both facts held at
+once, and the second is why the fix rests on the lecturer's bytes rather than on their word.
+The check took ten minutes and is now a permanent test.
+
+**Lesson 3 -- I asserted the opposite first.** The previous message to them argued this was a
+mix-up between two kit objects, on a reading of the kit's own docstrings. That was wrong, and
+it would have shipped if they had deferred to it. Reading a docstring about a construction is
+not the same as computing the construction.
+
+**Method.** Steps 1, 2, 4, 5, 6, 7 ran; step 3 could not -- the browser extension is not
+connected. The substitution and its justification are recorded in `TODO.md` rather than left
+implicit.
+
+## 2026-08-15d -- refusing a peer for a field we had already agreed to tolerate
+
+**Prompt.** Sharbel: "i ran the command, please check what is the problem", then after the
+opponent's own post-mortem, "check if you fixed that".
+
+**What was done.** Read our inbound wire log (the recorder armed under `C-039`), which showed
+their negotiate arriving and being queued -- so the transport was healthy and their "your
+endpoint was 502 the whole window" diagnosis described a later window, after our runner exited.
+Replayed their captured key set through the real validator offline: `'identity' is a required
+property`. Fixed the schema and the handler, then checked the companion for the same
+assumption and found a worse one -- `verify_peer` refusing an opponent's short identity, which
+would have killed sub-game 2.
+
+**Output.** `C-047`. Contract bumped across 25 files; one pin, `shared_contract/CONTRACT_VERSION`,
+is extensionless and matched none of the patterns I searched -- the contract tests caught it.
+
+**Lesson 1 -- check the sibling before declaring the bug fixed.** The Cop's defect was found
+from a live failure. The Thief's was found only because the same question was asked of it
+deliberately, and it was the more dangerous of the two: it sits one game later, so it would
+have surfaced after the first fix "worked" and made the second post-mortem harder. Third
+member of the cop/thief drift family after `C-039` (wire recorder armed on one side) and
+`C-041` (step-0 shape).
+
+**Lesson 2 -- a test that passes can encode a rule no source supports.**
+`test_a_short_identity_is_refused_at_the_wire_not_later` guarded the defect. It was green
+every run, its docstring argued for itself, and the behaviour it pinned contradicted an open
+`U-` row in the same repository. Deleting an assertion is a real act; the replacement says
+what changed and why the old one was wrong rather than quietly narrowing.
+
+**Lesson 3 -- read the opponent's diagnosis for what it gets right AND what it gets wrong.**
+Theirs was half correct. Accepting it whole would have sent us hunting a tunnel problem that
+did not exist; dismissing it would have missed that our runner leaves nothing listening
+between sub-games. The wire log settled which half was which in one read.
+
+**Method.** Steps 1, 2, 4, 5, 6, 7 ran; step 3 could not -- extension not connected. See
+`TODO.md` for why no notebook could have added to `U-024`/`U-029` here.
+
+## 2026-08-15e -- a campaign against one opponent, and the five defects it found
+
+**Prompt.** Sharbel, across the evening: run the friendly against `yanell11`, then repeatedly
+"what is the problem", "fix both", "can you fix the errors", "we must verify that they are not
+lying, we cant keep the gap".
+
+**What was done.** Four attempts at a six-sub-game friendly. Each of the first three died on a
+different defect of ours -- identity refusal, scent above the ceiling, a session-per-call
+request storm -- and the fourth completed. Along the way: reason-logging, opponent-audit
+retention, and a contract bumped twice.
+
+**Lesson 1 -- the opponent's instrumentation sees what ours cannot.** Twice they told us
+something about our own code that we had no way to observe: six requests per turn (their
+server log) and our calls stopping mid-game (also theirs). Our wire recorder logs inbound
+only. A peer that can only see one direction will misattribute a stall, and did.
+
+**Lesson 2 -- I read evidence that could not distinguish two cases, and picked one.** "Their
+turn arrived, then silence" is equally consistent with them stopping and with us stopping. I
+asserted the first, told Sharbel, and drafted a message accusing their client of a bug it did
+not have. Their server log settled it against me. The rule to keep: before attributing a
+failure across a boundary, ask what evidence would look different under the other explanation
+-- and if none of mine would, say so instead of choosing.
+
+**Lesson 3 -- and again, twice more, on the same opponent.** I explained their duplicate
+step-34 as retry-with-re-seal, and their stopping-at-34 as an off-by-one horizon. Both wrong:
+it was a boxed-in concession sealed at the current step. Three wrong attributions in one
+evening, all of them confident, all about the same peer. The refusals our code made were right
+every time; my stories about *why* they were needed were not, and the difference matters
+because the story is what we send them.
+
+**Lesson 4 -- a fix that is forced can still be expensive, and the cost must be tracked, not
+absorbed.** The clamp was mandatory: without it every sub-game is 0/0. It also degraded the
+belief decoder and 8 capture-rate tests with it. The temptation is to call the tests stale and
+move on. They are not stale -- they measure a real loss of capability, and the entry that
+hides that is the entry that lets it become permanent.
+
+**Lesson 5 -- keep the evidence, not the verdict.** Three separate diagnoses today were
+blocked by artifacts that recorded an outcome and not its cause: the technical loss, the
+opponent's audit, the Thief's belief. Two are fixed; the third is not.
+
+**Method.** Steps 1, 2, 4, 5, 6, 7 ran; step 3 could not -- the browser extension was
+unavailable for the whole session, and that is recorded in `TODO.md` with what was used
+instead.

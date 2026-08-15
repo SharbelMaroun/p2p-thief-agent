@@ -10,7 +10,7 @@ import pytest
 from p2p_thief_agent.domain.board import Board
 from p2p_thief_agent.domain.coordinates import Coordinate
 from p2p_thief_agent.perception.field import blank_field, deposit
-from p2p_thief_agent.perception.scent import emission_field, settle
+from p2p_thief_agent.perception.scent import EMISSION_CENTER, emission_field, settle
 
 BOARD = Board(size=7)
 
@@ -31,7 +31,12 @@ EXPECTED_EMISSION = (
 DECAY_SEQUENCE = [0.9, 0.81, 0.729, 0.6561, 0.59049]
 
 # Repeated emission on one cell (STAY), settle(τ, 0.9): accumulates.
-STAY_SEQUENCE = [0.9, 1.71, 2.439, 3.0951]
+# `C-048` (companion): was `[0.9, 1.71, 2.439, 3.0951]` -- an agent standing still climbing
+# to more than three times the intensity the book says tau can hold, stored as the expected
+# answer. Group `yanell11`'s verifier read such a value off the companion's wire and declared
+# the rule-23 model deviation that scores a sub-game 0/0. With the upper clamp a stationary
+# agent simply holds the ceiling, which is what "tau is continuous in [0, 0.9]" always meant.
+STAY_SEQUENCE = [0.9, 0.9, 0.9, 0.9]
 
 
 def test_the_emission_field_matches_the_stored_vector() -> None:
@@ -63,5 +68,10 @@ def test_a_board_deposit_and_a_stay_match_the_stored_field() -> None:
     assert field[1][1] == 0.04  # the d²=8 corner of the window
 
     stayed = deposit(field, BOARD, Coordinate(3, 3))  # decay then re-emit on the same cell
-    assert stayed[3][3] == pytest.approx(0.9 * 0.90 + 0.90)  # 1.71
-    assert stayed[2][3] == pytest.approx(0.9 * 0.62 + 0.62)  # 1.178
+    # `C-048`: both cells used to be asserted above the centre intensity -- 1.71 and 1.178.
+    # The sum is unchanged; it is now clamped to the ceiling before it reaches the wire.
+    assert stayed[3][3] == pytest.approx(EMISSION_CENTER)
+    assert stayed[2][3] == pytest.approx(EMISSION_CENTER)
+    # Below the ceiling the accumulation is untouched, which is what keeps the trail a
+    # gradient rather than a plateau everywhere.
+    assert stayed[1][1] == pytest.approx(0.9 * 0.04 + 0.04)

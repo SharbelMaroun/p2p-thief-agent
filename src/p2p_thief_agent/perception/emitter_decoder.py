@@ -41,7 +41,12 @@ from collections.abc import Iterable, Mapping
 
 from p2p_thief_agent.domain.board import Board
 from p2p_thief_agent.perception.belief import Grid
-from p2p_thief_agent.perception.scent import DECAY_RATE, DEFAULT_OUTER_RING_DELTA, emission_delta
+from p2p_thief_agent.perception.scent import (
+    DECAY_RATE,
+    DEFAULT_OUTER_RING_DELTA,
+    EMISSION_CENTER,
+    emission_delta,
+)
 
 Cell = tuple[int, int]
 
@@ -67,6 +72,42 @@ def residual(
     cells = set(now) | set(before or ())
     return {cell: now.get(cell, 0.0) - keep * (before or {}).get(cell, 0.0)
             for cell in cells}
+
+
+def informative(
+    now: Mapping[Cell, float],
+    before: Mapping[Cell, float] | None,
+    *,
+    cap: float = EMISSION_CENTER,
+    tolerance: float = 1e-9,
+) -> set[Cell]:
+    """Cells whose residual still recovers the stamp under the `C-048` upper clamp.
+
+    The module's premise was that `τ' = max(0, (1−ρ)τ + Δ)` never clips, so the residual
+    inverts the physics exactly. The clamp added by `C-048` breaks that for **saturated**
+    cells: once the sum is cut to the centre intensity, `now − (1−ρ)·before` under-reports
+    the stamp by however much was discarded, and scoring that gap punishes the true emitter
+    hardest -- it is the cell most likely to be at the ceiling.
+
+    A cell reading exactly the cap is ambiguous rather than always broken, and the two
+    cases are separable:
+
+    * ``before == 0`` -- nothing to clip. A fresh centre stamp on an empty cell reads the
+      cap legitimately, and it is the single most informative cell in the window, so it is
+      KEPT. Dropping every cap-valued cell would blind the decoder to the emitter itself.
+    * ``before > 0`` -- the unclipped sum was `(1−ρ)·before + Δ > Δ`, so a reading of
+      exactly the cap is either clipping or a coincidence that is indistinguishable from
+      it. Treated as unobserved, which is what `trusted` already means here: "unobserved"
+      is not "zero", and a cell we cannot invert must not vote.
+
+    Returns the cells that may be scored; intersect it with any window restriction.
+    """
+    previous = before or {}
+    return {
+        cell for cell in (set(now) | set(previous))
+        if not (now.get(cell, 0.0) >= cap - tolerance
+                and previous.get(cell, 0.0) > tolerance)
+    }
 
 
 def match_error(
@@ -123,7 +164,12 @@ def emitter_likelihood(
     if not now:
         return tuple(tuple(1.0 for _ in range(board.size)) for _ in range(board.size))
     delta = residual(now, before)
-    trusted_cells = None if trusted is None else set(trusted)
+    # `C-048`: saturated cells cannot be inverted, so they are dropped here rather than
+    # scored as a mismatch. Intersected with any caller-supplied window restriction --
+    # both are the same kind of statement ("this cell's residual is not computable"), and
+    # a cell excluded by either must not vote.
+    usable = informative(now, before)
+    trusted_cells = usable if trusted is None else usable & set(trusted)
     grid = tuple(
         tuple(
             exp(-match_error(board, delta,

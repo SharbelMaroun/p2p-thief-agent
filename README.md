@@ -1949,6 +1949,95 @@ That is the general lesson worth recording: every fixture in this repository des
 built only from your own outputs is grading its own homework -- the same failure the `M11`
 belief work opens with, in a different layer.
 
+
+### The consensus hash an opponent had to tell us was wrong (`C-046`, 2026-08-15)
+
+Every completed series ends with both teams publishing a `mutual_agreement.sha256` over the
+same six rows. Ours was computed over `{game_id, game_uid, sub_games}` with compact JSON
+separators. The reference computes `{game_id, aggregate, sub_games}` with **spaced** ones.
+
+Group `yanell11` raised it while we were agreeing terms. Their evidence was a probe whose
+reference scope is transcribed into the probe file, so it demonstrates self-consistency rather
+than agreement with the course. We fetched the lecturer's own sample-run artifact from the
+reference repository and recomputed from its bytes:
+
+```
+shipped mutual_agreement.sha256   31d678dadbd2...
+recompute, spaced separators      31d678dadbd2...   match
+recompute, compact separators     effb75c40fcd...   no match
+```
+
+They were right. Three things differed, not the one named: the separators, a `game_uid` we
+hashed and the reference does not, and an `aggregate` block we omitted.
+
+**The uncomfortable part is what the old test proved.** Its golden pinned `fd362f67…` — a
+digest published by a *previous opponent*, which we had reproduced bit for bit. It passed
+every run and guaranteed nothing, because both of us had built the same wrong construction and
+the test recorded our agreement rather than the course's rule. Our two counted series settled
+correctly against their opponents and would not settle against the lecturer's verifier.
+
+The golden now pins the lecturer's value, the only one here that originates outside every
+implementation involved, and a second test asserts the compact form does *not* reproduce it —
+a pin that cannot fail against the wrong serialization pins nothing. The old construction is
+kept as `legacy_consensus_sha` so the two reported series remain re-derivable, and their
+artifacts are left exactly as they were reported.
+
+
+### Refusing a peer for a field we had already agreed to tolerate (`C-047`, 2026-08-15)
+
+A friendly against group `yanell11` died at sub-game 1. Their peer carries `group_id` at the
+top level and sends no `identity` object — which they had told us in writing beforehand.
+
+Both repositories refused it, independently and for different reasons. Here, the negotiate
+schema listed `identity` as `required`, and validation runs before the offer review — so the
+message died with `'identity' is a required property` while the code that implements our
+documented tolerance, and which carries a comment explaining that refusing such a peer loses
+valid matches, never executed. **We had documented a tolerance we did not have.** In the
+companion, `verify_peer` refused an opponent whose identity was short of any of seven members,
+which would have killed sub-game 2 one game after the first fix appeared to work.
+
+The evidence came from our own inbound wire recorder: their negotiate arrived at
+`18:04:08.774Z` and was queued, so the tunnel and the mailbox were fine and the refusal was
+ours. The opponent's post-mortem reported our endpoint as dead for their whole window — true,
+but of a *later* window, after our runner exited on the failed sub-game. One log read
+separated the two.
+
+This is the third defect of exactly this shape, after a verifying audit scored as forgery over
+its nonce's length and a whole turn dropped over an unknown claim type. The pattern is now
+explicit enough to state as a rule: **a receive-side check that can refuse a peer needs a
+source that mandates refusal, not merely a source that mandates the content.** Rule 24 mandates
+what a pre-game exchange should carry and its sanction is the loss of a computational bonus —
+a cost we bear for what an opponent withheld, never a licence to void a game they might win.
+
+
+### What one evening against a real opponent found (2026-08-15)
+
+Four attempts at a six-sub-game friendly against group `yanell11`. The first three each ended
+on a different defect **of ours**, and the fourth completed.
+
+| | what broke | how it was found |
+| --- | --- | --- |
+| `C-047` | a negotiate refused for an `identity` object we had already decided to tolerate | their peer sends `group_id` at the top level |
+| `C-048` | we published scent above the model's `0.9` ceiling | their validator range-checks it and declared a rule-23 deviation |
+| `C-049` | a new MCP session per call — six HTTP requests per turn | **their** server log; invisible from our side |
+| `C-050` | logs recorded `technical_loss` and never why | it made us blame them for a stall that was ours |
+| `C-051` | we verified their audit and discarded the evidence | we had to ask them a question our own verifier had already answered |
+
+Every one is ours, and only the first was findable without an opponent.
+
+**The scoreline is worth stating carefully.** The completed series reported 15–60. It was not:
+the three technical losses were our captures, which the opponent confirmed from their side, so
+the series was **75–75** — 77–77 with the draw award. A number produced by a defect is not a
+result, and the 15–60 artifact is cited nowhere.
+
+**What it exposed that is not yet fixed.** Our Cop is blind against this opponent — 3
+localisations in 102 observations — and it is three causes compounding rather than one bug.
+Their `smell_grid` carries the whole accumulated board (30–48 cells where a 5×5 window is at
+most 25), so the `M11-01` geometry fix correctly refuses it, we fall back to the value-based
+decoder, and `C-048`'s clamp degraded that. The decoder has to learn to invert a whole field,
+not only a window. Until it does, the Cop plays conformant, legal, blind games — and the eight
+failing capture-rate tests say so rather than being quietly retired.
+
 ## License and provenance
 
 The [MIT license](LICENSE) covers team-authored material where legally valid.
