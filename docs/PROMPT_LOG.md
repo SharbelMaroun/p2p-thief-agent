@@ -1565,3 +1565,35 @@ opponent's audit, the Thief's belief. Two are fixed; the third is not.
 **Method.** Steps 1, 2, 4, 5, 6, 7 ran; step 3 could not -- the browser extension was
 unavailable for the whole session, and that is recorded in `TODO.md` with what was used
 instead.
+
+## 2026-08-16 -- the measurements were never measuring us
+
+**Prompt.** Sharbel, after the opponent pushed back on our wire shape: "Do whats best to make
+it run correctly and strongly", then "say that we dont use it or what you want. And you can
+push".
+
+**What was done.** Verified the opponent's claim in the reference source, switched our
+transmission to the accumulated trail, then went after the eight capture-rate tests the scent
+clamp had turned red. Found that the arena fed a window (a shape no peer sends) and that the
+belief arm ran `scent_likelihood`, an inference replaced two milestones ago. Corrected both;
+all eight cleared.
+
+**Lesson 1 -- I believed a cost because it was plausible.** "The clamp degraded the belief, 8
+tests prove it" was repeated all evening, used to justify a decoder rewrite, and told to the
+opponent. It was never true. It survived because it was the *expected* price of a fix we had
+already decided we had to make, so nobody asked the measurement to defend itself. A number that
+confirms what you already believe is the one to check first, not last.
+
+**Lesson 2 -- verify against the opponent's code, not a description of it.** The decisive move
+was importing `ref_book_full_turn` from their kit and generating the observation stream with
+it. Everything before that -- reading their docstrings, reasoning about shapes, measuring our
+decoder on our own emitter -- produced confident wrong answers. Ten minutes of running their
+code settled what an evening of inference had not.
+
+**Lesson 3 -- and `M11-01` had already written this lesson down.** It fixed a decoder that
+graded its own homework, and its replacement assumed a window shape only our emitter produces.
+Having the lesson recorded did not prevent repeating it one layer up, because the new
+assumption looked like a fact about the wire rather than a fact about us.
+
+**Method.** Steps 1, 2, 4, 5, 6, 7 ran; step 3 could not, and the reference source was used
+directly in its place.
