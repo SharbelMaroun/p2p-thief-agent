@@ -253,6 +253,134 @@ All three of this side's logs replay `Verified OK` with `tampered: false`, and e
 artifact written here is named `G009` — the naming defect fixed hours earlier, proven on a
 counted set. Artifacts in `games/counted-uohay26-0813-G009/`.
 
+**2026-08-15 the `imreeyal`/`anrbj666` interop kit: conformant on every core vector, and
+one missing config key was the whole blocker.** Groups `imreeyal` (Amri, Eyal) and `anrbj666`
+(Alon, Renat) published an open conformance kit at `github.com/Imreec/copthief-league-protocol`
+-- byte-level vectors for the constructions the book leaves to inter-team agreement, plus a
+sparring peer. Its own `verify_vectors.py` passes 125 checks across 15 fixtures.
+
+**We ran our own production functions against their fixtures rather than porting their
+`ref_*` bodies**, because a pass is only worth something if it is our shipped code that
+passes: `the Thief` reproduced **17 of 17** CORE vectors -- canonical JSON (Hebrew, astral
+emoji, code-point key sort, the float repr at the exponent cliff), the per-step commit
+including a non-ASCII payload, the terms signature, `game_uid`, and our own verifier
+re-hashing *their* committed records. The failure their README leads with -- two legal
+serializations, mutual false `tamper_forfeit`, both sides zeroed -- cannot occur between us.
+
+**Their real inbound greeting found a real defect here, which is what a shipped fixture is
+for.** `docs/cross-team-frame.json` in their kit is an actual negotiate message from a
+completed cross-team series. Fed to this repository's real offer verifier it refused on
+exactly one field -- `min_center_intensity` -- and accepted all 14 terms once it was present.
+The gap was ours and narrow: `config/match_friendly_imreeyal.json` omitted
+`pheromones.pheromone_min_center_intensity` while `match_amireman.json` and
+`match_friendly_uohay26.json` have both carried `0.5` all along. Not a new decision, an
+omission: `U-023` already settled the key as tolerated-when-present, the terms projection
+already treated it as the optional fourteenth term, and the schema already allowed it. Added
+to both repositories byte-identically (`862a3c03...`); `preflight` now reports `ready`, 14
+terms, Appendix F OK, on both sides.
+
+**Also confirmed aligned, so it does not have to be rediscovered at a handshake:** our flat
+signed-terms projection is their exact 14-key set with the same names, and our signature over
+our own projection reproduces their published signature bit for bit; our wire roles
+(`police`/`thief`) match; their sorted-first role rule gives us Thief on 1/3/5 and Cop on
+2/4/6, which is the schedule we already play; thief-moves-first matches; and both repositories
+accept their full ten-key turn message *and* tolerate unknown keys, so `C-037`'s fix
+generalised rather than special-cased that opponent.
+
+**Their `game_id` convention is adopted.** `[game].series_game_id` is now
+`imreeyal-vs-sharNamr` in the private config of both repositories, and the derived
+`game_uid` is `52b754cc-7110-ea79-7bb4-d3736b46531a`. Their sorted-pair rule removes the
+entire class of defect that produced a counted result report linking six logs written under a
+hash-derived name.
+
+**Two divergences declared up front rather than discovered live, neither of them blocking.**
+Their `ref_book_update` clamps tau at the centre intensity; ours implements the book's printed
+`max(0, (1-rho)tau + delta)` with no upper clamp, because that question is still open and the book never settles it -- and it is worth
+noting that this register has **no row for it at all**: the companion carries it as
+`U-031` and nothing here does, although this repository's `perception/scent.py` runs the
+same model. The gap is recorded rather than papered over with the companion's number. The emission kernel itself is *identical* to their `BOOK_KERNEL` across all
+25 cells (0.90 / 0.62 / 0.42 / 0.20 / 0.14 / 0.04). The grid rides unauthenticated so this
+cannot fail an audit, and the `M11` decoder reads the window's shape rather than its values,
+so a foreign emitter costs us nothing -- it would matter only under their opt-in
+`smell_binding`. Separately, we publish the rule-23 lock as `scent_model_hash` while they read
+`scent_model_sha256`: each side sees silence, both play, and the lock is inert between us.
+Neither side's rule refuses on omission, so this is a lost guarantee, not a lost game.
+
+**Nothing closes here. Nothing has been played.** Open on them: two MCP endpoint URLs, whether
+they are role-split or a single service, and `schema_version` for the shared file -- we
+implement `1.2` and refuse anything else, while their Stage-1 template shows `1.1`. If that
+`1.1` is their *artifact* version we already agree, since our four artifact families emit
+`1.1` too and we hold source-config and artifact schema to be separate domains. This is
+`C-035` wearing a different opponent, and it is being settled in writing before a window is
+booked rather than at the handshake. The outbound message is
+`games/friendly-imreeyal-PROMPT-FOR-THEM.md`.
+
+**Reporting is disarmed for this pairing.** `[email].mode` is `dry_run`; the counted alias
+must be re-armed deliberately for a counted run. Their WARNINGS section 3 argues the lecturer
+address should be structurally unreachable outside a counted run, and having already sent two
+real reports this is the cheapest form of that guard we can apply today.
+
+**Method, stated rather than left to be asked.** Steps 1, 2, 4, 5, 6 and 7 ran. **Step 3 --
+both NotebookLM notebooks -- did not.** The only question it would have asked is whether the
+shared match object may carry `pheromone_min_center_intensity`, and that is `U-023`, already
+closed against the book PDF and the lecturer's own artifact templates, with `0.5` being the
+value our two other opponent files already carry. No physics, wire shape or hash construction
+changed. Recorded here because a skipped step that goes unmentioned is the failure the
+standing order exists to prevent.
+
+**`THIEF-002` observed.** The conformance
+run above was executed in this repository's own environment against this repository's own
+`protocol/crypto.py`, `protocol/terms_projection.py` and `protocol/wire.py`; none of it rests
+on the companion's evidence, and no row closes on either side's.
+
+**2026-08-15b the `G008` naming mismatch is explained rather than rewritten, and the
+submission tag is moved deliberately.** Two items from the same audit, both closed the way the
+evidence rules here require rather than the way that would look tidiest.
+
+**`G008`.** The counted `amireman` series produced two internally consistent halves that
+disagree with each other: the declaration, six configs and six logs carry
+`game_id: game-772de8f029e4` and `game_uid: 772de8f029e42892faf7f4016f77c268`, while
+`result_G008.json` -- and the report already emailed to the lecturer -- carry `G008` and
+`6aba9341-d92a-6e4b-a6a4-bb44ccadac1a`. A grader following any link in that report finds
+nothing, and the declaration in turn links a `result_game-772de8f029e4.json` that was never
+written. The artifact half is the wrong one: Appendix F table 20 names all four families from
+the label the two teams agree, never from a hash of the configuration.
+
+**The artifacts were deliberately not renamed or edited.** They are the record of a counted
+game whose report has been sent and whose outcome the opponent has already agreed; rewriting
+them after the fact is indistinguishable from rewriting evidence that was wrong, and the audit
+model here rests on records nobody touches afterwards. Instead
+`games/amireman-real-0813-0534/README.md` (identical in both repositories) states what
+happened, maps all fourteen links to their real files and repository, and says plainly what
+was not done and why. Every one of the fourteen was checked to resolve, not sampled. The
+mismatch is also outside every hash that matters: `game_id` appears in no commit preimage, so
+nothing is unverifiable because of it, and all six logs were re-verified on 2026-08-15 --
+`Verified OK`, 34/35/34/35/34/35 steps.
+
+The defect itself was already fixed on 2026-08-13 in `shared/series_identity.py`, after
+`G009` sub-game 1 hit it and that series was stopped and replayed. `G008` is simply the last
+set written before the fix, and `games/counted-uohay26-0813-G009/` is what a correct set
+looks like.
+
+**The submission tag.** `v1.0-submission` named the 2026-08-09 commit while the branch had
+moved 57 commits (Cop) and 50 (Thief) beyond it, so it no longer named the reviewed state --
+`[AE-41]`, and the Thief's own `scripts/check_submission_tag.py` had been failing on it. The
+Cop repository has no such script at all, and neither CI runs it, which is why this went
+unnoticed while every other gate stayed green. The tag has been moved deliberately, which is
+one of the two remedies that check names; the other is submitting the tagged commit, and the
+tagged commit predates the counted league, the `M10` denial stack and the `M11` belief fix.
+
+**Not done, and worth stating:** no conflict-register row was opened for the naming defect.
+`SPECIFICATION_CONFLICTS.md` in the Cop repository already carries a duplicate `C-033` and
+lists `C-041` before `C-040`, and adding a row to a register with a live numbering defect
+compounds it. The register needs a pass of its own first.
+
+**Method.** Steps 1, 2, 4, 5, 6, 7 ran. Step 3 (both notebooks) did not: nothing here changes
+physics, wire shape or a hash construction -- one file documents an existing set and one tag
+pointer moves -- and the governing rule (Appendix F table 20's `<game_id>`) was already
+settled through both notebooks on 2026-08-13 when `series_identity` was written. Recorded
+rather than left to be asked.
+
 ## Conventions
 
 - **Authority tags** in the exit-evidence column cite the governing source in the order

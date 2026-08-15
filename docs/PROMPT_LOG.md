@@ -1377,3 +1377,73 @@ trapped Thief, mandatory truthful declaration, max_barriers 14, and a barrier re
 move that turn; section 6 explicitly endorses "look-ahead search (such as minimax or
 expectimax against the opponent's belief)" and stresses it "remains deterministic and
 transparent". The NotebookLM tool failure is recorded here rather than skipped.
+
+## 2026-08-15 -- the imreeyal/anrbj666 conformance kit, and the one key that blocked us
+
+**Prompt.** Sharbel forwarded the announcement of `github.com/Imreec/copthief-league-protocol`
+and asked whether we are aligned with that group and can run a game.
+
+**What was done.** Cloned the kit, ran its own `verify_vectors.py` (125 checks, 15 fixtures,
+all pass), then wrote adapters that point **our** production functions at **their** JSON
+fixtures. 17/17 CORE vectors pass in each repository. Fed their real cross-team greeting to
+our real offer verifier: refused on `min_center_intensity`, accepted 14 terms once the key was
+added to the shared match file. Adopted their sorted-pair `game_id`, disarmed the reporting
+mode, and drafted the Stage-1 planning message.
+
+**Output.** One blocker, and it was ours: an omitted optional term in one of three opponent
+match files. No code changed -- the projection, the schema and `U-028` all already supported
+the key.
+
+**Refinement.** The first draft of the conformance check re-implemented their `ref_commit` and
+compared it to their vectors, which proves only that two copies of the same function agree. It
+was rewritten to import our shipped `commit_of` / `move_commit`, which is the only version of
+the test that could have failed.
+
+**Lesson 1 -- a fixture of a *real* inbound message is worth more than a spec.** Every
+construction in their kit we already matched; the thing that found a defect was the archived
+greeting from a real peer. We have shipped fixtures of our own shapes and none of a
+classmate's. Their `cross-team-frame.json` is the pattern to copy.
+
+**Lesson 2 -- verify the edit, not the intent.** Patching the two private TOMLs with a
+PowerShell hashtable of replacement pairs silently corrupted one of them: `@(@('a','b'))`
+flattens to `@('a','b')`, so `$pair[0]` indexed a *character* and the script replaced every
+`s` in the file. It was caught only because the change was followed by a `tomllib` parse and a
+line-level diff against a backup taken first, and reverted from that backup. The habit that
+saved it -- back up, then assert the file still parses and only the intended lines moved -- is
+worth more than the tool choice; the rewrite in Python asserts each search string occurs
+exactly once before replacing.
+
+**Lesson 3 -- disclose the skipped gate in the same message.** Step 3 was not run; the reason
+is recorded in `TODO.md` beside the change rather than being available on request.
+
+**Method.** Steps 1, 2, 4, 5, 6, 7 ran. Step 3 (both notebooks) did **not** -- see `TODO.md`
+for why, and treat that as a weakened gate rather than a satisfied one.
+
+## 2026-08-15b -- G008's naming, and the tag that named the wrong commit
+
+**Prompt.** Sharbel: "fix the stale tags and the G008 naming while we wait".
+
+**What was done.** Established that the six `G008` artifacts and the emitted result report are
+each internally consistent and mutually contradictory, then asked before touching either,
+because `G008` is counted, reported, and mutually agreed. Chose to document rather than
+rewrite. Wrote `games/amireman-real-0813-0534/README.md` in both repositories, checked all
+fourteen links resolve under the documented substitution, and re-verified all six logs. Moved
+`v1.0-submission` in both repositories after committing the working tree.
+
+**Output.** One new file per repository, one tag pointer per repository, no evidence altered.
+
+**Lesson -- "fix" is not always "make it match".** The tidy option was to rename six files and
+rewrite their `game_id`/`game_uid` so the report's links resolved. It would have produced a
+cleaner-looking repository and a worse one: the artifacts are the record of a counted game
+that has already been reported and agreed by the opponent, and evidence edited after reporting
+cannot be distinguished from evidence edited because it was wrong. The cost of the honest
+option is one paragraph a grader has to read; the cost of the tidy one is every other artifact
+in the repository becoming slightly less believable. Asked rather than assumed, because the
+two options were not a matter of taste.
+
+**Lesson -- a gate that exists in one repository is not a gate.** `check_submission_tag.py`
+lives only in the Thief repository and runs in neither CI, so a stale tag failed silently in
+one repository and was unobservable in the other. The same asymmetry covers
+`check_artifacts_committed.py`. Gate parity across the two repositories is worth its own pass.
+
+**Method.** Steps 1, 2, 4, 5, 6, 7 ran; step 3 did not -- see `TODO.md` for the reason.

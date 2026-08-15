@@ -1923,6 +1923,32 @@ All three logs replay `Verified OK` with `tampered: false` on both sides, and ev
 this side wrote is named `G009` — the naming defect that had split the aborted first attempt,
 fixed and then proven where it counted.
 
+### Playing a group that publishes its own conformance kit (2026-08-15)
+
+Groups `imreeyal` and `anrbj666` published an open interop kit
+([`Imreec/copthief-league-protocol`](https://github.com/Imreec/copthief-league-protocol)):
+byte-level vectors for the serialization details the book leaves to inter-team agreement,
+on the argument that two legal implementations which canonicalize JSON differently will each
+conclude the other tampered, and both score zero.
+
+We checked it the only way that means anything -- by pointing **our shipped functions** at
+their fixtures rather than porting their reference bodies. **17 of 17 CORE vectors pass in
+both repositories**, including the case their README calls the single most important fact in
+the kit: `ensure_ascii=False`, so a Hebrew or emoji hint hashes as native UTF-8 on both sides.
+Our own verifier also re-hashes their committed records correctly, which is the direction that
+actually decides an audit.
+
+**The kit found one real defect here, and it was not in the code.** Their repository ships an
+archived *real* negotiate message from a completed cross-team series. Fed to our real offer
+verifier it refused on one field, `min_center_intensity` -- our shared match file for this
+pairing had omitted a term our other two opponent files both carry. One key, no code change,
+and it would otherwise have surfaced as an opaque refusal in a booked window.
+
+That is the general lesson worth recording: every fixture in this repository describes a shape
+*we* emit. The artifact that caught something was a shape *someone else* emitted. A test suite
+built only from your own outputs is grading its own homework -- the same failure the `M11`
+belief work opens with, in a different layer.
+
 ## License and provenance
 
 The [MIT license](LICENSE) covers team-authored material where legally valid.
