@@ -152,6 +152,14 @@ def evasion_action(
     byte; ``"barrier_aware_v2"`` is the always-on walled planner. An unknown name resolves to
     ``"current"`` so a stray config value can never leave the Thief without a legal move.
     """
+    if strategy == "open_field_v3":
+        from p2p_thief_agent.strategy.open_field import (  # noqa: PLC0415
+            choose_open_field_action,
+        )
+
+        return choose_open_field_action(
+            board, position, belief, tracker, step, blocked,
+            quota_remaining=quota_remaining, threshold=threshold)
     if strategy == "barrier_aware_v2":
         return choose_barrier_aware_action(
             board, position, belief, tracker, step, blocked,

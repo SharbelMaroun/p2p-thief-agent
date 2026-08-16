@@ -1,0 +1,944 @@
+{
+  "_schema": "log",
+  "game_id": "sharNamr-vs-yanell11",
+  "game_uid": "9b80122e-75f9-c32d-5bff-abc032ae086b",
+  "links": {},
+  "mutual_agreement": {
+    "confirmed": true,
+    "opponent_group_id": "yanell11",
+    "sha256": "41cd0d7dc0f6bbcc0f305f051b9fbbfa69d463122053dc8062486a24dd1c5373"
+  },
+  "records": [
+    {
+      "commit": "60d649e41383e261b49c6aed4890230e4811bf454a18a77ef9922b682b908d0b",
+      "nonce": "b7dd6e44ca320fcb39405984eead2ce6",
+      "payload": {
+        "hint": "I am always one step ahead of you.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          4,
+          3
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[4, 3];barriers=[]",
+        "step": 1,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "8a6d57f67a686e9e6a7ff15eef147f376196fd4abaa0d8ddaa2abe2531ad5d04",
+      "nonce": "97ba10693c02baede7b3709c481af5d5",
+      "payload": {
+        "hint": "Keep guessing, you are colder than you think.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          5,
+          3
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[5, 3];barriers=[]",
+        "step": 2,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "1af4577ae54d0fa532b4f9a130a84f7ee75d81edc6057d34f40153a98b1cd945",
+      "nonce": "c046f1383ce0c80071d51121cc1e7d16",
+      "payload": {
+        "hint": "The shadows here hide me well tonight.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:EAST",
+        "position": [
+          5,
+          4
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[5, 4];barriers=[]",
+        "step": 3,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "139dc34e750a6e7cd05b5b12fdb355238937312f2d33b0ab9f1137afcbafda14",
+      "nonce": "4df76e4debc81a0082082518e4ab901a",
+      "payload": {
+        "hint": "Chase all you like, the streets are mine.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:EAST",
+        "position": [
+          5,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[5, 5];barriers=[[0, 3]]",
+        "step": 4,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "96b1fe519796b36d8023d890f4aae3090346ac62037a2214622d693a8ae99942",
+      "nonce": "dbcefe35093bc337bd73c5ff6dcab1e7",
+      "payload": {
+        "hint": "You will not catch me this time, officer.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          6,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[6, 5];barriers=[[0, 3]]",
+        "step": 5,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "9e81ffc9b53c099b21503f4b9f54a16acade29de06b02b81c05db0614feff641",
+      "nonce": "54d7538a6086e4e6c998c8d207d13151",
+      "payload": {
+        "hint": "I am always one step ahead of you.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          5,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[5, 5];barriers=[[0, 3], [1, 3]]",
+        "step": 6,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "4be32e784f3e3715a83208b9496141ea470642f01e7d02fdeece8e41bbe95839",
+      "nonce": "4e6cd34cf68b22fb0785b8742c5e3122",
+      "payload": {
+        "hint": "Keep guessing, you are colder than you think.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          6,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[6, 5];barriers=[[0, 3], [1, 3]]",
+        "step": 7,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "4b4313bac270432c176ecf092656bfd0e01a97591322ef2f1ff81d83ef094a6c",
+      "nonce": "ab1e0d0b44b77aae44bb4637f88b545d",
+      "payload": {
+        "hint": "The shadows here hide me well tonight.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          5,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[5, 5];barriers=[[0, 3], [1, 3], [2, 3]]",
+        "step": 8,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "9a116bad023d72e37731c4e55e2a4bf4ae6e900d13af689358d3f5808479098b",
+      "nonce": "2ed42b849f18be60e18bf88c7ed21639",
+      "payload": {
+        "hint": "Chase all you like, the streets are mine.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          6,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[6, 5];barriers=[[0, 3], [1, 3], [2, 3]]",
+        "step": 9,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "aff747e9758cd49f2ae9e3bdbcd62fb120624356e67533dda9712f0acc395195",
+      "nonce": "3130bf2f34e7a695106a6e59c1a376a1",
+      "payload": {
+        "hint": "You will not catch me this time, officer.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          5,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[5, 5];barriers=[[0, 3], [1, 3], [2, 3]]",
+        "step": 10,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "c7359a18ad22d0497c6d6a94957708af00d0b858e79e67eef4afc95ae92515a7",
+      "nonce": "5492f111fea3f53daf64f93b8a4c5008",
+      "payload": {
+        "hint": "I am always one step ahead of you.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          6,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[6, 5];barriers=[[0, 3], [1, 3], [2, 3], [4, 3]]",
+        "step": 11,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "e3ece2b46b6ad7b0104f7e3d9bf5bc754e1b8edf706b42be01e1463da7f2e2a9",
+      "nonce": "63c9b968daac3e3b2c21ce7c74d2997c",
+      "payload": {
+        "hint": "Keep guessing, you are colder than you think.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          5,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[5, 5];barriers=[[0, 3], [1, 3], [2, 3], [4, 3]]",
+        "step": 12,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "9e9fa0b9f35bb5e4dbbb5a840da31047e4ced5419648017343f00c9eefb43f67",
+      "nonce": "8b8f9911d5dcb7075f48d9b5224000b3",
+      "payload": {
+        "hint": "The shadows here hide me well tonight.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          4,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[4, 5];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3]]",
+        "step": 13,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "4dc1d82a046b04ad1cee50cbf3d12081884e92f18ecd57218d8167b707c1977c",
+      "nonce": "f9acfdd9e7479b35c06fb7063b62e257",
+      "payload": {
+        "hint": "Chase all you like, the streets are mine.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          3,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[3, 5];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3]]",
+        "step": 14,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "a98dd85979cdd3789735648a9c4a6b2a13f382fa858361eec46c2a576530be38",
+      "nonce": "57762415fe37cd85a9d94a8db96ce851",
+      "payload": {
+        "hint": "You will not catch me this time, officer.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          2,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[2, 5];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3], [6, 3]]",
+        "step": 15,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "f7df744f19d8e66e887e49914b53e272abf6528c045ca445b377950cbfde844e",
+      "nonce": "b63d57bd23426a62111b45c6b81127ad",
+      "payload": {
+        "hint": "I am always one step ahead of you.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          1,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[1, 5];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3], [6, 3]]",
+        "step": 16,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "793378148496361111db3c79664363449989e5810d22738fb2bfbde8342cbb90",
+      "nonce": "676b4e4eea706b9c9f9daa0e496cea05",
+      "payload": {
+        "hint": "Keep guessing, you are colder than you think.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          0,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[0, 5];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3], [6, 3]]",
+        "step": 17,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "4afdce6d3de77b2f995e1bb7becec06511553483ddc8c3880cab2bfd14f5919f",
+      "nonce": "e1da5b4cef3daa8194190630bde26137",
+      "payload": {
+        "hint": "The shadows here hide me well tonight.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          1,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[1, 5];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3], [6, 3]]",
+        "step": 18,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "8275ae055ca1e1c22e40197d9bb3d255e4eddfee3de48506b11b30c100412d7e",
+      "nonce": "926373bbc8caa9259168ef5eda3d089e",
+      "payload": {
+        "hint": "Chase all you like, the streets are mine.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          0,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[0, 5];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3], [6, 3]]",
+        "step": 19,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "9d5d9636aecfc88cf4073bb2f135d2d463fc50bf7f76c82bc23d12cf1e8fda83",
+      "nonce": "21f8109b9de490e392b6e6efbd950a7c",
+      "payload": {
+        "hint": "You will not catch me this time, officer.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          1,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[1, 5];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3], [6, 3]]",
+        "step": 20,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "3d797f013775468970be27c9084fbac33f84451b926c7d891c2cac91b3578ad2",
+      "nonce": "aef0d17bcfc5bb05f99b00a735872e8e",
+      "payload": {
+        "hint": "I am always one step ahead of you.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          0,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[0, 5];barriers=[[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]",
+        "step": 21,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "db3afe61547623dbe0b97b3cd521890ed59eeb76f8bb152d678190d3cdffb75d",
+      "nonce": "72ed42a6afa186df6c4d2bbd3423f870",
+      "payload": {
+        "hint": "Keep guessing, you are colder than you think.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          1,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[1, 5];barriers=[[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]",
+        "step": 22,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "b38bb5b8cd8b43b8b8e9d857f31be6520a27d7336eaa0bc74ae380da57a321f8",
+      "nonce": "1bcdeb4dc139dfd5381a9cc2fd5fda31",
+      "payload": {
+        "hint": "The shadows here hide me well tonight.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          0,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[0, 5];barriers=[[0, 3], [1, 3], [2, 3], [2, 5], [3, 3], [4, 3], [5, 3], [6, 3]]",
+        "step": 23,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "a342f7b7a36aaa8a264ea9cb0eebac11e9d61268b20eb3c16485ebb33a02c9ef",
+      "nonce": "078c18fdb7fbfb484dfa9a4e9f87c044",
+      "payload": {
+        "hint": "Chase all you like, the streets are mine.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:EAST",
+        "position": [
+          0,
+          6
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[0, 6];barriers=[[0, 3], [1, 3], [2, 3], [2, 5], [3, 3], [4, 3], [5, 3], [6, 3]]",
+        "step": 24,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "ebbe72a12ac1e1e897075ef0bffb82c9d05df6da7fe084372b13c3714f76b8b4",
+      "nonce": "d3ca655cfde52af2364cd4fa00a374ff",
+      "payload": {
+        "hint": "You will not catch me this time, officer.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          1,
+          6
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[1, 6];barriers=[[0, 3], [1, 3], [2, 3], [2, 5], [3, 3], [4, 3], [5, 3], [6, 3]]",
+        "step": 25,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "84143264cc168c3c29e534a4d294306ded659dd2cb4ed7d676440fdde39fbc2d",
+      "nonce": "246cd994e9771f32bb925f85dce0846b",
+      "payload": {
+        "hint": "I am always one step ahead of you.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:WEST",
+        "position": [
+          1,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[1, 5];barriers=[[0, 3], [1, 3], [2, 3], [2, 5], [3, 3], [4, 3], [5, 3], [6, 3]]",
+        "step": 26,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "3780d58aca61c8dd1553fef54c6b80141832d0462c01b3fffc53a22590f9de6f",
+      "nonce": "10780ec0079a0b379ec500a223552db8",
+      "payload": {
+        "hint": "Keep guessing, you are colder than you think.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          0,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[0, 5];barriers=[[0, 3], [1, 3], [2, 3], [2, 5], [3, 3], [4, 3], [5, 3], [6, 3]]",
+        "step": 27,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "4e6f7aba504989e1714fd162e544dd2e99c4caea295ca342153fbe0be119f99c",
+      "nonce": "90c5d8a8810ae2e7f2075fec93fe6533",
+      "payload": {
+        "hint": "The shadows here hide me well tonight.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:EAST",
+        "position": [
+          0,
+          6
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[0, 6];barriers=[[0, 3], [1, 3], [2, 3], [2, 5], [3, 3], [3, 4], [4, 3], [5, 3], [6, 3]]",
+        "step": 28,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "5fbc7107627bab94739f7c00a17b3e76687aca32cd1fb3d21fe0493177cea8e1",
+      "nonce": "5aba1a525b8d662dfa5c34f2659f7d41",
+      "payload": {
+        "hint": "Chase all you like, the streets are mine.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:WEST",
+        "position": [
+          0,
+          5
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[0, 5];barriers=[[0, 3], [1, 3], [2, 3], [2, 5], [3, 3], [3, 4], [4, 3], [5, 3], [6, 3]]",
+        "step": 29,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "a4bb6c0b9deabacb3d037577c67038409cab4e405be8b385ff0f74004e134c04",
+      "nonce": "cf14c790299053e997a30ce07abaf59e",
+      "payload": {
+        "hint": "You will not catch me this time, officer.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:WEST",
+        "position": [
+          0,
+          4
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[0, 4];barriers=[[0, 3], [1, 3], [2, 3], [2, 5], [3, 3], [3, 4], [4, 3], [5, 3], [6, 3]]",
+        "step": 30,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "457c541452e9bc2894c0fd236443b9db8eb49474b471f9d34b268d8919dd712a",
+      "nonce": "a1635081a7a2d7855c856d7a88292a42",
+      "payload": {
+        "hint": "I am always one step ahead of you.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          1,
+          4
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[1, 4];barriers=[[0, 3], [1, 3], [2, 3], [2, 5], [3, 3], [3, 4], [4, 3], [5, 3], [6, 3]]",
+        "step": 31,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "aeb6b505e3fc9747d136cb70f3916968e78a69f308938455d4c2bfc8260eb799",
+      "nonce": "45a73d4460387fa5bf161ef2850ffbc4",
+      "payload": {
+        "hint": "Keep guessing, you are colder than you think.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:NORTH",
+        "position": [
+          0,
+          4
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[0, 4];barriers=[[0, 3], [1, 3], [1, 5], [2, 3], [2, 5], [3, 3], [3, 4], [4, 3], [5, 3], [6, 3]]",
+        "step": 32,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "a654bc3e42a23c6f55801b60c8a0aefdc1d1f0387d744922e601148bb724cc25",
+      "nonce": "2d5be78db271f82932d5bb5622bbe0d6",
+      "payload": {
+        "hint": "The shadows here hide me well tonight.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:SOUTH",
+        "position": [
+          1,
+          4
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[1, 4];barriers=[[0, 3], [1, 3], [1, 5], [2, 3], [2, 5], [3, 3], [3, 4], [4, 3], [5, 3], [6, 3]]",
+        "step": 33,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "68fe1d57f77e386d23ec95a38665d3832955c8cc77ee5d531fa47f16d1851e44",
+      "nonce": "9615c56ed176edfffad8887110fd2741",
+      "payload": {
+        "hint": "Chase all you like, the streets are mine.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:STAY",
+        "position": [
+          1,
+          4
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[1, 4];barriers=[[0, 3], [1, 3], [1, 5], [2, 3], [2, 5], [3, 3], [3, 4], [4, 3], [5, 3], [6, 3]]",
+        "step": 34,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    },
+    {
+      "commit": "5364a5f0b4964b4d1cbb3d863de56a6c58e34cdf123e950b0a76aa40afa1e503",
+      "nonce": "e5bdcb5e439c39ed2652b2746dc40e7e",
+      "payload": {
+        "hint": "You will not catch me this time, officer.",
+        "intent": "truth",
+        "model": "unknown",
+        "move": "MOVE:STAY",
+        "position": [
+          1,
+          4
+        ],
+        "prompt_discussion": {
+          "bluff_classification": "truth",
+          "llm_prompt": "",
+          "llm_reasoning": ""
+        },
+        "random_move": false,
+        "response_seconds": 0.0,
+        "state": "grid=7x7;self=[1, 4];barriers=[[0, 3], [1, 3], [1, 5], [2, 3], [2, 5], [3, 3], [3, 4], [4, 3], [5, 3], [6, 3]]",
+        "step": 35,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "verdict": "truth"
+      }
+    }
+  ],
+  "schema_version": "1.1",
+  "summary": {
+    "audit": {},
+    "duration_seconds": 0,
+    "ended_at": "2026-08-16T22:24:48.110423+00:00",
+    "github_commit": {
+      "sharNamr": "1da299a745b81c80e84485ab3cbc81011e87ec08",
+      "yanell11": "unknown"
+    },
+    "group_id": "sharNamr",
+    "opponent_group_id": "yanell11",
+    "result": "survival",
+    "result_reason": "survived the agreed limit of 35 steps",
+    "role": "thief",
+    "started_at": "2026-08-16T22:23:56.499100+00:00",
+    "steps": 35,
+    "sub_game_number": 6,
+    "timezone": "UTC",
+    "tokens_total": 0,
+    "winner_role": "thief"
+  }
+}

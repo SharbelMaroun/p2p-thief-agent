@@ -155,8 +155,7 @@ def play(strategy: str, opponent: str, *, use_cop_start: bool) -> tuple[bool, in
     return True, HORIZON, closest
 
 
-ARMS = [("current", False), ("current", True),
-        ("barrier_aware_v2", False), ("barrier_aware_v2", True)]
+ARMS = [("current", True), ("barrier_aware_v2", True), ("open_field_v3", True)]
 OPPONENTS = [*REPLAYS, "chaser", "cutoff"]
 
 print(f"{'thief arm':<28}" + "".join(f"{o:>12}" for o in OPPONENTS))
