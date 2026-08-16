@@ -11,71 +11,13 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from p2p_thief_agent.adapters.negotiated_terms import cop_start, grid_size
+from p2p_thief_agent.adapters.private_settings import (
+    _audit_window,
+    _connect_budget,
+    _strategy,
+)
 from p2p_thief_agent.shared.series_identity import series_game_id_from_private
-
-
-def _audit_window(private: Path | None) -> float:
-    """How long to stay reachable for the opponent's audit, from the private TOML.
-
-    Never raises: a missing or unreadable private file falls back to the default window
-    rather than refusing to play. The window is generous by design — see `post_match`.
-    """
-    from p2p_thief_agent.adapters.post_match import (  # noqa: PLC0415
-        DEFAULT_AUDIT_WINDOW,
-        audit_window_seconds,
-    )
-
-    if private is None:
-        return DEFAULT_AUDIT_WINDOW
-    try:
-        from p2p_thief_agent.shared.private_config import load_private_config  # noqa: PLC0415
-
-        return audit_window_seconds(load_private_config(private))
-    except Exception:  # noqa: BLE001 - a config problem must not cost the audit window
-        return DEFAULT_AUDIT_WINDOW
-
-
-def _connect_budget(private: Path | None) -> float:
-    """How long to wait for the opponent to answer, from the private TOML.
-
-    The Cop has read ``[network].connect_timeout_seconds`` since M9; this side silently
-    kept `serve_match`'s 30-second default, and that asymmetry ended the first amireman
-    smoke at the role swap: their Police server was still rebinding for sub-game 2 when
-    our 30 seconds ran out, and the whole series quit as "match did not start". Same
-    never-raise contract as `_audit_window` — a config problem must not shrink the wait.
-    """
-    from p2p_thief_agent.services.readiness import (  # noqa: PLC0415
-        DEFAULT_CONNECT_TIMEOUT,
-        timeouts_from_private_config,
-    )
-
-    if private is None:
-        return DEFAULT_CONNECT_TIMEOUT
-    try:
-        from p2p_thief_agent.shared.private_config import load_private_config  # noqa: PLC0415
-
-        return timeouts_from_private_config(load_private_config(private))[0]
-    except Exception:  # noqa: BLE001 - a config problem must not shrink the wait
-        return DEFAULT_CONNECT_TIMEOUT
-
-
-def _strategy(private: Path | None) -> dict:
-    """Per-opponent strategy flags from the private TOML's ``[strategy]`` table.
-
-    Private on purpose: these describe the OPPONENT's protocol profile (e.g. amireman's
-    Cop claims its own cell every turn, so ``claim_reveals_cop`` turns that claim into
-    pursuer intel), and never enter the signed terms. Same never-raise contract as the
-    other private readers — a config problem costs the flag, not the match.
-    """
-    if private is None:
-        return {}
-    try:
-        from p2p_thief_agent.shared.private_config import load_private_config  # noqa: PLC0415
-
-        section = load_private_config(private).get("strategy")
-        return dict(section) if isinstance(section, dict) else {}
-    except Exception:  # noqa: BLE001 - a config problem must not cost the match
-        return {}
 
 
 def resolve_peer_address(peer: str | None, private: Path | None) -> str:
@@ -162,7 +104,12 @@ def play(args: argparse.Namespace) -> int:
     decide = make_decide(
         threshold=args.threshold,
         claim_reveals_cop=bool(strat.get("claim_reveals_cop")),
-        strategy=str(strat.get("policy", "current")),  # default-off: known-good adaptive
+        # `policy` OR `name` -- see `_strategy` for why both are read.
+        strategy=str(strat.get("policy") or strat.get("name") or "current"),
+        # Both sharpeners come from the signed terms; see `negotiated_terms` for why a
+        # uniform first belief and a hardcoded 7 were each worth removing.
+        cop_start=cop_start(game_config),
+        grid_size=grid_size(game_config),
     )
     try:
         result = serve_match(
