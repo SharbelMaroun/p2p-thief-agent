@@ -68,7 +68,17 @@ def scent_model_record(outer_ring: float = DEFAULT_OUTER_RING_DELTA) -> dict:
     profile[str(OUTER_RING_SQUARED_DISTANCE)] = require_outer_ring(outer_ring)
     return {
         "model": "multiplicative-decay",
-        "update": "tau_next = max(0, (1 - decay_per_step) * tau + emission)",
+        # The UPPER clamp belongs in the declared string because `settle` applies it
+        # (`U-031`/companion `C-048`). It was missing here until 2026-08-16 while the
+        # physics had already been clamped, so this peer published a locked description of
+        # a model it does not run -- declaring an unbounded tau while emitting a bounded
+        # one. Rule 23 sanctions a deviation between the declared model and the emitted
+        # field, and this was that deviation pointing the other way: an auditor recomputing
+        # our saturated cells from this record would predict values above what we send.
+        # It also split the team: the companion Cop locked `c77a1260...` and this peer
+        # still answered `e6aef097...`, so one team declared two models.
+        "update": "tau_next = min(max(0, (1 - decay_per_step) * tau + emission), "
+                  "center_intensity)",
         "center_intensity": EMISSION_CENTER,
         "decay_per_step": DECAY_RATE,
         "field_size": FIELD_SIZE,

@@ -38,7 +38,18 @@ TERMS = {
 }
 
 # The lock over the default model, reproduced independently by the Cop peer.
-AGREED_DEFAULT_LOCK = "e6aef0978ff91fe8aaf7d0a49d8bb839f03cd259a554e4251c182a20b02c6ea1"
+#
+# Moved 2026-08-16 from `e6aef097...` when the upper clamp entered the declared `update`
+# string (`U-031`). The old value is worth remembering rather than deleting: the clamp
+# reached this repository's *physics* days earlier, and only the declaration lagged, so
+# between those dates this constant asserted agreement with the Cop that no longer held --
+# the Cop answered `c77a1260...` while this peer answered `e6aef097...`, and the test that
+# exists precisely to catch a cross-peer split went on passing.
+#
+# It could not catch it: the digest is recomputed from THIS repository alone, so a literal
+# updated on one side only records agreement instead of checking it. The real cross-peer
+# check is `export_scent_parity.py`/`test_scent_parity`, which compares emitted fields.
+AGREED_DEFAULT_LOCK = "c77a12609b9f1c3df90067ce166b6b0455c8343dba9d463b0e8e402f8469b34f"
 
 
 def test_the_record_carries_the_formula_constants_field_and_profile() -> None:

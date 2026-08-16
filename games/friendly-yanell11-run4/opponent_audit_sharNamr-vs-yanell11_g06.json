@@ -1,0 +1,593 @@
+{
+  "_note": "The opponent's revealed audit payloads, exactly as received, after our verifier confirmed every commitment reproduces. Retained as evidence: these records fix where their agent actually was, which a capture claim alone does not (C-051).",
+  "_schema": "opponent-audit",
+  "audits": [
+    {
+      "records": [
+        {
+          "commit": "dd1285fa894aa7a041df485839e7db3932a0b05b3b86505a5fb80077facd08ab",
+          "nonce": "336d02080b109698af45492f86e1035d",
+          "payload": {
+            "code_version": "1.00",
+            "github_commit": "290de3cc6f8d0fe2a1b05fddd0de96a50e791229",
+            "group_name": "YANELL11",
+            "model": "claude-haiku-4-5",
+            "spec": {
+              "cpu_cores": 12,
+              "cpu_mhz": 2592.0,
+              "gpu": "none detected",
+              "machine": "AMD64",
+              "os": "Windows 10",
+              "python": "3.10.20",
+              "ram_gb": 15.77
+            },
+            "step": 0,
+            "sub_game_number": 6,
+            "token_budget": 200000,
+            "type": "system_spec"
+          }
+        },
+        {
+          "commit": "4e8773e65dd07205a8f5da261e97a35096ab1b2bd22dde16f1b5a28d4ceb1ede",
+          "nonce": "e91a4b4c1b55df72a023e5df7d36c184",
+          "payload": {
+            "hint": "Somewhere between Mount Carmel and nowhere, good luck.",
+            "intent": "truth",
+            "move": "move:E",
+            "position": [
+              0,
+              1
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[0, 1];barriers=[]",
+            "step": 1,
+            "tokens_step": 0,
+            "tokens_total": 0,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "35eddd36fda7b5585ff871b3bcfda5d63d2366e815c031097c47fda34fda43d9",
+          "nonce": "b8e0740491ae91e7be3017e4f310e837",
+          "payload": {
+            "hint": "the German Colony keeps my secrets better than you keep pace.",
+            "intent": "truth",
+            "move": "move:E",
+            "position": [
+              0,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[0, 2];barriers=[]",
+            "step": 2,
+            "tokens_step": 0,
+            "tokens_total": 0,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "4789ebc2feb723b090724a946b0834ceace7a55bfcd02974cf7fadd760693bb6",
+          "nonce": "aea3f0378d7ad976073c392284252c16",
+          "payload": {
+            "hint": "Better luck next time, criminal\u2014the Bah\u00e1\u02bc\u00ed Gardens remember every footstep.",
+            "intent": "truth",
+            "move": "move:STAY",
+            "position": [
+              0,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[0, 2];barriers=[[0, 3]]",
+            "step": 3,
+            "tokens_step": 124,
+            "tokens_total": 124,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "2b5c1cf073d910373bb23e1cf667eaa14f6b1a084238bc4897581f81d0aafc35",
+          "nonce": "b92a65d14c63bc5c41d5e9e1eaa68aae",
+          "payload": {
+            "hint": "I could be watching you from Wadi Nisnas at this very moment.",
+            "intent": "truth",
+            "move": "move:S",
+            "position": [
+              1,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[1, 2];barriers=[[0, 3]]",
+            "step": 4,
+            "tokens_step": 0,
+            "tokens_total": 124,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "cc7acc85c1085b011434da0d47701232d3eadb6f35b16492db450eb8275e07b3",
+          "nonce": "de0f636c9ac4bff6fa167545e74ae52f",
+          "payload": {
+            "hint": "The city hides me well, ask the Louis Promenade if you doubt it.",
+            "intent": "truth",
+            "move": "move:STAY",
+            "position": [
+              1,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[1, 2];barriers=[[0, 3], [1, 3]]",
+            "step": 5,
+            "tokens_step": 0,
+            "tokens_total": 124,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "aa60d991bf3f550d21a739b8cc9a1848dcef185f02b7c5cee5378f08048dc930",
+          "nonce": "55a0d7413dbc81a0530b17fcefabcdb9",
+          "payload": {
+            "hint": "Your breath fogs the Stella Maris air\u2014we're closing in, criminal.",
+            "intent": "truth",
+            "move": "move:S",
+            "position": [
+              2,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[2, 2];barriers=[[0, 3], [1, 3]]",
+            "step": 6,
+            "tokens_step": 122,
+            "tokens_total": 246,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "87ce96b5b3165aa249e0f11356371cea23dd60ac2448f0a867109486f6049fa4",
+          "nonce": "9b00d9a386ca7fa05ee0538ba6b5d630",
+          "payload": {
+            "hint": "Mount Carmel keeps my secrets better than you keep pace.",
+            "intent": "truth",
+            "move": "move:STAY",
+            "position": [
+              2,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[2, 2];barriers=[[0, 3], [1, 3], [2, 3]]",
+            "step": 7,
+            "tokens_step": 0,
+            "tokens_total": 246,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "b3cc6f2c2b54ea08ba814dbd4046be4d1cc56cb45e4ae4978d91369c50a02bd1",
+          "nonce": "d20832bcf9b2dc841f3523011e556b46",
+          "payload": {
+            "hint": "Every alley near the German Colony tells a different story about me.",
+            "intent": "truth",
+            "move": "move:S",
+            "position": [
+              3,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[3, 2];barriers=[[0, 3], [1, 3], [2, 3]]",
+            "step": 8,
+            "tokens_step": 0,
+            "tokens_total": 246,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "fcc7b862d4e8e663d59995eabb70c94495d3674aaac14d56a68c85cf188f6080",
+          "nonce": "ca43f442b53739b6ca631ecdde775ad5",
+          "payload": {
+            "hint": "Your criminal instincts can't match the Carmel's ancient wisdom, fugitive.",
+            "intent": "truth",
+            "move": "move:S",
+            "position": [
+              4,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[4, 2];barriers=[[0, 3], [1, 3], [2, 3]]",
+            "step": 9,
+            "tokens_step": 122,
+            "tokens_total": 368,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "84e2cbe6d7494bce18d564a26b8c59edbbca1724c159c1d16d0b4e41a1e2d639",
+          "nonce": "ef468ac129d1f071bf8ab9879987a624",
+          "payload": {
+            "hint": "The city hides me well, ask Wadi Nisnas if you doubt it.",
+            "intent": "truth",
+            "move": "move:STAY",
+            "position": [
+              4,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[4, 2];barriers=[[0, 3], [1, 3], [2, 3], [4, 3]]",
+            "step": 10,
+            "tokens_step": 0,
+            "tokens_total": 368,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "85ae39c0669f36905b070f703cf3bc7e9db783723cfafbd4b5e1e01622ee5dfc",
+          "nonce": "e044f21455ab432f22bfdb08ec5776e8",
+          "payload": {
+            "hint": "Somewhere between the Louis Promenade and nowhere, good luck.",
+            "intent": "truth",
+            "move": "move:S",
+            "position": [
+              5,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[5, 2];barriers=[[0, 3], [1, 3], [2, 3], [4, 3]]",
+            "step": 11,
+            "tokens_step": 0,
+            "tokens_total": 368,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "d8d91cf8fa9fec1ebfd7a3e16806c2552505058846b247b0d284ea1972d7ad08",
+          "nonce": "e9525c2c8605269bd75b3d106f8c7cec",
+          "payload": {
+            "hint": "\"We can see the Stella Maris from here, and you're running out of time!\"",
+            "intent": "truth",
+            "move": "move:STAY",
+            "position": [
+              5,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[5, 2];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3]]",
+            "step": 12,
+            "tokens_step": 124,
+            "tokens_total": 492,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "39f4c656ca960b0ace5db7c2136deb613dd2adedca74d7973c3f904f90d0b404",
+          "nonce": "51a09cfa809fa98a112205e3b168a61b",
+          "payload": {
+            "hint": "Every alley near Mount Carmel tells a different story about me.",
+            "intent": "truth",
+            "move": "move:S",
+            "position": [
+              6,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[6, 2];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3]]",
+            "step": 13,
+            "tokens_step": 0,
+            "tokens_total": 492,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "26fb928642b8fe426ffed41fc9aa30781a1737b854b367abc82c2e119ae7013e",
+          "nonce": "dae725ad4ce125ab8165fd7f2ee5d6b3",
+          "payload": {
+            "hint": "I could be watching you from the German Colony at this very moment.",
+            "intent": "truth",
+            "move": "move:STAY",
+            "position": [
+              6,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[6, 2];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 14,
+            "tokens_step": 0,
+            "tokens_total": 492,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "33fe62ffbfc43111dd4a20e93eaf015e2f84917c6a3175147f94023368aab894",
+          "nonce": "469195ac7dbf1a5c9c26aa419769520f",
+          "payload": {
+            "hint": "We're closing in, criminal\u2014the Baha'i Gardens won't shelter you forever!",
+            "intent": "truth",
+            "move": "move:N",
+            "position": [
+              5,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[5, 2];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 15,
+            "tokens_step": 123,
+            "tokens_total": 615,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "d471c5f0151317c31450340e3174ae78ca0a143041cb00e4671406a315bc2a5b",
+          "nonce": "a5b71d1a6025d8016af4e0211abb99ae",
+          "payload": {
+            "hint": "Somewhere between Wadi Nisnas and nowhere, good luck.",
+            "intent": "truth",
+            "move": "move:N",
+            "position": [
+              4,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[4, 2];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 16,
+            "tokens_step": 0,
+            "tokens_total": 615,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "6658d37a3c42f3c865eca405a1842a93d341777af249eaa815400cfca414598b",
+          "nonce": "32153b07cbb7f3078dbfdc3dca64d8bd",
+          "payload": {
+            "hint": "the Louis Promenade keeps my secrets better than you keep pace.",
+            "intent": "truth",
+            "move": "move:N",
+            "position": [
+              3,
+              2
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[3, 2];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 17,
+            "tokens_step": 0,
+            "tokens_total": 615,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "34d7693023aa19c552623d09a1b9d3054ba2ad8fbd0f1cba93b46c67394afa3b",
+          "nonce": "7234c98837a97ede357e2b20c1f85a5d",
+          "payload": {
+            "hint": "Your criminal instincts won't help you under the Stella Maris gaze.",
+            "intent": "truth",
+            "move": "move:E",
+            "position": [
+              3,
+              3
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[3, 3];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 18,
+            "tokens_step": 122,
+            "tokens_total": 737,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "5b7700ad78606fc5c0f28d410e9f83c6f23fcaa34cbee2eebf4e30a878abe943",
+          "nonce": "075387f2dc3ae392f06e4143f3f836d4",
+          "payload": {
+            "hint": "I could be watching you from Mount Carmel at this very moment.",
+            "intent": "truth",
+            "move": "move:E",
+            "position": [
+              3,
+              4
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[3, 4];barriers=[[0, 3], [1, 3], [2, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 19,
+            "tokens_step": 0,
+            "tokens_total": 737,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "07be271ecceda8f95536698c073cc5bb63a264182a1f9cd73455682a7d1a33aa",
+          "nonce": "125ca46657cbbf6bd25e5dae5d8d119c",
+          "payload": {
+            "hint": "The city hides me well, ask the German Colony if you doubt it.",
+            "intent": "truth",
+            "move": "move:STAY",
+            "position": [
+              3,
+              4
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[3, 4];barriers=[[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 20,
+            "tokens_step": 0,
+            "tokens_total": 737,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "a395210eaa96649cd3ab0055d9a0a3e9e7e6a58a4ac71515a93158199d50d668",
+          "nonce": "6ae19999be6df95138f8ae0e806c0f29",
+          "payload": {
+            "hint": "Your fugitive skills won't match the views from Stella Maris, criminal.",
+            "intent": "truth",
+            "move": "move:N",
+            "position": [
+              2,
+              4
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[2, 4];barriers=[[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 21,
+            "tokens_step": 121,
+            "tokens_total": 858,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "bd748610a582149d54e30f2b8a180cd27a7ff8c3c4e4d1f4e90f2dea4aa9d72c",
+          "nonce": "0664e179163209d0ac610742bb66f3cf",
+          "payload": {
+            "hint": "Wadi Nisnas keeps my secrets better than you keep pace.",
+            "intent": "truth",
+            "move": "move:STAY",
+            "position": [
+              2,
+              4
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[2, 4];barriers=[[0, 3], [1, 3], [1, 4], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 22,
+            "tokens_step": 0,
+            "tokens_total": 858,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "f8fec2cb6a844449240e4f5b70c790f5125a0ad42ecadd278033ff33decf8e4a",
+          "nonce": "55627f8fe4b4618a572709bad112689c",
+          "payload": {
+            "hint": "Every alley near the Louis Promenade tells a different story about me.",
+            "intent": "truth",
+            "move": "move:E",
+            "position": [
+              2,
+              5
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[2, 5];barriers=[[0, 3], [1, 3], [1, 4], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 23,
+            "tokens_step": 0,
+            "tokens_total": 858,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "daca824688cfbb0a9a2279efe4738f0ce4a741a0cb30ea7fe42308b87971d453",
+          "nonce": "8eac78f1926a5b81ee2f44d2b4f93839",
+          "payload": {
+            "hint": "\"The Stella Maris lighthouse watches all who pass through these sacred streets.\"",
+            "intent": "truth",
+            "move": "move:STAY",
+            "position": [
+              2,
+              5
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[2, 5];barriers=[[0, 3], [1, 3], [1, 4], [1, 5], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 24,
+            "tokens_step": 120,
+            "tokens_total": 978,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "9c6b7136dfc75a798ef85135afc459c993db92e3ea4ebba9c3056f7d257b7d88",
+          "nonce": "cc086b9ff731a6cb52775d1e4d8bff36",
+          "payload": {
+            "hint": "The city hides me well, ask Mount Carmel if you doubt it.",
+            "intent": "truth",
+            "move": "move:E",
+            "position": [
+              2,
+              6
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[2, 6];barriers=[[0, 3], [1, 3], [1, 4], [1, 5], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 25,
+            "tokens_step": 0,
+            "tokens_total": 978,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "c65bf65988419c99ac2edc51654f134015d3fce45625b1cb9225b7e8c560e7c5",
+          "nonce": "d4426bb5bc60e93d8448431402b1fe49",
+          "payload": {
+            "hint": "Somewhere between the German Colony and nowhere, good luck.",
+            "intent": "truth",
+            "move": "move:N",
+            "position": [
+              1,
+              6
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[1, 6];barriers=[[0, 3], [1, 3], [1, 4], [1, 5], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 26,
+            "tokens_step": 0,
+            "tokens_total": 978,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "12dd3b328aa4f45a6adf90742f974dbc2423cee6248a13b4c8975a0ca7b4cdbf",
+          "nonce": "f77f657d4e59ada7c477b36927eb0063",
+          "payload": {
+            "hint": "You can't escape the shadow of the Bah\u00e1'\u00ed Gardens\u2014we're closing in, thief!",
+            "intent": "truth",
+            "move": "move:N",
+            "position": [
+              0,
+              6
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[0, 6];barriers=[[0, 3], [1, 3], [1, 4], [1, 5], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 27,
+            "tokens_step": 126,
+            "tokens_total": 1104,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "f22c7af56125625918ea98c73487296a5370734ac1ecccf9de8d3de36e5b5abe",
+          "nonce": "fb9a56118c203a26d9feeeb99d1bb815",
+          "payload": {
+            "hint": "Every alley near Wadi Nisnas tells a different story about me.",
+            "intent": "truth",
+            "move": "move:W",
+            "position": [
+              0,
+              5
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[0, 5];barriers=[[0, 3], [1, 3], [1, 4], [1, 5], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 28,
+            "tokens_step": 0,
+            "tokens_total": 1104,
+            "type": "turn"
+          }
+        },
+        {
+          "commit": "daf3235fe927324f17875eeb7742f5ebdde897e364b4bbf4dd0e4025812b6256",
+          "nonce": "9b9e5300753a9e907fa2820ca3090f39",
+          "payload": {
+            "hint": "I could be watching you from the Louis Promenade at this very moment.",
+            "intent": "truth",
+            "move": "move:STAY",
+            "position": [
+              0,
+              5
+            ],
+            "role": "police",
+            "state": "grid=7x7;self=[0, 5];barriers=[[0, 3], [0, 4], [1, 3], [1, 4], [1, 5], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]",
+            "step": 29,
+            "tokens_step": 0,
+            "tokens_total": 1104,
+            "type": "turn"
+          }
+        }
+      ],
+      "result_claim": {
+        "how": "capture claim",
+        "type": "capture",
+        "winner": "police"
+      },
+      "sender": "police"
+    }
+  ],
+  "game_id": "sharNamr-vs-yanell11",
+  "opponent_group_id": "yanell11",
+  "sub_game_number": 6
+}
