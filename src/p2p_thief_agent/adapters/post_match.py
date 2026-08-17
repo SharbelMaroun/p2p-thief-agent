@@ -141,31 +141,12 @@ def finalise(
         return audited
     context = None
     if agreement is not None and game_config is not None and identity is not None:
-        from p2p_thief_agent.protocol.crypto import canonical_sha256
-        from p2p_thief_agent.protocol.terms_projection import terms_from_shared_config
-        from p2p_thief_agent.shared.series_identity import derive_game_uid, series_label
+        from p2p_thief_agent.adapters.log_identity import series_log_context
 
-        sha = canonical_sha256(dict(game_config))
-        # The agreed label names the files; the shared derivation names the set. Both are
-        # computed here rather than defaulted, because a default is how this repository
-        # and the companion drifted into two naming schemes for one G009 series.
-        opponent_gid = str(agreement.peer_identity.get("group_id", "unknown"))
-        context = log_context(
-            sha=sha, sub_game=sub_game, identity=identity,
-            opponent_group_id=agreement.peer_identity.get("group_id", "unknown"),
-            started_at=started_at, confirmed=audited,
-            opponent_commit=agreement.peer_identity.get("git_commit_hash", "unknown"),
-            game_id=series_game_id,
-            # The LABEL is threaded, not dropped. Without it this log carried the
-            # unlabelled uid while the result carried the labelled one -- two names for
-            # one series inside our own evidence (friendly-9).
-            game_uid=derive_game_uid(
-                terms_from_shared_config(dict(game_config)),
-                [str(identity.get("group_id", "unknown")), opponent_gid],
-                series_label(series_game_id,
-                             [str(identity.get("group_id", "unknown")), opponent_gid]),
-            ),
-        )
+        context = series_log_context(
+            agreement=agreement, game_config=game_config, identity=identity,
+            sub_game=sub_game, started_at=started_at, audited=audited,
+            series_game_id=series_game_id, log_context=log_context)
     write_log(artifacts_dir, records, result, context)
     # Companion `C-051`: keep THEIR evidence, not just our verdict on it. `audit_peer` has
     # just verified every commitment in these payloads; discarding them left us unable to
