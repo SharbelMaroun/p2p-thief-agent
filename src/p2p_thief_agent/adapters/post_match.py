@@ -143,7 +143,7 @@ def finalise(
     if agreement is not None and game_config is not None and identity is not None:
         from p2p_thief_agent.protocol.crypto import canonical_sha256
         from p2p_thief_agent.protocol.terms_projection import terms_from_shared_config
-        from p2p_thief_agent.shared.series_identity import derive_game_uid
+        from p2p_thief_agent.shared.series_identity import derive_game_uid, series_label
 
         sha = canonical_sha256(dict(game_config))
         # The agreed label names the files; the shared derivation names the set. Both are
@@ -156,9 +156,14 @@ def finalise(
             started_at=started_at, confirmed=audited,
             opponent_commit=agreement.peer_identity.get("git_commit_hash", "unknown"),
             game_id=series_game_id,
+            # The LABEL is threaded, not dropped. Without it this log carried the
+            # unlabelled uid while the result carried the labelled one -- two names for
+            # one series inside our own evidence (friendly-9).
             game_uid=derive_game_uid(
                 terms_from_shared_config(dict(game_config)),
                 [str(identity.get("group_id", "unknown")), opponent_gid],
+                series_label(series_game_id,
+                             [str(identity.get("group_id", "unknown")), opponent_gid]),
             ),
         )
     write_log(artifacts_dir, records, result, context)

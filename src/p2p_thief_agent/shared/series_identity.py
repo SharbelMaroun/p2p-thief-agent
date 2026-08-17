@@ -56,7 +56,8 @@ def series_game_id(config: Mapping[str, object]) -> str:
     return label
 
 
-def derive_game_uid(terms: Mapping[str, object], group_ids: Sequence[str]) -> str:
+def derive_game_uid(terms: Mapping[str, object], group_ids: Sequence[str],
+                    game_id: str | None = None) -> str:
     """The shared derivation: a UUID from the agreed terms and the sorted group pair.
 
     Byte-compatible with the companion's `reporting/series_consensus.derive_game_uid` and
@@ -67,9 +68,23 @@ def derive_game_uid(terms: Mapping[str, object], group_ids: Sequence[str]) -> st
     Replaces ``config_sha256[:32]``, a value only this side computed, so the log carried an
     identifier that appeared in no report from either team.
     """
+    # Two branches, agreed with `yanell11` on 2026-08-17 and pinned on both sides.
+    #
+    #   no label  -> seed tail is "|".join(sorted(group_ids))   (unchanged)
+    #   label set -> seed tail is the agreed game_id
+    #
+    # The unlabelled form consumes only the terms and the pair, so it CANNOT tell two
+    # series between the same peers apart -- runs 4, 7 and 8 all carried
+    # `9b80122e-...`. The labelled form gives each series its own identity.
+    #
+    # The two tails are different strings for the same pair -- `a-vs-b` is not `a|b` --
+    # which is precisely the trap in the spec `yanell11` first sent us: it described only
+    # the labelled formula while claiming the unlabelled value was preserved. Following it
+    # literally renames every artifact either team has written. Both branches stay.
+    tail = game_id if game_id else "|".join(sorted(group_ids))
     seed = (json.dumps(dict(terms), sort_keys=True, ensure_ascii=False,
                        separators=(",", ":")).encode("utf-8")
-            + b"|" + "|".join(sorted(group_ids)).encode("utf-8"))
+            + b"|" + tail.encode("utf-8"))
     return str(uuid.UUID(bytes=hashlib.sha256(seed).digest()[:16]))
 
 
@@ -91,3 +106,23 @@ def series_game_id_from_private(private: object) -> str:
             "(declaration_<id>.json, config_<id>_gNN.json, log_<id>_gNN.json)"
         )
     return series_game_id(load_private_config(Path(private)))
+
+
+def series_label(series_id: str, group_ids: Sequence[str]) -> str | None:
+    """Return `series_id` when it is a LABELLED pair id, else None.
+
+    Byte-compatible with the companion Cop's `adapters/report_identity.series_label`, and
+    it has to be: the two repositories name the artifacts of one series, so a label one
+    side recognises and the other does not puts two uids on the same six sub-games. That
+    is exactly what friendly-9 shipped -- the Cop log, the Thief log and the result each
+    carried a different identity.
+
+    The trigger is the id's SHAPE (`"<a>-vs-<b>-<label>"`) rather than a flag, so the name
+    and the uid cannot disagree: the name IS the trigger. `G009` and the bare pair keep
+    the derivation they were reported under.
+    """
+    for first, second in ((group_ids[0], group_ids[1]), (group_ids[1], group_ids[0])):
+        pair = f"{first}-vs-{second}"
+        if series_id.startswith(f"{pair}-") and len(series_id) > len(pair) + 1:
+            return series_id
+    return None
