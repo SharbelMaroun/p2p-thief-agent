@@ -83,7 +83,11 @@ def test_a_correct_capture_claim_ends_the_run_early_over_the_wire(remote_peer) -
     )
 
     assert result.outcome is Outcome.CAPTURE
-    assert result.steps == 2
+    # The COP's step, not ours (`yanell11`, 2026-08-17): a capture settles in the numbering
+    # of the side that caused it. The claim rides the Cop's message numbered 1, which this
+    # peer reads on its own step 2, so the answer is 1. Asserted 2 until then -- our own
+    # concession turn -- which is the 29-against-28 our two reports disagreed on.
+    assert result.steps == 1, "a capture settles on the Cop's turn, not on our concession"
     assert result.audit["result_claim"] == "capture"
 
     turns = [e for e in transcript_entries(transcript) if e["tool"] == "receive_turn"]

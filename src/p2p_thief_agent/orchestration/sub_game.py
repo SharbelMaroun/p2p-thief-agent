@@ -27,6 +27,7 @@ from contextlib import suppress
 from dataclasses import dataclass
 
 from p2p_thief_agent.orchestration.phases import PhaseMachine
+from p2p_thief_agent.orchestration.settled_step import capture_step
 from p2p_thief_agent.orchestration.turn_loop import (
     Decide,
     Deliver,
@@ -114,8 +115,11 @@ def run_sub_game_over_wire(
             if isinstance(answer, dict) and answer.get("caught") is True:
                 caught = f"we conceded capture at {answer.get('claim')!r}"
         if caught is not None:
-            return _finish(Outcome.CAPTURE, step, caught, turns, ledger, transport,
-                           send_audit, step_zero)
+            # THEIR step, not ours: a capture is caused by the Cop, so it settles in the
+            # Cop's numbering. Our concession is a real sealed turn one step later, which
+            # is why our counter read 29 where theirs read 28 on the same sub-game.
+            return _finish(Outcome.CAPTURE, capture_step(record.received, step), caught,
+                           turns, ledger, transport, send_audit, step_zero)
 
     return _finish(
         Outcome.SURVIVAL,

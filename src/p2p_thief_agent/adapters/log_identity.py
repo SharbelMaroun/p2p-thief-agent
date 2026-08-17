@@ -25,12 +25,14 @@ def series_log_context(
     audited: bool,
     series_game_id: str,
     log_context: Callable[..., dict],
+    opponent_audits: object = (),
 ) -> dict:
     """Build the log context for one finished sub-game, fully identified.
 
     `log_context` is injected so this module stays free of the artifact-writing layer it
     names for -- the same reason the caller passes it rather than importing it here.
     """
+    from p2p_thief_agent.perception.opponent_spec import opponent_commit
     from p2p_thief_agent.protocol.crypto import canonical_sha256
     from p2p_thief_agent.protocol.terms_projection import terms_from_shared_config
     from p2p_thief_agent.shared.series_identity import derive_game_uid, series_label
@@ -45,7 +47,11 @@ def series_log_context(
         opponent_group_id=peer.get("group_id", "unknown"),
         started_at=started_at,
         confirmed=audited,
-        opponent_commit=peer.get("git_commit_hash", "unknown"),
+        # Their negotiation identity first, then the Step-0 attestation they disclosed.
+        # This filed "unknown" on every sub-game while the value sat in the first record
+        # of every audit they revealed -- fixed on the companion Cop and left here.
+        opponent_commit=(peer.get("git_commit_hash")
+                         or opponent_commit(opponent_audits) or "unknown"),
         game_id=series_game_id,
         # The LABEL is threaded, not dropped. Without it this log carried the unlabelled
         # uid while the result carried the labelled one -- two names for one series inside

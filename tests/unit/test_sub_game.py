@@ -52,16 +52,23 @@ def test_surviving_the_threshold_wins_inclusively() -> None:
 def test_a_correct_capture_claim_ends_the_sub_game() -> None:
     """Only this peer knows it was there, so it is this peer that concedes.
 
-    The claim arrives on the Cop's first message, which this peer reads at **step 3**
-    — step 1 opens without waiting, so the opponent's messages land one turn later
-    than their own numbering suggests.
+    **The settled step is the COP's, not ours** (`yanell11`, 2026-08-17). This asserted 3
+    until then, and the old docstring explained why in the very words that show it was
+    wrong: "step 1 opens without waiting, so the opponent's messages land one turn later
+    than their own numbering suggests." That offset is not a quirk to document -- it is the
+    28-against-29 our two teams' reports disagreed on for three series.
+
+    A capture is caused by the Cop, so it settles in the Cop's numbering. The claim here
+    rides the Cop's message numbered **2**, which this peer reads on its own step 3, so the
+    answer is 2. Both sides now read the same integer off the same bytes instead of each
+    reporting its own counter.
     """
     result = play(
         Opponent(cop_turn(1), cop_turn(2, capture_claim=[3, 2]), cop_turn(3)),
         answer=lambda cell: cell == [3, 2],
     )
     assert result.outcome is Outcome.CAPTURE
-    assert result.steps == 3
+    assert result.steps == 2, "a capture settles on the Cop's turn, not on our concession"
     assert "capture claim at [3, 2] was correct" in result.reason
 
 

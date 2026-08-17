@@ -146,7 +146,8 @@ def finalise(
         context = series_log_context(
             agreement=agreement, game_config=game_config, identity=identity,
             sub_game=sub_game, started_at=started_at, audited=audited,
-            series_game_id=series_game_id, log_context=log_context)
+            series_game_id=series_game_id, log_context=log_context,
+            opponent_audits=audit_peer.audits_verified)
     write_log(artifacts_dir, records, result, context)
     # Companion `C-051`: keep THEIR evidence, not just our verdict on it. `audit_peer` has
     # just verified every commitment in these payloads; discarding them left us unable to
