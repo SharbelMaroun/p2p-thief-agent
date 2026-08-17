@@ -147,7 +147,12 @@ def finalise(
             agreement=agreement, game_config=game_config, identity=identity,
             sub_game=sub_game, started_at=started_at, audited=audited,
             series_game_id=series_game_id, log_context=log_context,
-            opponent_audits=audit_peer.audits_verified)
+            # , NOT . The latter holds one PASS/FAIL
+            # report per audit -- {passed, failed_steps} -- with no records in it, so the
+            # Step-0 reader searched a list of verdicts and correctly found nothing. Their
+            # commit stayed "unknown" on every Thief row while the attestation sat in the
+            # payload list beside it. Two lists whose names both sound like the evidence.
+            opponent_audits=audit_peer.opponent_audits)
     write_log(artifacts_dir, records, result, context)
     # Companion `C-051`: keep THEIR evidence, not just our verdict on it. `audit_peer` has
     # just verified every commitment in these payloads; discarding them left us unable to
